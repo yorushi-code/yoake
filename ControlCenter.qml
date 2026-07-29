@@ -8,6 +8,20 @@ import Quickshell.Bluetooth
 Item {
     id: root
 
+    // Animations bind to this, not to the toggle. The panel is created lazily,
+    // which means it is born with the toggle already true — an entry animation
+    // bound straight to the toggle has nothing to animate from and the panel
+    // simply appears at its final size. `armed` turns on a frame later, so the
+    // open state is always a transition.
+    readonly property bool open: Toggles.controlCenterOpen && root.armed
+    property bool armed: false
+    Component.onCompleted: armTick.start()
+    property Timer _armTick: Timer {
+        id: armTick
+        interval: 16
+        onTriggered: root.armed = true
+    }
+
     PwObjectTracker {
         objects: Pipewire.defaultAudioSink ? [Pipewire.defaultAudioSink] : []
     }
@@ -69,7 +83,7 @@ Item {
         }
         color: "transparent"
         exclusiveZone: 0
-        focusable: Toggles.controlCenterOpen
+        focusable: root.open
 
         readonly property int cardWidth: 320
         // 36 top inset (clears the close button) + 16 bottom, plus slack —
@@ -105,7 +119,7 @@ Item {
 
         Item {
             anchors.fill: parent
-            focus: Toggles.controlCenterOpen
+            focus: root.open
             Keys.onEscapePressed: Toggles.controlCenterOpen = false
 
             PanelChrome {
@@ -118,8 +132,8 @@ Item {
                 height: win.cardHeight
                 screenX: Screen.width - Theme.barMargin - win.cardWidth
                 screenY: Theme.barHeight + Theme.barMargin * 2
-                opacity: Toggles.controlCenterOpen ? 1 : 0
-                scale: Toggles.controlCenterOpen ? 1 : 0.9
+                opacity: root.open ? 1 : 0
+                scale: root.open ? 1 : 0.9
                 transformOrigin: Item.TopRight
                 // Duration/easing depend on direction: the open state's value
                 // is already latched by the time the Behavior fires, so this
@@ -127,16 +141,16 @@ Item {
                 // (bigger spring, longer); exit accelerates cleanly to 0.
                 Behavior on opacity {
                     NumberAnimation {
-                        duration: Toggles.controlCenterOpen ? Theme.animSlow : Theme.animExit
+                        duration: root.open ? Theme.animSlow : Theme.animExit
                         easing.type: Easing.Bezier
-                        easing.bezierCurve: Toggles.controlCenterOpen ? Theme.easeEmphasized : Theme.easeExit
+                        easing.bezierCurve: root.open ? Theme.easeEmphasized : Theme.easeExit
                     }
                 }
                 Behavior on scale {
                     NumberAnimation {
-                        duration: Toggles.controlCenterOpen ? Theme.animSlow : Theme.animExit
+                        duration: root.open ? Theme.animSlow : Theme.animExit
                         easing.type: Easing.Bezier
-                        easing.bezierCurve: Toggles.controlCenterOpen ? Theme.easeSpringBig : Theme.easeExit
+                        easing.bezierCurve: root.open ? Theme.easeSpringBig : Theme.easeExit
                     }
                 }
                 onCloseRequested: Toggles.controlCenterOpen = false
@@ -171,8 +185,8 @@ Item {
                                     Pipewire.defaultAudioSink.audio.volume = v;
                                 }
                             }
-                            opacity: Toggles.controlCenterOpen ? 1 : 0
-                            scale: Toggles.controlCenterOpen ? 1 : 0.92
+                            opacity: root.open ? 1 : 0
+                            scale: root.open ? 1 : 0.92
                             transformOrigin: Item.Top
                             Behavior on opacity {
                                 NumberAnimation { duration: Theme.animNormal; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeEmphasized }
@@ -190,8 +204,8 @@ Item {
                             // the Fn keys too, and this has to follow.
                             value: Brightness.value
                             onMoved: v => Brightness.set(v)
-                            opacity: Toggles.controlCenterOpen ? 1 : 0
-                            scale: Toggles.controlCenterOpen ? 1 : 0.92
+                            opacity: root.open ? 1 : 0
+                            scale: root.open ? 1 : 0.92
                             transformOrigin: Item.Top
                             Behavior on opacity {
                                 SequentialAnimation {
@@ -211,8 +225,8 @@ Item {
                         Column {
                             width: parent.width
                             spacing: 6
-                            opacity: Toggles.controlCenterOpen ? 1 : 0
-                            scale: Toggles.controlCenterOpen ? 1 : 0.92
+                            opacity: root.open ? 1 : 0
+                            scale: root.open ? 1 : 0.92
                             transformOrigin: Item.Top
                             Behavior on opacity {
                                 SequentialAnimation {
@@ -277,8 +291,8 @@ Item {
                         Column {
                             width: parent.width
                             spacing: 6
-                            opacity: Toggles.controlCenterOpen ? 1 : 0
-                            scale: Toggles.controlCenterOpen ? 1 : 0.92
+                            opacity: root.open ? 1 : 0
+                            scale: root.open ? 1 : 0.92
                             transformOrigin: Item.Top
                             Behavior on opacity {
                                 SequentialAnimation {
@@ -346,8 +360,8 @@ Item {
                             width: parent.width
                             spacing: 6
                             visible: Power.available
-                            opacity: Toggles.controlCenterOpen ? 1 : 0
-                            scale: Toggles.controlCenterOpen ? 1 : 0.92
+                            opacity: root.open ? 1 : 0
+                            scale: root.open ? 1 : 0.92
                             transformOrigin: Item.Top
                             Behavior on opacity {
                                 SequentialAnimation {
@@ -421,7 +435,7 @@ Item {
                         // ── Palette ──
                         PalettePreview {
                             width: parent.width
-                            opacity: Toggles.controlCenterOpen ? 1 : 0
+                            opacity: root.open ? 1 : 0
                             Behavior on opacity {
                                 NumberAnimation { duration: Theme.animNormal; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeEmphasized }
                             }
@@ -439,7 +453,7 @@ Item {
                             active: Wallpaper.pauseOnBattery
                             expandable: false
                             onToggled: Wallpaper.pauseOnBattery = !Wallpaper.pauseOnBattery
-                            opacity: Toggles.controlCenterOpen ? 1 : 0
+                            opacity: root.open ? 1 : 0
                             Behavior on opacity {
                                 NumberAnimation { duration: Theme.animNormal; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeEmphasized }
                             }
@@ -451,7 +465,7 @@ Item {
                         Row {
                             width: parent.width
                             spacing: 10
-                            opacity: Toggles.controlCenterOpen ? 1 : 0
+                            opacity: root.open ? 1 : 0
                             Behavior on opacity {
                                 SequentialAnimation {
                                     PauseAnimation { duration: 180 }
@@ -487,7 +501,7 @@ Item {
                             width: parent.width
                             spacing: 6
                             visible: root.quickLaunch.length > 0
-                            opacity: Toggles.controlCenterOpen ? 1 : 0
+                            opacity: root.open ? 1 : 0
                             Behavior on opacity {
                                 SequentialAnimation {
                                     PauseAnimation { duration: 200 }
@@ -576,8 +590,8 @@ Item {
                         Row {
                             width: parent.width
                             spacing: 8
-                            opacity: Toggles.controlCenterOpen ? 1 : 0
-                            scale: Toggles.controlCenterOpen ? 1 : 0.92
+                            opacity: root.open ? 1 : 0
+                            scale: root.open ? 1 : 0.92
                             transformOrigin: Item.Top
                             Behavior on opacity {
                                 SequentialAnimation {

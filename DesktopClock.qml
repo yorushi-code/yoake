@@ -22,6 +22,17 @@ PanelWindow {
     exclusiveZone: 0
     focusable: false
     aboveWindows: false
+
+    // Unmapped whenever a window covers the desktop. Occlusion does not stop
+    // Qt's animation driver, so the spectrum kept animating 28 bars behind an
+    // opaque terminal — around half the shell's idle CPU, spent on something
+    // nobody could see. niri is a scrolling tiler, so any window on the active
+    // workspace covers this completely.
+    //
+    // Read from the singleton rather than calling Niri.desktopVisibleOn() with
+    // this window's own screen: unmapping resets `screen`, so the binding fed
+    // itself. WallpaperView publishes the same answer and is always mapped.
+    visible: Wallpaper.desktopVisible
     // Only the media card takes input; the clock and spectrum stay
     // click-through so the desktop behaves like bare wallpaper everywhere
     // except the transport controls. The region has to collapse when there is
@@ -121,10 +132,14 @@ PanelWindow {
                     height: 76
 
                     // Glow scales with the band's own level, so loud bands
-                    // bloom and quiet ones stay clean.
+                    // bloom and quiet ones stay clean. Gated on being visible
+                    // at all: below this the glow is under 0.17 opacity and
+                    // indistinguishable from nothing, but all 28 were still
+                    // drawn every frame.
                     RectangularShadow {
                         anchors.fill: barRect
                         radius: barRect.radius
+                        visible: level > 0.25
                         color: Theme.accent
                         blur: 18
                         spread: 1
@@ -143,7 +158,7 @@ PanelWindow {
                             GradientStop { position: 1.0; color: Theme.blue }
                         }
                         opacity: 0.5 + level * 0.5
-                        Behavior on height { NumberAnimation { duration: 70; easing.type: Easing.OutQuad } }
+                        // See BarMedia: the fall is smoothed in Cava now.
                     }
 
                     // Peak-hold: a transient that would be gone by the next

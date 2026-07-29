@@ -1,13 +1,19 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell.Widgets
 
 // Real frosted-glass backing for panels: samples the actual wallpaper at the
-// panel's screen position and blurs it, rather than faking depth with a flat
-// translucent fill. niri has no backdrop-blur protocol, so the wallpaper is
-// re-rendered here and offset by the panel's own screen coords — swaybg draws
-// the same image at the same scale, so the alignment is exact and the panel
-// reads as genuinely see-through.
+// panel's screen position, rather than faking depth with a flat translucent
+// fill. niri has no backdrop-blur protocol, so the wallpaper is re-drawn here
+// and offset by the panel's own screen coords — the wallpaper layer draws the
+// same image at the same scale, so the alignment is exact and the panel reads
+// as genuinely see-through.
+//
+// The blur itself is not done here. It used to be: an Item with layer.enabled
+// (one offscreen render target) feeding a MultiEffect at blurMax 64 (a
+// multi-pass downsample/upsample chain), per panel, about twenty of them — all
+// computing the same image, which only ever changes when the wallpaper does.
+// set-wallpaper.sh now blurs once to disk and this became four plain draws
+// over one small shared texture.
 //
 // Callers must pass their on-screen position (screenX/screenY); a panel that
 // gets this wrong looks subtly "off" rather than broken, so it's worth
@@ -17,9 +23,6 @@ ClippingRectangle {
 
     property real screenX: 0
     property real screenY: 0
-    // Higher than a typical CSS backdrop-filter — the wallpaper is busy anime
-    // art, and anything less lets detail fight the foreground text.
-    property real blurAmount: 1.0
     // Low enough that the blurred wallpaper is clearly visible through the
     // panel — past ~0.65 the glass reads as flat dark plastic and the whole
     // effect is wasted.
@@ -28,44 +31,20 @@ ClippingRectangle {
     color: "transparent"
     radius: Theme.radius
 
-    Item {
-        id: wallSource
-        anchors.fill: parent
-        visible: false
-        layer.enabled: true
-
-        Image {
-            x: -root.screenX
-            y: -root.screenY
-            width: Screen.width
-            height: Screen.height
-            // Same source the wallpaper layer draws, so the blur behind a
-            // panel matches what's actually on screen and recolours the
-            // instant the wallpaper crossfades. For video wallpapers this
-            // resolves to the extracted still frame instead: blurring live
-            // video under six panels every vsync would cost real GPU time to
-            // produce something already blurred past recognition.
-            source: Wallpaper.blurSource
-            // Decode at screen resolution, not the wallpaper's native size.
-            // The source images are 7680x4320 (~130 MB decoded each); without
-            // this cap every FrostedBackground kept a full-size copy and the
-            // shell sat at ~600 MB, with a CPU spike each time one decoded.
-            // The result is blurred anyway, so there's no visible quality loss.
-            sourceSize.width: Screen.width
-            sourceSize.height: Screen.height
-            fillMode: Image.PreserveAspectCrop
-            cache: true
-            asynchronous: true
-        }
-    }
-
-    MultiEffect {
-        anchors.fill: parent
-        source: wallSource
-        blurEnabled: true
-        blur: root.blurAmount
-        blurMax: 64
-        autoPaddingEnabled: false
+    Image {
+        x: -root.screenX
+        y: -root.screenY
+        width: Screen.width
+        height: Screen.height
+        // Already blurred, and small: one texture shared by every panel via the
+        // pixmap cache, since they all name the same source at the same size.
+        source: Wallpaper.blurSource
+        fillMode: Image.PreserveAspectCrop
+        cache: true
+        asynchronous: true
+        // Upscaling a 512px blur is itself a smooth, which is what lets the
+        // stored copy be this small without a visible quality difference.
+        smooth: true
     }
 
     // Tint keeps contrast usable over bright wallpaper regions; the accent

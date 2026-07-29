@@ -58,7 +58,9 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         color: Theme.accent
                         opacity: 0.55 + parent.level * 0.45
-                        Behavior on height { NumberAnimation { duration: 70; easing.type: Easing.OutQuad } }
+                        // No Behavior: Cava smooths the fall itself, once per
+                        // frame for the whole band set, instead of restarting one
+                        // animation per bar per frame.
                     }
 
                     // Peak marker: a transient that would otherwise be gone by

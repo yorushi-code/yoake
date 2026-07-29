@@ -7,6 +7,23 @@ import Quickshell.Io
 Item {
     id: root
 
+    // Animations bind to this, not to the toggle. The panel is created lazily,
+    // which means it is born with the toggle already true — an entry animation
+    // bound straight to the toggle has nothing to animate from and the panel
+    // simply appears at its final size. `armed` turns on a frame later, so the
+    // open state is always a transition.
+    readonly property bool open: Toggles.cheatSheetOpen && root.armed
+    property bool armed: false
+    Component.onCompleted: {
+        armTick.start();
+        reader.running = true;
+    }
+    property Timer _armTick: Timer {
+        id: armTick
+        interval: 16
+        onTriggered: root.armed = true
+    }
+
     property var categories: []
 
     Process {
@@ -109,8 +126,6 @@ Item {
         }
     }
 
-    Component.onCompleted: reader.running = true
-
     PanelWindow {
         id: win
         // Explicit mapping bool — see ControlCenter.qml. Stays mapped through
@@ -127,7 +142,7 @@ Item {
         color: "transparent"
         exclusiveZone: 0
         aboveWindows: true
-        focusable: Toggles.cheatSheetOpen
+        focusable: root.open
 
         Timer {
             id: hideDelay
@@ -158,12 +173,12 @@ Item {
             Rectangle {
                 anchors.fill: parent
                 color: "black"
-                opacity: Toggles.cheatSheetOpen ? 0.35 : 0
+                opacity: root.open ? 0.35 : 0
                 Behavior on opacity {
                     NumberAnimation {
-                        duration: Toggles.cheatSheetOpen ? Theme.animNormal : Theme.animExit
+                        duration: root.open ? Theme.animNormal : Theme.animExit
                         easing.type: Easing.Bezier
-                        easing.bezierCurve: Toggles.cheatSheetOpen ? Theme.easeEmphasized : Theme.easeExit
+                        easing.bezierCurve: root.open ? Theme.easeEmphasized : Theme.easeExit
                     }
                 }
             }
@@ -176,7 +191,7 @@ Item {
         Item {
             id: focusScope
             anchors.fill: parent
-            focus: Toggles.cheatSheetOpen
+            focus: root.open
             Keys.onEscapePressed: Toggles.cheatSheetOpen = false
 
             PanelChrome {
@@ -189,20 +204,20 @@ Item {
                 height: Math.min(parent.height - 80, 700)
                 screenX: (Screen.width - width) / 2
                 screenY: (Screen.height - height) / 2
-                opacity: Toggles.cheatSheetOpen ? 1 : 0
-                scale: Toggles.cheatSheetOpen ? 1 : 0.9
+                opacity: root.open ? 1 : 0
+                scale: root.open ? 1 : 0.9
                 Behavior on opacity {
                     NumberAnimation {
-                        duration: Toggles.cheatSheetOpen ? Theme.animSlow : Theme.animExit
+                        duration: root.open ? Theme.animSlow : Theme.animExit
                         easing.type: Easing.Bezier
-                        easing.bezierCurve: Toggles.cheatSheetOpen ? Theme.easeEmphasized : Theme.easeExit
+                        easing.bezierCurve: root.open ? Theme.easeEmphasized : Theme.easeExit
                     }
                 }
                 Behavior on scale {
                     NumberAnimation {
-                        duration: Toggles.cheatSheetOpen ? Theme.animSlow : Theme.animExit
+                        duration: root.open ? Theme.animSlow : Theme.animExit
                         easing.type: Easing.Bezier
-                        easing.bezierCurve: Toggles.cheatSheetOpen ? Theme.easeSpringBig : Theme.easeExit
+                        easing.bezierCurve: root.open ? Theme.easeSpringBig : Theme.easeExit
                     }
                 }
                 onCloseRequested: Toggles.cheatSheetOpen = false

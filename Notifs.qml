@@ -1,6 +1,7 @@
 pragma Singleton
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.Notifications
 
 // Bridges notification events from NotificationCenter (which owns the single
 // NotificationServer) to anything else that wants to react — the bar's bell,
@@ -25,6 +26,15 @@ Singleton {
 
     function clearAll() {
         root.clearAllRequested();
+    }
+
+    // Lives here rather than in NotificationCenter because the toast stack and
+    // the history panel are separate windows in separate files and must agree
+    // on what an urgency looks like.
+    function accentFor(urgency) {
+        if (urgency === NotificationUrgency.Critical) return Theme.red;
+        if (urgency === NotificationUrgency.Low) return Theme.subtext0;
+        return Theme.accent;
     }
 
     IpcHandler {

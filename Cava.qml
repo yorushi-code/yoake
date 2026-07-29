@@ -17,7 +17,38 @@ Singleton {
     // Slowly-decaying maxima, so a transient peak leaves a mark that falls back
     // instead of vanishing on the next frame (see the decay timer).
     property var peaks: new Array(barCount).fill(0)
+
+    // Whether anything is actually playing. Read directly from each frame this
+    // chattered at the frame rate around silence, and it drives two nested
+    // width Behaviors (the mini spectrum's, then the whole centre island's at
+    // 420ms), so the bar spent its idle time continuously re-laying itself
+    // out. Rising edge is immediate — the spectrum must not lag the music —
+    // and only the falling edge waits.
     property bool active: false
+    readonly property real _onThreshold: 0.04
+
+    // Fraction of the remaining distance a falling bar covers per frame.
+    // Tuned against the 70ms OutQuad Behavior this replaced.
+    readonly property real releaseRate: 0.45
+
+    // Mean of the three lowest bands, for anything that wants to pulse to the
+    // beat. Computed here so the widgets using it neither re-derive it nor
+    // need their own smoothing Behaviors — one blurred shadow re-rendering
+    // every frame because two 90ms animations kept restarting was as
+    // expensive as the whole spectrum it was reacting to.
+    property real bass: 0
+
+    Timer {
+        id: quietDelay
+        interval: 700
+        onTriggered: {
+            root.active = false;
+            // The spectrum fades out with `active`, so there is nothing left
+            // for the peaks to decay in front of — and this lets the decay
+            // timer stop instead of ticking through silence forever.
+            root.peaks = new Array(root.barCount).fill(0);
+        }
+    }
 
     readonly property string _runtimeDir: Quickshell.env("XDG_RUNTIME_DIR") || "/tmp"
 
@@ -32,7 +63,11 @@ Singleton {
         command: ["sh", "-c", `cat > ${root._runtimeDir}/qs-cava.conf <<CAVAEOF
 [general]
 mode = normal
-framerate = 60
+# 30 rather than 60: every frame allocates a new values array and invalidates
+# the bindings of 28 desktop bars plus 14 in the bar. The per-bar height
+# Behaviors interpolate between frames anyway, so the spectrum looks identical
+# and costs half as much.
+framerate = 30
 bars = ${root.barCount}
 autosens = 1
 [input]
@@ -53,6 +88,7 @@ exec cava -p ${root._runtimeDir}/qs-cava.conf`]
         onRestarted: {
             root.values = new Array(root.barCount).fill(0);
             root.peaks = new Array(root.barCount).fill(0);
+            quietDelay.stop();
             root.active = false;
         }
 
@@ -62,15 +98,30 @@ exec cava -p ${root._runtimeDir}/qs-cava.conf`]
                 const parts = line.split(";");
                 const out = [];
                 const pk = root.peaks;
+                const prev = root.values;
                 for (let i = 0; i < root.barCount; i++) {
                     const v = parseInt(parts[i]);
-                    const level = isNaN(v) ? 0 : Math.max(0, Math.min(1, v / 100));
-                    out.push(level);
-                    if (level > pk[i]) pk[i] = level;
+                    const raw = isNaN(v) ? 0 : Math.max(0, Math.min(1, v / 100));
+                    // Smoothed here, once, rather than by a `Behavior on
+                    // height` per bar. Those never finished: a 70ms animation
+                    // restarted every frame is 42 animations being torn down
+                    // and rebuilt per frame across the two spectrums, which
+                    // was most of the shell's idle CPU. Attack is instant so a
+                    // beat lands on the frame it happens; only the fall is
+                    // damped, which is the part the eye reads as smooth.
+                    out.push(raw > prev[i] ? raw : prev[i] + (raw - prev[i]) * root.releaseRate);
+                    if (raw > pk[i]) pk[i] = raw;
                 }
                 root.values = out;
                 root.peaks = pk;
-                root.active = out.some(v => v > 0.01);
+                root.bass = (out[0] + out[1] + out[2]) / 3;
+
+                if (out.some(v => v > root._onThreshold)) {
+                    quietDelay.stop();
+                    root.active = true;
+                } else if (root.active && !quietDelay.running) {
+                    quietDelay.restart();
+                }
             }
         }
     }
@@ -89,7 +140,7 @@ exec cava -p ${root._runtimeDir}/qs-cava.conf`]
     // decay to incoming frames means they never move once cava stops sending.
     Timer {
         interval: 60
-        running: true
+        running: root.active
         repeat: true
         onTriggered: {
             const pk = root.peaks;

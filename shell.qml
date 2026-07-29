@@ -27,12 +27,33 @@ ShellRoot {
         Bar {}
     }
 
-    NotificationCenter {}
+    // The OSDs stay eager: they answer a volume or brightness keypress, where
+    // even an asynchronous load would be a visible lag on the first press.
     Osd {}
     MediaOsd {}
-    CheatSheet {}
-    ControlCenter {}
-    Calendar {}
+
+    // The toast stack has to exist from startup: it is what puts a
+    // notification on screen in the first place.
+    NotificationCenter {}
+
+    // These four cost ~41 MB of resident set between them, measured by taking
+    // them out of this file, and in a typical session most are never opened.
+    LazyPanel {
+        shown: Toggles.notifCenterOpen
+        NotificationPanel {}
+    }
+    LazyPanel {
+        shown: Toggles.cheatSheetOpen
+        CheatSheet {}
+    }
+    LazyPanel {
+        shown: Toggles.controlCenterOpen
+        ControlCenter {}
+    }
+    LazyPanel {
+        shown: Toggles.calendarOpen
+        Calendar {}
+    }
 
     // A menu or panel left up after the user has moved to a window reads as
     // the shell being stuck. Popups hold no focus of their own under niri, so

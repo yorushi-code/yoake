@@ -82,9 +82,10 @@ PanelWindow {
 
         pulseWithAudio: true
 
-        Behavior on width {
-            NumberAnimation { duration: Theme.animSlow; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeEmphasized }
-        }
+        // No Behavior on width here. Animating the island's own width relayouts
+        // every widget inside it on each frame of the animation, and its width
+        // is driven by the mini spectrum, which already animates its own. The
+        // island follows for free and nothing has to be laid out twice.
 
         Row {
             anchors.verticalCenter: parent.verticalCenter

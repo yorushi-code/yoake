@@ -7,6 +7,23 @@ import Quickshell
 PanelWindow {
     id: win
 
+    // Animations bind to this, not to the toggle. The panel is created lazily,
+    // which means it is born with the toggle already true — an entry animation
+    // bound straight to the toggle has nothing to animate from and the panel
+    // simply appears at its final size. `armed` turns on a frame later, so the
+    // open state is always a transition.
+    readonly property bool open: Toggles.calendarOpen && win.armed
+    property bool armed: false
+    Component.onCompleted: {
+        armTick.start();
+        win.mapped = Toggles.calendarOpen;
+    }
+    property Timer _armTick: Timer {
+        id: armTick
+        interval: 16
+        onTriggered: win.armed = true
+    }
+
     anchors {
         top: true
         bottom: true
@@ -15,7 +32,7 @@ PanelWindow {
     }
     color: "transparent"
     exclusiveZone: 0
-    focusable: Toggles.calendarOpen
+    focusable: win.open
     // Explicit mapping bool — see ControlCenter.qml (avoids the visible-binding
     // race that cut the exit animation short).
     property bool mapped: false
@@ -89,11 +106,9 @@ PanelWindow {
             }
         }
     }
-    Component.onCompleted: win.mapped = Toggles.calendarOpen
-
     Item {
         anchors.fill: parent
-        focus: Toggles.calendarOpen
+        focus: win.open
         Keys.onEscapePressed: Toggles.calendarOpen = false
 
         // Click-outside-to-close. The panel previously masked input to the card
@@ -121,22 +136,22 @@ PanelWindow {
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
             }
 
-            opacity: Toggles.calendarOpen ? 1 : 0
-            scale: Toggles.calendarOpen ? 1 : 0.9
+            opacity: win.open ? 1 : 0
+            scale: win.open ? 1 : 0.9
             transformOrigin: Item.Top
             // See ControlCenter: open punches in, exit accelerates.
             Behavior on opacity {
                 NumberAnimation {
-                    duration: Toggles.calendarOpen ? Theme.animSlow : Theme.animExit
+                    duration: win.open ? Theme.animSlow : Theme.animExit
                     easing.type: Easing.Bezier
-                    easing.bezierCurve: Toggles.calendarOpen ? Theme.easeEmphasized : Theme.easeExit
+                    easing.bezierCurve: win.open ? Theme.easeEmphasized : Theme.easeExit
                 }
             }
             Behavior on scale {
                 NumberAnimation {
-                    duration: Toggles.calendarOpen ? Theme.animSlow : Theme.animExit
+                    duration: win.open ? Theme.animSlow : Theme.animExit
                     easing.type: Easing.Bezier
-                    easing.bezierCurve: Toggles.calendarOpen ? Theme.easeSpringBig : Theme.easeExit
+                    easing.bezierCurve: win.open ? Theme.easeSpringBig : Theme.easeExit
                 }
             }
 

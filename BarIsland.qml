@@ -34,9 +34,7 @@ Item {
     // reports a binding loop (and picks an arbitrary width).
     implicitWidth: inner.width + root.padding * 2
 
-    readonly property real bass: (root.pulseWithAudio && Cava.active)
-        ? ((Cava.values[0] || 0) + (Cava.values[1] || 0) + (Cava.values[2] || 0)) / 3
-        : 0
+    readonly property real bass: (root.pulseWithAudio && Cava.active) ? Cava.bass : 0
 
     RectangularShadow {
         anchors.fill: glass
@@ -59,10 +57,9 @@ Item {
         spread: -2 + root.bass * 6
         opacity: Math.min(0.85, 0.22 + root.bass * 0.55)
         offset: Qt.vector2d(0, 0)
-        // Fast enough to track the beat but still smoothing the per-frame cava
-        // jitter.
-        Behavior on opacity { NumberAnimation { duration: 90; easing.type: Easing.OutQuad } }
-        Behavior on spread { NumberAnimation { duration: 90; easing.type: Easing.OutQuad } }
+        // No Behaviors. Two 90ms animations restarting on every cava frame
+        // never finished, and each restart re-rendered a blur-28 shadow.
+        // Cava.bass is already damped on its falling edge.
     }
 
     FrostedBackground {

@@ -30,10 +30,18 @@ Singleton {
     // for something that is, by definition, blurred past recognition.
     property string stillPath: ""
 
-    // What panels should blur — the video's still frame, or the image itself.
-    readonly property string blurSource: (root.isVideo && root.stillPath !== "")
-        ? root.stillPath
-        : root.path
+    // The frosted glass under every panel samples this. It is blurred once, on
+    // disk, by set-wallpaper.sh: doing it on the GPU meant one offscreen render
+    // target and one multi-pass blur per panel, about twenty of each, all
+    // producing the same image that only changes when the wallpaper does.
+    property string blurPath: ""
+
+    // Falls back to the sharp image so a shell started before the blur exists
+    // (first run after this change, or a hand-edited trigger file) still draws
+    // something rather than empty panels.
+    readonly property string blurSource: root.blurPath !== ""
+        ? root.blurPath
+        : ((root.isVideo && root.stillPath !== "") ? root.stillPath : root.path)
 
     // ── Video playback policy ──
     property bool pauseOnBattery: true
@@ -58,15 +66,22 @@ Singleton {
         watchChanges: true
         onLoaded: {
             // Line 1 is the wallpaper; line 2, for video, is the still frame
-            // set-wallpaper.sh extracted for the palette and the panel blur.
+            // set-wallpaper.sh extracted for the palette; line 3 the pre-blurred
+            // copy the panels sample.
             const lines = trigger.text().trim().split("\n");
             const p = (lines[0] || "").trim();
             const still = (lines[1] || "").trim();
+            const blur = (lines[2] || "").trim();
             // The still is assigned first on purpose: blurSource falls back to
             // `path` while stillPath is empty, so setting path first hands every
             // panel's Image the raw video file for one evaluation and each logs
             // an "unsupported image format" decode error before correcting.
             root.stillPath = still !== "" ? "file://" + still : "";
+            // Cache-busted: the path is constant across wallpaper changes, so
+            // without this the panels keep showing the previous blur.
+            root.blurPath = blur !== ""
+                ? "file://" + blur + "?v=" + Date.now()
+                : "";
             if (p !== "") root.path = "file://" + p;
         }
         onFileChanged: reload()
