@@ -152,6 +152,101 @@ Singleton {
         }
     }
 
+    // ── per-wallpaper detail ──
+    // Dimensions, byte size, and the palette the wallpaper would produce if it
+    // were applied. Both are probed on demand and cached by path, because the
+    // picker only ever asks about the one entry the user has settled on — the
+    // whole library would be a dozen ffprobes and three seconds of colour
+    // analysis for information nobody looked at.
+    property var meta: ({})
+    property var palettes: ({})
+
+    function request(entry) {
+        if (!entry) return;
+        if (root.meta[entry.path] === undefined) {
+            root._metaWant = entry;
+            root._pumpMeta();
+        }
+        if (root.palettes[entry.path] === undefined) {
+            root._paletteWant = entry;
+            root._pumpPalette();
+        }
+    }
+
+    function formatBytes(n) {
+        if (!n || n <= 0) return "";
+        if (n < 1024 * 1024) return Math.round(n / 1024) + " КБ";
+        return (n / 1048576).toFixed(1) + " МБ";
+    }
+
+    property var _metaWant: null
+
+    function _pumpMeta() {
+        const want = root._metaWant;
+        if (info.running || !want) return;
+        root._metaWant = null;
+        info.target = want.path;
+        // ffprobe rather than `magick identify`: one tool answers for both
+        // stills and video, so there is no branch to get wrong.
+        info.command = ["sh", "-c",
+            "ffprobe -v error -select_streams v:0 -show_entries stream=width,height "
+            + "-of csv=p=0:s=x \"$1\"; stat -c %s \"$1\"", "_", want.path];
+        info.running = true;
+    }
+
+    Process {
+        id: info
+        property string target: ""
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const lines = text.trim().split("\n");
+                const next = Object.assign({}, root.meta);
+                next[info.target] = {
+                    size: (lines[0] || "").trim(),
+                    bytes: parseInt((lines[1] || "0").trim(), 10) || 0
+                };
+                root.meta = next;
+            }
+        }
+        onExited: root._pumpMeta()
+    }
+
+    property var _paletteWant: null
+
+    function _pumpPalette() {
+        const want = root._paletteWant;
+        if (probe.running || !want) return;
+        // A video is analysed through the frame already extracted for its
+        // thumbnail: ImageMagick will not decode an mp4, and that frame is what
+        // set-wallpaper.sh would build the palette from anyway.
+        const source = want.video ? want.thumb : want.path;
+        if (want.video && root.ready[want.key] !== true) return;
+        root._paletteWant = null;
+        probe.target = want.path;
+        probe.command = [Quickshell.env("HOME") + "/.local/bin/wallpaper-palette.py",
+                         "--probe", source];
+        probe.running = true;
+    }
+
+    Process {
+        id: probe
+        property string target: ""
+        stdout: StdioCollector {
+            onStreamFinished: {
+                let parsed = null;
+                try {
+                    parsed = JSON.parse(text);
+                } catch (e) {
+                    return;
+                }
+                const next = Object.assign({}, root.palettes);
+                next[probe.target] = parsed;
+                root.palettes = next;
+            }
+        }
+        onExited: root._pumpPalette()
+    }
+
     // ── applying ──
     property Process setter: Process {}
 

@@ -26,17 +26,45 @@ Singleton {
         return root.workspaces.find(w => w.output === output && w.is_active) || null;
     }
 
-    // Whether the wallpaper is actually being looked at on this output. niri is
-    // a scrolling tiler, so any window on the active workspace covers the
-    // background layer completely — this shell already assumes as much (the
-    // desktop clock sits below windows and only shows on empty space). Used to
-    // stop paying for video wallpaper playback nobody can see; this build of
-    // niri reports no is_fullscreen flag, so window presence is the signal.
-    function desktopVisibleOn(output) {
-        if (root.overviewOpen) return true;
+    // How much of this output the active workspace's tiles cover, 0..1.
+    //
+    // Mere window presence used to be the signal, and it was wrong in the one
+    // way that matters: niri's default column is half the output width, so a
+    // single terminal froze the video wallpaper across the other half of the
+    // screen. This build reports no tile position (tile_pos_in_workspace_view
+    // is null even for the visible workspace), so summed tile area is the
+    // honest measure available — overlapping tiles only ever push the estimate
+    // up, which errs towards pausing rather than towards decoding unseen video.
+    function desktopCoverageOn(output) {
+        if (root.overviewOpen) return 0;
         const ws = root.focusedWorkspaceOn(output);
-        if (!ws) return true;
-        return !root.windows.some(w => w.workspace_id === ws.id);
+        if (!ws) return 0;
+        let area = 0;
+        for (const s of Quickshell.screens) {
+            if (s.name === output) {
+                area = s.width * s.height;
+                break;
+            }
+        }
+        if (area <= 0) return 1;
+        let covered = 0;
+        for (const w of root.windows) {
+            if (w.workspace_id !== ws.id) continue;
+            const size = w.layout ? (w.layout.tile_size || w.layout.window_size) : null;
+            // A window we cannot measure is still a window; assuming it fills
+            // the output is the safe direction.
+            if (!size) return 1;
+            covered += size[0] * size[1];
+        }
+        return Math.min(1, covered / area);
+    }
+
+    // Not 1.0: gaps and rounding leave a few unlit pixels around a genuinely
+    // full column, and a sliver of wallpaper is not worth playing video for.
+    readonly property real coverageLimit: 0.85
+
+    function desktopVisibleOn(output) {
+        return root.desktopCoverageOn(output) < root.coverageLimit;
     }
 
     // Anything that moves the user's attention elsewhere. A menu left hanging
@@ -90,6 +118,18 @@ Singleton {
         }
     }
 
+    // Tiles resize with no window opening, closing or changing focus — dragging
+    // a column edge is exactly the case where desktop coverage moves and
+    // nothing else does.
+    function _applyWindowLayoutsChanged(payload) {
+        const changes = (payload && payload.changes) || [];
+        if (changes.length === 0) return;
+        const byId = {};
+        for (const c of changes) byId[c[0]] = c[1];
+        root.windows = root.windows.map(w =>
+            byId[w.id] ? Object.assign({}, w, { layout: byId[w.id] }) : w);
+    }
+
     // Supervised because losing this stream is silent and unrecoverable: the
     // workspace pills would keep rendering the last state forever with no hint
     // that they had stopped updating. niri replays WorkspacesChanged and
@@ -112,6 +152,7 @@ Singleton {
                 else if (evt.WindowOpenedOrChanged) root._applyWindowOpenedOrChanged(evt.WindowOpenedOrChanged);
                 else if (evt.WindowClosed) root.windows = root.windows.filter(w => w.id !== evt.WindowClosed.id);
                 else if (evt.WindowFocusChanged) root._applyWindowFocusChanged(evt.WindowFocusChanged);
+                else if (evt.WindowLayoutsChanged) root._applyWindowLayoutsChanged(evt.WindowLayoutsChanged);
                 else if (evt.OverviewOpenedOrClosed) root.overviewOpen = evt.OverviewOpenedOrClosed.is_open;
             }
         }

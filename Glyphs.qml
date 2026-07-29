@@ -106,6 +106,7 @@ Singleton {
     readonly property string apps: "\u{F003B}"
     readonly property string monitor: "\u{F0379}"
     readonly property string folder: "\u{F024B}"
+    readonly property string magnify: "\u{F0349}"
     readonly property string terminal: "\u{F018D}"
     readonly property string web: "\u{F059F}"
     readonly property string calendar: "\u{F00F6}"

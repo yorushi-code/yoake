@@ -1,52 +1,64 @@
 import QtQuick
 import QtQuick.Effects
+import Quickshell.Widgets
 
-// One card in the wallpaper grid.
+// One frame in the wallpaper filmstrip.
 //
-// Video wallpapers preview on hover, but the player itself is owned by the
-// picker and lent to whichever tile the cursor is over. One MediaPlayer per
-// tile would mean a dozen decoders running behind a grid where only one card
-// can be under the pointer.
+// ClippingRectangle, not `Rectangle { clip: true }`: Qt's clip is a rectangular
+// scissor that ignores `radius`, so the thumbnail's square corners used to poke
+// out from under the rounded frame — which is exactly what stood out against
+// the selection ring.
+//
+// The tile draws a still thumbnail even for video. Preview playback belongs to
+// the picker, which runs one full-screen decoder for the focused entry; a
+// player per tile is a dozen decoders for a strip where only one frame is being
+// looked at.
 Item {
     id: root
 
     required property var modelData
     required property int index
 
-    property bool current: false
+    // Where the strip's attention is. Distinct from `applied`, which is the
+    // wallpaper actually on screen.
+    property bool focusedItem: false
+    property bool applied: false
     property bool thumbReady: false
-    // Set by the picker to the tile the shared video player is attached to.
-    property Item videoSurface: null
 
     signal activated()
+    signal requested()
 
-    scale: mouse.containsMouse ? 1.05 : 1
-    z: mouse.containsMouse ? 1 : 0
+    // Unfocused frames sit back rather than disappearing: the strip has to read
+    // as a continuous reel, and the focused frame has to be unmistakable.
+    scale: root.focusedItem ? 1.0 : 0.87
+    z: root.focusedItem ? 2 : (mouse.containsMouse ? 1 : 0)
+    transformOrigin: Item.Center
+
     Behavior on scale {
         NumberAnimation {
             duration: Theme.animNormal
             easing.type: Easing.Bezier
-            easing.bezierCurve: Theme.easeSpring
+            easing.bezierCurve: Theme.easeSpringBig
         }
     }
 
     RectangularShadow {
         anchors.fill: frame
         radius: frame.radius
-        color: root.current ? Theme.accent : Theme.shadowColor
-        blur: root.current ? 26 : Theme.shadowBlur
-        spread: root.current ? 2 : Theme.shadowSpread
-        offset: root.current ? Qt.vector2d(0, 0) : Qt.vector2d(0, 4)
-        opacity: root.current ? 0.8 : (mouse.containsMouse ? 0.9 : 0.5)
+        color: root.focusedItem ? Theme.accent : Theme.shadowColor
+        blur: root.focusedItem ? 34 : Theme.shadowBlur
+        spread: root.focusedItem ? 2 : Theme.shadowSpread
+        offset: root.focusedItem ? Qt.vector2d(0, 0) : Qt.vector2d(0, 6)
+        opacity: root.focusedItem ? 0.85 : 0.4
         Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
+        Behavior on blur { NumberAnimation { duration: Theme.animNormal } }
     }
 
-    Rectangle {
+    ClippingRectangle {
         id: frame
         anchors.fill: parent
-        radius: Theme.radius + 4
+        radius: Theme.radius + 6
         color: Theme.surface0
-        clip: true
 
         Image {
             id: thumb
@@ -59,15 +71,16 @@ Item {
             Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
         }
 
-        // Where the picker reparents its single VideoOutput while this tile is
-        // hovered. Empty otherwise.
-        Item {
-            id: videoSlot
-            objectName: "videoSlot"
+        // Everything but the focused frame is pushed towards the backdrop, so
+        // the eye lands on one image instead of scanning a wall of them.
+        Rectangle {
             anchors.fill: parent
+            color: Theme.crust
+            opacity: root.focusedItem ? 0 : (mouse.containsMouse ? 0.18 : 0.45)
+            Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
         }
 
-        // Placeholder while the thumbnail is still being generated: a grid of
+        // Placeholder while the thumbnail is still being generated: a strip of
         // empty rectangles reads as broken, a pulsing one reads as loading.
         Rectangle {
             anchors.fill: parent
@@ -87,13 +100,16 @@ Item {
             }
         }
 
-        // Caption strip. Gradient rather than a flat bar so a bright wallpaper
-        // does not put light text on light pixels.
+        // Caption only on the focused frame. On every frame the strip turns
+        // into a list of filenames, which is the opposite of what a filmstrip
+        // is for.
         Rectangle {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            height: 44
+            height: 40
+            opacity: root.focusedItem ? 1 : 0
+            Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
             gradient: Gradient {
                 GradientStop { position: 0.0; color: "transparent" }
                 GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, 0.92) }
@@ -103,28 +119,27 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                anchors.margins: 10
+                anchors.margins: 9
                 text: root.modelData.label
                 color: Theme.text
-                font.pixelSize: 12
+                font.pixelSize: 11
                 font.bold: true
                 elide: Text.ElideRight
             }
         }
 
-        // Video badge, so it is obvious before hovering which cards move.
+        // Video badge, so it is obvious before focusing which frames move.
         Rectangle {
             anchors.top: parent.top
             anchors.left: parent.left
-            anchors.margins: 8
-            width: videoGlyph.width + 14
+            anchors.margins: 7
+            width: 22
             height: 22
             radius: 11
             visible: root.modelData.video
             color: Qt.alpha(Theme.crust, 0.8)
 
             Text {
-                id: videoGlyph
                 anchors.centerIn: parent
                 text: Glyphs.video
                 font.family: "Symbols Nerd Font"
@@ -134,7 +149,7 @@ Item {
         }
     }
 
-    // Selected ring drawn outside the clip so the stroke is not halved.
+    // Focus ring drawn outside the clip so the stroke is not halved.
     Rectangle {
         anchors.fill: parent
         anchors.margins: -3
@@ -142,8 +157,30 @@ Item {
         color: "transparent"
         border.width: 2
         border.color: Theme.accent
-        opacity: root.current ? 1 : 0
+        opacity: root.focusedItem ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
+    }
+
+    // The wallpaper currently on screen. Marked even when it is not the frame
+    // under attention — otherwise walking the strip loses track of where you
+    // started.
+    Rectangle {
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.margins: 7
+        width: 22
+        height: 22
+        radius: 11
+        visible: root.applied
+        color: Theme.accent
+
+        Text {
+            anchors.centerIn: parent
+            text: Glyphs.check
+            font.family: "Symbols Nerd Font"
+            font.pixelSize: 12
+            color: Theme.crust
+        }
     }
 
     MouseArea {
@@ -151,9 +188,10 @@ Item {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onClicked: root.activated()
+        // Hovering moves attention, clicking commits. Splitting the two is what
+        // lets the full-screen preview follow the cursor without a stray click
+        // changing the wallpaper.
+        onEntered: root.requested()
+        onClicked: root.focusedItem ? root.activated() : root.requested()
     }
-
-    readonly property bool hovered: mouse.containsMouse
-    readonly property Item slot: videoSlot
 }

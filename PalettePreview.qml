@@ -1,17 +1,40 @@
 import QtQuick
 
-// The accent, where it came from, and the other candidates found in the
-// wallpaper.
+// The accent, where it came from, and the other candidates found in the image.
 //
-// This exists because "the clock is cyan and there is no cyan in the image"
+// This exists because "the clock is cyan and there is no cyan in the wallpaper"
 // was unanswerable: the accent was ANSI slot 12 with a saturate() on top, and
 // nothing in the UI could have told you that. Now the measured hue and the
-// confidence behind it are on screen, and any swatch can be pinned by clicking
-// it.
+// confidence behind it are on screen.
+//
+// With `probe` set it describes a palette that is not in force yet — what the
+// shell would look like after applying that wallpaper. Pinning is only offered
+// for the live palette: a pin belongs to the image it was chosen against, and
+// wallpaper-palette.py drops it on the next wallpaper change anyway.
 Column {
     id: root
 
     property real swatchSize: 30
+    property var probe: null
+
+    readonly property bool live: root.probe === null
+
+    // Each of these tests `probe` itself rather than the derived `live`: QML
+    // does not promise the two bindings are re-evaluated in the same pass, and
+    // one frame of `live === false` with a null probe is a TypeError.
+    readonly property color accentColor: root.probe ? root.probe.accent : Theme.accent
+    readonly property real hue: root.probe
+        ? ((root.probe.meta && root.probe.meta.hue) || 0)
+        : GeneratedColors.hue
+    readonly property real confidence: root.probe
+        ? ((root.probe.meta && root.probe.meta.confidence) || 0)
+        : GeneratedColors.confidence
+    readonly property bool muted: root.probe
+        ? (root.probe.meta && root.probe.meta.muted === true)
+        : GeneratedColors.muted
+    readonly property var swatches: root.probe
+        ? ((root.probe.meta && root.probe.meta.swatches) || [])
+        : GeneratedColors.swatches
 
     spacing: 10
 
@@ -22,7 +45,7 @@ Column {
             width: root.swatchSize * 1.6
             height: root.swatchSize
             radius: Theme.radius - 3
-            color: Theme.accent
+            color: root.accentColor
             Behavior on color { ColorAnimation { duration: Theme.animNormal } }
 
             Rectangle {
@@ -43,9 +66,11 @@ Column {
 
             Text {
                 width: parent.width
-                text: GeneratedColors.pinned
-                    ? "Акцент закреплён вручную"
-                    : "Оттенок обоев " + Math.round(GeneratedColors.hue) + "°"
+                text: {
+                    if (!root.live) return "Станет оттенком " + Math.round(root.hue) + "°";
+                    if (GeneratedColors.pinned) return "Акцент закреплён вручную";
+                    return "Оттенок обоев " + Math.round(root.hue) + "°";
+                }
                 color: Theme.text
                 font.pixelSize: 12
                 font.bold: true
@@ -56,9 +81,9 @@ Column {
                 width: parent.width
                 // Naming the low-chroma case outright: on a near-monochrome
                 // wallpaper a muted accent is the correct answer, not a bug.
-                text: GeneratedColors.muted
+                text: root.muted
                     ? "Мало цвета — акцент приглушён"
-                    : "Насыщенность " + Math.round(GeneratedColors.confidence * 100) + "%"
+                    : "Насыщенность " + Math.round(root.confidence * 100) + "%"
                 color: Theme.subtext0
                 font.pixelSize: 11
                 elide: Text.ElideRight
@@ -75,10 +100,10 @@ Column {
         color: Qt.alpha(Theme.text, 0.10)
 
         Rectangle {
-            width: parent.width * Math.max(0.02, GeneratedColors.confidence)
+            width: parent.width * Math.max(0.02, root.confidence)
             height: parent.height
             radius: parent.radius
-            color: Theme.accent
+            color: root.accentColor
             Behavior on width { NumberAnimation { duration: Theme.animNormal; easing.type: Easing.OutCubic } }
             Behavior on color { ColorAnimation { duration: Theme.animNormal } }
         }
@@ -87,10 +112,10 @@ Column {
     Flow {
         width: parent.width
         spacing: 8
-        visible: GeneratedColors.swatches.length > 0
+        visible: root.swatches.length > 0
 
         Repeater {
-            model: GeneratedColors.swatches
+            model: root.swatches
 
             delegate: Rectangle {
                 id: swatch
@@ -103,7 +128,7 @@ Column {
 
                 // Loose: the dominant hue is a weighted mean over the whole
                 // image and lands a degree or two off the peak it came from.
-                readonly property bool current: Math.abs(GeneratedColors.hue - swatch.modelData.hue) < 2
+                readonly property bool current: Math.abs(root.hue - swatch.modelData.hue) < 2
 
                 scale: swatchArea.containsMouse ? 1.12 : 1
                 Behavior on scale {
@@ -129,6 +154,7 @@ Column {
                     id: swatchArea
                     anchors.fill: parent
                     hoverEnabled: true
+                    enabled: root.live
                     cursorShape: Qt.PointingHandCursor
                     onClicked: GeneratedColors.pin(swatch.modelData.hue, swatch.modelData.chroma)
                 }
@@ -138,7 +164,7 @@ Column {
                     active: swatchArea.containsMouse
                     text: Math.round(swatch.modelData.hue) + "° · "
                         + Math.round(swatch.modelData.chroma * 1000) / 10 + "% цветности"
-                    subtext: "ЛКМ — закрепить как акцент"
+                    subtext: root.live ? "ЛКМ — закрепить как акцент" : "Кандидат в акценты"
                 }
             }
         }
@@ -149,7 +175,7 @@ Column {
         color: resetArea.containsMouse ? Theme.accent : Theme.subtext0
         font.pixelSize: 11
         font.underline: resetArea.containsMouse
-        visible: GeneratedColors.pinned
+        visible: root.live && GeneratedColors.pinned
         Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
         MouseArea {
