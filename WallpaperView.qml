@@ -138,6 +138,29 @@ PanelWindow {
         }
     }
 
+    // The still is not only a transition device: it is what the desktop shows
+    // whenever a video wallpaper is stopped, so pausing reads as a freeze
+    // frame rather than as the wallpaper being switched off.
+    NumberAnimation {
+        id: stillFade
+        target: base
+        property: "opacity"
+        duration: Theme.animNormal
+        easing.type: Easing.Bezier
+        easing.bezierCurve: Theme.easeEmphasized
+    }
+
+    Connections {
+        target: Wallpaper
+        function onVideoPausedChanged() {
+            if (!Wallpaper.isVideo || Wallpaper.stillPath === "") return;
+            if (win.revealingVideo || reveal.running) return;
+            if (base.source != Wallpaper.stillPath) base.source = Wallpaper.stillPath;
+            stillFade.to = Wallpaper.videoPaused ? 1 : 0;
+            stillFade.restart();
+        }
+    }
+
     Connections {
         target: overlay
         function onStatusChanged() {
@@ -154,6 +177,18 @@ PanelWindow {
         id: reveal
         onFinished: {
             if (win.revealingVideo) {
+                // Only hand over to live video if it is actually running. A
+                // video paused before it ever decoded a frame — which is the
+                // normal case, since playback is gated on the desktop being
+                // visible and a window is usually covering it — leaves
+                // VideoOutput with nothing to draw, and the desktop came up
+                // black. The extracted still stands in until playback starts.
+                if (Wallpaper.videoPaused) {
+                    win.pendingCommit = overlay.source;
+                    base.source = overlay.source;
+                    win.revealingVideo = false;
+                    return;
+                }
                 // The still has done its job; drop both images to reveal the
                 // video that has been playing underneath all along.
                 stillHandoff.restart();

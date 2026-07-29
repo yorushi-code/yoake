@@ -14,7 +14,11 @@ import Quickshell.Services.UPower
 Singleton {
     id: root
 
-    property string path: "file://" + Quickshell.env("HOME") + "/.config/current-wallpaper"
+    // Empty until the trigger file is read. It used to default to the
+    // current-wallpaper symlink, which has no extension — so isVideo was false
+    // for it and every panel tried to decode an mp4 as an image on the first
+    // frame after a video wallpaper was set.
+    property string path: ""
 
     readonly property var videoExtensions: ["mp4", "mkv", "webm", "mov", "m4v", "avi"]
     readonly property bool isVideo: {
@@ -85,5 +89,10 @@ Singleton {
             if (p !== "") root.path = "file://" + p;
         }
         onFileChanged: reload()
+        // Only reachable if the trigger file was never written; the symlink is
+        // the one thing guaranteed to exist, extension or not.
+        onLoadFailed: if (root.path === "") {
+            root.path = "file://" + Quickshell.env("HOME") + "/.config/current-wallpaper";
+        }
     }
 }

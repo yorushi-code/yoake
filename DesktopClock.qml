@@ -22,17 +22,6 @@ PanelWindow {
     exclusiveZone: 0
     focusable: false
     aboveWindows: false
-
-    // Unmapped whenever a window covers the desktop. Occlusion does not stop
-    // Qt's animation driver, so the spectrum kept animating 28 bars behind an
-    // opaque terminal — around half the shell's idle CPU, spent on something
-    // nobody could see. niri is a scrolling tiler, so any window on the active
-    // workspace covers this completely.
-    //
-    // Read from the singleton rather than calling Niri.desktopVisibleOn() with
-    // this window's own screen: unmapping resets `screen`, so the binding fed
-    // itself. WallpaperView publishes the same answer and is always mapped.
-    visible: Wallpaper.desktopVisible
     // Only the media card takes input; the clock and spectrum stay
     // click-through so the desktop behaves like bare wallpaper everywhere
     // except the transport controls. The region has to collapse when there is
@@ -119,11 +108,21 @@ PanelWindow {
             anchors.right: parent.right
             height: 76
             spacing: 4
-            opacity: Cava.active ? 1 : 0
+            opacity: (Cava.active && Wallpaper.desktopVisible) ? 1 : 0
             Behavior on opacity { NumberAnimation { duration: Theme.animSlow } }
 
             Repeater {
-                model: Cava.barCount
+                // Zero rows, not just an invisible Row: occlusion does not stop
+                // Qt from re-evaluating bindings, so twenty-eight delegates
+                // kept recomputing their heights off every cava frame behind an
+                // opaque window — about half the shell's idle CPU, spent on
+                // something nobody could see. Dropping the delegates is what
+                // actually stops the work.
+                //
+                // Only the spectrum is gated. Hiding the whole window would
+                // also take the clock, and niri is a scrolling tiler: a window
+                // on this workspace very often leaves most of the output bare.
+                model: (Cava.active && Wallpaper.desktopVisible) ? Cava.barCount : 0
                 delegate: Item {
                     required property int index
                     readonly property real level: Cava.values[index] || 0

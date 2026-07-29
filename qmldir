@@ -13,6 +13,7 @@ singleton Recorder 1.0 Recorder.qml
 singleton Notifs 1.0 Notifs.qml
 singleton Wallpaper 1.0 Wallpaper.qml
 singleton ShellActions 1.0 ShellActions.qml
+singleton Wallpapers 1.0 Wallpapers.qml
 ManagedProcess 1.0 ManagedProcess.qml
 MenuSurface 1.0 MenuSurface.qml
 MenuItemRow 1.0 MenuItemRow.qml
@@ -36,6 +37,8 @@ PalettePreview 1.0 PalettePreview.qml
 Reveal 1.0 Reveal.qml
 MotionAdd 1.0 MotionAdd.qml
 MotionMove 1.0 MotionMove.qml
+WallpaperPicker 1.0 WallpaperPicker.qml
+WallpaperTile 1.0 WallpaperTile.qml
 LazyPanel 1.0 LazyPanel.qml
 NotificationPanel 1.0 NotificationPanel.qml
 StatChip 1.0 StatChip.qml
