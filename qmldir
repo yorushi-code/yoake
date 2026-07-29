@@ -12,6 +12,7 @@ singleton SysInfo 1.0 SysInfo.qml
 singleton Recorder 1.0 Recorder.qml
 singleton Notifs 1.0 Notifs.qml
 singleton Wallpaper 1.0 Wallpaper.qml
+singleton ShellActions 1.0 ShellActions.qml
 ManagedProcess 1.0 ManagedProcess.qml
 MenuSurface 1.0 MenuSurface.qml
 MenuItemRow 1.0 MenuItemRow.qml
@@ -30,6 +31,7 @@ BarBattery 1.0 BarBattery.qml
 BarRecorder 1.0 BarRecorder.qml
 BarNotifications 1.0 BarNotifications.qml
 WallpaperView 1.0 WallpaperView.qml
+DesktopLayer 1.0 DesktopLayer.qml
 StatChip 1.0 StatChip.qml
 FrostedBackground 1.0 FrostedBackground.qml
 MediaOsd 1.0 MediaOsd.qml

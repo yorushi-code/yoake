@@ -16,6 +16,9 @@ Item {
     id: root
 
     property var barWindow: null
+    // Scoped to the output so the same widget on a second monitor
+    // does not share one open-menu key with this one.
+    readonly property string menuId: Menus.idFor(root.barWindow, "network")
 
     width: netRow.width
     height: Theme.barHeight
@@ -88,24 +91,21 @@ Item {
         cursorShape: Qt.PointingHandCursor
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         onClicked: {
-            if (Menus.isOpen(menu)) {
-                Menus.closeAll();
-            } else {
-                // The one place a scan is acceptable: the user just asked to
-                // see the list, and it is a single scan rather than a poll.
-                if (root.wifiDevice && Networking.wifiEnabled) root.wifiDevice.scan();
-                netProc.running = true;
-                Menus.open(menu);
-            }
+            // The one place a scan is acceptable: the user just asked to
+            // see the list, and it is a single scan rather than a poll.
+            if (root.wifiDevice && Networking.wifiEnabled) root.wifiDevice.scan();
+            netProc.running = true;
+            Menus.toggle(root.menuId);
         }
     }
 
     ActionMenu {
         id: menu
+        menuId: root.menuId
         anchorItem: root
-        open: Menus.isOpen(menu)
+        open: Menus.isOpen(root.menuId)
         model: {
-            if (!Menus.isOpen(menu)) return [];
+            if (!Menus.isOpen(root.menuId)) return [];
             const out = [{
                 text: Networking.wifiEnabled ? "Выключить Wi-Fi" : "Включить Wi-Fi",
                 glyph: Networking.wifiEnabled ? Glyphs.wifiOff : Glyphs.wifi,
@@ -137,7 +137,7 @@ Item {
 
     Tooltip {
         anchorItem: root
-        active: ma.containsMouse && !Menus.isOpen(menu)
+        active: ma.containsMouse && !Menus.isOpen(root.menuId)
         text: root.ssid !== "" ? root.ssid : "Не подключено"
         subtext: "ПКМ — выбор сети"
     }

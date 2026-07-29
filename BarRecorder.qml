@@ -7,6 +7,9 @@ Item {
     id: root
 
     property var barWindow: null
+    // Scoped to the output so the same widget on a second monitor
+    // does not share one open-menu key with this one.
+    readonly property string menuId: Menus.idFor(root.barWindow, "recorder")
 
     visible: Recorder.recording
     width: Recorder.recording ? recRow.width : 0
@@ -60,8 +63,7 @@ Item {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         onClicked: mouse => {
             if (mouse.button === Qt.RightButton) {
-                if (Menus.isOpen(menu)) Menus.closeAll();
-                else Menus.open(menu);
+                Menus.toggle(root.menuId);
                 return;
             }
             Recorder.stop();
@@ -70,9 +72,10 @@ Item {
 
     ActionMenu {
         id: menu
+        menuId: root.menuId
         anchorItem: root
-        open: Menus.isOpen(menu)
-        model: Menus.isOpen(menu) ? [
+        open: Menus.isOpen(root.menuId)
+        model: Menus.isOpen(root.menuId) ? [
             {
                 text: "Остановить запись",
                 glyph: Glyphs.stop,
@@ -97,7 +100,7 @@ Item {
 
     Tooltip {
         anchorItem: root
-        active: ma.containsMouse && !Menus.isOpen(menu)
+        active: ma.containsMouse && !Menus.isOpen(root.menuId)
         text: "Идёт запись — " + Recorder.elapsedText
         subtext: "ЛКМ — остановить · ПКМ — меню"
     }

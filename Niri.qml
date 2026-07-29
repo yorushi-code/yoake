@@ -39,6 +39,24 @@ Singleton {
         return !root.windows.some(w => w.workspace_id === ws.id);
     }
 
+    // Anything that moves the user's attention elsewhere. A menu left hanging
+    // after the user has alt-tabbed away reads as the shell being stuck, and
+    // the popup has no focus of its own to lose under niri.
+    signal attentionMoved()
+
+    property var focusedWindowId: null
+
+    // Focus *leaving* every window is exactly what happens when the bar grabs
+    // keyboard focus to open a menu, so a null id must not count as attention
+    // moving — otherwise every menu would close on the frame it opened.
+    function _applyWindowFocusChanged(payload) {
+        const id = (payload && payload.id !== undefined) ? payload.id : null;
+        if (id === null) return;
+        if (id === root.focusedWindowId) return;
+        root.focusedWindowId = id;
+        root.attentionMoved();
+    }
+
     function _applyWorkspacesChanged(payload) {
         root.workspaces = payload.workspaces;
     }
@@ -46,6 +64,7 @@ Singleton {
     function _applyWorkspaceActivated(payload) {
         const target = root.workspaces.find(w => w.id === payload.id);
         if (!target) return;
+        root.attentionMoved();
         const output = target.output;
         root.workspaces = root.workspaces.map(w => {
             if (w.output === output) {
@@ -91,6 +110,7 @@ Singleton {
                 else if (evt.WindowsChanged) root.windows = evt.WindowsChanged.windows;
                 else if (evt.WindowOpenedOrChanged) root._applyWindowOpenedOrChanged(evt.WindowOpenedOrChanged);
                 else if (evt.WindowClosed) root.windows = root.windows.filter(w => w.id !== evt.WindowClosed.id);
+                else if (evt.WindowFocusChanged) root._applyWindowFocusChanged(evt.WindowFocusChanged);
                 else if (evt.OverviewOpenedOrClosed) root.overviewOpen = evt.OverviewOpenedOrClosed.is_open;
             }
         }

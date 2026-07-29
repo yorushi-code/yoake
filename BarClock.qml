@@ -7,6 +7,9 @@ Row {
     id: root
 
     property var barWindow: null
+    // Scoped to the output so the same widget on a second monitor
+    // does not share one open-menu key with this one.
+    readonly property string menuId: Menus.idFor(root.barWindow, "clock")
 
     spacing: 10
     anchors.verticalCenter: parent ? parent.verticalCenter : undefined
@@ -69,8 +72,7 @@ Row {
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onClicked: mouse => {
                 if (mouse.button === Qt.RightButton) {
-                    if (Menus.isOpen(menu)) Menus.closeAll();
-                    else Menus.open(menu);
+                    Menus.toggle(root.menuId);
                     return;
                 }
                 Menus.closeAll();
@@ -82,14 +84,15 @@ Row {
         // right-clicked without duplicating the model.
         ActionMenu {
             id: menu
+            menuId: root.menuId
             anchorItem: timeItem
-            model: Menus.isOpen(menu) ? root.menuModel : []
-            open: Menus.isOpen(menu)
+            model: Menus.isOpen(root.menuId) ? root.menuModel : []
+            open: Menus.isOpen(root.menuId)
         }
 
         Tooltip {
             anchorItem: timeItem
-            active: clockArea.containsMouse && !Menus.isOpen(menu)
+            active: clockArea.containsMouse && !Menus.isOpen(root.menuId)
             text: Qt.formatDateTime(clock.date, "dddd, d MMMM yyyy")
             subtext: "ЛКМ — панель управления · ПКМ — меню"
         }
@@ -117,8 +120,7 @@ Row {
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onClicked: mouse => {
                 if (mouse.button === Qt.RightButton) {
-                    if (Menus.isOpen(menu)) Menus.closeAll();
-                    else Menus.open(menu);
+                    Menus.toggle(root.menuId);
                     return;
                 }
                 Menus.closeAll();
@@ -128,7 +130,7 @@ Row {
 
         Tooltip {
             anchorItem: dateItem
-            active: dateArea.containsMouse && !Menus.isOpen(menu)
+            active: dateArea.containsMouse && !Menus.isOpen(root.menuId)
             text: "Календарь"
             subtext: "ПКМ — меню"
         }

@@ -18,6 +18,9 @@ Row {
     // Needed for the fallback path: quickshell's own menu renderer wants the
     // window the popup should belong to.
     property var barWindow: null
+    // Scoped to the output; the per-item suffix is added in the delegate,
+    // since each tray icon owns a separate menu.
+    readonly property string menuScope: Menus.idFor(root.barWindow, "tray")
 
     spacing: 4
     anchors.verticalCenter: parent ? parent.verticalCenter : undefined
@@ -30,6 +33,8 @@ Row {
         delegate: Item {
             id: entry
             required property var modelData
+
+            readonly property string menuId: root.menuScope + "/" + entry.modelData.id
 
             // Full bar height so the icon is actually clickable — the old 15px
             // square demanded pixel-accurate aim.
@@ -88,8 +93,7 @@ Row {
                         entry.modelData.activate();
                         return;
                     }
-                    if (Menus.isOpen(menu)) Menus.closeAll();
-                    else Menus.open(menu);
+                    Menus.toggle(entry.menuId);
                 }
 
                 // Volume-style scroll handling is part of the spec and some
@@ -102,14 +106,15 @@ Row {
 
             TrayMenu {
                 id: menu
+                menuId: entry.menuId
                 handle: entry.modelData.menu
                 anchorItem: entry
-                open: Menus.isOpen(menu)
+                open: Menus.isOpen(entry.menuId)
             }
 
             Tooltip {
                 anchorItem: entry
-                active: trayMa.containsMouse && !Menus.isOpen(menu)
+                active: trayMa.containsMouse && !Menus.isOpen(entry.menuId)
                 text: entry.modelData.tooltipTitle || entry.modelData.title || entry.modelData.id
                 subtext: entry.modelData.tooltipDescription || ""
             }

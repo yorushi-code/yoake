@@ -14,7 +14,12 @@ Item {
 
     default property alias content: inner.data
     // Right-click on the island's own surface (not on a widget inside it).
-    property var menuModel: []
+    property var menuModel: ShellActions.shellMenu
+    // Distinguishes the three islands on this output from each other and from
+    // the same islands on another monitor.
+    property string islandName: ""
+    property var barWindow: null
+    readonly property string menuId: Menus.idFor(root.barWindow, "island/" + root.islandName)
     property real padding: 14
     // Centre island only: the accent glow breathes with the bass. Implemented
     // here rather than passed in as a child, since a glow anchored to the
@@ -74,10 +79,7 @@ Item {
         anchors.fill: parent
         acceptedButtons: Qt.RightButton
         enabled: root.menuModel.length > 0
-        onClicked: {
-            if (Menus.isOpen(shellMenu)) Menus.closeAll();
-            else Menus.open(shellMenu);
-        }
+        onClicked: Menus.toggle(root.menuId)
     }
 
     Item {
@@ -89,9 +91,9 @@ Item {
     }
 
     ActionMenu {
-        id: shellMenu
+        menuId: root.menuId
         anchorItem: root
-        model: Menus.isOpen(shellMenu) ? root.menuModel : []
-        open: Menus.isOpen(shellMenu)
+        model: Menus.isOpen(root.menuId) ? root.menuModel : []
+        open: Menus.isOpen(root.menuId)
     }
 }

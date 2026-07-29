@@ -9,6 +9,9 @@ Item {
     id: root
 
     property var barWindow: null
+    // Scoped to the output so the same widget on a second monitor
+    // does not share one open-menu key with this one.
+    readonly property string menuId: Menus.idFor(root.barWindow, "audio")
 
     width: audioRow.width
     height: Theme.barHeight
@@ -88,8 +91,7 @@ Item {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         onClicked: mouse => {
             if (mouse.button === Qt.RightButton) {
-                if (Menus.isOpen(menu)) Menus.closeAll();
-                else Menus.open(menu);
+                Menus.toggle(root.menuId);
                 return;
             }
             if (root.sink && root.sink.audio) root.sink.audio.muted = !root.muted;
@@ -103,11 +105,12 @@ Item {
 
     ActionMenu {
         id: menu
+        menuId: root.menuId
         anchorItem: root
-        open: Menus.isOpen(menu)
+        open: Menus.isOpen(root.menuId)
         // Rebuilt on each open so hot-plugged devices appear without a reload.
         model: {
-            if (!Menus.isOpen(menu)) return [];
+            if (!Menus.isOpen(root.menuId)) return [];
             const out = [];
             const sinks = Pipewire.nodes.values.filter(n => n.isSink && !n.isStream);
             for (const node of sinks) {
@@ -136,7 +139,7 @@ Item {
 
     Tooltip {
         anchorItem: root
-        active: ma.containsMouse && !Menus.isOpen(menu)
+        active: ma.containsMouse && !Menus.isOpen(root.menuId)
         text: root.sink ? root.nameFor(root.sink) : "Нет устройства вывода"
         subtext: "ЛКМ — звук вкл/выкл · колесо — громкость · ПКМ — устройство"
     }

@@ -10,6 +10,9 @@ Item {
     id: root
 
     property var barWindow: null
+    // Scoped to the output so the same widget on a second monitor
+    // does not share one open-menu key with this one.
+    readonly property string menuId: Menus.idFor(root.barWindow, "media")
 
     width: mediaRow.width
     height: Theme.barHeight
@@ -105,8 +108,7 @@ Item {
         acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
         onClicked: mouse => {
             if (mouse.button === Qt.RightButton) {
-                if (Menus.isOpen(menu)) Menus.closeAll();
-                else Menus.open(menu);
+                Menus.toggle(root.menuId);
             } else if (mouse.button === Qt.MiddleButton) {
                 Media.next();
             } else {
@@ -121,10 +123,11 @@ Item {
 
     ActionMenu {
         id: menu
+        menuId: root.menuId
         anchorItem: root
-        open: Menus.isOpen(menu)
+        open: Menus.isOpen(root.menuId)
         model: {
-            if (!Menus.isOpen(menu)) return [];
+            if (!Menus.isOpen(root.menuId)) return [];
             const out = [];
             const players = Mpris.players.values;
             if (players.length > 1) {
@@ -177,7 +180,7 @@ Item {
 
     Tooltip {
         anchorItem: root
-        active: mediaArea.containsMouse && Media.hasPlayer && !Menus.isOpen(menu)
+        active: mediaArea.containsMouse && Media.hasPlayer && !Menus.isOpen(root.menuId)
         text: Media.title
         subtext: "ЛКМ — пауза · колесо — трек · ПКМ — плеер"
     }

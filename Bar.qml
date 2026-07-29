@@ -41,6 +41,7 @@ PanelWindow {
 
     // Any click that isn't on a menu should dismiss it. The islands don't cover
     // the whole bar, so this sits underneath them and catches the gaps.
+    // Clicks on bare desktop are DesktopLayer's job.
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
@@ -51,66 +52,10 @@ PanelWindow {
     Item {
         anchors.fill: parent
         focus: Menus.anyOpen
-        Keys.onEscapePressed: Menus.closeAll()
-    }
-
-    // Applications offered in the shell menu. Resolved through DesktopEntries
-    // so the real Exec line and icon are used rather than a guessed command,
-    // and entries that aren't installed are dropped instead of producing a
-    // menu item that fails silently.
-    readonly property var favouriteIds: [
-        "dev.yorushi.MihomoGui",
-        "org.pulseaudio.pavucontrol",
-        "org.gnome.Nautilus",
-        "kitty"
-    ]
-
-    readonly property var shellMenuModel: {
-        const out = [
-            {
-                text: "Сменить обои",
-                glyph: Glyphs.image,
-                action: () => Quickshell.execDetached(["python3", Quickshell.env("HOME") + "/.local/bin/wallpaper-picker-gui.py"])
-            },
-            {
-                text: "Горячие клавиши",
-                glyph: Glyphs.keyboard,
-                action: () => Toggles.cheatSheetOpen = true
-            },
-            {
-                text: "Панель управления",
-                glyph: Glyphs.tune,
-                action: () => Toggles.controlCenterOpen = true
-            }
-        ];
-
-        // DesktopEntries populates asynchronously, and byId() is a plain call
-        // that registers no dependency — touching the model here is what makes
-        // this binding re-run once the entries have actually been scanned.
-        const _ = DesktopEntries.applications.values.length;
-
-        const apps = [];
-        for (const id of bar.favouriteIds) {
-            const entry = DesktopEntries.byId(id);
-            if (!entry) continue;
-            apps.push({
-                text: entry.name,
-                glyph: Glyphs.apps,
-                action: () => Quickshell.execDetached(entry.command)
-            });
+        Keys.onEscapePressed: {
+            Menus.closeAll();
+            Toggles.closeAll();
         }
-        if (apps.length > 0) {
-            out.push({ separator: true });
-            for (const a of apps) out.push(a);
-        }
-
-        out.push({ separator: true });
-        out.push({
-            text: "Перезагрузить оболочку",
-            glyph: Glyphs.refresh,
-            action: () => Quickshell.reload(true)
-        });
-        return out;
     }
 
     // ── Left island: workspaces ──
@@ -118,7 +63,8 @@ PanelWindow {
         id: leftIsland
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
-        menuModel: bar.shellMenuModel
+        barWindow: bar
+        islandName: "left"
 
         BarWorkspaces {
             anchors.verticalCenter: parent.verticalCenter
@@ -131,7 +77,8 @@ PanelWindow {
         id: centerIsland
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
-        menuModel: bar.shellMenuModel
+        barWindow: bar
+        islandName: "centre"
 
         pulseWithAudio: true
 
@@ -153,7 +100,8 @@ PanelWindow {
         id: rightIsland
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
-        menuModel: bar.shellMenuModel
+        barWindow: bar
+        islandName: "right"
 
         Row {
             anchors.verticalCenter: parent.verticalCenter

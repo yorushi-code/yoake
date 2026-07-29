@@ -15,6 +15,9 @@ MenuSurface {
     property var model: []
     // The item the menu hangs from; the caller sets this and toggles `open`.
     property Item anchorItem: null
+    // The owner's key in the Menus registry, so this menu can retire itself
+    // without the owner having to observe every way it might close.
+    property string menuId: ""
 
     anchor {
         item: root.anchorItem
@@ -54,7 +57,7 @@ MenuSurface {
     onModelChanged: root.contentWidth = root.measure(root.model)
     Component.onCompleted: root.contentWidth = root.measure(root.model)
 
-    onDismissed: Menus.close(root)
+    onDismissed: Menus.close(root.menuId)
 
     Column {
         id: column
@@ -98,7 +101,7 @@ MenuSurface {
                 onTriggered: {
                     // Close first: an action that opens a window or another
                     // menu should not leave this one hanging behind it.
-                    Menus.close(root);
+                    Menus.close(root.menuId);
                     if (modelData.action) modelData.action();
                 }
             }

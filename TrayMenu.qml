@@ -24,6 +24,8 @@ MenuSurface {
     // A QsMenuHandle — SystemTrayItem.menu.
     property var handle: null
     property Item anchorItem: null
+    // The owner's key in the Menus registry; see ActionMenu.
+    property string menuId: ""
 
     anchor {
         item: root.anchorItem
@@ -59,7 +61,7 @@ MenuSurface {
 
     onEntriesChanged: root.contentWidth = root.measure(root.entries)
 
-    onDismissed: Menus.close(root)
+    onDismissed: Menus.close(root.menuId)
     onOpenChanged: if (!root.open) root.expanded = null
 
     // Which entry currently has its children shown. One at a time, so the menu
@@ -132,7 +134,7 @@ MenuSurface {
                                 return;
                             }
                             modelData.triggered();
-                            Menus.close(root);
+                            Menus.close(root.menuId);
                         }
                     }
 
@@ -171,7 +173,7 @@ MenuSurface {
 
                                 onTriggered: {
                                     modelData.triggered();
-                                    Menus.close(root);
+                                    Menus.close(root.menuId);
                                 }
                             }
                         }

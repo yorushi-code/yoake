@@ -6,6 +6,9 @@ Item {
     id: root
 
     property var barWindow: null
+    // Scoped to the output so the same widget on a second monitor
+    // does not share one open-menu key with this one.
+    readonly property string menuId: Menus.idFor(root.barWindow, "notifications")
 
     // Wider than the glyph so the count badge has somewhere to sit without
     // colliding with the tray icon beside it.
@@ -82,8 +85,7 @@ Item {
         acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
         onClicked: mouse => {
             if (mouse.button === Qt.RightButton) {
-                if (Menus.isOpen(menu)) Menus.closeAll();
-                else Menus.open(menu);
+                Menus.toggle(root.menuId);
                 return;
             }
             if (mouse.button === Qt.MiddleButton) {
@@ -97,9 +99,10 @@ Item {
 
     ActionMenu {
         id: menu
+        menuId: root.menuId
         anchorItem: root
-        open: Menus.isOpen(menu)
-        model: Menus.isOpen(menu) ? [
+        open: Menus.isOpen(root.menuId)
+        model: Menus.isOpen(root.menuId) ? [
             {
                 text: Notifs.dnd ? "Выключить «не беспокоить»" : "Не беспокоить",
                 glyph: Notifs.dnd ? Glyphs.bell : Glyphs.bellOff,
@@ -125,7 +128,7 @@ Item {
 
     Tooltip {
         anchorItem: root
-        active: notifArea.containsMouse && !Menus.isOpen(menu)
+        active: notifArea.containsMouse && !Menus.isOpen(root.menuId)
         text: Notifs.dnd ? "Не беспокоить"
             : (Notifs.count > 0 ? "Уведомлений: " + Notifs.count : "Нет уведомлений")
         subtext: "СКМ — не беспокоить · ПКМ — меню"

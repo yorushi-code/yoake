@@ -10,30 +10,46 @@ import Quickshell
 // immediately for a popup opened without a preceding click.
 //
 // So dismissal is driven from here instead: opening any menu closes the
-// previous one, and anything that should cancel a menu (a click elsewhere in
-// the bar, Escape, a triggered item) calls closeAll(). The focus grab stays
-// enabled on top of this as a bonus path for clicks on the desktop.
+// previous one, and anything that should cancel a menu (a click on the
+// desktop, Escape, a triggered item, focus moving to a window) calls
+// closeAll(). The focus grab stays enabled on top of this as a bonus path.
+//
+// Keys are strings, not object identities. A menu behind a LazyLoader is a
+// different object every time it is shown, and `current === theObject` cannot
+// survive that — worse, the loader's `active` is driven *by* isOpen(), so the
+// object does not exist at the moment the answer is needed.
 Singleton {
     id: root
 
-    // Opaque token identifying the open menu — each menu passes its own `this`.
-    property var current: null
-    readonly property bool anyOpen: current !== null
+    property string current: ""
+    readonly property bool anyOpen: root.current !== ""
 
-    function open(token) {
-        if (root.current === token) return;
-        root.current = token;
+    function open(id) {
+        if (id) root.current = id;
     }
 
-    function close(token) {
-        if (root.current === token) root.current = null;
+    function close(id) {
+        if (root.current === id) root.current = "";
     }
 
     function closeAll() {
-        root.current = null;
+        root.current = "";
     }
 
-    function isOpen(token) {
-        return root.current === token;
+    function isOpen(id) {
+        return id !== "" && root.current === id;
+    }
+
+    // Every call site spelled this out as if/else; a menu that toggles itself
+    // is the only behaviour any of them wanted.
+    function toggle(id) {
+        root.current = (root.current === id) ? "" : id;
+    }
+
+    // Scopes a name to the output whose bar owns it. Without this the same
+    // widget on two monitors shares one key and both menus open together.
+    function idFor(barWindow, name) {
+        const output = (barWindow && barWindow.barScreen) ? barWindow.barScreen.name : "?";
+        return output + "/" + name;
     }
 }

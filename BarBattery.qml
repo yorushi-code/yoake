@@ -9,6 +9,9 @@ Item {
     id: root
 
     property var barWindow: null
+    // Scoped to the output so the same widget on a second monitor
+    // does not share one open-menu key with this one.
+    readonly property string menuId: Menus.idFor(root.barWindow, "battery")
 
     visible: UPower.displayDevice.isLaptopBattery
     width: visible ? batRow.width : 0
@@ -76,21 +79,18 @@ Item {
         cursorShape: Qt.PointingHandCursor
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         onClicked: {
-            if (Menus.isOpen(menu)) {
-                Menus.closeAll();
-            } else {
-                Power.refresh();
-                Menus.open(menu);
-            }
+            Power.refresh();
+            Menus.toggle(root.menuId);
         }
     }
 
     ActionMenu {
         id: menu
+        menuId: root.menuId
         anchorItem: root
-        open: Menus.isOpen(menu)
+        open: Menus.isOpen(root.menuId)
         model: {
-            if (!Menus.isOpen(menu)) return [];
+            if (!Menus.isOpen(root.menuId)) return [];
             const out = [];
             for (const p of Power.profiles) {
                 out.push({
@@ -112,7 +112,7 @@ Item {
 
     Tooltip {
         anchorItem: root
-        active: ma.containsMouse && !Menus.isOpen(menu)
+        active: ma.containsMouse && !Menus.isOpen(root.menuId)
         text: root.charging ? "Заряжается" : "От батареи"
         subtext: root.remaining !== ""
             ? (root.charging ? "До полного: " + root.remaining : "Осталось: " + root.remaining)

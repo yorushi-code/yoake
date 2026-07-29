@@ -35,6 +35,11 @@ PanelWindow {
     // other surfaces' zones; 0 would respect them and get shrunk, leaving that
     // strip as niri's grey clear colour under/around the bar islands.
     exclusiveZone: -1
+    // Nothing here is clickable, but a full-output surface with no mask claims
+    // the whole input region and silently ate every click on bare desktop —
+    // which is why menus could not be dismissed by clicking away from them.
+    // DesktopLayer handles desktop clicks instead.
+    mask: Region {}
 
     // Publishing this lets the singleton decide whether playback is worth
     // paying for, without it having to know about screens.
