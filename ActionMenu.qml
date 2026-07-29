@@ -55,7 +55,18 @@ MenuSurface {
     // Assigned, never bound: reading the metrics inside a binding that also
     // writes to them is exactly the loop this is avoiding.
     onModelChanged: root.contentWidth = root.measure(root.model)
-    Component.onCompleted: root.contentWidth = root.measure(root.model)
+
+    // Rows are built from the snapshot, not from the live model. Owners derive
+    // their entries from services that keep moving — Pipewire nodes, wifi scan
+    // results, MPRIS players — and any change while the menu was up rebuilt
+    // every row and replayed the whole reveal cascade in place. Menus close on
+    // any trigger, so there is nothing a live update could usefully show.
+    property var snapshot: []
+    onOpenChanged: if (root.open) root.snapshot = root.model
+    Component.onCompleted: {
+        root.contentWidth = root.measure(root.model);
+        if (root.open) root.snapshot = root.model;
+    }
 
     onDismissed: Menus.close(root.menuId)
 
@@ -65,7 +76,7 @@ MenuSurface {
         anchors.right: parent.right
 
         Repeater {
-            model: root.model
+            model: root.snapshot
             delegate: MenuItemRow {
                 id: entryRow
                 required property var modelData
@@ -81,12 +92,13 @@ MenuSurface {
                 enabled: modelData.enabled !== false
 
                 // Staggered reveal, capped so a long device list doesn't
-                // cascade slowly on open.
+                // cascade slowly on open. The cap lives in Theme.stagger so
+                // every cascade in the shell has the same rhythm.
                 opacity: 0
                 Component.onCompleted: entry.start()
                 SequentialAnimation {
                     id: entry
-                    PauseAnimation { duration: Math.min(index, 8) * 18 }
+                    PauseAnimation { duration: Theme.stagger(index) }
                     // Targets the row explicitly: `parent` inside an
                     // animation resolves to the enclosing Item's parent — the
                     // Column — so this animated the wrong object's opacity and

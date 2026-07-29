@@ -66,14 +66,15 @@ Singleton {
         if (!target) return;
         root.attentionMoved();
         const output = target.output;
+        // Copies rather than in-place edits, and only for rows that actually
+        // change. ScriptModel diffs this list to decide which delegates to
+        // update, and a mutated object compares equal to itself, so the pill
+        // would keep rendering the old focus state.
         root.workspaces = root.workspaces.map(w => {
-            if (w.output === output) {
-                w.is_active = (w.id === payload.id);
-            }
-            if (payload.focused) {
-                w.is_focused = (w.id === payload.id);
-            }
-            return w;
+            const active = (w.output === output) ? (w.id === payload.id) : w.is_active;
+            const focused = payload.focused ? (w.id === payload.id) : w.is_focused;
+            if (active === w.is_active && focused === w.is_focused) return w;
+            return Object.assign({}, w, { is_active: active, is_focused: focused });
         });
     }
 

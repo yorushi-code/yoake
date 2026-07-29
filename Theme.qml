@@ -63,14 +63,31 @@ QtObject {
     // look, since every animated Behavior in the shell pulls from the same
     // two curves instead of each panel inventing its own.
     readonly property var easeEmphasized: [0.05, 0.7, 0.1, 1.0, 1, 1]
-    readonly property var easeSpring: [0.34, 1.56, 0.64, 1.0, 1, 1]
+    readonly property var easeSpring: [0.34, 1.70, 0.60, 1.0, 1, 1]
     // Harder overshoot for panel entrances — a small scale change reads as
     // barely animated, so opens punch in with this and a wider scale delta.
-    readonly property var easeSpringBig: [0.22, 1.9, 0.5, 1.0, 1, 1]
+    // The overshoot is what carries "animated", not the duration: raising the
+    // amplitude makes motion read as more deliberate, where raising the
+    // duration would only make the shell feel slow to answer.
+    readonly property var easeSpringBig: [0.22, 2.15, 0.45, 1.0, 1, 1]
     // Accelerate curve for exits. easeEmphasized/easeSpring are decelerate
     // curves tuned for arrival — reused on close they leave the panel
     // lingering at low opacity until the hard unmap cuts it off, which is the
     // "jerky hide" this fixes. This one starts slow and finishes fast, so the
     // panel is genuinely gone by the time the window is dropped.
     readonly property var easeExit: [0.4, 0.0, 1.0, 1.0, 1, 1]
+
+    // ── Motion vocabulary ──
+    // How far a panel or row travels on the way in. Kept here rather than
+    // spelled out per file so a cascade in the control centre and one in a
+    // menu have visibly the same hand.
+    readonly property real revealScale: 0.90
+    readonly property real revealSlide: 18
+
+    // Per-item delay for a cascade. Capped: a fifty-node VPN list staggered
+    // linearly would still be arriving a second and a half after it opened,
+    // which reads as the shell being slow rather than as motion.
+    function stagger(index) {
+        return Math.min(Math.max(0, index), 9) * 34;
+    }
 }

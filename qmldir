@@ -33,6 +33,9 @@ BarNotifications 1.0 BarNotifications.qml
 WallpaperView 1.0 WallpaperView.qml
 DesktopLayer 1.0 DesktopLayer.qml
 PalettePreview 1.0 PalettePreview.qml
+Reveal 1.0 Reveal.qml
+MotionAdd 1.0 MotionAdd.qml
+MotionMove 1.0 MotionMove.qml
 LazyPanel 1.0 LazyPanel.qml
 NotificationPanel 1.0 NotificationPanel.qml
 StatChip 1.0 StatChip.qml

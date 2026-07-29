@@ -95,6 +95,25 @@ Item {
             color: mediaArea.containsMouse ? Theme.text : Theme.subtext1
             font.pixelSize: 11
             Behavior on color { ColorAnimation { duration: Theme.animFast } }
+
+            // A track change was the one thing in the bar that swapped with no
+            // motion at all. A dip and rise on the incoming title is enough to
+            // register as "this just changed" — a true crossfade would need a
+            // second label to hold the outgoing text, which is more machinery
+            // than eleven pixels of type is worth.
+            onTextChanged: if (trackText.text.length > 0) trackSwap.restart()
+            SequentialAnimation {
+                id: trackSwap
+                NumberAnimation {
+                    target: trackText; property: "opacity"; to: 0.2
+                    duration: Theme.animFast; easing.type: Easing.OutQuad
+                }
+                NumberAnimation {
+                    target: trackText; property: "opacity"; to: 1
+                    duration: Theme.animNormal
+                    easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeEmphasized
+                }
+            }
             Behavior on width {
                 NumberAnimation { duration: Theme.animNormal; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeEmphasized }
             }

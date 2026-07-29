@@ -25,6 +25,12 @@ Row {
     spacing: 4
     anchors.verticalCenter: parent ? parent.verticalCenter : undefined
 
+    // Tray icons used to blink in and out with no transition at all, and the
+    // neighbours teleported into the gap — one of the places the shell simply
+    // had no motion.
+    add: MotionAdd {}
+    move: MotionMove {}
+
     Repeater {
         // Passive means the application is asking not to be shown right now;
         // drawing it anyway leaves dead icons in the bar.

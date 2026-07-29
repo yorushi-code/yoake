@@ -30,6 +30,9 @@ Item {
     // button and nothing in it.
     function appendToast(notification) {
         const entry = {
+            // Stable key for the ScriptModel below; without one the list
+            // cannot be diffed and every toast is rebuilt on any change.
+            id: notification.id,
             notification: notification,
             summary: notification.summary || "",
             body: notification.body || "",
@@ -52,8 +55,8 @@ Item {
     function dismissToast(notification) {
         root.activeToasts = root.activeToasts.map(t =>
             t.notification === notification
-                ? { notification: t.notification, summary: t.summary, body: t.body,
-                    urgency: t.urgency, leaving: true }
+                ? { id: t.id, notification: t.notification, summary: t.summary,
+                    body: t.body, urgency: t.urgency, leaving: true }
                 : t);
         const reaper = toastReaperComponent.createObject(root, { notification });
         reaper.start();
@@ -143,7 +146,17 @@ Item {
             spacing: 8
 
             Repeater {
-                model: root.activeToasts
+                // ScriptModel, not the array. dismissToast() rebuilds the
+                // array, and a Repeater bound to one destroys every delegate
+                // when its identity changes. That replayed the entry animation
+                // on all the surviving toasts, and — worse — the recreated
+                // delegate for the leaving toast was born with `leaving`
+                // already true, so onLeavingChanged never fired and the exit
+                // animation had never once played.
+                model: ScriptModel {
+                    values: root.activeToasts
+                    objectProp: "id"
+                }
                 delegate: Item {
                     id: toastDelegate
                     required property var modelData
@@ -165,7 +178,13 @@ Item {
                     opacity: 0
                     x: 40
                     scale: 0.92
-                    Component.onCompleted: entryAnim.start()
+                    // A toast can be created already leaving if it is
+                    // dismissed within a frame of arriving; onLeavingChanged
+                    // does not fire for a value present at construction.
+                    Component.onCompleted: {
+                        if (toastDelegate.leaving) exitAnim.start();
+                        else entryAnim.start();
+                    }
                     ParallelAnimation {
                         id: entryAnim
                         SequentialAnimation {

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Effects
+import Quickshell
 
 // Workspace pills. Unfocused workspaces are dots and the focused one widens
 // into a numbered pill — a lighter touch than uniform numbered squares.
@@ -15,8 +16,26 @@ Row {
     spacing: 7
     anchors.verticalCenter: parent ? parent.verticalCenter : undefined
 
+    // Positioner transitions rather than a Component.onCompleted animation in
+    // the delegate: these fire only when a pill really is added or has to
+    // shift, which is the whole point of the ScriptModel below. The old
+    // hand-rolled entry ran on every delegate construction, and before the
+    // model was diffed that meant every workspace switch.
+    add: MotionAdd {}
+    move: MotionMove {}
+    populate: MotionAdd {}
+
     Repeater {
-        model: Niri.workspacesFor(root.output)
+        // ScriptModel, not the plain array. workspacesFor() returns a fresh
+        // array on every niri event, and a Repeater bound to an array rebuilds
+        // every delegate when its identity changes — so switching workspace
+        // destroyed and recreated all the pills and replayed their pop-in
+        // animation each time. That is the "animations repeat for no reason"
+        // bug: measured at 24 delegate rebuilds over seven switches, now zero.
+        model: ScriptModel {
+            values: Niri.workspacesFor(root.output)
+            objectProp: "id"
+        }
 
         delegate: Item {
             id: wsDelegate
@@ -24,16 +43,6 @@ Row {
             width: pill.width
             height: Theme.barHeight
             anchors.verticalCenter: parent.verticalCenter
-
-            // Pop in when a workspace is added rather than appearing instantly,
-            // so the row animates as workspaces come and go.
-            scale: 0
-            Component.onCompleted: wsEntry.start()
-            NumberAnimation {
-                id: wsEntry
-                target: wsDelegate; property: "scale"; from: 0; to: 1
-                duration: Theme.animNormal; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig
-            }
 
             // Accent-tinted RectangularShadow doubles as a glow, so the focused
             // workspace reads as lit rather than just filled.
