@@ -1,0 +1,185 @@
+pragma Singleton
+import QtQuick
+import Quickshell
+import Quickshell.Services.Mpris
+
+// Single source of truth for "the player we're showing". Bar, DesktopClock
+// and MediaOsd all need the same answer, and each picking its own favourite
+// out of Mpris.players meant they could disagree mid-track-change.
+//
+// Browser players emit badly behaved metadata. Firefox, on every track
+// change, alternates the real track frame with a placeholder carrying the
+// page title and an empty artist, and it sets `mpris:artUrl` only to clear it
+// again a few milliseconds later:
+//
+//   T=[Осколки]                A=[БАСТАРД] ART=[…_53.png]
+//   T=[Yandex Music: Select…]  A=[]        ART=[]          <- 26ms later
+//   T=[Осколки]                A=[БАСТАРД] ART=[]
+//
+// Binding the UI straight to those properties makes the art and title
+// visibly flicker. Everything below latches the last frame that looks real.
+Singleton {
+    id: root
+
+    // An explicit choice from the bar's right-click menu, which wins over the
+    // heuristic below until that player goes away. Without it there was no way
+    // to say which of two paused players the shell should be controlling.
+    property var pinned: null
+
+    // Prefer something actually playing; fall back to the first known player
+    // so a paused track still shows instead of the UI going blank.
+    readonly property var player: {
+        const list = Mpris.players.values;
+        if (root.pinned && list.indexOf(root.pinned) >= 0) return root.pinned;
+        return list.find(p => p.isPlaying) || list[0] || null;
+    }
+
+    function pin(target) {
+        root.pinned = (root.pinned === target) ? null : target;
+    }
+
+    // ── Latched metadata (what the UI binds to) ──
+    property string title: ""
+    property string artist: ""
+    property string artUrl: ""
+
+    // Whether this player has ever reported a non-empty artist. Used to tell
+    // "Firefox glitch frame" from "a player that genuinely has no artist"
+    // (podcasts, radio streams) — without it, the filter below would leave
+    // those players permanently blank.
+    property bool _sawArtist: false
+
+    function _sync() {
+        if (!player) {
+            title = "";
+            artist = "";
+            artUrl = "";
+            _sawArtist = false;
+            return;
+        }
+
+        const t = player.trackTitle;
+        const a = player.trackArtist;
+        const art = player.trackArtUrl;
+
+        if (a !== "") {
+            _sawArtist = true;
+        } else if (_sawArtist) {
+            // Artist vanished on a player that normally reports one: this is
+            // the placeholder frame, not a real track. Drop it entirely.
+            return;
+        }
+
+        if (t !== title || a !== artist) {
+            title = t;
+            artist = a;
+            // Art belongs to the track we just left, and Firefox deletes the
+            // old file, so keeping it would only produce a broken image.
+            artUrl = "";
+        }
+
+        // Only ever latched from a non-empty value — the clear-to-empty that
+        // follows a few milliseconds later is exactly the flicker we drop.
+        if (art !== "") artUrl = art;
+    }
+
+    // Metadata changes are coalesced through a short debounce instead of
+    // syncing on every raw change. Switching tracks forward-then-back makes a
+    // browser player churn title/artist/artUrl within a few ms, and reacting
+    // to each one thrashed the async image loader in AlbumArt hard enough to
+    // segfault the whole shell (rapid source swaps to already-deleted art
+    // files, racing cancel-vs-load). Collapsing the churn to a single sync
+    // per settle both fixes the crash and drops the redundant work.
+    Timer {
+        id: syncDebounce
+        interval: 90
+        onTriggered: root._sync()
+    }
+
+    Connections {
+        target: root.player
+        function onTrackTitleChanged() { syncDebounce.restart(); }
+        function onTrackArtistChanged() { syncDebounce.restart(); }
+        function onTrackArtUrlChanged() { syncDebounce.restart(); }
+    }
+
+    onPlayerChanged: {
+        _sawArtist = false;
+        _sync();
+    }
+    Component.onCompleted: _sync()
+
+    readonly property bool hasPlayer: player !== null && title !== ""
+    readonly property bool playing: player !== null && player.isPlaying
+
+    readonly property real position: player ? player.position : 0
+    readonly property real length: player && player.lengthSupported ? player.length : 0
+    readonly property real progress: length > 0 ? Math.max(0, Math.min(1, position / length)) : 0
+
+    // ── OSD visibility, driven by track changes ──
+    property bool osdShown: false
+
+    // Built from the latched values, not the raw ones — keyed off the raw
+    // title this fired on every placeholder frame and the OSD flashed
+    // repeatedly during a single track change.
+    readonly property string trackId: title === "" ? "" : `${title}|${artist}`
+    property bool _primed: false
+
+    onTrackIdChanged: {
+        // The first assignment happens at startup, when nothing actually
+        // changed — showing the OSD there would pop it on every login.
+        if (!_primed) {
+            _primed = trackId !== "";
+            return;
+        }
+        if (trackId !== "") root.showOsd();
+    }
+
+    Timer {
+        id: osdTimer
+        interval: 4000
+        onTriggered: root.osdShown = false
+    }
+
+    function showOsd() {
+        if (!root.hasPlayer) return;
+        root.osdShown = true;
+        osdTimer.restart();
+    }
+
+    function hideOsd() {
+        root.osdShown = false;
+        osdTimer.stop();
+    }
+
+    // ── Controls ──
+    function togglePlay() {
+        if (player && player.canTogglePlaying) player.togglePlaying();
+        showOsd();
+    }
+
+    function next() {
+        if (player && player.canGoNext) player.next();
+        showOsd();
+    }
+
+    function previous() {
+        if (player && player.canGoPrevious) player.previous();
+        showOsd();
+    }
+
+    // fraction is 0..1 of total length.
+    function seek(fraction) {
+        if (!player || !player.canSeek || root.length <= 0) return;
+        player.position = Math.max(0, Math.min(1, fraction)) * root.length;
+    }
+
+    // MPRIS position is only refreshed on demand, so without this poll every
+    // progress bar in the shell sits frozen while a track plays.
+    Timer {
+        interval: 1000
+        running: root.playing
+        repeat: true
+        onTriggered: if (root.player) root.player.positionChanged()
+    }
+}

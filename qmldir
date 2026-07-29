@@ -1,0 +1,50 @@
+singleton GeneratedColors 1.0 GeneratedColors.qml
+singleton Theme 1.0 Theme.qml
+singleton Glyphs 1.0 Glyphs.qml
+singleton Menus 1.0 Menus.qml
+singleton Power 1.0 Power.qml
+singleton Brightness 1.0 Brightness.qml
+singleton Niri 1.0 Niri.qml
+singleton Toggles 1.0 Toggles.qml
+singleton Cava 1.0 Cava.qml
+singleton Media 1.0 Media.qml
+singleton SysInfo 1.0 SysInfo.qml
+singleton Recorder 1.0 Recorder.qml
+singleton Notifs 1.0 Notifs.qml
+singleton Wallpaper 1.0 Wallpaper.qml
+ManagedProcess 1.0 ManagedProcess.qml
+MenuSurface 1.0 MenuSurface.qml
+MenuItemRow 1.0 MenuItemRow.qml
+ActionMenu 1.0 ActionMenu.qml
+TrayMenu 1.0 TrayMenu.qml
+Tooltip 1.0 Tooltip.qml
+Ripple 1.0 Ripple.qml
+BarIsland 1.0 BarIsland.qml
+BarWorkspaces 1.0 BarWorkspaces.qml
+BarMedia 1.0 BarMedia.qml
+BarClock 1.0 BarClock.qml
+BarTray 1.0 BarTray.qml
+BarNetwork 1.0 BarNetwork.qml
+BarAudio 1.0 BarAudio.qml
+BarBattery 1.0 BarBattery.qml
+BarRecorder 1.0 BarRecorder.qml
+BarNotifications 1.0 BarNotifications.qml
+WallpaperView 1.0 WallpaperView.qml
+StatChip 1.0 StatChip.qml
+FrostedBackground 1.0 FrostedBackground.qml
+MediaOsd 1.0 MediaOsd.qml
+MediaButton 1.0 MediaButton.qml
+SeekBar 1.0 SeekBar.qml
+AlbumArt 1.0 AlbumArt.qml
+Bar 1.0 Bar.qml
+NotificationCenter 1.0 NotificationCenter.qml
+NotificationIcon 1.0 NotificationIcon.qml
+NotificationActions 1.0 NotificationActions.qml
+Osd 1.0 Osd.qml
+CheatSheet 1.0 CheatSheet.qml
+ControlCenter 1.0 ControlCenter.qml
+SliderRow 1.0 SliderRow.qml
+ToggleRow 1.0 ToggleRow.qml
+PanelChrome 1.0 PanelChrome.qml
+DesktopClock 1.0 DesktopClock.qml
+Calendar 1.0 Calendar.qml

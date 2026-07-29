@@ -1,0 +1,109 @@
+import QtQuick
+import QtQuick.Effects
+
+// Workspace pills. Unfocused workspaces are dots and the focused one widens
+// into a numbered pill — a lighter touch than uniform numbered squares.
+//
+// The output is a parameter rather than the hardcoded "eDP-1" it used to be:
+// the shell is instantiated per screen now, and a bar on a second monitor was
+// previously showing the laptop panel's workspaces.
+Row {
+    id: root
+
+    property string output: ""
+
+    spacing: 7
+    anchors.verticalCenter: parent ? parent.verticalCenter : undefined
+
+    Repeater {
+        model: Niri.workspacesFor(root.output)
+
+        delegate: Item {
+            id: wsDelegate
+            required property var modelData
+            width: pill.width
+            height: Theme.barHeight
+            anchors.verticalCenter: parent.verticalCenter
+
+            // Pop in when a workspace is added rather than appearing instantly,
+            // so the row animates as workspaces come and go.
+            scale: 0
+            Component.onCompleted: wsEntry.start()
+            NumberAnimation {
+                id: wsEntry
+                target: wsDelegate; property: "scale"; from: 0; to: 1
+                duration: Theme.animNormal; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig
+            }
+
+            // Accent-tinted RectangularShadow doubles as a glow, so the focused
+            // workspace reads as lit rather than just filled.
+            RectangularShadow {
+                anchors.fill: pill
+                radius: pill.radius
+                color: modelData.is_urgent ? Theme.red : Theme.accent
+                blur: 20
+                spread: 1
+                opacity: modelData.is_focused ? 0.75 : (modelData.is_urgent ? 0.6 : 0)
+                offset: Qt.vector2d(0, 0)
+                Behavior on opacity {
+                    NumberAnimation { duration: Theme.animNormal; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeEmphasized }
+                }
+            }
+
+            Rectangle {
+                id: pill
+                width: modelData.is_focused ? 26 : 9
+                height: 9
+                radius: 4.5
+                anchors.verticalCenter: parent.verticalCenter
+                color: modelData.is_focused
+                    ? Theme.accent
+                    : (modelData.is_urgent ? Theme.red : (mouseArea.containsMouse ? Theme.subtext0 : Theme.surface2))
+                Behavior on color { ColorAnimation { duration: Theme.animFast } }
+                Behavior on width {
+                    NumberAnimation { duration: Theme.animNormal; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpring }
+                }
+
+                Text {
+                    anchors.centerIn: parent
+                    text: modelData.idx
+                    visible: modelData.is_focused
+                    color: Theme.crust
+                    font.pixelSize: 9
+                    font.bold: true
+                }
+
+                Ripple {
+                    anchors.fill: parent
+                    radius: parent.radius
+                    rippleColor: Theme.text
+                }
+            }
+
+            MouseArea {
+                id: mouseArea
+                anchors.fill: parent
+                anchors.margins: -4
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                acceptedButtons: Qt.LeftButton
+                onClicked: {
+                    Menus.closeAll();
+                    Niri.focusWorkspace(modelData.idx);
+                }
+                // Wheel over the workspace row walks between them, matching the
+                // Mod+scroll bind that already does this compositor-side.
+                onWheel: wheel => {
+                    Niri.action(wheel.angleDelta.y > 0 ? "focus-workspace-up" : "focus-workspace-down");
+                }
+            }
+
+            Tooltip {
+                anchorItem: wsDelegate
+                active: mouseArea.containsMouse
+                text: modelData.name ? modelData.name : "Рабочий стол " + modelData.idx
+                subtext: "колесо — переключение"
+            }
+        }
+    }
+}
