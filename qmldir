@@ -32,6 +32,7 @@ BarRecorder 1.0 BarRecorder.qml
 BarNotifications 1.0 BarNotifications.qml
 WallpaperView 1.0 WallpaperView.qml
 DesktopLayer 1.0 DesktopLayer.qml
+PalettePreview 1.0 PalettePreview.qml
 StatChip 1.0 StatChip.qml
 FrostedBackground 1.0 FrostedBackground.qml
 MediaOsd 1.0 MediaOsd.qml

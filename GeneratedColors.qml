@@ -3,7 +3,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Wallust-derived palette, read from a JSON data file rather than being a
+// Wallpaper-derived palette, read from a JSON data file rather than being a
 // generated .qml. Two reasons:
 //   1. Rewriting a .qml in the config dir triggers a full quickshell reload
 //      (every window destroyed and recreated) — a hard visual reset on every
@@ -13,6 +13,11 @@ import Quickshell.Io
 //      rather than snapping.
 // Values fall back to the last-shipped palette if the file is missing or
 // caught mid-write (JSON.parse throws → we keep what we had).
+//
+// Two sources, in priority order: a pin the user placed by clicking a swatch,
+// then the palette derived from the wallpaper. Both are written by
+// ~/.local/bin/wallpaper-palette.py, which drops the pin whenever the
+// wallpaper changes — a pin belongs to the image it was chosen against.
 Singleton {
     id: root
 
@@ -44,31 +49,63 @@ Singleton {
     Behavior on subtext1 { ColorAnimation { duration: root._fade } }
     Behavior on subtext0 { ColorAnimation { duration: root._fade } }
 
-    // Status colors stay fixed rather than wallpaper-derived: color10/color2
-    // aren't guaranteed to actually read as green/red for a given image (a
-    // charging-battery indicator turning reddish because the wallpaper
-    // happens to lack green content would be a real usability regression).
+    // Status colors stay fixed rather than wallpaper-derived: a hue that
+    // happens to be absent from one image isn't a reason for a charging
+    // indicator to stop reading as "good".
     readonly property color red: "#f38ba8"
     readonly property color green: "#a6e3a1"
 
+    // ── analysis, for the palette picker ──
+    // What the extractor measured, so the UI can explain where the colour came
+    // from instead of leaving the user to guess — which was the complaint.
+    property real hue: 0
+    property real chroma: 0
+    property real confidence: 0
+    property bool muted: false
+    property bool pinned: false
+    // [{ hex, hue, chroma }] — candidate accents found in the image.
+    property var swatches: []
+
+    readonly property string _keys: "background foreground surface0 surface1 surface2"
+        + " accent accentAlt blue yellow subtext1 subtext0"
+
+    // Tracked separately from FileView.loaded, which is already true while an
+    // async read is still in flight.
+    property bool hasPin: false
+
     function _apply() {
+        // The pin wins outright; it is a full palette, not a patch.
+        const text = root.hasPin ? pinFile.text() : colorFile.text();
         let j;
         try {
-            j = JSON.parse(colorFile.text());
+            j = JSON.parse(text);
         } catch (e) {
             return; // mid-write or malformed — keep current values
         }
-        if (j.background) root.background = j.background;
-        if (j.foreground) root.foreground = j.foreground;
-        if (j.surface0) root.surface0 = j.surface0;
-        if (j.surface1) root.surface1 = j.surface1;
-        if (j.surface2) root.surface2 = j.surface2;
-        if (j.accent) root.accent = j.accent;
-        if (j.accentAlt) root.accentAlt = j.accentAlt;
-        if (j.blue) root.blue = j.blue;
-        if (j.yellow) root.yellow = j.yellow;
-        if (j.subtext1) root.subtext1 = j.subtext1;
-        if (j.subtext0) root.subtext0 = j.subtext0;
+        for (const key of root._keys.split(" ")) {
+            if (j[key]) root[key] = j[key];
+        }
+        const meta = j.meta || {};
+        root.hue = meta.hue || 0;
+        root.chroma = meta.chroma || 0;
+        root.confidence = meta.confidence || 0;
+        root.muted = meta.muted === true;
+        root.pinned = meta.pinned === true;
+        root.swatches = meta.swatches || [];
+    }
+
+    // ── pinning ──
+    property Process pinProc: Process {}
+
+    function pin(hue, chroma) {
+        pinProc.command = [Quickshell.env("HOME") + "/.local/bin/wallpaper-palette.py",
+                           "--pin", String(hue), String(chroma)];
+        pinProc.running = true;
+    }
+
+    function unpin() {
+        pinProc.command = [Quickshell.env("HOME") + "/.local/bin/wallpaper-palette.py", "--unpin"];
+        pinProc.running = true;
     }
 
     FileView {
@@ -78,6 +115,20 @@ Singleton {
         path: Quickshell.shellPath("generated-colors.json")
         watchChanges: true
         onLoaded: root._apply()
+        onFileChanged: reload()
+    }
+
+    FileView {
+        id: pinFile
+        path: Quickshell.shellPath("palette-override.json")
+        watchChanges: true
+        // Absent most of the time — that is the unpinned state, not an error
+        // worth logging on every start.
+        printErrors: false
+        // Its disappearance is how unpinning takes effect, so both directions
+        // have to re-run the apply.
+        onLoaded: { root.hasPin = true; root._apply(); }
+        onLoadFailed: { root.hasPin = false; root._apply(); }
         onFileChanged: reload()
     }
 }

@@ -418,6 +418,15 @@ Item {
                             }
                         }
 
+                        // ── Palette ──
+                        PalettePreview {
+                            width: parent.width
+                            opacity: Toggles.controlCenterOpen ? 1 : 0
+                            Behavior on opacity {
+                                NumberAnimation { duration: Theme.animNormal; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeEmphasized }
+                            }
+                        }
+
                         // ── Video wallpaper ──
                         // Only meaningful when the current wallpaper is a video;
                         // playback is otherwise stopped anyway.
