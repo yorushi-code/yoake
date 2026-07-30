@@ -15,7 +15,33 @@ Rectangle {
     signal refreshRequested()
     signal removeRequested()
 
-    height: 54
+    // Node count, quota and expiry as the provider reported them during the
+    // last download. It only sends them in the headers of that download, so
+    // there is nothing to poll and nothing more recent to show.
+    readonly property var meta: root.modelData.meta || ({})
+    readonly property real used: (root.meta.upload || 0) + (root.meta.download || 0)
+    readonly property real quota: root.meta.total || 0
+    readonly property int daysLeft: root.meta.expire
+        ? Math.floor((root.meta.expire * 1000 - Date.now()) / 86400000)
+        : -9999
+
+    readonly property string detail: {
+        const parts = [];
+        if (root.meta.nodes) parts.push(root.meta.nodes + " нод");
+        if (root.quota > 0) {
+            parts.push(Mihomo.formatBytes(root.used) + " / " + Mihomo.formatBytes(root.quota));
+        } else if (root.used > 0) {
+            parts.push(Mihomo.formatBytes(root.used));
+        }
+        if (root.meta.expire) {
+            parts.push(root.daysLeft < 0
+                ? "истекла"
+                : "до " + Qt.formatDate(new Date(root.meta.expire * 1000), "dd.MM.yy"));
+        }
+        return parts.join(" · ");
+    }
+
+    height: info.implicitHeight + 20
     radius: Theme.radius
     color: root.modelData.active
         ? Qt.alpha(Theme.accent, 0.14)
@@ -23,6 +49,7 @@ Rectangle {
     Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
     Column {
+        id: info
         anchors.left: parent.left
         anchors.leftMargin: 12
         anchors.right: actions.left
@@ -57,6 +84,42 @@ Rectangle {
             color: Theme.subtext0
             font.pixelSize: 10
             elide: Text.ElideRight
+        }
+
+        Text {
+            width: parent.width
+            visible: root.detail !== ""
+            text: root.detail
+            // Red once the subscription has run out of either resource: by then
+            // it is the reason nothing connects, not a detail.
+            color: root.daysLeft < 0 || (root.quota > 0 && root.used >= root.quota)
+                ? Theme.red : Theme.subtext1
+            font.pixelSize: 10
+            elide: Text.ElideRight
+        }
+    }
+
+    // Quota as a hairline along the bottom edge, so the ratio is legible
+    // without reading the numbers.
+    Rectangle {
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.leftMargin: 12
+        anchors.rightMargin: 12
+        anchors.bottomMargin: 4
+        height: 2
+        radius: 1
+        color: Qt.alpha(Theme.text, 0.10)
+        visible: root.quota > 0
+
+        Rectangle {
+            height: parent.height
+            radius: parent.radius
+            width: parent.width * Math.min(1, root.used / root.quota)
+            color: root.used / root.quota > 0.9 ? Theme.red
+                : (root.used / root.quota > 0.7 ? Theme.yellow : Theme.accent)
+            Behavior on width { NumberAnimation { duration: Theme.animNormal } }
         }
     }
 

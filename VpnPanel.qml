@@ -1,11 +1,11 @@
 import QtQuick
 import Quickshell
 
-// VPN control, in the shell.
+// yworld — VPN control, in the shell.
 //
-// This replaces the GTK application entirely: subscriptions, node selection,
-// latency and the tunnel itself are all here, and mihomo-gui is now a headless
-// backend with no window of its own.
+// This is the whole user interface; ~/yworld is a headless backend with no
+// window of its own. Subscriptions, node selection, latency and the tunnel are
+// all driven from here.
 Item {
     id: root
 
@@ -29,7 +29,47 @@ Item {
         && Mihomo.groupNamed(root.shownGroup)) ? root.shownGroup : Mihomo.primaryGroup
     readonly property var activeGroupData: Mihomo.groupNamed(root.activeGroup)
 
+    // On a link that blocks most of a subscription, a fifty-row list with eleven
+    // usable rows scattered through it is the whole problem. Read once and
+    // written explicitly: a two-way binding to Prefs is a binding loop.
+    property bool hideDead: false
+    property Connections _prefsReady: Connections {
+        target: Prefs
+        function onLoadedChanged() { root.hideDead = Prefs.get("vpn.hideDead", false); }
+    }
+    Component.onCompleted: if (Prefs.loaded) root.hideDead = Prefs.get("vpn.hideDead", false)
+
+    readonly property var allNodes: root.activeGroupData ? root.activeGroupData.nodes : []
+    readonly property int measured: {
+        let n = 0;
+        for (const node of root.allNodes) {
+            if (Mihomo.delays[node] !== undefined) n++;
+        }
+        return n;
+    }
+    readonly property int aliveCount: {
+        let n = 0;
+        for (const node of root.allNodes) {
+            if (Mihomo.delays[node]) n++;
+        }
+        return n;
+    }
+    readonly property var shownNodes: {
+        if (!root.hideDead) return root.allNodes;
+        return root.allNodes.filter(n => Mihomo.delays[n] !== null);
+    }
+
     property bool adding: false
+
+    // Active subscription first. The footer is a bounded scroller, and with five
+    // providers the one actually running was as likely as not to be below the
+    // fold — which is the row you look for. sort() is stable, so everything else
+    // keeps the backend's alphabetical order.
+    readonly property var orderedSubscriptions: {
+        const list = (Mihomo.subscriptions || []).slice();
+        list.sort((a, b) => (b.active ? 1 : 0) - (a.active ? 1 : 0));
+        return list;
+    }
 
     PanelWindow {
         id: win
@@ -121,6 +161,18 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
+                }
+
+                Text {
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.topMargin: 13
+                    anchors.leftMargin: 16
+                    text: "yworld"
+                    color: Theme.subtext0
+                    font.pixelSize: 10
+                    font.bold: true
+                    font.letterSpacing: 1.5
                 }
 
                 Item {
@@ -240,23 +292,123 @@ Item {
                             }
                         }
 
+                        // Where traffic actually comes out. The reply also says
+                        // whether that address matches the one the physical link
+                        // has — the only thing that distinguishes a working
+                        // tunnel from one that is up and carrying nothing — but
+                        // the physical address itself is never printed: it is the
+                        // user's real location, and this panel gets screenshotted.
+                        // An Item around the Row, not a bare Row: a Row lays out
+                        // every child it has, so a MouseArea filling it would be
+                        // positioned as content and widen it.
+                        Item {
+                            id: egressRow
+                            width: parent.width
+                            height: egressContent.implicitHeight
+                            visible: Mihomo.running && (Mihomo.egress !== null || Mihomo.checking)
+
+                            Row {
+                                id: egressContent
+                                spacing: 6
+
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: Glyphs.earth
+                                    font.family: "Symbols Nerd Font"
+                                    font.pixelSize: 11
+                                    color: Mihomo.leaking ? Theme.red : Theme.accent
+                                    opacity: Mihomo.checking ? 0.5 : 1
+                                    Behavior on opacity { NumberAnimation { duration: Theme.animFast } }
+                                }
+
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: {
+                                        if (Mihomo.egress === null) return "Проверяю выход…";
+                                        if (Mihomo.leaking) return "Трафик идёт мимо туннеля";
+                                        const e = Mihomo.egress;
+                                        return e.ip + (e.country ? " · " + e.country : "");
+                                    }
+                                    color: Mihomo.leaking ? Theme.red : Theme.subtext1
+                                    font.pixelSize: 11
+                                    font.underline: egressArea.containsMouse && !Mihomo.checking
+                                }
+                            }
+
+                            MouseArea {
+                                id: egressArea
+                                width: egressContent.width + 8
+                                height: parent.height + 8
+                                anchors.centerIn: egressContent
+                                hoverEnabled: true
+                                enabled: !Mihomo.checking
+                                cursorShape: Qt.PointingHandCursor
+                                // The reading belongs to whichever node was
+                                // selected when it was taken, so it needs a way
+                                // to be retaken without reopening the panel.
+                                onClicked: Mihomo.check()
+                            }
+
+                            Tooltip {
+                                anchorItem: egressRow
+                                active: egressArea.containsMouse && !Mihomo.checking
+                                text: "Проверить выход заново"
+                                subtext: "Запрос идёт через сам mihomo"
+                            }
+                        }
+
                         Rectangle {
                             width: parent.width
-                            height: conflictText.implicitHeight + 16
+                            height: conflictColumn.implicitHeight + 16
                             radius: Theme.radius
                             visible: Mihomo.conflict !== ""
                             color: Qt.alpha(Theme.yellow, 0.16)
 
-                            Text {
-                                id: conflictText
+                            Column {
+                                id: conflictColumn
                                 anchors.left: parent.left
                                 anchors.right: parent.right
                                 anchors.margins: 10
                                 anchors.verticalCenter: parent.verticalCenter
-                                text: Mihomo.conflict + " держит маршрут по умолчанию — трафик пойдёт мимо туннеля"
-                                color: Theme.yellow
-                                font.pixelSize: 11
-                                wrapMode: Text.WordWrap
+                                spacing: 7
+
+                                Text {
+                                    width: parent.width
+                                    text: Mihomo.conflict + " держит маршрут по умолчанию — трафик пойдёт мимо туннеля"
+                                    color: Theme.yellow
+                                    font.pixelSize: 11
+                                    wrapMode: Text.WordWrap
+                                }
+
+                                // Only when there is a service to stop. Happ's
+                                // tunnel daemon runs as root, so this raises a
+                                // polkit prompt rather than acting silently.
+                                Rectangle {
+                                    width: rivalText.width + 20
+                                    height: 24
+                                    radius: 12
+                                    visible: Mihomo.conflictCanStop
+                                    color: Qt.alpha(Theme.yellow, rivalArea.containsMouse ? 0.4 : 0.22)
+                                    Behavior on color { ColorAnimation { duration: Theme.animFast } }
+
+                                    Text {
+                                        id: rivalText
+                                        anchors.centerIn: parent
+                                        text: "Остановить " + Mihomo.conflict
+                                        color: Theme.yellow
+                                        font.pixelSize: 11
+                                        font.bold: true
+                                    }
+
+                                    MouseArea {
+                                        id: rivalArea
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        enabled: !Mihomo.busy
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: Mihomo.stopRival()
+                                    }
+                                }
                             }
                         }
 
@@ -374,6 +526,49 @@ Item {
                                 }
                             }
                         }
+
+                        // How much of the group this network can actually carry.
+                        // Worth its own line: a subscription where two nodes in
+                        // fifty answer is not a subscription problem to solve by
+                        // scrolling, and the number says so at a glance.
+                        Item {
+                            width: parent.width
+                            height: 14
+                            visible: root.measured > 0
+
+                            Text {
+                                anchors.left: parent.left
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: "Живых " + root.aliveCount + " из " + root.allNodes.length
+                                color: root.aliveCount === 0 ? Theme.red
+                                    : (root.aliveCount * 3 < root.allNodes.length ? Theme.yellow : Theme.subtext0)
+                                font.pixelSize: 10
+                                font.bold: true
+                                font.letterSpacing: 1
+                            }
+
+                            Text {
+                                anchors.right: parent.right
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: root.hideDead ? "показать все" : "скрыть недоступные"
+                                color: hideArea.containsMouse ? Theme.accent : Theme.subtext0
+                                font.pixelSize: 10
+                                font.underline: hideArea.containsMouse
+                                Behavior on color { ColorAnimation { duration: Theme.animFast } }
+
+                                MouseArea {
+                                    id: hideArea
+                                    anchors.fill: parent
+                                    anchors.margins: -5
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        root.hideDead = !root.hideDead;
+                                        Prefs.set("vpn.hideDead", root.hideDead);
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     // ── footer: subscriptions ──
@@ -445,7 +640,7 @@ Item {
                                 spacing: 5
 
                                 Repeater {
-                                    model: Mihomo.subscriptions
+                                    model: root.orderedSubscriptions
 
                                     delegate: VpnSubscriptionRow {
                                         width: subsColumn.width
@@ -477,7 +672,7 @@ Item {
                             spacing: 2
 
                             Repeater {
-                                model: root.activeGroupData ? root.activeGroupData.nodes : []
+                                model: root.shownNodes
 
                                 delegate: VpnNodeRow {
                                     required property var modelData

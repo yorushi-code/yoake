@@ -5,7 +5,7 @@ import Quickshell
 // mihomo's RESTful controller, spoken to directly.
 //
 // Everything here is plain HTTP against a loopback port and needs no help from
-// Python. Routing it through mihomo-gui's CLI meant spawning an interpreter —
+// Python. Routing it through yworld's CLI meant spawning an interpreter —
 // 150-250ms — for a request that completes in under a millisecond, so the node
 // list visibly lagged every click. Python keeps only what genuinely cannot be
 // done from QML: subscription download with the user-agent probing that is the
@@ -13,7 +13,10 @@ import Quickshell
 // assembly, and starting or stopping the process.
 //
 // No secret is configured on the controller and it binds to 127.0.0.1 only, so
-// there is no authentication header to carry.
+// there is no authentication header to carry. Loopback is not by itself an
+// access control — mihomo accepts any Origin unless told otherwise, so the
+// generated config refuses them all (see config_build.py). None of the requests
+// below send an Origin header, so that costs this file nothing.
 Singleton {
     id: root
 

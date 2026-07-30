@@ -67,11 +67,17 @@ Rectangle {
         color: Qt.alpha(root.delayColor, 0.16)
         visible: root.delay !== undefined || root.probing
 
+        // A re-probe used to replace every number with an ellipsis, erasing
+        // readings that were about to be confirmed. Only nodes that have never
+        // been measured say nothing; the rest fade while the new number arrives.
+        opacity: root.probing && root.delay !== undefined ? 0.45 : 1
+        Behavior on opacity { NumberAnimation { duration: Theme.animFast } }
+
         Text {
             id: pillText
             anchors.centerIn: parent
             text: {
-                if (root.probing) return "…";
+                if (root.delay === undefined) return "…";
                 if (root.delay === null) return "нет";
                 return root.delay + " мс";
             }

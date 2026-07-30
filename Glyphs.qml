@@ -25,6 +25,7 @@ Singleton {
     readonly property string wifiNone: "\u{F092F}"
     readonly property string ethernet: "\u{F0200}"
     readonly property string vpn: "\u{F0582}"
+    readonly property string earth: "\u{F01E7}"
 
     // Audio
     readonly property string volumeHigh: "\u{F057E}"
