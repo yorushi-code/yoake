@@ -124,6 +124,7 @@ PanelWindow {
                 color: Qt.alpha(Theme.text, 0.15)
             }
 
+            BarVpn { barWindow: bar }
             BarNetwork { barWindow: bar }
             BarAudio { barWindow: bar }
             BarBattery { barWindow: bar }

@@ -14,6 +14,8 @@ singleton Notifs 1.0 Notifs.qml
 singleton Wallpaper 1.0 Wallpaper.qml
 singleton ShellActions 1.0 ShellActions.qml
 singleton Wallpapers 1.0 Wallpapers.qml
+singleton MihomoApi 1.0 MihomoApi.qml
+singleton Mihomo 1.0 Mihomo.qml
 ManagedProcess 1.0 ManagedProcess.qml
 MenuSurface 1.0 MenuSurface.qml
 MenuItemRow 1.0 MenuItemRow.qml
@@ -31,6 +33,11 @@ BarAudio 1.0 BarAudio.qml
 BarBattery 1.0 BarBattery.qml
 BarRecorder 1.0 BarRecorder.qml
 BarNotifications 1.0 BarNotifications.qml
+BarVpn 1.0 BarVpn.qml
+VpnPanel 1.0 VpnPanel.qml
+VpnNodeRow 1.0 VpnNodeRow.qml
+VpnSubscriptionRow 1.0 VpnSubscriptionRow.qml
+VpnSubscriptionEditor 1.0 VpnSubscriptionEditor.qml
 WallpaperView 1.0 WallpaperView.qml
 DesktopLayer 1.0 DesktopLayer.qml
 PalettePreview 1.0 PalettePreview.qml

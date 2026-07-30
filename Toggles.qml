@@ -15,12 +15,14 @@ QtObject {
     property bool cheatSheetOpen: false
     property bool calendarOpen: false
     property bool wallpaperPickerOpen: false
+    property bool vpnPanelOpen: false
 
     // Panels are dismissed by the same gestures as menus (desktop click,
     // Escape, focus moving to a window), so the desktop catcher needs one
     // question answered rather than a growing list of them.
     readonly property bool anyOpen: root.notifCenterOpen || root.controlCenterOpen
         || root.cheatSheetOpen || root.calendarOpen || root.wallpaperPickerOpen
+        || root.vpnPanelOpen
 
     function closeAll() {
         root.notifCenterOpen = false;
@@ -28,6 +30,7 @@ QtObject {
         root.cheatSheetOpen = false;
         root.calendarOpen = false;
         root.wallpaperPickerOpen = false;
+        root.vpnPanelOpen = false;
     }
 
     // Opening one panel closes the others: two frosted sheets overlapping read
@@ -46,6 +49,7 @@ QtObject {
         function cheatSheet() { root.exclusive("cheatSheet"); }
         function calendar() { root.exclusive("calendar"); }
         function wallpaper() { root.exclusive("wallpaperPicker"); }
+        function vpn() { root.exclusive("vpnPanel"); }
         function close() { root.closeAll(); Menus.closeAll(); }
     }
 }
