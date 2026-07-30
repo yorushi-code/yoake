@@ -14,7 +14,7 @@ import QtQuick
 Item {
     id: root
 
-    default property alias content: inner.data
+    default property alias content: inner.children
 
     property bool shown: false
     property int delay: 0

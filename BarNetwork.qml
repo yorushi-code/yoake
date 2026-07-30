@@ -91,11 +91,20 @@ Item {
         cursorShape: Qt.PointingHandCursor
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         onClicked: {
-            // The one place a scan is acceptable: the user just asked to
-            // see the list, and it is a single scan rather than a poll.
-            if (root.wifiDevice && Networking.wifiEnabled) root.wifiDevice.scan();
             netProc.running = true;
             Menus.toggle(root.menuId);
+        }
+    }
+
+    // Scanning runs only while the list is on screen. There is no one-shot scan
+    // in the API — the old `scan()` call was not a function at all and threw on
+    // every open — and leaving the scanner on stalls this single-radio card's
+    // association, which was the "network keeps dropping" bug.
+    Connections {
+        target: Menus
+        function onCurrentChanged() {
+            if (!root.wifiDevice) return;
+            root.wifiDevice.scannerEnabled = Menus.isOpen(root.menuId) && Networking.wifiEnabled;
         }
     }
 
@@ -118,7 +127,7 @@ Item {
                 if (nets.length > 0) out.push({ separator: true });
                 for (const n of nets) {
                     out.push({
-                        text: `${n.name}  ${Math.round(n.signalStrength)}%`,
+                        text: `${n.name}  ${Math.round(n.signalStrength * 100)}%`,
                         checkable: true,
                         checked: n.connected === true,
                         action: () => n.connected ? n.disconnect() : n.connect()

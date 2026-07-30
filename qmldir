@@ -16,6 +16,7 @@ singleton ShellActions 1.0 ShellActions.qml
 singleton Wallpapers 1.0 Wallpapers.qml
 singleton MihomoApi 1.0 MihomoApi.qml
 singleton Mihomo 1.0 Mihomo.qml
+singleton NightLight 1.0 NightLight.qml
 ManagedProcess 1.0 ManagedProcess.qml
 MenuSurface 1.0 MenuSurface.qml
 MenuItemRow 1.0 MenuItemRow.qml
@@ -61,6 +62,16 @@ NotificationActions 1.0 NotificationActions.qml
 Osd 1.0 Osd.qml
 CheatSheet 1.0 CheatSheet.qml
 ControlCenter 1.0 ControlCenter.qml
+CcTile 1.0 CcTile.qml
+CcTileGrid 1.0 CcTileGrid.qml
+CcPager 1.0 CcPager.qml
+CcListRow 1.0 CcListRow.qml
+CcWifiPage 1.0 CcWifiPage.qml
+CcBluetoothPage 1.0 CcBluetoothPage.qml
+CcDisplayPage 1.0 CcDisplayPage.qml
+CcPowerPage 1.0 CcPowerPage.qml
+CcStats 1.0 CcStats.qml
+CcQuickLaunch 1.0 CcQuickLaunch.qml
 SliderRow 1.0 SliderRow.qml
 ToggleRow 1.0 ToggleRow.qml
 PanelChrome 1.0 PanelChrome.qml
