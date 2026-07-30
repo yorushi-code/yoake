@@ -25,6 +25,10 @@ Singleton {
     property bool running: false
     property string active: ""
     property string lastError: ""
+    // Another TUN client owning the default route. The worst failure mode
+    // there is: both tunnels stay up and look healthy, and the one that lost
+    // simply carries nothing.
+    property string conflict: ""
     // A start blocks for up to about 7.5s while the controller is polled, so
     // the UI has to be able to say so.
     property bool busy: false
@@ -218,6 +222,7 @@ Singleton {
                 const j = root._parse(text);
                 root.running = j.running === true;
                 root.active = j.active || "";
+                root.conflict = j.conflict || "";
                 if (j.error) root.lastError = j.error;
                 // A running tunnel is the only case where asking the controller
                 // anything can succeed.

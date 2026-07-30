@@ -240,6 +240,26 @@ Item {
                             }
                         }
 
+                        Rectangle {
+                            width: parent.width
+                            height: conflictText.implicitHeight + 16
+                            radius: Theme.radius
+                            visible: Mihomo.conflict !== ""
+                            color: Qt.alpha(Theme.yellow, 0.16)
+
+                            Text {
+                                id: conflictText
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.margins: 10
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: Mihomo.conflict + " держит маршрут по умолчанию — трафик пойдёт мимо туннеля"
+                                color: Theme.yellow
+                                font.pixelSize: 11
+                                wrapMode: Text.WordWrap
+                            }
+                        }
+
                         Text {
                             width: parent.width
                             visible: Mihomo.lastError !== ""
