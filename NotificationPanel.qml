@@ -115,7 +115,7 @@ PanelWindow {
 
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
-                    text: server.trackedNotifications.values.length === 0
+                    text: Notifs.tracked.length === 0
                         ? "Нет уведомлений" : "Уведомления"
                     color: Theme.subtext1
                     font.pixelSize: 12
@@ -123,7 +123,7 @@ PanelWindow {
 
                 Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
-                    visible: server.trackedNotifications.values.length > 0
+                    visible: Notifs.tracked.length > 0
                     width: clearText.implicitWidth + 16
                     height: 20
                     radius: 10
@@ -188,7 +188,7 @@ PanelWindow {
                     spacing: 6
 
                     Repeater {
-                        model: server.trackedNotifications
+                        model: Notifs.tracked
                         delegate: Rectangle {
                             id: histDelegate
                             required property var modelData

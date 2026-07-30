@@ -111,7 +111,12 @@ Item {
     Connections {
         target: server.trackedNotifications
         function onValuesChanged() {
-            Notifs.count = server.trackedNotifications.values.length;
+            const values = server.trackedNotifications.values;
+            Notifs.count = values.length;
+            // A copy: the model's own values array is mutated in place, so
+            // assigning it directly hands out a reference that compares equal
+            // to itself after every change and never redraws.
+            Notifs.tracked = values.slice();
         }
     }
 

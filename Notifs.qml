@@ -15,6 +15,11 @@ Singleton {
     id: root
 
     property int count: 0
+    // The tracked list itself, mirrored out of NotificationCenter because it
+    // owns the one NotificationServer that can exist. The history panel lives
+    // in a different file and cannot see that file's ids — reaching for them
+    // is exactly how it ended up rendering nothing at all.
+    property var tracked: []
     // Suppresses toasts while still recording everything in the history, so
     // nothing is lost — this is "don't interrupt me", not "discard".
     property bool dnd: false
