@@ -26,45 +26,52 @@ Singleton {
         return root.workspaces.find(w => w.output === output && w.is_active) || null;
     }
 
-    // How much of this output the active workspace's tiles cover, 0..1.
+    // Whether the background layer on this output is certainly hidden.
     //
-    // Mere window presence used to be the signal, and it was wrong in the one
-    // way that matters: niri's default column is half the output width, so a
-    // single terminal froze the video wallpaper across the other half of the
-    // screen. This build reports no tile position (tile_pos_in_workspace_view
-    // is null even for the visible workspace), so summed tile area is the
-    // honest measure available — overlapping tiles only ever push the estimate
-    // up, which errs towards pausing rather than towards decoding unseen video.
-    function desktopCoverageOn(output) {
-        if (root.overviewOpen) return 0;
+    // Two things this build of niri does not report make the obvious approaches
+    // impossible: `tile_pos_in_workspace_view` is null even for the focused
+    // workspace, so where a column sits in the viewport is unknowable, and
+    // there is no `is_fullscreen` flag on a window at all.
+    //
+    // The previous answer summed every tile's area on the workspace and called
+    // 85% covered. That counts columns scrolled far off screen, so four open
+    // columns saturated it: the wallpaper froze on any busy workspace and
+    // started again the moment you switched to an emptier one — which is
+    // exactly how it looked from the outside, and it was this, not a decoder
+    // fault.
+    //
+    // What is left is one certain signal: a tile whose size is the whole
+    // output. niri gives a fullscreen window exactly that, gaps and bar strip
+    // included, and nothing else gets it. Everything short of fullscreen keeps
+    // playing, because niri's gaps and screen-edge padding leave real wallpaper
+    // showing under even a maximised column, and a frozen strip there is a far
+    // worse bug than the few percent of CPU that decoding costs.
+    function desktopOccludedOn(output) {
+        if (root.overviewOpen) return false;
         const ws = root.focusedWorkspaceOn(output);
-        if (!ws) return 0;
-        let area = 0;
+        if (!ws) return false;
+        let width = 0;
+        let height = 0;
         for (const s of Quickshell.screens) {
             if (s.name === output) {
-                area = s.width * s.height;
+                width = s.width;
+                height = s.height;
                 break;
             }
         }
-        if (area <= 0) return 1;
-        let covered = 0;
+        if (width <= 0 || height <= 0) return false;
         for (const w of root.windows) {
             if (w.workspace_id !== ws.id) continue;
             const size = w.layout ? (w.layout.tile_size || w.layout.window_size) : null;
-            // A window we cannot measure is still a window; assuming it fills
-            // the output is the safe direction.
-            if (!size) return 1;
-            covered += size[0] * size[1];
+            if (!size) continue;
+            // A pixel of slack: these are floats and the compositor rounds.
+            if (size[0] >= width - 1 && size[1] >= height - 1) return true;
         }
-        return Math.min(1, covered / area);
+        return false;
     }
 
-    // Not 1.0: gaps and rounding leave a few unlit pixels around a genuinely
-    // full column, and a sliver of wallpaper is not worth playing video for.
-    readonly property real coverageLimit: 0.85
-
     function desktopVisibleOn(output) {
-        return root.desktopCoverageOn(output) < root.coverageLimit;
+        return !root.desktopOccludedOn(output);
     }
 
     // Anything that moves the user's attention elsewhere. A menu left hanging

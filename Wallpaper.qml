@@ -47,22 +47,50 @@ Singleton {
         ? root.blurPath
         : ((root.isVideo && root.stillPath !== "") ? root.stillPath : root.path)
 
+    // What the player opens, as opposed to what the user picked. set-wallpaper
+    // caps a video's frame rate to what the screen and the CPU budget can
+    // carry, and `path` stays the source so the picker still highlights the
+    // file that was chosen.
+    property string playPath: ""
+    readonly property string playSource: root.playPath !== "" ? root.playPath : root.path
+
     // ── Video playback policy ──
     property bool pauseOnBattery: true
-    // Set by WallpaperView from Niri.desktopVisibleOn(); kept here so the
-    // control centre can report the state without reaching into a per-screen
-    // window.
-    property bool desktopVisible: true
 
     readonly property bool onBattery: UPower.displayDevice.isLaptopBattery
         && UPower.displayDevice.state === UPowerDeviceState.Discharging
 
-    // Playback stops whenever nobody can see it: niri is a scrolling tiler, so
-    // any window on the active workspace covers the background layer
-    // completely. Decoding video behind an opaque window is the single biggest
-    // cost this feature could add for no benefit at all.
-    readonly property bool videoPaused: !root.desktopVisible
-        || (root.pauseOnBattery && root.onBattery)
+    readonly property bool batteryPaused: root.pauseOnBattery && root.onBattery
+
+    // Which outputs are certainly covered, by name. A map rather than one bool
+    // because there is one WallpaperView per screen and they all used to assign
+    // to the same flag: on two monitors the last one to change decided for
+    // both, so covering one screen froze the wallpaper on the other.
+    //
+    // Each view still makes its own playback decision; this exists so the
+    // control centre and the desktop widgets can ask about the whole desk
+    // without reaching into a per-screen window.
+    property var occluded: ({})
+
+    function setOccluded(output, value) {
+        if (root.occluded[output] === value) return;
+        const next = Object.assign({}, root.occluded);
+        next[output] = value;
+        root.occluded = next;
+    }
+
+    readonly property bool desktopVisible: {
+        const names = Object.keys(root.occluded);
+        if (names.length === 0) return true;
+        for (const name of names) {
+            if (!root.occluded[name]) return true;
+        }
+        return false;
+    }
+
+    // Reported, not obeyed: what actually gates a player is the state of the
+    // screen it is drawn on. This is the summary the control centre shows.
+    readonly property bool videoPaused: !root.desktopVisible || root.batteryPaused
 
     FileView {
         id: trigger
@@ -76,6 +104,8 @@ Singleton {
             const p = (lines[0] || "").trim();
             const still = (lines[1] || "").trim();
             const blur = (lines[2] || "").trim();
+            const play = (lines[3] || "").trim();
+            root.playPath = play !== "" ? "file://" + play : "";
             // The still is assigned first on purpose: blurSource falls back to
             // `path` while stillPath is empty, so setting path first hands every
             // panel's Image the raw video file for one evaluation and each logs

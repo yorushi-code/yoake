@@ -41,11 +41,13 @@ PanelWindow {
     // DesktopLayer handles desktop clicks instead.
     mask: Region {}
 
-    // Publishing this lets the singleton decide whether playback is worth
-    // paying for, without it having to know about screens.
-    readonly property bool desktopVisible: Niri.desktopVisibleOn(win.modelData.name)
-    onDesktopVisibleChanged: Wallpaper.desktopVisible = win.desktopVisible
-    Component.onCompleted: Wallpaper.desktopVisible = win.desktopVisible
+    // Decided per screen and published, rather than read back from a shared
+    // flag: there is one of these windows per output, and they all used to
+    // write the same singleton property, so covering one monitor stopped the
+    // wallpaper on the other.
+    readonly property bool occluded: Niri.desktopOccludedOn(win.modelData.name)
+    onOccludedChanged: Wallpaper.setOccluded(win.modelData.name, win.occluded)
+    Component.onCompleted: Wallpaper.setOccluded(win.modelData.name, win.occluded)
 
     // ── Video layer ──
     // Below the images: while a still is crossfading in on top, the video is
@@ -53,7 +55,7 @@ PanelWindow {
     // every other transition.
     MediaPlayer {
         id: player
-        source: Wallpaper.isVideo ? Wallpaper.path : ""
+        source: Wallpaper.isVideo ? Wallpaper.playSource : ""
         loops: MediaPlayer.Infinite
         // Wallpapers are decoration, never a sound source.
         audioOutput: AudioOutput { muted: true; volume: 0 }
@@ -62,7 +64,12 @@ PanelWindow {
         // Playback is gated rather than the source being cleared: clearing it
         // would force a full re-open, and a visible black frame, every time a
         // window covered the desktop.
-        readonly property bool shouldPlay: Wallpaper.isVideo && !Wallpaper.videoPaused
+        //
+        // Pausing is deliberately invisible. VideoOutput keeps the last decoded
+        // frame, so a pause behind a fullscreen window changes nothing anyone
+        // can see, and coming back does not jump.
+        readonly property bool shouldPlay: Wallpaper.isVideo && !win.occluded
+            && !Wallpaper.batteryPaused
         onShouldPlayChanged: shouldPlay ? play() : pause()
         onSourceChanged: if (shouldPlay) play()
     }
@@ -138,26 +145,25 @@ PanelWindow {
         }
     }
 
-    // The still is not only a transition device: it is what the desktop shows
-    // whenever a video wallpaper is stopped, so pausing reads as a freeze
-    // frame rather than as the wallpaper being switched off.
-    NumberAnimation {
-        id: stillFade
-        target: base
-        property: "opacity"
-        duration: Theme.animNormal
-        easing.type: Easing.Bezier
-        easing.bezierCurve: Theme.easeEmphasized
-    }
-
+    // The still stops standing in for the video the moment the video has
+    // something of its own to show. Watched rather than assumed: playback is
+    // gated on the screen being visible, so a video wallpaper set while a
+    // fullscreen window is up decodes nothing at all, and dropping the still
+    // then would leave a black desktop until the window closed.
+    //
+    // There used to be the mirror of this — a cross-fade back to the still
+    // whenever playback paused. That was the freeze: the still is the frame one
+    // second into the video, so every time a window covered the desktop the
+    // visible strip of wallpaper jumped to a different frame and stopped, and
+    // every time one closed it jumped back. Pausing now changes nothing on
+    // screen at all.
     Connections {
-        target: Wallpaper
-        function onVideoPausedChanged() {
-            if (!Wallpaper.isVideo || Wallpaper.stillPath === "") return;
-            if (win.revealingVideo || reveal.running) return;
-            if (base.source != Wallpaper.stillPath) base.source = Wallpaper.stillPath;
-            stillFade.to = Wallpaper.videoPaused ? 1 : 0;
-            stillFade.restart();
+        target: player
+        function onPositionChanged() {
+            if (!Wallpaper.isVideo || player.position <= 0) return;
+            if (win.revealingVideo || reveal.running || stillHandoff.running) return;
+            if (base.opacity === 0 && overlay.opacity === 0) return;
+            stillHandoff.restart();
         }
     }
 
@@ -178,12 +184,12 @@ PanelWindow {
         onFinished: {
             if (win.revealingVideo) {
                 // Only hand over to live video if it is actually running. A
-                // video paused before it ever decoded a frame — which is the
-                // normal case, since playback is gated on the desktop being
-                // visible and a window is usually covering it — leaves
-                // VideoOutput with nothing to draw, and the desktop came up
-                // black. The extracted still stands in until playback starts.
-                if (Wallpaper.videoPaused) {
+                // video paused before it ever decoded a frame — which happens
+                // whenever the wallpaper is set behind a fullscreen window —
+                // leaves VideoOutput with nothing to draw, and the desktop came
+                // up black. The extracted still stands in until playback
+                // starts, and the position watcher above hands over then.
+                if (!player.shouldPlay) {
                     win.pendingCommit = overlay.source;
                     base.source = overlay.source;
                     win.revealingVideo = false;
