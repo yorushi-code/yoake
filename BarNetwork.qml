@@ -67,14 +67,18 @@ Item {
         anchors.centerIn: parent
         spacing: 5
 
-        Text {
+        BarIcon {
             anchors.verticalCenter: parent.verticalCenter
-            text: Networking.wifiEnabled ? Glyphs.wifiFor(root.signalPercent) : Glyphs.wifiOff
-            font.family: "Symbols Nerd Font"
-            font.pixelSize: 13
+            glyph: Networking.wifiEnabled ? Glyphs.wifiFor(root.signalPercent) : Glyphs.wifiOff
             color: (root.signalPercent >= 0 && Networking.wifiEnabled) ? Theme.accent : Theme.subtext0
-            Behavior on color { ColorAnimation { duration: Theme.animNormal } }
+            // Signal quality as the ring. The four-step Nerd Font glyph only
+            // has four states; the ring shows where inside a step it sits.
+            progress: (Networking.wifiEnabled && root.signalPercent >= 0)
+                ? root.signalPercent / 100 : -1
+            ringColor: root.signalPercent < 30 ? Theme.yellow : Theme.accent
+            hovered: ma.containsMouse
         }
+
         Text {
             anchors.verticalCenter: parent.verticalCenter
             color: root.signalPercent >= 0 ? Theme.text : Theme.subtext0

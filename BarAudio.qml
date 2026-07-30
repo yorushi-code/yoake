@@ -42,24 +42,14 @@ Item {
         anchors.centerIn: parent
         spacing: 5
 
-        Text {
-            id: glyph
+        BarIcon {
             anchors.verticalCenter: parent.verticalCenter
-            font.family: "Symbols Nerd Font"
-            font.pixelSize: 13
+            glyph: Glyphs.volumeFor(root.volume, root.muted)
             color: root.muted ? Theme.subtext0 : Theme.accent
-            text: Glyphs.volumeFor(root.volume, root.muted)
-            Behavior on color { ColorAnimation { duration: Theme.animFast } }
-
-            // A short kick whenever the level crosses into a different icon,
-            // so a scroll past a threshold registers as a change rather than a
-            // silent glyph swap.
-            SequentialAnimation {
-                id: pop
-                NumberAnimation { target: glyph; property: "scale"; to: 1.28; duration: 90; easing.type: Easing.OutQuad }
-                NumberAnimation { target: glyph; property: "scale"; to: 1.0; duration: 160; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig }
-            }
-            onTextChanged: pop.restart()
+            // No ring while muted: a level readout under a muted icon is a
+            // contradiction, and the ring is the loudest part of the widget.
+            progress: root.muted ? -1 : root.volume
+            hovered: ma.containsMouse
         }
 
         Text {

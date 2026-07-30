@@ -32,20 +32,19 @@ Item {
         anchors.centerIn: parent
         spacing: 5
 
-        Text {
+        BarIcon {
+            id: vpnIcon
             anchors.verticalCenter: parent.verticalCenter
-            text: Glyphs.vpn
-            font.family: "Symbols Nerd Font"
-            font.pixelSize: 13
+            glyph: Glyphs.vpn
             color: root.stateColor
-            Behavior on color { ColorAnimation { duration: Theme.animNormal } }
+            hovered: ma.containsMouse
 
             // Pulses only while the tunnel is coming up — the one moment the
             // shell has nothing else to say for several seconds.
             SequentialAnimation on opacity {
                 running: Mihomo.busy
                 loops: Animation.Infinite
-                onStopped: parent.opacity = 1
+                onStopped: vpnIcon.opacity = 1
                 NumberAnimation { to: 0.35; duration: 520; easing.type: Easing.InOutQuad }
                 NumberAnimation { to: 1.0; duration: 520; easing.type: Easing.InOutQuad }
             }

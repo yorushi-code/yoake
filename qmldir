@@ -36,6 +36,7 @@ BarAudio 1.0 BarAudio.qml
 BarBattery 1.0 BarBattery.qml
 BarRecorder 1.0 BarRecorder.qml
 BarNotifications 1.0 BarNotifications.qml
+BarIcon 1.0 BarIcon.qml
 BarVpn 1.0 BarVpn.qml
 VpnPanel 1.0 VpnPanel.qml
 VpnNodeRow 1.0 VpnNodeRow.qml

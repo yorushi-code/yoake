@@ -38,23 +38,16 @@ Item {
         anchors.centerIn: parent
         spacing: 5
 
-        Text {
+        BarIcon {
             id: glyph
             anchors.verticalCenter: parent.verticalCenter
-            font.family: "Symbols Nerd Font"
-            font.pixelSize: 13
+            glyph: root.low ? Glyphs.batteryAlert : Glyphs.batteryFor(root.fraction, root.charging)
             color: root.low ? Theme.red : (root.charging ? Theme.green : Theme.accent)
-            text: root.low ? Glyphs.batteryAlert : Glyphs.batteryFor(root.fraction, root.charging)
-            Behavior on color { ColorAnimation { duration: Theme.animNormal } }
-
-            // Marks the moment the icon steps to a different level, which is
-            // otherwise a change you only notice by chance.
-            SequentialAnimation {
-                id: pop
-                NumberAnimation { target: glyph; property: "scale"; to: 1.25; duration: 110; easing.type: Easing.OutQuad }
-                NumberAnimation { target: glyph; property: "scale"; to: 1.0; duration: 200; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig }
-            }
-            onTextChanged: pop.restart()
+            // The ring is the charge: at a glance the shape says how full it is
+            // without reading the number beside it.
+            progress: root.fraction
+            ringColor: root.low ? Theme.red : (root.charging ? Theme.green : Theme.accent)
+            hovered: ma.containsMouse
 
             SequentialAnimation on opacity {
                 running: root.low

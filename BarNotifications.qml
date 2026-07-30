@@ -12,67 +12,33 @@ Item {
 
     // Wider than the glyph so the count badge has somewhere to sit without
     // colliding with the tray icon beside it.
-    width: 22
+    width: 24
     height: Theme.barHeight
     anchors.verticalCenter: parent ? parent.verticalCenter : undefined
 
-    Text {
-        id: bellText
+    BarIcon {
+        id: bell
         anchors.centerIn: parent
-        text: Notifs.dnd ? Glyphs.bellOff : Glyphs.bell
-        font.family: "Symbols Nerd Font"
-        font.pixelSize: 14
+        glyph: Notifs.dnd ? Glyphs.bellOff : Glyphs.bell
+        glyphSize: 14
         color: Notifs.dnd ? Theme.subtext0
             : (notifArea.containsMouse ? Theme.accent : Theme.text)
-        scale: notifArea.pressed ? 0.85 : (notifArea.containsMouse ? 1.25 : 1.0)
-        Behavior on color { ColorAnimation { duration: Theme.animFast } }
-        Behavior on scale {
-            NumberAnimation { duration: Theme.animFast; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig }
-        }
+        badge: (Notifs.count > 0 && !Notifs.dnd) ? (Notifs.count > 9 ? "9+" : String(Notifs.count)) : ""
+        hovered: notifArea.containsMouse
+        pressed: notifArea.pressed
 
         // A quick swing when a new notification is registered, so the bar
         // acknowledges it even if the toast was missed.
         SequentialAnimation {
             id: bellRing
-            RotationAnimation { target: bellText; from: 0; to: 18; duration: 90; easing.type: Easing.OutQuad }
-            RotationAnimation { target: bellText; to: -14; duration: 130; easing.type: Easing.InOutQuad }
-            RotationAnimation { target: bellText; to: 8; duration: 110; easing.type: Easing.InOutQuad }
-            RotationAnimation { target: bellText; to: 0; duration: 90; easing.type: Easing.InQuad }
+            RotationAnimation { target: bell; from: 0; to: 18; duration: 90; easing.type: Easing.OutQuad }
+            RotationAnimation { target: bell; to: -14; duration: 130; easing.type: Easing.InOutQuad }
+            RotationAnimation { target: bell; to: 8; duration: 110; easing.type: Easing.InOutQuad }
+            RotationAnimation { target: bell; to: 0; duration: 90; easing.type: Easing.InQuad }
         }
         Connections {
             target: Notifs
             function onArrived() { bellRing.restart(); }
-        }
-    }
-
-    // Count badge. Deliberately a small chip rather than a full pill: the bar
-    // is 34px tall and anything larger unbalances the island. The ring in the
-    // island's own colour separates it from the bell underneath, which it
-    // necessarily overlaps at this size.
-    Rectangle {
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.topMargin: 4
-        anchors.rightMargin: -5
-        width: Math.max(13, countText.implicitWidth + 7)
-        height: 13
-        radius: 6.5
-        color: Theme.red
-        border.color: Theme.crust
-        border.width: 1.5
-        visible: Notifs.count > 0 && !Notifs.dnd
-        scale: visible ? 1 : 0
-        Behavior on scale {
-            NumberAnimation { duration: Theme.animNormal; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig }
-        }
-
-        Text {
-            id: countText
-            anchors.centerIn: parent
-            text: Notifs.count > 9 ? "9+" : Notifs.count
-            color: Theme.crust
-            font.pixelSize: 8
-            font.bold: true
         }
     }
 
