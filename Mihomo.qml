@@ -68,6 +68,14 @@ Singleton {
         return null;
     }
 
+    // Members that are not nodes: the two built-ins, and any nested group.
+    // A group has no latency of its own, and recording the probe's silence as a
+    // failure painted AUTO red — the one row worth picking when every node
+    // beside it is red.
+    function measurable(name) {
+        return name !== "DIRECT" && name !== "REJECT" && !root.groupNamed(name);
+    }
+
     readonly property var primary: root.groupNamed(root.primaryGroup)
     readonly property string currentNode: root.primary ? (root.primary.now || "") : ""
     readonly property var currentDelay: root.delays[root.currentNode]
@@ -158,7 +166,7 @@ Singleton {
             // the previous reading would silently stand in for it.
             const next = Object.assign({}, root.delays);
             for (const node of target.nodes) {
-                if (node === "DIRECT" || node === "REJECT") continue;
+                if (!root.measurable(node)) continue;
                 next[node] = (data && data[node] !== undefined) ? data[node] : null;
             }
             root.delays = next;
@@ -173,7 +181,7 @@ Singleton {
         const target = root.groupNamed(group || root.primaryGroup);
         if (!target) return;
         for (const node of target.nodes) {
-            if (node === "DIRECT" || node === "REJECT") continue;
+            if (!root.measurable(node)) continue;
             if (root.delays[node] === undefined) {
                 root.probeDelays(group);
                 return;
