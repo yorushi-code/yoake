@@ -107,7 +107,6 @@ Singleton {
         _sawArtist = false;
         _sync();
     }
-    Component.onCompleted: _sync()
 
     readonly property bool hasPlayer: player !== null && title !== ""
     readonly property bool playing: player !== null && player.isPlaying
@@ -118,6 +117,49 @@ Singleton {
 
     // ── OSD visibility, driven by track changes ──
     property bool osdShown: false
+
+    // A popup telling you what is playing, over the window you are playing it
+    // in, is noise covering the controls you just used. Matching MPRIS to a
+    // niri window has no exact key, so this compares tokens: the DesktopEntry
+    // ("firefox"), the dbus name's own segment, and the last component of the
+    // window's app_id ("org.mozilla.firefox" -> "firefox").
+    readonly property var ownerTokens: {
+        if (!root.player) return [];
+        const out = [];
+        if (root.player.desktopEntry) out.push(String(root.player.desktopEntry).toLowerCase());
+        const name = String(root.player.dbusName || "");
+        const tail = name.replace("org.mpris.MediaPlayer2.", "").split(".")[0];
+        if (tail !== "") out.push(tail.toLowerCase());
+        if (root.player.identity) out.push(String(root.player.identity).toLowerCase().replace(/\s+/g, ""));
+        return out;
+    }
+
+    readonly property bool ownerFocused: {
+        const win = Niri.focusedWindow;
+        if (!win || !win.app_id || root.ownerTokens.length === 0) return false;
+        const appId = String(win.app_id).toLowerCase();
+        const last = appId.split(".").pop();
+        return root.ownerTokens.some(t => t === last || appId.indexOf(t) >= 0 || t.indexOf(last) >= 0);
+    }
+
+    // Read from Prefs once rather than bound to it: a binding plus the
+    // write-back handler is a loop, since storing the value changes the object
+    // the binding reads from.
+    property bool osdEnabled: true
+    Component.onCompleted: {
+        _sync();
+        if (Prefs.loaded) root.osdEnabled = Prefs.get("mediaOsd", true);
+    }
+    onOsdEnabledChanged: if (Prefs.loaded) Prefs.set("mediaOsd", root.osdEnabled)
+
+    // Singleton construction order is not defined, so the file may still be
+    // unread when this one is built.
+    property Connections _prefsReady: Connections {
+        target: Prefs
+        function onLoadedChanged() {
+            if (Prefs.loaded) root.osdEnabled = Prefs.get("mediaOsd", true);
+        }
+    }
 
     // Built from the latched values, not the raw ones — keyed off the raw
     // title this fired on every placeholder frame and the OSD flashed
@@ -142,7 +184,7 @@ Singleton {
     }
 
     function showOsd() {
-        if (!root.hasPlayer) return;
+        if (!root.hasPlayer || !root.osdEnabled || root.ownerFocused) return;
         root.osdShown = true;
         osdTimer.restart();
     }
@@ -151,6 +193,10 @@ Singleton {
         root.osdShown = false;
         osdTimer.stop();
     }
+
+    // Alt-tabbing into the player while the popup is still up is the same
+    // situation as the popup never having been shown.
+    onOwnerFocusedChanged: if (root.ownerFocused) root.hideOsd()
 
     // ── Controls ──
     function togglePlay() {

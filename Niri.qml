@@ -74,6 +74,11 @@ Singleton {
 
     property var focusedWindowId: null
 
+    readonly property var focusedWindow: {
+        if (root.focusedWindowId === null) return null;
+        return root.windows.find(w => w.id === root.focusedWindowId) || null;
+    }
+
     // Focus *leaving* every window is exactly what happens when the bar grabs
     // keyboard focus to open a menu, so a null id must not count as attention
     // moving — otherwise every menu would close on the frame it opened.

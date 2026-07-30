@@ -54,6 +54,16 @@ Flickable {
 
         ToggleRow {
             width: parent.width
+            glyph: Glyphs.music
+            label: "Плашка плеера"
+            detail: Media.osdEnabled ? "при смене трека" : "не показывать"
+            active: Media.osdEnabled
+            expandable: false
+            onToggled: Media.osdEnabled = !Media.osdEnabled
+        }
+
+        ToggleRow {
+            width: parent.width
             visible: Wallpaper.isVideo
             glyph: Glyphs.video
             label: "Пауза видео на батарее"

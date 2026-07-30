@@ -17,6 +17,7 @@ singleton Wallpapers 1.0 Wallpapers.qml
 singleton MihomoApi 1.0 MihomoApi.qml
 singleton Mihomo 1.0 Mihomo.qml
 singleton NightLight 1.0 NightLight.qml
+singleton Prefs 1.0 Prefs.qml
 ManagedProcess 1.0 ManagedProcess.qml
 MenuSurface 1.0 MenuSurface.qml
 MenuItemRow 1.0 MenuItemRow.qml

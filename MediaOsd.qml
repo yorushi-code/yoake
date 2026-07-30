@@ -2,28 +2,54 @@ import QtQuick
 import QtQuick.Effects
 import Quickshell
 
-// Now-playing popup that slides up from the bottom on every track change —
-// the same "transient status" slot the volume/brightness OSD uses, so media
-// changes get acknowledged without needing the desktop to be visible.
+// Now-playing popup, in the bottom-right corner.
+//
+// It used to sit centred at the bottom, which on a browser is exactly where
+// video controls, cookie banners and chat inputs live — it covered the page
+// with something the user had not asked for and could not get rid of. Three
+// things changed:
+//
+//   - It does not appear at all while the window playing the audio is focused.
+//     Telling you what is playing, over the player you are looking at, is
+//     noise.
+//   - Resting the pointer on it makes it ghost: nearly transparent and
+//     click-through, so whatever it is covering can be used. The ghost is
+//     latched until the popup hides, because dropping the input region ends
+//     the hover, and re-arming would flicker it back on the next frame.
+//   - It can be dismissed outright: a close button, or drag it aside.
 PanelWindow {
     id: win
 
+    // Wider than the card on purpose: layer-shell surfaces cannot be dragged
+    // outside their own geometry, so the slack to the card's left is the
+    // travel the dismiss gesture needs.
+    readonly property int cardWidth: 420
+    readonly property int cardHeight: 92
+
     anchors.bottom: true
-    margins.bottom: 60
-    implicitWidth: 460
-    implicitHeight: 96
+    anchors.right: true
+    margins.bottom: 24
+    margins.right: 24
+    implicitWidth: win.cardWidth + 280
+    implicitHeight: win.cardHeight + 14
     color: "transparent"
     exclusiveZone: 0
-    // Never takes keyboard focus; its controls only need pointer input, which
-    // layer-shell surfaces get regardless. The mask keeps input to the card
-    // itself so the transparent margin around it isn't a dead click-trap over
-    // whatever is underneath.
     focusable: false
-    mask: Region { item: card }
+
     // Explicit mapping bool — see ControlCenter.qml. Keeps the window mapped
-    // through the whole slide-down exit instead of unmapping instantly.
+    // through the whole exit instead of unmapping instantly.
     property bool mapped: false
     visible: mapped
+
+    // Latched: once ghosted, it stays out of the way until it hides. Collapsing
+    // the input region is what ends the hover that set it, so re-evaluating
+    // would toggle it back on the very next frame.
+    property bool ghosted: false
+    property real dragOffset: 0
+
+    // Ghosting drops the input region entirely, which is the point: the popup
+    // stops being a click-trap over whatever is underneath it.
+    mask: Region { item: win.ghosted ? null : card }
 
     Timer {
         id: hideDelay
@@ -36,6 +62,9 @@ PanelWindow {
             if (Media.osdShown) {
                 hideDelay.stop();
                 win.mapped = true;
+                win.ghosted = false;
+                win.dragOffset = 0;
+                ghostDwell.stop();
             } else {
                 hideDelay.restart();
             }
@@ -43,27 +72,27 @@ PanelWindow {
     }
     Component.onCompleted: win.mapped = Media.osdShown
 
-    RectangularShadow {
-        anchors.fill: card
-        radius: card.radius
-        color: Theme.shadowColor
-        blur: Theme.shadowBlur
-        spread: Theme.shadowSpread
-        offset: Qt.vector2d(Theme.shadowOffset.x, Theme.shadowOffset.y)
+    // A dwell rather than an immediate ghost: the pointer crossing the corner
+    // on its way somewhere else should not blank the popup, and a grab for the
+    // dismiss drag has to survive long enough to start.
+    Timer {
+        id: ghostDwell
+        interval: 320
+        onTriggered: win.ghosted = true
     }
 
-    FrostedBackground {
-        id: card
-        anchors.fill: parent
-        radius: Theme.radiusLarge
-        screenX: (Screen.width - width) / 2
-        screenY: Screen.height - win.margins.bottom - height
-        tintOpacity: 0.80
+    Item {
+        id: host
+        width: win.cardWidth
+        height: win.cardHeight
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
 
-        opacity: Media.osdShown ? 1 : 0
+        x: 0
+        opacity: Media.osdShown ? (win.ghosted ? 0.12 : 1) : 0
         // Rises into place rather than just fading — reinforces that it came
-        // from the bottom edge. On exit it sinks back down (see the larger
-        // exit offset) with an accelerate curve, matching the other panels.
+        // from the bottom edge. On exit it sinks back down with an accelerate
+        // curve, matching the other panels.
         y: Media.osdShown ? 0 : 20
         Behavior on opacity {
             NumberAnimation {
@@ -80,62 +109,156 @@ PanelWindow {
             }
         }
 
-        Row {
-            anchors.fill: parent
-            anchors.margins: 14
-            spacing: 14
+        // A handler rather than a MouseArea: the transport buttons have their
+        // own hover areas, and a parent MouseArea would lose the hover — and
+        // hide the close button — the moment the pointer crossed one.
+        HoverHandler {
+            id: hover
+            onHoveredChanged: hovered ? ghostDwell.restart() : ghostDwell.stop()
+        }
 
-            AlbumArt {
-                size: 68
-                anchors.verticalCenter: parent.verticalCenter
+        RectangularShadow {
+            anchors.fill: card
+            radius: card.radius
+            color: Theme.shadowColor
+            blur: Theme.shadowBlur
+            spread: Theme.shadowSpread
+            offset: Qt.vector2d(Theme.shadowOffset.x, Theme.shadowOffset.y)
+        }
+
+        FrostedBackground {
+            id: card
+            anchors.fill: parent
+            radius: Theme.radiusLarge
+            screenX: Screen.width - win.margins.right - win.cardWidth + host.x
+            screenY: Screen.height - win.margins.bottom - win.implicitHeight + host.y + 7
+            tintOpacity: 0.80
+
+            // Under the controls, so the transport buttons still take their own
+            // clicks and only the card body starts a drag.
+            MouseArea {
+                id: dragArea
+                anchors.fill: parent
+                drag.target: host
+                drag.axis: Drag.XAxis
+                drag.minimumX: -240
+                drag.maximumX: 0
+
+                // A drag must not be cut short by the popup ghosting out from
+                // under the cursor mid-gesture.
+                onPressed: ghostDwell.stop()
+                onReleased: {
+                    if (host.x < -80) {
+                        Media.hideOsd();
+                    } else {
+                        returnHome.restart();
+                        ghostDwell.restart();
+                    }
+                }
             }
 
-            Column {
-                anchors.verticalCenter: parent.verticalCenter
-                width: parent.width - 68 - 14 - controls.width - 14
-                spacing: 6
-
-                Text {
-                    width: parent.width
-                    text: Media.title
-                    color: Theme.text
-                    font.pixelSize: 14
-                    font.bold: true
-                    elide: Text.ElideRight
-                }
-                Text {
-                    width: parent.width
-                    text: Media.artist
-                    color: Theme.subtext1
-                    font.pixelSize: 12
-                    elide: Text.ElideRight
-                }
-
-                SeekBar { width: parent.width }
+            NumberAnimation {
+                id: returnHome
+                target: host
+                property: "x"
+                to: 0
+                duration: Theme.animNormal
+                easing.type: Easing.Bezier
+                easing.bezierCurve: Theme.easeSpringBig
             }
 
             Row {
-                id: controls
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 4
+                anchors.fill: parent
+                anchors.margins: 14
+                spacing: 14
 
-                MediaButton {
-                    glyph: Glyphs.skipPrevious
-                    enabled: Media.player !== null && Media.player.canGoPrevious
-                    onActivated: Media.previous()
+                AlbumArt {
+                    size: 64
+                    anchors.verticalCenter: parent.verticalCenter
                 }
-                MediaButton {
-                    glyph: Media.playing ? Glyphs.pause : Glyphs.play
-                    size: 40
-                    accented: true
-                    enabled: Media.player !== null && Media.player.canTogglePlaying
-                    onActivated: Media.togglePlay()
+
+                Column {
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width - 64 - 14 - controls.width - 14
+                    spacing: 6
+
+                    Text {
+                        width: parent.width
+                        text: Media.title
+                        color: Theme.text
+                        font.pixelSize: 14
+                        font.bold: true
+                        elide: Text.ElideRight
+                    }
+                    Text {
+                        width: parent.width
+                        text: Media.artist
+                        color: Theme.subtext1
+                        font.pixelSize: 12
+                        elide: Text.ElideRight
+                    }
+
+                    SeekBar { width: parent.width }
                 }
-                MediaButton {
-                    glyph: Glyphs.skipNext
-                    enabled: Media.player !== null && Media.player.canGoNext
-                    onActivated: Media.next()
+
+                Row {
+                    id: controls
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 4
+
+                    MediaButton {
+                        glyph: Glyphs.skipPrevious
+                        enabled: Media.player !== null && Media.player.canGoPrevious
+                        onActivated: Media.previous()
+                    }
+                    MediaButton {
+                        glyph: Media.playing ? Glyphs.pause : Glyphs.play
+                        size: 40
+                        accented: true
+                        enabled: Media.player !== null && Media.player.canTogglePlaying
+                        onActivated: Media.togglePlay()
+                    }
+                    MediaButton {
+                        glyph: Glyphs.skipNext
+                        enabled: Media.player !== null && Media.player.canGoNext
+                        onActivated: Media.next()
+                    }
                 }
+            }
+        }
+
+        // Inside the card's bounds, because the window's input region is the
+        // card: a button hanging over the edge would not be clickable. Shown
+        // only while the pointer is near — a permanent ✕ on a popup that
+        // dismisses itself after four seconds is clutter.
+        Rectangle {
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.margins: 5
+            width: 22
+            height: 22
+            radius: 11
+            color: closeArea.containsMouse ? Theme.red : Theme.surface1
+            opacity: hover.hovered ? 1 : 0
+            visible: opacity > 0
+            Behavior on color { ColorAnimation { duration: Theme.animFast } }
+            Behavior on opacity { NumberAnimation { duration: Theme.animFast } }
+
+            Text {
+                anchors.centerIn: parent
+                text: Glyphs.close
+                font.family: "Symbols Nerd Font"
+                font.pixelSize: 11
+                color: Theme.text
+            }
+
+            MouseArea {
+                id: closeArea
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onEntered: ghostDwell.stop()
+                onClicked: Media.hideOsd()
             }
         }
     }
