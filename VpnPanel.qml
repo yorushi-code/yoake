@@ -14,7 +14,12 @@ Item {
     // to the toggle has nothing to animate from.
     readonly property bool open: Toggles.vpnPanelOpen && root.armed
     property bool armed: false
-    Component.onCompleted: armTick.start()
+    // One handler, because two of them on the same object is not two handlers —
+    // it is "Property value set multiple times" and the file does not load.
+    Component.onCompleted: {
+        armTick.start();
+        if (Prefs.loaded) root.hideDead = Prefs.get("vpn.hideDead", false);
+    }
     property Timer _armTick: Timer {
         id: armTick
         interval: 16
@@ -37,7 +42,6 @@ Item {
         target: Prefs
         function onLoadedChanged() { root.hideDead = Prefs.get("vpn.hideDead", false); }
     }
-    Component.onCompleted: if (Prefs.loaded) root.hideDead = Prefs.get("vpn.hideDead", false)
 
     readonly property var allNodes: root.activeGroupData ? root.activeGroupData.nodes : []
     readonly property int measured: {
