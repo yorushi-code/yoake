@@ -123,6 +123,20 @@ Grid {
 
     CcTile {
         width: root.cellWidth
+        glyph: Glyphs.monitor
+        label: "Виджеты"
+        detail: DesktopWidgets.editing ? "перетаскивание" : "закреплены"
+        active: DesktopWidgets.editing
+        // Closes on its way out: the widgets being edited are behind this
+        // panel, so leaving it up would hide the thing being arranged.
+        onToggled: {
+            DesktopWidgets.toggleEditing();
+            Toggles.controlCenterOpen = false;
+        }
+    }
+
+    CcTile {
+        width: root.cellWidth
         glyph: Power.available ? Power.glyphFor(Power.activeProfile) : Glyphs.power
         label: "Питание"
         detail: Power.available ? Power.labelFor(Power.activeProfile) : "выключение"

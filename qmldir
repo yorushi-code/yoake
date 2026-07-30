@@ -18,6 +18,7 @@ singleton MihomoApi 1.0 MihomoApi.qml
 singleton Mihomo 1.0 Mihomo.qml
 singleton NightLight 1.0 NightLight.qml
 singleton Prefs 1.0 Prefs.qml
+singleton DesktopWidgets 1.0 DesktopWidgets.qml
 ManagedProcess 1.0 ManagedProcess.qml
 MenuSurface 1.0 MenuSurface.qml
 MenuItemRow 1.0 MenuItemRow.qml
@@ -76,5 +77,10 @@ CcQuickLaunch 1.0 CcQuickLaunch.qml
 SliderRow 1.0 SliderRow.qml
 ToggleRow 1.0 ToggleRow.qml
 PanelChrome 1.0 PanelChrome.qml
-DesktopClock 1.0 DesktopClock.qml
+DesktopSurface 1.0 DesktopSurface.qml
+DesktopWidget 1.0 DesktopWidget.qml
+WidgetClock 1.0 WidgetClock.qml
+WidgetSpectrum 1.0 WidgetSpectrum.qml
+WidgetStats 1.0 WidgetStats.qml
+WidgetMedia 1.0 WidgetMedia.qml
 Calendar 1.0 Calendar.qml

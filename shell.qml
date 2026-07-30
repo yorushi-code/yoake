@@ -12,7 +12,7 @@ ShellRoot {
         WallpaperView {}
     }
 
-    // Before DesktopClock on purpose: both live on the Bottom layer, surfaces
+    // Before DesktopSurface on purpose: both live on the Bottom layer, surfaces
     // there stack in creation order, and the catcher has to end up underneath
     // the desktop widgets or it would swallow their clicks.
     Variants {
@@ -20,7 +20,10 @@ ShellRoot {
         DesktopLayer {}
     }
 
-    DesktopClock {}
+    Variants {
+        model: Quickshell.screens
+        DesktopSurface {}
+    }
 
     Variants {
         model: Quickshell.screens
