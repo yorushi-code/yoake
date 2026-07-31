@@ -90,7 +90,30 @@ Item {
         anchors { top: true; bottom: true; left: true; right: true }
         color: "transparent"
         exclusiveZone: 0
-        focusable: root.open
+        // Bound to the toggle, not to `open`. `open` waits a frame for `armed`
+        // so the entrance has something to animate from, and a surface mapped
+        // asking for no keyboard never gets offered one afterwards -- which is
+        // a panel that ignores Escape and every key in it.
+        focusable: Toggles.vpnPanelOpen
+        // Exclusive, not merely focusable. `focusable` alone asks for
+        // on-demand interactivity, which means the compositor hands over the
+        // keyboard when the surface is clicked -- so a panel opened from a
+        // keybind ignored Escape until you had clicked it first.
+        WlrLayershell.keyboardFocus: Toggles.vpnPanelOpen
+            ? WlrKeyboardFocus.Exclusive
+            : WlrKeyboardFocus.None
+
+        // Escape closes it, from anywhere inside.
+        Item {
+            anchors.fill: parent
+            focus: true
+            Keys.onPressed: event => {
+                if (event.key === Qt.Key_Escape) {
+                    Toggles.vpnPanelOpen = false;
+                    event.accepted = true;
+                }
+            }
+        }
 
         readonly property int cardWidth: 420
         readonly property int cardHeight: Math.min(Screen.height - Theme.barHeight - 60, 760)

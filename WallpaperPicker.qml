@@ -48,6 +48,25 @@ PanelWindow {
     color: "transparent"
     exclusiveZone: 0
     focusable: Toggles.wallpaperPickerOpen
+    // Exclusive, not merely focusable. `focusable` alone asks for
+    // on-demand interactivity, which means the compositor hands over the
+    // keyboard when the surface is clicked -- so a panel opened from a
+    // keybind ignored Escape until you had clicked it first.
+    WlrLayershell.keyboardFocus: Toggles.wallpaperPickerOpen
+        ? WlrKeyboardFocus.Exclusive
+        : WlrKeyboardFocus.None
+
+    // Escape closes it, from anywhere inside.
+    Item {
+        anchors.fill: parent
+        focus: true
+        Keys.onPressed: event => {
+            if (event.key === Qt.Key_Escape) {
+                Toggles.wallpaperPickerOpen = false;
+                event.accepted = true;
+            }
+        }
+    }
 
     Timer {
         id: hideDelay
