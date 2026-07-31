@@ -126,11 +126,12 @@ case "${IMG,,}" in
     STILL="$CACHE/wallpaper-still.png"
     # Seek before decoding, and take a frame a second in: many videos open on
     # black, which would produce a palette of pure greys.
-    ffmpeg -y -loglevel error -ss 1 -i "$IMG" -frames:v 1 -vf scale=1920:-1 "$STILL" </dev/null
-    if [ ! -s "$STILL" ]; then
+    ffmpeg -y -loglevel error -ss 1 -i "$IMG" -frames:v 1 -vf scale=1920:-1 "$STILL.tmp.png" </dev/null
+    if [ ! -s "$STILL.tmp.png" ]; then
       # Shorter than a second, so fall back to the very first frame.
-      ffmpeg -y -loglevel error -i "$IMG" -frames:v 1 -vf scale=1920:-1 "$STILL" </dev/null
+      ffmpeg -y -loglevel error -i "$IMG" -frames:v 1 -vf scale=1920:-1 "$STILL.tmp.png" </dev/null
     fi
+    [ -s "$STILL.tmp.png" ] && mv -f "$STILL.tmp.png" "$STILL"
     PLAY="$(prepare_video "$IMG")"
     ;;
 esac
@@ -149,8 +150,14 @@ PALETTE_SRC="${STILL:-$IMG}"
 # behind the whole lock screen the old one was a smear with no wallpaper left in
 # it. One 1024x576 texture shared by every panel costs 2.4 MB.
 BLUR="$CACHE/wallpaper-blur.png"
+# Written through a temp file and renamed. The shell watches this path, and
+# magick writes it in place over several seconds: reloading halfway through gets
+# a truncated PNG, which is the "Unable to read image data" every panel logged
+# on a wallpaper change. A rename is atomic, so a reader sees the old file or
+# the new one and never half of either.
 magick -define jpeg:size=2048x2048 "$PALETTE_SRC" \
-  -resize 1024x -gaussian-blur 0x16 -strip "$BLUR"
+  -resize 1024x -gaussian-blur 0x16 -strip "$BLUR.tmp"
+mv -f "$BLUR.tmp" "$BLUR"
 
 ln -sf "$IMG" ~/.config/current-wallpaper
 

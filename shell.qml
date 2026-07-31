@@ -73,6 +73,10 @@ ShellRoot {
         shown: Toggles.launcherOpen
         Launcher {}
     }
+    LazyPanel {
+        shown: Toggles.dashboardOpen
+        Dashboard {}
+    }
 
     // A menu or panel left up after the user has moved to a window reads as
     // the shell being stuck. Popups hold no focus of their own under niri, so

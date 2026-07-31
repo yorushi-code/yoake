@@ -16,6 +16,10 @@ QtObject {
     property bool calendarOpen: false
     property bool wallpaperPickerOpen: false
     property bool vpnPanelOpen: false
+    property bool dashboardOpen: false
+    // Which dashboard page is showing. Kept here rather than in the panel so a
+    // hand-off from a bar widget can pick the page before the panel exists.
+    property int dashPage: 0
     property bool launcherOpen: false
 
     // Panels are dismissed by the same gestures as menus (desktop click,
@@ -32,6 +36,7 @@ QtObject {
         root.calendarOpen = false;
         root.wallpaperPickerOpen = false;
         root.vpnPanelOpen = false;
+        root.dashboardOpen = false;
         root.launcherOpen = false;
     }
 
@@ -47,6 +52,14 @@ QtObject {
         target: "toggles"
 
         function launcher() { root.exclusive("launcher"); }
+        function dashboard() { root.exclusive("dashboard"); }
+
+        function dash(page: string): void {
+            const pages = ["overview", "system", "desks"];
+            const at = pages.indexOf(page);
+            if (at >= 0) root.dashPage = at;
+            root.exclusive("dashboard");
+        }
         function notifCenter() { root.exclusive("notifCenter"); }
         function controlCenter() { root.exclusive("controlCenter"); }
         function cheatSheet() { root.exclusive("cheatSheet"); }
