@@ -203,12 +203,25 @@ Singleton {
     function showOsd() {
         if (!root.hasPlayer || !root.osdEnabled || root.ownerFocused) return;
         root.osdShown = true;
+        osdTimer.interval = 4000;
         osdTimer.restart();
     }
 
     function hideOsd() {
         root.osdShown = false;
         osdTimer.stop();
+    }
+
+    // Held open while the pointer is on it, and given a fresh, shorter run when
+    // the pointer leaves -- long enough to reach for a button again, short
+    // enough that brushing past does not pin the popup to the corner.
+    function holdOsd(held) {
+        if (!root.osdShown) return;
+        if (held) osdTimer.stop();
+        else {
+            osdTimer.interval = 1600;
+            osdTimer.restart();
+        }
     }
 
     // Alt-tabbing into the player while the popup is still up is the same

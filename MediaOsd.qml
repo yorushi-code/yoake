@@ -12,10 +12,12 @@ import Quickshell
 //   - It does not appear at all while the window playing the audio is focused.
 //     Telling you what is playing, over the player you are looking at, is
 //     noise.
-//   - Resting the pointer on it makes it ghost: nearly transparent and
-//     click-through, so whatever it is covering can be used. The ghost is
-//     latched until the popup hides, because dropping the input region ends
-//     the hover, and re-arming would flicker it back on the next frame.
+//   - Resting the pointer on it holds it open. It used to do the opposite --
+//     ghost out to nearly nothing so the page underneath could be used -- and
+//     that is wrong about what pointing at something means: reaching for the
+//     pause button made the card vanish under the hand reaching for it. It is
+//     dismissed deliberately instead, by the close button or by dragging it
+//     aside, and it goes on its own when the timer runs out.
 //   - It can be dismissed outright: a close button, or drag it aside.
 PanelWindow {
     id: win
@@ -41,15 +43,9 @@ PanelWindow {
     property bool mapped: false
     visible: mapped
 
-    // Latched: once ghosted, it stays out of the way until it hides. Collapsing
-    // the input region is what ends the hover that set it, so re-evaluating
-    // would toggle it back on the very next frame.
-    property bool ghosted: false
     property real dragOffset: 0
 
-    // Ghosting drops the input region entirely, which is the point: the popup
-    // stops being a click-trap over whatever is underneath it.
-    mask: Region { item: win.ghosted ? null : card }
+    mask: Region { item: card }
 
     Timer {
         id: hideDelay
@@ -62,9 +58,7 @@ PanelWindow {
             if (Media.osdShown) {
                 hideDelay.stop();
                 win.mapped = true;
-                win.ghosted = false;
                 win.dragOffset = 0;
-                ghostDwell.stop();
             } else {
                 hideDelay.restart();
             }
@@ -72,14 +66,7 @@ PanelWindow {
     }
     Component.onCompleted: win.mapped = Media.osdShown
 
-    // A dwell rather than an immediate ghost: the pointer crossing the corner
-    // on its way somewhere else should not blank the popup, and a grab for the
-    // dismiss drag has to survive long enough to start.
-    Timer {
-        id: ghostDwell
-        interval: 320
-        onTriggered: win.ghosted = true
-    }
+
 
     Item {
         id: host
@@ -89,7 +76,7 @@ PanelWindow {
         anchors.verticalCenter: parent.verticalCenter
 
         x: 0
-        opacity: Media.osdShown ? (win.ghosted ? 0.12 : 1) : 0
+        opacity: Media.osdShown ? 1 : 0
         // Rises into place rather than just fading — reinforces that it came
         // from the bottom edge. On exit it sinks back down with an accelerate
         // curve, matching the other panels.
@@ -114,7 +101,9 @@ PanelWindow {
         // hide the close button — the moment the pointer crossed one.
         HoverHandler {
             id: hover
-            onHoveredChanged: hovered ? ghostDwell.restart() : ghostDwell.stop()
+            // Pointing at it keeps it. The auto-hide is for a popup nobody is
+            // looking at, and the moment the pointer arrives somebody is.
+            onHoveredChanged: Media.holdOsd(hovered)
         }
 
         RectangularShadow {
@@ -144,15 +133,12 @@ PanelWindow {
                 drag.minimumX: -240
                 drag.maximumX: 0
 
-                // A drag must not be cut short by the popup ghosting out from
-                // under the cursor mid-gesture.
-                onPressed: ghostDwell.stop()
+
                 onReleased: {
                     if (host.x < -80) {
                         Media.hideOsd();
                     } else {
                         returnHome.restart();
-                        ghostDwell.restart();
                     }
                 }
             }
@@ -206,7 +192,6 @@ PanelWindow {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onEntered: ghostDwell.stop()
                 onClicked: Media.hideOsd()
             }
         }

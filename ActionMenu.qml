@@ -54,7 +54,10 @@ MenuSurface {
 
     // Assigned, never bound: reading the metrics inside a binding that also
     // writes to them is exactly the loop this is avoiding.
-    onModelChanged: root.contentWidth = root.measure(root.model)
+    onModelChanged: {
+        root.contentWidth = root.measure(root.model);
+        if (root.open && root.snapshot.length === 0) Qt.callLater(root._capture);
+    }
 
     // Rows are built from the snapshot, not from the live model. Owners derive
     // their entries from services that keep moving — Pipewire nodes, wifi scan
@@ -62,10 +65,21 @@ MenuSurface {
     // every row and replayed the whole reveal cascade in place. Menus close on
     // any trigger, so there is nothing a live update could usefully show.
     property var snapshot: []
-    onOpenChanged: if (root.open) root.snapshot = root.model
+
+    // Taken after the bindings settle, not during them. `open` and `model` are
+    // both derived from the same "is this menu open" question, and QML gives no
+    // order between two bindings on the same dependency -- when `open` won the
+    // race the snapshot captured the model as it was a moment earlier, which is
+    // the empty list, and the menu mapped as a thin empty sliver under the bar.
+    function _capture() {
+        if (root.open) root.snapshot = root.model;
+    }
+
+    onOpenChanged: if (root.open) Qt.callLater(root._capture);
+
     Component.onCompleted: {
         root.contentWidth = root.measure(root.model);
-        if (root.open) root.snapshot = root.model;
+        root._capture();
     }
 
     onDismissed: Menus.close(root.menuId)
