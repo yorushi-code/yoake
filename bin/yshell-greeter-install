@@ -16,6 +16,11 @@ fi
 install -d -m 0755 "$DEST"
 install -m 0644 "$SRC/greeter/shell.qml" "$SRC/greeter/Theme.qml" "$SRC/greeter/qmldir" "$DEST/"
 install -m 0644 "$SRC/RollDigit.qml" "$SRC/RollClock.qml" "$DEST/"
+
+# The greeter account cannot read the shell's config directory, so the one
+# sprite it uses goes where its own assets live.
+install -d -m 0755 /var/lib/yshell-greeter
+install -m 0644 "$SRC/assets/bongo/bongo-sleeping.png" /var/lib/yshell-greeter/
 install -m 0755 "$SRC/bin/yshell-greeter" "$SRC/bin/yshell-greeter-sync" /usr/local/bin/
 
 # The greeter account has no home on a stock Fedora install, and Qt wants a

@@ -36,8 +36,14 @@ fi
 tmp=$(runuser -u "$OWNER" -- mktemp /tmp/yshell-greeter-wall.XXXXXX.jpg)
 trap 'rm -f "$tmp"' EXIT
 
+# Blurred here rather than in the greeter. The snapshot only changes when this
+# runs, so blurring it once at sync time is both cheaper at login and one less
+# thing that can go wrong on a screen with no way to report a fault -- the
+# runtime MultiEffect pass rendered nothing at all and the login screen came up
+# as a flat void.
 runuser -u "$OWNER" -- magick "$src" \
     -resize 1920x1080^ -gravity center -extent 1920x1080 \
+    -blur 0x22 -modulate 100,88,100 \
     -quality 88 "$tmp"
 
 install -d -m 0755 -o root -g root "$DEST"

@@ -70,7 +70,7 @@ ShellRoot {
     }
 
     function begin() {
-        if (!Greetd.available || root.currentUser === "") return;
+        if (root.currentUser === "") return;
         root.ready = false;
         Greetd.createSession(root.currentUser);
     }
@@ -108,7 +108,7 @@ ShellRoot {
             root.shake();
             // greetd discards the session on failure, so the next attempt needs
             // a fresh one rather than another respond().
-            retry.restart();
+            begin.restart();
         }
 
         function onReadyToLaunch() {
@@ -120,24 +120,53 @@ ShellRoot {
         function onError(err) {
             root.busy = false;
             root.message = err;
-            retry.restart();
+            begin.restart();
         }
     }
 
-    Timer {
-        id: retry
-        interval: 350
-        onTriggered: root.begin()
-    }
+    // Nothing starts until the account list has been read -- and then it keeps
+    // asking. Greetd.available is a constant property read once at startup, and
+    // the socket connects asynchronously: a single attempt fired the instant
+    // /etc/passwd parsed found `available` still false and gave up silently,
+    // which is a login screen that never asks for a password.
+    onUsersChanged: if (root.users.length > 0) begin.restart();
 
-    // Nothing starts until the account list has been read.
-    onUsersChanged: if (root.users.length > 0 && !root.ready) root.begin();
+    Timer {
+        id: begin
+        interval: 200
+        repeat: true
+        property int tries: 0
+        onTriggered: {
+            if (root.ready || root.busy) {
+                begin.stop();
+                begin.tries = 0;
+                return;
+            }
+            root.begin();
+            begin.tries++;
+            if (begin.tries > 25) begin.stop();
+        }
+    }
 
     Process {
         id: power
         running: false
     }
 
+    // Nothing is built until a screen exists.
+    //
+    // cage brings its output up after the client connects, and Qt logged "There
+    // are no outputs - creating placeholder screen": the window was made
+    // against a screen that was not the display, which is why the login screen
+    // did not work on the real machine while it rendered fine nested inside a
+    // session that already had one.
+    Loader {
+        active: Quickshell.screens.length > 0
+        sourceComponent: greeterWindow
+    }
+
+    Component {
+    id: greeterWindow
     FloatingWindow {
         id: win
         color: "black"
@@ -154,35 +183,22 @@ ShellRoot {
             onTriggered: win.entered = true
         }
 
-        // The wallpaper snapshot, softened here rather than on disk, exactly as
-        // the lock screen does it: heavy enough to sit type on, light enough
-        // that the picture is still recognisably itself.
+        // The wallpaper snapshot, already blurred by yshell-greeter-sync. Doing
+        // it here needed a MultiEffect over a hidden source, which rendered
+        // nothing and left the login screen a flat void -- and the picture only
+        // changes when the sync runs, so there was never a reason to redo the
+        // work at every login.
         Image {
-            id: canvas
             anchors.fill: parent
             source: "file://" + Theme.assetDir + "/wallpaper.jpg"
             fillMode: Image.PreserveAspectCrop
-            sourceSize.width: win.width
-            sourceSize.height: win.height
             cache: false
             asynchronous: true
-            visible: false
-            layer.enabled: true
-        }
 
-        MultiEffect {
-            anchors.fill: parent
-            source: canvas
-            visible: canvas.status === Image.Ready
-            blurEnabled: true
-            blur: 1.0
-            blurMax: 40
-            blurMultiplier: 0.6
-            saturation: -0.12
             // Slow drift, so a still image does not read as a frozen screen.
-            scale: win.entered ? 1.05 : 1.12
+            scale: win.entered ? 1.04 : 1.10
             Behavior on scale {
-                NumberAnimation { duration: 1600; easing.type: Easing.OutCubic }
+                NumberAnimation { duration: 1800; easing.type: Easing.OutCubic }
             }
         }
 
@@ -409,7 +425,29 @@ ShellRoot {
                             }
                         }
 
-                        Component.onCompleted: input.forceActiveFocus()
+                        Component.onCompleted: {
+                            input.forceActiveFocus();
+                            focusRetry.restart();
+                        }
+
+                        // Asked again until it sticks. Focus requested before
+                        // the compositor has handed the window a keyboard goes
+                        // nowhere, and a login screen that ignores typing is
+                        // the worst failure this file has.
+                        Timer {
+                            id: focusRetry
+                            interval: 60
+                            repeat: true
+                            property int tries: 0
+                            onTriggered: {
+                                input.forceActiveFocus();
+                                focusRetry.tries++;
+                                if (input.activeFocus || focusRetry.tries > 25) {
+                                    focusRetry.stop();
+                                    focusRetry.tries = 0;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -497,6 +535,46 @@ ShellRoot {
             }
         }
 
+        // Asleep in the corner until somebody logs in. The screen is a clock
+        // and a box for a password; this is the one thing on it that is not
+        // asking you for something.
+        Image {
+            anchors.left: parent.left
+            anchors.bottom: parent.bottom
+            anchors.leftMargin: 34
+            anchors.bottomMargin: 30
+            source: "file://" + Theme.assetDir + "/bongo-sleeping.png"
+            sourceSize.width: 256
+            sourceSize.height: 256
+            width: 132
+            height: 132
+            fillMode: Image.PreserveAspectFit
+            opacity: win.entered ? 0.5 : 0
+            Behavior on opacity {
+                SequentialAnimation {
+                    PauseAnimation { duration: 420 }
+                    NumberAnimation { duration: 900; easing.type: Easing.OutCubic }
+                }
+            }
+
+            Text {
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.topMargin: 14
+                text: "z"
+                color: Qt.alpha(Theme.text, 0.7)
+                font.family: Theme.fontFamily
+                font.pixelSize: 14
+
+                SequentialAnimation on y {
+                    running: true
+                    loops: Animation.Infinite
+                    NumberAnimation { from: 22; to: 2; duration: 2400; easing.type: Easing.InOutQuad }
+                    PauseAnimation { duration: 500 }
+                }
+            }
+        }
+
         // Wordmark, quiet, bottom centre.
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
@@ -526,4 +604,6 @@ ShellRoot {
             font.pixelSize: Theme.fontLabel
         }
     }
+    }
+
 }

@@ -3,21 +3,22 @@
 #
 # greetd has no recovery of its own: if the greeter will not start, the machine
 # simply cannot be logged into, and finding that out means a rescue VT and a
-# text editor. So a run that dies in the first few seconds hands over to the
-# stock greeter instead. A successful login also ends this process -- greetd
-# kills the greeter once the session is up -- which is why the fallback is
-# gated on how long it lasted rather than on the exit code.
+# text editor. That happened once already.
+#
+# So the fallback is not a guess about timing. greetd terminates the greeter
+# with a signal once a session has been started, and a shell reports a
+# signalled child as 128+N -- so an exit above 128 is the success case and
+# anything else, at any point, is a greeter that gave up without logging anyone
+# in. The stock greeter takes over in that case.
 
 CONFIG=/usr/share/yshell/greeter/shell.qml
 FALLBACK=/usr/bin/gtkgreet
 
-start=$SECONDS
 qs -p "$CONFIG"
 rc=$?
-elapsed=$(( SECONDS - start ))
 
-if [ "$elapsed" -lt 10 ] && [ -x "$FALLBACK" ]; then
-    echo "yshell greeter exited after ${elapsed}s (rc=$rc); falling back" >&2
+if [ "$rc" -le 128 ] && [ -x "$FALLBACK" ]; then
+    echo "yshell greeter exited with $rc without starting a session; falling back" >&2
     exec "$FALLBACK"
 fi
 
