@@ -163,10 +163,14 @@ Item {
                 id: fallback
                 anchors.fill: parent
                 visible: art.status !== Image.Ready
-                source: Wallpaper.blurSource
+                // The sharp wallpaper, not the panels' pre-blurred copy: that
+                // one is 1024px of deliberate mush for frosted glass, and
+                // sampling it at 256 and stretching it back out is why the face
+                // looked like porridge.
+                source: Wallpaper.isVideo ? Wallpaper.stillPath : Wallpaper.path
                 fillMode: Image.PreserveAspectCrop
-                sourceSize.width: 256
-                sourceSize.height: 256
+                sourceSize.width: 640
+                sourceSize.height: 640
                 asynchronous: true
                 cache: true
             }
@@ -190,8 +194,10 @@ Item {
                 anchors.fill: parent
                 source: Media.cover
                 fillMode: Image.PreserveAspectCrop
-                sourceSize.width: 320
-                sourceSize.height: 320
+                // Covers are served at 300-640px; decoding to 640 costs one
+                // texture and is the difference between a disc and a mosaic.
+                sourceSize.width: 640
+                sourceSize.height: 640
                 asynchronous: true
                 // Holds the previous cover while the next loads instead of
                 // blanking for the fetch, which is what stops the disc flashing
@@ -244,6 +250,100 @@ Item {
                 radius: width / 2
                 color: Theme.crust
             }
+        }
+    }
+
+    // ── Tonearm ──
+    // What finishes the machine. It rests off the record when nothing plays,
+    // drops onto the lead-in when it starts, and tracks inward as the side
+    // plays out — a second, slower reading of the same position the ring gives,
+    // and the one that is felt rather than read.
+    //
+    // Built as one rotated item: the arm hangs straight down from the pivot and
+    // the whole thing is turned, so the headshell cannot drift away from the
+    // end of the arm the way it did when each piece was placed by hand.
+    Item {
+        id: arm
+        // Pivot just outside the rim at four o'clock, where a turntable's is.
+        readonly property real pivotX: root.width / 2 + root.coverSize * 0.60
+        readonly property real pivotY: root.height / 2 - root.coverSize * 0.44
+        readonly property real length: root.coverSize * 0.62
+
+        // Parked clear of the record; then from the lead-in groove to the
+        // run-out as the track plays.
+        //
+        // The angles are solved, and the sign matters: Qt rotates clockwise, so
+        // a point hanging at (0, L) below the pivot lands at
+        // pivotX - L*sin(t) — a positive angle swings the tip *left*, towards
+        // the record. With the pivot 0.60*S right of centre and the arm 0.62*S
+        // long, the outer groove (0.35*S from centre) is sin(t) = 0.40 and the
+        // inner (0.12*S) is 0.77. Getting that sign backwards is what left the
+        // arm hanging off the side of the record.
+        readonly property real parked: -8
+        readonly property real leadIn: 24
+        readonly property real runOut: 51
+
+        x: arm.pivotX
+        y: arm.pivotY
+        width: 1
+        height: 1
+        z: 3
+
+        rotation: Media.playing
+            ? arm.leadIn + (arm.runOut - arm.leadIn) * Math.max(0, Math.min(1, Media.progress))
+            : arm.parked
+        transformOrigin: Item.TopLeft
+
+        Behavior on rotation {
+            NumberAnimation {
+                // Slow and springy: a tonearm has mass, and the drop is the most
+                // satisfying half-second in the panel.
+                duration: 900
+                easing.type: Easing.Bezier
+                easing.bezierCurve: Theme.easeSpring
+            }
+        }
+
+        // The arm, hanging down-left from the pivot.
+        Rectangle {
+            x: -1.5
+            y: 0
+            width: 3
+            height: arm.length
+            radius: 1.5
+            color: Qt.alpha(Theme.text, 0.7)
+        }
+
+        // The headshell at the far end.
+        Rectangle {
+            x: -6
+            y: arm.length - 4
+            width: 12
+            height: 8
+            radius: 2
+            color: Theme.accent
+        }
+
+        // Counterweight behind the pivot.
+        Rectangle {
+            x: -6
+            y: -12
+            width: 12
+            height: 9
+            radius: 3
+            color: Qt.alpha(Theme.text, 0.5)
+        }
+
+        // The pivot cap, last so it covers the joint.
+        Rectangle {
+            x: -5
+            y: -5
+            width: 10
+            height: 10
+            radius: 5
+            color: Qt.alpha(Theme.text, 0.82)
+            border.width: 1
+            border.color: Qt.alpha(Theme.crust, 0.7)
         }
     }
 

@@ -40,10 +40,19 @@ Item {
                 coverSize: Math.min(parent.height - 40, 168)
             }
 
+            MediaCat {
+                id: cat
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.rightMargin: 6
+                anchors.bottomMargin: 4
+            }
+
             Column {
                 anchors.left: orb.right
-                anchors.right: parent.right
+                anchors.right: cat.left
                 anchors.leftMargin: 26
+                anchors.rightMargin: 20
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 6
 
@@ -70,7 +79,12 @@ Item {
                 Text {
                     width: parent.width
                     visible: text !== ""
-                    text: Media.player && Media.player.trackAlbum ? Media.player.trackAlbum : ""
+                    // Sources that have no album name often put the track's
+                    // there, and a line repeating the title reads as a fault.
+                    text: {
+                        const album = Media.player ? (Media.player.trackAlbum || "") : "";
+                        return album === Media.title ? "" : album;
+                    }
                     color: Theme.subtext0
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSmall

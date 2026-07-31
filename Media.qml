@@ -43,11 +43,20 @@ Singleton {
     property string artist: ""
     property string artUrl: ""
 
-    // Firefox publishes no mpris:artUrl for most sites, but the extension that
-    // controls playback does send a notification carrying the cover. When the
-    // two agree on the track, that image is the art -- and it is the only place
-    // in the system it exists.
+    // Firefox publishes no mpris:artUrl at all for most sites — verified with
+    // playerctl, the key is simply absent — but the extension that controls
+    // playback sends a notification carrying the cover. When the two agree on
+    // the track, that image is the art, and it is the only copy of it in the
+    // system.
+    //
+    // The catch is what the notification hands over: an image://qsimage/<id>
+    // handle owned by the notification itself. Dismiss it, let it expire, or
+    // restart the shell, and the handle is dead — which is the cover vanishing
+    // and "Failed to get image from provider" in the log. So the notification
+    // that supplied it is remembered, and the art is dropped the moment that
+    // notification is no longer among the tracked ones.
     property string notificationArt: ""
+    property var notificationArtId: null
 
     readonly property string cover: root.artUrl !== "" ? root.artUrl : root.notificationArt
 
@@ -210,6 +219,22 @@ Singleton {
     // image. Matching on the title rather than trusting any notification with a
     // picture: a mail client's avatar is not album art.
     function _adoptNotificationArt(values) {
+        // The handle dies with its notification, so a cover whose source is
+        // gone has to go with it rather than leaving a broken image behind.
+        if (root.notificationArtId !== null) {
+            let alive = false;
+            for (const n of values) {
+                if (n && n.id === root.notificationArtId) {
+                    alive = true;
+                    break;
+                }
+            }
+            if (!alive) {
+                root.notificationArt = "";
+                root.notificationArtId = null;
+            }
+        }
+
         if (root.artUrl !== "" || root.title === "") return;
         for (let i = values.length - 1; i >= 0; i--) {
             const n = values[i];
@@ -217,13 +242,17 @@ Singleton {
             const text = ((n.summary || "") + " " + (n.body || "")).toLowerCase();
             if (text.indexOf(root.title.toLowerCase()) >= 0) {
                 root.notificationArt = n.image;
+                root.notificationArtId = n.id;
                 return;
             }
         }
     }
 
     // A new track invalidates whatever the last notification handed over.
-    onTitleChanged: root.notificationArt = ""
+    onTitleChanged: {
+        root.notificationArt = "";
+        root.notificationArtId = null;
+    }
 
     // ── Controls ──
     function togglePlay() {
