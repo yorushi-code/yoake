@@ -57,7 +57,7 @@ Item {
                 anchors.left: orb.right
                 anchors.right: cat.left
                 anchors.leftMargin: 26
-                anchors.rightMargin: 20
+                anchors.rightMargin: 14
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 6
 
@@ -69,6 +69,13 @@ Item {
                     font.pixelSize: Theme.fontDisplay
                     font.weight: Font.DemiBold
                     font.letterSpacing: Theme.trackDisplay
+                    // Wraps to a second line before it gives up. The column is
+                    // narrow -- an orb on one side and a cat on the other --
+                    // and eliding at one line threw away most of every video
+                    // title while a card two hundred pixels tall sat empty
+                    // underneath it.
+                    wrapMode: Text.Wrap
+                    maximumLineCount: 2
                     elide: Text.ElideRight
                 }
 

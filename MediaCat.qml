@@ -22,8 +22,8 @@ import QtQuick.Effects
 Item {
     id: root
 
-    implicitWidth: 208
-    implicitHeight: 164
+    implicitWidth: 182
+    implicitHeight: 146
 
     readonly property bool live: Cava.active && Media.playing
     readonly property real beat: root.live ? Cava.bass : 0
