@@ -97,3 +97,5 @@ DashOverview 1.0 DashOverview.qml
 DashSystem 1.0 DashSystem.qml
 DashDesks 1.0 DashDesks.qml
 Dashboard 1.0 Dashboard.qml
+MediaOrb 1.0 MediaOrb.qml
+DashMedia 1.0 DashMedia.qml

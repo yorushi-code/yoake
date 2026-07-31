@@ -214,6 +214,35 @@ Singleton {
         showOsd();
     }
 
+    // Shuffle and repeat, which every player exposes and nothing in this shell
+    // could reach until the media page needed them.
+    readonly property bool shuffleOn: root.player !== null && root.player.shuffle
+    readonly property bool canShuffle: root.player !== null && root.player.shuffleSupported
+
+    function toggleShuffle() {
+        if (root.canShuffle) root.player.shuffle = !root.player.shuffle;
+    }
+
+    readonly property int loopState: root.player ? root.player.loopState : 0
+    readonly property string loopGlyph: {
+        if (root.loopState === MprisLoopState.Track) return Glyphs.repeatOne;
+        if (root.loopState === MprisLoopState.Playlist) return Glyphs.repeatAll;
+        return Glyphs.repeatOff;
+    }
+
+    // None -> playlist -> track -> none, which is the order every player's own
+    // button walks and therefore the one people expect.
+    function cycleLoop() {
+        if (!root.player || !root.player.loopSupported) return;
+        if (root.loopState === MprisLoopState.None) {
+            root.player.loopState = MprisLoopState.Playlist;
+        } else if (root.loopState === MprisLoopState.Playlist) {
+            root.player.loopState = MprisLoopState.Track;
+        } else {
+            root.player.loopState = MprisLoopState.None;
+        }
+    }
+
     // fraction is 0..1 of total length.
     function seek(fraction) {
         if (!player || !player.canSeek || root.length <= 0) return;

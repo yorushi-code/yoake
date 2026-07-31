@@ -28,6 +28,7 @@ Item {
 
     readonly property var tabs: [
         { key: "overview", label: "Обзор", glyph: Glyphs.apps },
+        { key: "media", label: "Медиа", glyph: Glyphs.music },
         { key: "system", label: "Система", glyph: Glyphs.speedometer },
         { key: "desks", label: "Столы", glyph: Glyphs.monitor }
     ]
@@ -274,7 +275,7 @@ Item {
                         Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
                     }
 
-                    DashSystem {
+                    DashMedia {
                         anchors.fill: parent
                         visible: opacity > 0
                         revealed: root.open && root.tab === 1
@@ -282,10 +283,18 @@ Item {
                         Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
                     }
 
+                    DashSystem {
+                        anchors.fill: parent
+                        visible: opacity > 0
+                        revealed: root.open && root.tab === 2
+                        opacity: root.tab === 2 ? 1 : 0
+                        Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
+                    }
+
                     DashDesks {
                         anchors.fill: parent
                         visible: opacity > 0
-                        opacity: root.tab === 2 ? 1 : 0
+                        opacity: root.tab === 3 ? 1 : 0
                         Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
                     }
                 }

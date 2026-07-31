@@ -55,7 +55,7 @@ QtObject {
         function dashboard() { root.exclusive("dashboard"); }
 
         function dash(page: string): void {
-            const pages = ["overview", "system", "desks"];
+            const pages = ["overview", "media", "system", "desks"];
             const at = pages.indexOf(page);
             if (at >= 0) root.dashPage = at;
             root.exclusive("dashboard");
