@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 
 // The overview: what time it is, what month it is, what this machine is, and
@@ -218,6 +219,11 @@ Item {
     }
 
     // ── Now playing ──
+    // The cover is the card. Blown up, blurred and dimmed behind the content,
+    // it makes this the one card on the page that changes character with the
+    // music instead of being another grey rectangle with a thumbnail in the
+    // corner — and it costs one cached texture, because the blur is a layer Qt
+    // renders once per track rather than per frame.
     DashCard {
         id: mediaCard
         order: 3
@@ -230,6 +236,42 @@ Item {
         anchors.bottom: parent.bottom
         interactive: Media.hasPlayer
         onActivated: Media.togglePlay()
+
+        Image {
+            id: bleed
+            anchors.fill: parent
+            source: Media.cover
+            fillMode: Image.PreserveAspectCrop
+            sourceSize.width: 320
+            sourceSize.height: 320
+            asynchronous: true
+            retainWhileLoading: true
+            visible: false
+            layer.enabled: true
+        }
+
+        MultiEffect {
+            anchors.fill: parent
+            source: bleed
+            visible: bleed.status === Image.Ready
+            blurEnabled: true
+            blur: 1.0
+            blurMax: 48
+            blurMultiplier: 1.2
+            saturation: 0.25
+            opacity: 0.5
+        }
+
+        // A scrim, so the type stays readable whatever the cover happens to be.
+        Rectangle {
+            anchors.fill: parent
+            visible: bleed.status === Image.Ready
+            gradient: Gradient {
+                orientation: Gradient.Horizontal
+                GradientStop { position: 0.0; color: Qt.alpha(Theme.crust, 0.62) }
+                GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, 0.86) }
+            }
+        }
 
         Text {
             anchors.centerIn: parent
@@ -245,17 +287,19 @@ Item {
             anchors.margins: 16
             visible: Media.hasPlayer
 
-            AlbumArt {
-                id: art
+            MediaOrb {
+                id: orb
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                size: Math.min(parent.height, 148)
+                coverSize: Math.min(parent.height - 46, 116)
+                barLength: 18
+                gap: 9
             }
 
             Column {
-                anchors.left: art.right
+                anchors.left: orb.right
                 anchors.right: parent.right
-                anchors.leftMargin: 18
+                anchors.leftMargin: 16
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 5
 
@@ -272,7 +316,7 @@ Item {
                 Text {
                     width: parent.width
                     text: Media.artist
-                    color: Theme.subtext0
+                    color: Theme.subtext1
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontBody
                     elide: Text.ElideRight

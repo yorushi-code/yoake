@@ -87,19 +87,19 @@ Item {
             adjustment: PopupAdjustment.SlideX
         }
 
-        // Hover on the card itself, so the pointer can travel into it without
-        // the close timer winning the race.
-        MouseArea {
-            id: cardArea
-            anchors.fill: parent
-            hoverEnabled: true
-            acceptedButtons: Qt.NoButton
+        // A HoverHandler, not a MouseArea. A hoverEnabled MouseArea further up
+        // the stack consumes the hover, so a parent one goes false the instant
+        // the pointer reaches any control inside the card -- and the card then
+        // closed exactly as the user reached to click something in it. A
+        // HoverHandler sees the pointer regardless of what is above it.
+        HoverHandler {
+            id: cardHover
         }
 
         Item {
             id: card
             anchors.fill: parent
-            readonly property bool hovered: cardArea.containsMouse
+            readonly property bool hovered: cardHover.hovered
 
             opacity: root.open ? 1 : 0
             scale: root.open ? 1 : 0.94
