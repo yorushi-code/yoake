@@ -28,6 +28,14 @@ Singleton {
     property int gpuTemperature: 0
     property int uptimeSeconds: 0
 
+    property real load1: 0
+    property real swapUsedGb: 0
+    property real swapTotalGb: 0
+    // Bytes per second across the physical interfaces only. Summing the tunnel
+    // as well would count every proxied byte twice.
+    property real rxRate: 0
+    property real txRate: 0
+
     property string distro: ""
     property string kernel: ""
     property string host: ""
@@ -45,6 +53,12 @@ Singleton {
 
     function formatGb(value) {
         return value >= 100 ? value.toFixed(0) : value.toFixed(1);
+    }
+
+    function formatRate(bytesPerSecond) {
+        if (bytesPerSecond < 1024) return Math.round(bytesPerSecond) + " Б/с";
+        if (bytesPerSecond < 1024 * 1024) return Math.round(bytesPerSecond / 1024) + " КБ/с";
+        return (bytesPerSecond / (1024 * 1024)).toFixed(1) + " МБ/с";
     }
 
     Process {
@@ -114,7 +128,43 @@ while :; do
 
   up=$(cut -d. -f1 /proc/uptime)
 
-  echo "$cpu;$mem;$temp;$mem_used;$mem_total;$disk_used;$disk_total;$up;$gtemp"
+  load=$(cut -d' ' -f1 /proc/loadavg)
+
+  swap_total=$(awk '/^SwapTotal:/{print $2}' /proc/meminfo)
+  swap_free=$(awk '/^SwapFree:/{print $2}' /proc/meminfo)
+  swap_used=$((swap_total - swap_free))
+
+  # Physical interfaces only: the tunnel carries the same bytes as the radio
+  # underneath it, and counting both reports twice the traffic that exists.
+  #
+  # Split on the colon rather than on whitespace. /proc/net/dev right-aligns
+  # the interface name in an eight-column field, so a short name has spaces
+  # before it and a six-character one does not -- splitting on [: ]+ put the
+  # device in $1 for some rows and $2 for others, and the counters read as
+  # sixty bytes a second while a video was streaming.
+  set -- $(awk '
+    /:/ {
+      split($0, a, ":")
+      dev = a[1]
+      gsub(/[ \t]/, "", dev)
+      if (dev ~ /^(lo|tun|tap|veth|docker|br-|virbr|mihomo|wg)/) next
+      split(a[2], f, " ")
+      rx += f[1]; tx += f[9]
+    }
+    END { print rx+0, tx+0 }' /proc/net/dev)
+  rx_now=$1
+  tx_now=$2
+  if [ -n "$rx_prev" ]; then
+    rx_rate=$(( (rx_now - rx_prev) / 2 ))
+    tx_rate=$(( (tx_now - tx_prev) / 2 ))
+  else
+    rx_rate=0
+    tx_rate=0
+  fi
+  rx_prev=$rx_now
+  tx_prev=$tx_now
+
+  echo "$cpu;$mem;$temp;$mem_used;$mem_total;$disk_used;$disk_total;$up;$gtemp;$load;$swap_used;$swap_total;$rx_rate;$tx_rate"
   sleep 2
 done
 `]
@@ -134,6 +184,12 @@ done
                 root.diskTotalGb = (parseInt(p[6]) || 0) / mib;
                 root.uptimeSeconds = parseInt(p[7]) || 0;
                 root.gpuTemperature = parseInt(p[8]) || 0;
+                if (p.length < 14) return;
+                root.load1 = parseFloat(p[9]) || 0;
+                root.swapUsedGb = (parseInt(p[10]) || 0) / mib;
+                root.swapTotalGb = (parseInt(p[11]) || 0) / mib;
+                root.rxRate = Math.max(0, parseInt(p[12]) || 0);
+                root.txRate = Math.max(0, parseInt(p[13]) || 0);
             }
         }
     }

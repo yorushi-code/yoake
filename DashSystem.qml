@@ -90,7 +90,16 @@ Item {
                     { label: "Батарея", value: UPower.displayDevice.isLaptopBattery
                         ? Math.round(UPower.displayDevice.percentage * 100) + "%" : "нет" },
                     { label: "Свободно на диске", value: SysInfo.formatGb(
-                        SysInfo.diskTotalGb - SysInfo.diskUsedGb) + " ГиБ" }
+                        SysInfo.diskTotalGb - SysInfo.diskUsedGb) + " ГиБ" },
+                    { label: "Средняя нагрузка", value: SysInfo.load1.toFixed(2) },
+                    { label: "Подкачка", value: SysInfo.swapTotalGb > 0
+                        ? SysInfo.formatGb(SysInfo.swapUsedGb) + " из "
+                          + SysInfo.formatGb(SysInfo.swapTotalGb) + " ГиБ"
+                        : "нет" },
+                    { label: "Приём", value: SysInfo.formatRate(SysInfo.rxRate) },
+                    { label: "Передача", value: SysInfo.formatRate(SysInfo.txRate) },
+                    { label: "Система", value: SysInfo.distro },
+                    { label: "Хост", value: SysInfo.host }
                 ]
 
                 delegate: Item {
