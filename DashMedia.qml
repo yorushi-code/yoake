@@ -50,9 +50,7 @@ Item {
                 // it read as having fallen out of the layout instead of being
                 // part of it.
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.verticalCenterOffset: 34
-                scale: 1.25
-                transformOrigin: Item.Bottom
+                anchors.verticalCenterOffset: 30
             }
 
             Column {

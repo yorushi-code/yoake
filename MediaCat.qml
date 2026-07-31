@@ -1,34 +1,65 @@
 import QtQuick
+import QtQuick.Effects
 
 // The cat.
 //
-// It drums on the beat. Every part of it is a shape drawn here — no image, no
-// sprite sheet, nothing downloaded — so it recolours with the wallpaper like
-// everything else and there is no asset to lose.
+// It was drawn here out of primitives, which kept the shell free of assets and
+// looked exactly like a cat drawn out of primitives. The frames are the real
+// bongo cat now — assets/bongo, from wayland-bongocat, MIT, see the LICENSE
+// beside them.
+//
+// Left the colour it was drawn in. A MultiEffect colourise pass over the frame
+// stack made the cat disappear between strikes -- the effect had no texture to
+// sample in the instant one child became visible and the next did not -- and a
+// white bongo cat on dark glass is the shape everybody already knows. It is
+// tied to the record through the surface it drums on instead.
 //
 // The paws are driven by the bass rather than by a timer: a timer would tap at
 // its own tempo and be wrong for every track, where the bass is the beat by
-// definition. They alternate, because a cat hitting both at once is a cat
-// falling over.
+// definition. Hands alternate, because a cat hitting both at once every time is
+// a cat falling over — both together is reserved for a hit hard enough to
+// deserve it.
 Item {
     id: root
 
-    implicitWidth: 132
-    implicitHeight: 104
+    implicitWidth: 208
+    implicitHeight: 164
 
     readonly property bool live: Cava.active && Media.playing
     readonly property real beat: root.live ? Cava.bass : 0
 
-    // A hit is a rising edge over the threshold, not the level itself: holding
-    // the paw down for as long as the bass is loud makes it lean, not drum.
-    property bool leftDown: false
+    // A hit is a rising edge, not the level itself: holding the paw down for as
+    // long as the bass is loud makes the cat lean, not drum.
+    //
+    // Measured against a decaying peak rather than a fixed number. A constant
+    // threshold is a guess about how loud the music is, and it was wrong -- at
+    // 0.34 the cat sat still through a whole track whose bass never reached it,
+    // and a louder track would have had it hammering continuously. Against the
+    // recent peak, the same beat is found in a quiet mix and a loud one.
+    property real _peak: 0
+    readonly property real _floor: 0.06
+
+    // "" idle, "left", "right", "both"
+    property string strike: ""
     property int _side: 0
-    readonly property real _threshold: 0.34
 
     onBeatChanged: {
-        if (root.beat > root._threshold && !hold.running) {
-            root._side = 1 - root._side;
-            root.leftDown = root._side === 0;
+        // Rises instantly and falls slowly, so one loud passage does not deafen
+        // the detector for the rest of the track.
+        root._peak = root.beat > root._peak
+            ? root.beat
+            : root._peak * 0.985;
+
+        if (!root.live) return;
+
+        const gate = Math.max(root._floor, root._peak * 0.62);
+        if (root.beat > gate && !hold.running) {
+            if (root.beat > Math.max(root._floor * 2, root._peak * 0.92)) {
+                root.strike = "both";
+            } else {
+                root._side = 1 - root._side;
+                root.strike = root._side === 0 ? "left" : "right";
+            }
             hold.restart();
         }
     }
@@ -38,189 +69,148 @@ Item {
         // Long enough to be seen, short enough that a fast track still reads as
         // separate hits rather than a blur.
         interval: 110
-        onTriggered: {}
+        onTriggered: root.strike = ""
     }
 
-    readonly property bool striking: hold.running
+    // Asleep rather than merely still. A paused player showing an alert cat
+    // waiting for a beat that is not coming is the widget lying about the state
+    // of the machine.
+    readonly property bool asleep: !root.live
+
+    readonly property string frame: {
+        if (root.asleep) return "sleeping";
+        switch (root.strike) {
+        case "left": return "left-down";
+        case "right": return "right-down";
+        case "both": return "both-down";
+        }
+        return "both-up";
+    }
+
+    // The drawing is square with the cat in its lower half, so the item is
+    // square too and hangs below the box: fitting a square picture into an
+    // oblong slot wastes the height on empty sky above the ears.
+    Item {
+        id: art
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: -14
+        width: Math.min(root.width, root.height * 1.32)
+        height: width
+
+
+        // Every frame is loaded and kept, and only one is shown. Swapping one
+        // Image's source at drumming speed means rasterising an SVG on the
+        // beat: the first hit of every track arrives late and the cat stutters
+        // exactly when the music is busiest.
+        Repeater {
+            model: ["both-up", "left-down", "right-down", "both-down", "sleeping"]
+
+            delegate: Image {
+                required property string modelData
+
+                anchors.fill: parent
+                source: Qt.resolvedUrl("assets/bongo/bongo-" + modelData + ".png")
+                fillMode: Image.PreserveAspectFit
+                // Rasterised from the SVGs at install time rather than loaded
+                // as SVG: Qt's own renderer draws these files wrong -- the cat
+                // comes out cropped and its transparent field opaque -- and a
+                // 512px sprite is smaller than arguing with it.
+                sourceSize.width: 512
+                sourceSize.height: 512
+                asynchronous: true
+                cache: true
+                visible: root.frame === modelData
+            }
+        }
+    }
+
+    // Drops on the beat. The frames carry the paws; this is the weight behind
+    // them, and it is what stops four still pictures reading as a slideshow.
+    y: root.strike !== "" ? 3 : 0
+    Behavior on y {
+        NumberAnimation { duration: 90; easing.type: Easing.OutQuad }
+    }
+
+    scale: root.asleep ? 1 : 1 + root.beat * 0.03
+    Behavior on scale {
+        NumberAnimation { duration: Theme.animFast; easing.type: Easing.OutQuad }
+    }
 
     // ── Table ──
+    // The paws have to land on something or they are just waving.
     Rectangle {
-        // Inset, and only as wide as the cat needs: run to the full width and
-        // it stops reading as the surface the paws land on and starts reading
-        // as an underline somebody left behind.
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.leftMargin: 12
-        anchors.rightMargin: 12
-        anchors.bottom: parent.bottom
+        id: table
+        // Placed off the art, not the item: the drawing hangs below its box,
+        // and a line on the box's edge floats well under the paws.
+        anchors.horizontalCenter: art.horizontalCenter
+        width: art.width * 0.72
+        anchors.bottom: art.bottom
+        anchors.bottomMargin: art.height * 0.295
         height: 3
         radius: 1.5
+        z: -1
+        // Lights up under the paws on the beat, in the record's colour. The cat
+        // stays the colour it was drawn; what belongs to the track is the
+        // surface it is hitting.
+        //
+        // Reached through the id, not through `parent`: inside a GradientStop
+        // `parent` is the Gradient, which has no such property, and an
+        // undefined colour resolves to opaque black -- a dark bar under the cat
+        // in every frame.
+        readonly property color lit: root.strike !== ""
+            ? MediaTint.accent
+            : Qt.alpha(Theme.text, 0.20)
         gradient: Gradient {
             orientation: Gradient.Horizontal
             GradientStop { position: 0.0; color: "transparent" }
-            GradientStop { position: 0.2; color: Qt.alpha(Theme.text, 0.18) }
-            GradientStop { position: 0.8; color: Qt.alpha(Theme.text, 0.18) }
+            GradientStop { position: 0.22; color: table.lit }
+            GradientStop { position: 0.78; color: table.lit }
             GradientStop { position: 1.0; color: "transparent" }
         }
     }
 
-    // ── Body ──
-    Rectangle {
-        id: body
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 3
-        width: 58
-        height: 44
-        radius: 22
-        color: Qt.alpha(Theme.text, 0.9)
-        // Settles a little on each hit, the way something that just struck a
-        // surface does.
-        scale: root.striking ? 0.97 : 1
-        Behavior on scale { NumberAnimation { duration: 90; easing.type: Easing.OutQuad } }
+    // The strike itself, as light rather than as a second drawing. Sized off
+    // the bass so a heavy beat throws more of it.
+    //
+    // A RectangularShadow rather than a blurred layer: a MultiEffect blur over
+    // a layer renders its transparent field opaque, and what landed under the
+    // cat was a dark smudge instead of a glow.
+    RectangularShadow {
+        anchors.horizontalCenter: art.horizontalCenter
+        anchors.bottom: art.bottom
+        anchors.bottomMargin: art.height * 0.295 - height / 2 + 1.5
+        width: art.width * (0.30 + root.beat * 0.28)
+        height: 8
+        radius: 4
+        z: -2
+        color: MediaTint.accent
+        blur: 26
+        spread: 2
+        offset: Qt.vector2d(0, 0)
+        opacity: root.strike !== "" ? 0.55 : 0
+        visible: opacity > 0
+        Behavior on opacity { NumberAnimation { duration: 150; easing.type: Easing.OutQuad } }
     }
 
-    // ── Head ──
-    Item {
-        id: head
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: body.top
-        anchors.bottomMargin: -12
-        width: 54
-        height: 44
-        // Bobs with the beat, a touch behind the paws.
-        y: body.y - height + 12 - root.beat * 3
-
-        Rectangle {
-            anchors.fill: parent
-            radius: 21
-            color: Qt.alpha(Theme.text, 0.9)
-        }
-
-        // Ears: rotated squares, which read as triangles once the head covers
-        // their lower halves.
-        Repeater {
-            model: [-1, 1]
-
-            delegate: Rectangle {
-                required property var modelData
-                width: 15
-                height: 15
-                radius: 3
-                rotation: 45
-                color: Qt.alpha(Theme.text, 0.9)
-                x: parent.width / 2 + modelData * 16 - width / 2
-                y: -3
-                z: -1
-            }
-        }
-
-        // Eyes. They shut on the strike, which is most of the character.
-        Repeater {
-            model: [-1, 1]
-
-            delegate: Rectangle {
-                required property var modelData
-                width: 5
-                height: root.striking ? 1.5 : 5
-                radius: width / 2
-                color: Theme.crust
-                x: parent.width / 2 + modelData * 11 - width / 2
-                y: 18 + (root.striking ? 1.8 : 0)
-                Behavior on height { NumberAnimation { duration: 70 } }
-                Behavior on y { NumberAnimation { duration: 70 } }
-            }
-        }
-
-        // Nose and whiskers.
-        Rectangle {
-            width: 5
-            height: 3.5
-            radius: 1.75
-            color: Qt.alpha(MediaTint.accent, 0.85)
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: 27
-        }
-
-        Repeater {
-            model: [
-                { side: -1, y: 26 }, { side: -1, y: 30 },
-                { side: 1, y: 26 }, { side: 1, y: 30 }
-            ]
-
-            delegate: Rectangle {
-                required property var modelData
-                width: 13
-                height: 1
-                color: Qt.alpha(Theme.crust, 0.55)
-                x: modelData.side < 0 ? -6 : parent.width - 7
-                y: modelData.y
-                rotation: modelData.side * (modelData.y > 28 ? 8 : -6)
-            }
-        }
-    }
-
-    // ── Paws ──
-    Repeater {
-        model: [-1, 1]
-
-        delegate: Rectangle {
-            id: paw
-            required property var modelData
-            required property int index
-
-            readonly property bool down: root.striking
-                && (paw.index === 0 ? root.leftDown : !root.leftDown)
-
-            width: 20
-            height: 13
-            radius: 6.5
-            color: Qt.alpha(Theme.text, 0.95)
-            x: root.width / 2 + paw.modelData * 30 - width / 2
-            y: paw.down ? root.height - 14 : root.height - 30
-            rotation: paw.modelData * (paw.down ? 0 : 14)
-
-            Behavior on y {
-                NumberAnimation {
-                    duration: paw.down ? 55 : 130
-                    easing.type: paw.down ? Easing.InQuad : Easing.OutBack
-                }
-            }
-            Behavior on rotation { NumberAnimation { duration: 100 } }
-
-            // The knock: a ring that flashes out where the paw lands.
-            Rectangle {
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.bottom
-                anchors.topMargin: 1
-                width: paw.down ? 22 : 6
-                height: 2
-                radius: 1
-                color: MediaTint.accent
-                opacity: paw.down ? 0.75 : 0
-                Behavior on width { NumberAnimation { duration: 160; easing.type: Easing.OutQuad } }
-                Behavior on opacity { NumberAnimation { duration: 200 } }
-            }
-        }
-    }
-
-    // Asleep when nothing is playing: the eyes are already shut by `striking`
-    // being false, so all that is left is to stop it looking expectant.
+    // ── Sleeping ──
     Text {
         anchors.right: parent.right
         anchors.top: parent.top
+        anchors.rightMargin: 10
         text: "z"
-        color: Qt.alpha(Theme.subtext0, 0.7)
+        color: Qt.alpha(Theme.subtext0, 0.8)
         font.family: Theme.fontFamily
-        font.pixelSize: Theme.fontSmall
-        opacity: root.live ? 0 : 1
+        font.pixelSize: 13
+        opacity: root.asleep ? 1 : 0
+        visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: Theme.animSlow } }
 
         SequentialAnimation on y {
-            running: !root.live
+            running: root.asleep
             loops: Animation.Infinite
-            NumberAnimation { from: 8; to: 0; duration: 1400; easing.type: Easing.InOutQuad }
-            NumberAnimation { from: 0; to: 8; duration: 1400; easing.type: Easing.InOutQuad }
+            NumberAnimation { from: 8; to: -6; duration: 2200; easing.type: Easing.InOutQuad }
+            PauseAnimation { duration: 400 }
         }
     }
 }

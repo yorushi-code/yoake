@@ -1,0 +1,8 @@
+Bongo cat frames from https://github.com/saatvik333/wayland-bongocat
+MIT, Copyright (c) 2025 Saatvik Sharma -- see LICENSE.
+
+The SVGs are the originals and are kept for provenance; the shell loads the
+PNGs beside them. Qt's own SVG renderer draws these files wrong -- cropped, on
+an opaque field -- so they are rasterised at install time instead:
+
+    for f in *.svg; do magick -background none "$f" -resize 512x512 "${f%.svg}.png"; done
