@@ -22,6 +22,18 @@ Singleton {
             .sort((a, b) => a.idx - b.idx);
     }
 
+    // How many windows a workspace holds. The pills showed every unfocused
+    // workspace as the same dot, so an empty one and one with six windows on it
+    // were indistinguishable — which is most of what a workspace indicator is
+    // for.
+    function windowCountOn(workspaceId) {
+        let n = 0;
+        for (const w of root.windows) {
+            if (w.workspace_id === workspaceId) n++;
+        }
+        return n;
+    }
+
     function focusedWorkspaceOn(output) {
         return root.workspaces.find(w => w.output === output && w.is_active) || null;
     }

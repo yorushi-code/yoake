@@ -59,17 +59,29 @@ Row {
                 }
             }
 
+            readonly property bool occupied: Niri.windowCountOn(modelData.id) > 0
+
             Rectangle {
                 id: pill
-                width: modelData.is_focused ? 26 : 9
-                height: 9
-                radius: 4.5
+                // Three states, not two: focused is a numbered pill, occupied a
+                // full dot, empty a small hollow one. An empty workspace and one
+                // with six windows used to be the same mark.
+                width: modelData.is_focused ? 26 : (wsDelegate.occupied ? 9 : 7)
+                height: modelData.is_focused ? 9 : (wsDelegate.occupied ? 9 : 7)
+                radius: height / 2
                 anchors.verticalCenter: parent.verticalCenter
                 color: modelData.is_focused
                     ? Theme.accent
-                    : (modelData.is_urgent ? Theme.red : (mouseArea.containsMouse ? Theme.subtext0 : Theme.surface2))
+                    : (modelData.is_urgent ? Theme.red
+                        : (mouseArea.containsMouse ? Theme.subtext0
+                            : (wsDelegate.occupied ? Qt.alpha(Theme.text, 0.45) : "transparent")))
+                border.width: (!modelData.is_focused && !wsDelegate.occupied) ? 1.5 : 0
+                border.color: Qt.alpha(Theme.text, 0.34)
                 Behavior on color { ColorAnimation { duration: Theme.animFast } }
                 Behavior on width {
+                    NumberAnimation { duration: Theme.animNormal; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpring }
+                }
+                Behavior on height {
                     NumberAnimation { duration: Theme.animNormal; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpring }
                 }
 
@@ -78,8 +90,10 @@ Row {
                     text: modelData.idx
                     visible: modelData.is_focused
                     color: Theme.crust
-                    font.pixelSize: 9
-                    font.bold: true
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontMicro
+                    font.weight: Font.Bold
+                    font.features: ({ "tnum": 1 })
                 }
 
                 Ripple {
@@ -111,7 +125,12 @@ Row {
                 anchorItem: wsDelegate
                 active: mouseArea.containsMouse
                 text: modelData.name ? modelData.name : "Рабочий стол " + modelData.idx
-                subtext: "колесо — переключение"
+                subtext: {
+                    const n = Niri.windowCountOn(modelData.id);
+                    if (n === 0) return "пусто · колесо — переключение";
+                    const word = n === 1 ? "окно" : (n < 5 ? "окна" : "окон");
+                    return n + " " + word + " · колесо — переключение";
+                }
             }
         }
     }
