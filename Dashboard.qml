@@ -49,8 +49,10 @@ Item {
         anchors { top: true; bottom: true; left: true; right: true }
         color: "transparent"
         exclusiveZone: 0
-        focusable: root.open
-        WlrLayershell.keyboardFocus: root.open
+        // See Launcher: bound to the toggle, because `open` waits a frame for
+        // `armed` and a surface mapped asking for no keyboard never gets one.
+        focusable: Toggles.dashboardOpen
+        WlrLayershell.keyboardFocus: Toggles.dashboardOpen
             ? WlrKeyboardFocus.Exclusive
             : WlrKeyboardFocus.None
 

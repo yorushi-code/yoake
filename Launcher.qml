@@ -109,8 +109,13 @@ Item {
         anchors { top: true; bottom: true; left: true; right: true }
         color: "transparent"
         exclusiveZone: 0
-        focusable: root.open
-        WlrLayershell.keyboardFocus: root.open
+        // Bound to the toggle, not to `open`. `open` waits a frame for `armed`
+        // so the entrance has something to animate from -- which meant the
+        // surface was mapped asking for no keyboard at all, and the compositor
+        // does not come back later to offer it. The launcher opened unfocused:
+        // no typing, no arrows, and Escape did nothing either.
+        focusable: Toggles.launcherOpen
+        WlrLayershell.keyboardFocus: Toggles.launcherOpen
             ? WlrKeyboardFocus.Exclusive
             : WlrKeyboardFocus.None
 
@@ -127,6 +132,24 @@ Item {
             root.selected = 0;
             input.text = "";
             input.forceActiveFocus();
+            // Again once the surface is actually up. Focus asked for before the
+            // compositor has handed the window a keyboard goes nowhere.
+            focusRetry.restart();
+        }
+
+        Timer {
+            id: focusRetry
+            interval: 40
+            repeat: true
+            property int tries: 0
+            onTriggered: {
+                input.forceActiveFocus();
+                focusRetry.tries++;
+                if (input.activeFocus || focusRetry.tries > 12) {
+                    focusRetry.stop();
+                    focusRetry.tries = 0;
+                }
+            }
         }
 
         Connections {
@@ -147,7 +170,10 @@ Item {
 
         Item {
             anchors.fill: parent
-            focus: root.open
+            // The field holds the focus, not this. Anything typed has to reach
+            // a TextInput to become text, and a wrapper that takes focus for
+            // its key handler is a wrapper that swallows the search.
+            Keys.forwardTo: [input]
 
             Keys.onPressed: event => {
                 if (event.key === Qt.Key_Escape) {
@@ -184,33 +210,39 @@ Item {
                 readonly property int visibleRows: Math.max(1, Math.min(
                     Math.floor(396 / chrome.rowHeight),
                     Math.ceil(list.contentHeight / chrome.rowHeight)))
-                height: header.height + chrome.visibleRows * chrome.rowHeight + 20
+                // The empty state is a picture, not a row, so it needs a body
+                // of its own height -- at one row's worth the cat was clipped
+                // through the middle and sat on the search field.
+                readonly property int bodyHeight: root.results.length === 0
+                    ? 196
+                    : chrome.visibleRows * chrome.rowHeight
+                height: header.height + chrome.bodyHeight + 20
                 screenX: Math.round((Screen.width - 620) / 2)
                 screenY: Math.round(Screen.height * 0.16)
 
+                // Short, and decelerating. The card resizes on every keystroke
+                // as the result count changes; at 220ms with a spring it was
+                // still settling when the next letter arrived, so the whole
+                // panel wobbled the entire time you were typing.
                 Behavior on height {
                     NumberAnimation {
-                        duration: Theme.animNormal
-                        easing.type: Easing.Bezier
-                        easing.bezierCurve: Theme.easeEmphasized
+                        duration: 130
+                        easing.type: Easing.OutCubic
                     }
                 }
 
+                // Rises into place. It used to spring in on scale, which on a
+                // 620px card is the whole panel breathing in and out -- fine on
+                // a chip in the bar, seasick on something this big. A short
+                // lift and a fade is what a search field should do; you are
+                // already typing by the time it lands.
                 opacity: root.open ? 1 : 0
-                scale: root.open ? 1 : Theme.revealScale
-                transformOrigin: Item.Top
+                transform: Translate { y: root.open ? 0 : 22 }
                 Behavior on opacity {
                     NumberAnimation {
-                        duration: root.open ? Theme.animSlow : Theme.animExit
+                        duration: root.open ? 180 : Theme.animExit
                         easing.type: Easing.Bezier
                         easing.bezierCurve: root.open ? Theme.easeEmphasized : Theme.easeExit
-                    }
-                }
-                Behavior on scale {
-                    NumberAnimation {
-                        duration: root.open ? Theme.animSlow : Theme.animExit
-                        easing.type: Easing.Bezier
-                        easing.bezierCurve: root.open ? Theme.easeSpringBig : Theme.easeExit
                     }
                 }
                 onCloseRequested: Toggles.launcherOpen = false
@@ -253,7 +285,36 @@ Item {
                         selectByMouse: true
                         selectionColor: Qt.alpha(Theme.accent, 0.4)
                         clip: true
+                        focus: true
                         onTextChanged: root.query = text
+
+                        // Navigation lives on the field itself: TextInput
+                        // ignores these keys, and putting them anywhere else
+                        // means competing for the focus the field needs.
+                        Keys.onPressed: event => {
+                            if (event.key === Qt.Key_Escape) {
+                                Toggles.launcherOpen = false;
+                                event.accepted = true;
+                            } else if (event.key === Qt.Key_Down) {
+                                root.move(1);
+                                event.accepted = true;
+                            } else if (event.key === Qt.Key_Up) {
+                                root.move(-1);
+                                event.accepted = true;
+                            } else if (event.key === Qt.Key_PageDown) {
+                                root.move(8);
+                                event.accepted = true;
+                            } else if (event.key === Qt.Key_PageUp) {
+                                root.move(-8);
+                                event.accepted = true;
+                            } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                                root.launch(root.selected);
+                                event.accepted = true;
+                            } else if (event.key === Qt.Key_Tab) {
+                                root.move(1);
+                                event.accepted = true;
+                            }
+                        }
 
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
@@ -321,13 +382,32 @@ Item {
                     }
                 }
 
-                Text {
+                Column {
                     anchors.centerIn: parent
                     visible: root.results.length === 0
-                    text: "Ничего не найдено"
-                    color: Theme.subtext0
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontBody
+                    spacing: 6
+
+                    // The cat, asleep, because nothing turned up. A line of grey
+                    // type is the correct amount of information and none of the
+                    // right amount of character.
+                    Image {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        source: Qt.resolvedUrl("assets/bongo/bongo-sleeping.png")
+                        sourceSize.width: 256
+                        sourceSize.height: 256
+                        width: 104
+                        height: 104
+                        fillMode: Image.PreserveAspectFit
+                        opacity: 0.55
+                    }
+
+                    Text {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: "Ничего не найдено"
+                        color: Theme.subtext0
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontBody
+                    }
                 }
             }
         }
