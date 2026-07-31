@@ -229,10 +229,18 @@ Item {
                                 IconImage {
                                     anchors.verticalCenter: parent.verticalCenter
                                     implicitSize: 14
-                                    source: chip.modelData.desktopEntry
-                                        ? Quickshell.iconPath(String(chip.modelData.desktopEntry),
-                                                              "application-x-executable")
-                                        : Quickshell.iconPath("application-x-executable")
+                                    // Through the desktop entry, not through the
+                                    // entry's id. MPRIS reports the id
+                                    // (org.mozilla.firefox), which is not an icon
+                                    // name -- the theme has no such icon and every
+                                    // load logged a failure.
+                                    source: {
+                                        const id = chip.modelData.desktopEntry;
+                                        const entry = id ? DesktopEntries.byId(String(id)) : null;
+                                        const name = entry && entry.icon
+                                            ? entry.icon : "application-x-executable";
+                                        return Quickshell.iconPath(name, "application-x-executable");
+                                    }
                                 }
 
                                 Text {

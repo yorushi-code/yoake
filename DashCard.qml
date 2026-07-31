@@ -8,7 +8,12 @@ import Quickshell.Widgets
 // The whole point of a card here is that it is quiet: a low fill, no border, no
 // shadow. Depth is already carried by the sheet the cards sit on — repeating it
 // per card is what turns a dashboard into a pile of boxes.
-ClippingRectangle {
+//
+// The root is an Item with the clipped rectangle inside it, rather than being
+// the rectangle. A default alias onto a ClippingRectangle's own `data` makes
+// Qt report the type as overriding a member of its base on every load, and the
+// content still has to be clipped, so the shape moved inwards instead.
+Item {
     id: root
 
     // An optional eyebrow across the top of the card.
@@ -54,45 +59,49 @@ ClippingRectangle {
         }
     }
 
-    radius: 18
-    color: root.interactive && area.containsMouse
-        ? Qt.alpha(Theme.text, 0.10)
-        : Qt.alpha(Theme.text, 0.055)
-    Behavior on color { ColorAnimation { duration: Theme.animFast } }
-
     // Content starts below the eyebrow when there is one, so children can
     // simply fill this and never think about it.
     default property alias content: body.data
 
-    Text {
-        id: eyebrow
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.topMargin: 14
-        anchors.leftMargin: 16
-        visible: root.title !== ""
-        text: root.title.toUpperCase()
-        color: Theme.subtext0
-        font.family: Theme.fontFamily
-        font.pixelSize: Theme.fontLabel
-        font.weight: Font.Medium
-        font.letterSpacing: Theme.trackLabel
-    }
-
-    Item {
-        id: body
+    ClippingRectangle {
+        id: card
         anchors.fill: parent
-        anchors.topMargin: root.title !== "" ? 36 : 0
-    }
+        radius: 18
+        color: root.interactive && area.containsMouse
+            ? Qt.alpha(Theme.text, 0.10)
+            : Qt.alpha(Theme.text, 0.055)
+        Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
-    MouseArea {
-        id: area
-        anchors.fill: parent
-        enabled: root.interactive
-        hoverEnabled: root.interactive
-        cursorShape: root.interactive ? Qt.PointingHandCursor : Qt.ArrowCursor
-        acceptedButtons: Qt.LeftButton
-        onClicked: root.activated()
-        z: -1
+        Text {
+            id: eyebrow
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.topMargin: 14
+            anchors.leftMargin: 16
+            visible: root.title !== ""
+            text: root.title.toUpperCase()
+            color: Theme.subtext0
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontLabel
+            font.weight: Font.Medium
+            font.letterSpacing: Theme.trackLabel
+        }
+
+        Item {
+            id: body
+            anchors.fill: parent
+            anchors.topMargin: root.title !== "" ? 36 : 0
+        }
+
+        MouseArea {
+            id: area
+            anchors.fill: parent
+            enabled: root.interactive
+            hoverEnabled: root.interactive
+            cursorShape: root.interactive ? Qt.PointingHandCursor : Qt.ArrowCursor
+            acceptedButtons: Qt.LeftButton
+            onClicked: root.activated()
+            z: -1
+        }
     }
 }
