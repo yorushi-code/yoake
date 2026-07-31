@@ -69,7 +69,7 @@ PanelWindow {
         // frame, so a pause behind a fullscreen window changes nothing anyone
         // can see, and coming back does not jump.
         readonly property bool shouldPlay: Wallpaper.isVideo && !win.occluded
-            && !Wallpaper.batteryPaused
+            && !Wallpaper.batteryPaused && !Wallpaper.previewingVideo
         onShouldPlayChanged: shouldPlay ? play() : pause()
         onSourceChanged: if (shouldPlay) play()
     }

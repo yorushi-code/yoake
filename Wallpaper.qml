@@ -62,6 +62,13 @@ Singleton {
 
     readonly property bool batteryPaused: root.pauseOnBattery && root.onBattery
 
+    // Set while the wallpaper picker is previewing a video. Its preview is a
+    // second decoder for a second full-screen video, running on top of the one
+    // underneath it -- and the desktop's copy is completely hidden behind the
+    // picker anyway. Two decoders at once is what made the wallpaper stutter
+    // exactly while somebody was choosing one.
+    property bool previewingVideo: false
+
     // Which outputs are certainly covered, by name. A map rather than one bool
     // because there is one WallpaperView per screen and they all used to assign
     // to the same flag: on two monitors the last one to change decided for
@@ -91,6 +98,7 @@ Singleton {
     // Reported, not obeyed: what actually gates a player is the state of the
     // screen it is drawn on. This is the summary the control centre shows.
     readonly property bool videoPaused: !root.desktopVisible || root.batteryPaused
+        || root.previewingVideo
 
     FileView {
         id: trigger

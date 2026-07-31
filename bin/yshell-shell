@@ -1,0 +1,39 @@
+#!/usr/bin/bash
+# Starts the shell, and only ever one of it.
+#
+# `qs` and `qs -p <path>` load the same configuration but are separate
+# instances as far as Quickshell is concerned, so a second copy can end up
+# running with nothing on screen saying so. Two of everything, including a
+# second decoder for the video wallpaper -- which is what "the wallpaper
+# sometimes plays slowly" was: 36.8% and 18.9% of a core, both drawing the same
+# desktop.
+#
+# Idempotent on purpose: running this again replaces the shell rather than
+# adding to it.
+
+CONFIG="$HOME/.config/quickshell/shell.qml"
+GREETER_MARK="/usr/share/yshell/greeter"
+
+others() {
+    local pid
+    for pid in $(pgrep -x qs 2>/dev/null); do
+        [ "$pid" = "$$" ] && continue
+        # The login greeter runs the same binary and is none of our business.
+        if tr '\0' '\n' < "/proc/$pid/cmdline" 2>/dev/null | grep -qF "$GREETER_MARK"; then
+            continue
+        fi
+        printf '%s\n' "$pid"
+    done
+}
+
+for pid in $(others); do
+    kill "$pid" 2>/dev/null
+done
+
+# Let them release their Wayland surfaces before taking the layer back.
+for _ in $(seq 1 30); do
+    [ -z "$(others)" ] && break
+    sleep 0.1
+done
+
+exec qs -p "$CONFIG"

@@ -308,6 +308,12 @@ PanelWindow {
             audioOutput: AudioOutput { muted: true; volume: 0 }
             videoOutput: videoOut
             onSourceChanged: source == "" ? stop() : play()
+
+            // The desktop's own copy is hidden behind this window and does not
+            // need decoding while this one is up.
+            onPlaybackStateChanged: Wallpaper.previewingVideo =
+                (playbackState === MediaPlayer.PlayingState)
+            Component.onDestruction: Wallpaper.previewingVideo = false
         }
 
         VideoOutput {
