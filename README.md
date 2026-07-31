@@ -1,0 +1,88 @@
+# yshell
+
+The desktop shell for this machine. Quickshell on niri: the bar, the wallpaper,
+the notification stack, the control centre, the launcher, the session lock and
+the desktop widgets are all one program drawing one design.
+
+Named to match `~/yworld`, the VPN backend — `y` for yorushi, the rest of the
+word left alone.
+
+## What it is made of
+
+| | |
+|---|---|
+| `shell.qml` | what exists, and which parts are loaded lazily |
+| `Theme.qml` | colours, type scale, elevation, motion vocabulary |
+| `Bar*.qml` | the three bar islands and every widget in them |
+| `Launcher*.qml` | app launcher (`Mod+D`) |
+| `LockScreen.qml`, `LockState.qml` | session lock (`Super+Alt+L`) |
+| `Wallpaper*.qml` | wallpaper layer, picker and palette plumbing |
+| `Cc*.qml`, `ControlCenter.qml` | control centre (`Mod+P`) |
+| `Notif*.qml`, `Notifs.qml` | notification server, toasts and history (`Mod+N`) |
+| `Vpn*.qml`, `Mihomo*.qml` | the front end for `~/yworld` |
+| `Desktop*.qml`, `Widget*.qml` | desktop widgets (`Mod+Shift+E` to move them) |
+| `bin/` | wallpaper pipeline and the idle chain |
+
+Colours are not a fixed palette. `bin/set-wallpaper.sh` extracts them from the
+wallpaper and writes `generated-colors.json`, which the shell reads live and
+fades to — so the whole desktop, fuzzel included, re-themes itself when the
+wallpaper changes.
+
+## Video wallpapers
+
+`set-wallpaper.sh` prepares three things beside the image itself: a still frame
+for the palette, a blurred copy for the panels' frosted glass, and — for video —
+a playable copy with its frame rate halved.
+
+That last one is measured, not guessed. Shell CPU with the wallpaper fully on
+screen:
+
+| | |
+|---|---|
+| 1080p24 source | 20.7% |
+| 720p24, 56% fewer pixels | 16.5% |
+| 1080p15, half the frames | 13.3% |
+| a still image | 8.1% |
+
+Frames cost about twice what pixels do — what dominates is per-frame work, not
+decode — so the rate is halved and the resolution is left alone. Halved rather
+than clamped to a number, because an uneven divisor is what judder is: 24 → 12
+drops every other frame and stays regular, 24 → 16 would alternate one- and
+two-frame gaps.
+
+Playback pauses only when a window's tile is the size of the whole output, which
+is what niri gives a fullscreen window and nothing else. It reports neither tile
+positions nor an `is_fullscreen` flag, so nothing short of that is knowable, and
+anything less keeps playing: niri's gaps leave real wallpaper showing under even
+a maximised column, and a frozen strip there is a worse bug than the CPU.
+Pausing itself changes nothing on screen — VideoOutput keeps its last frame.
+
+## The lock
+
+`WlSessionLock`, one surface per output, one PAM conversation for all of them.
+Authenticating per surface would open a conversation per monitor and count a
+wrong password twice.
+
+The PAM service is `/etc/pam.d/yshell` — `auth include login`, the same shape
+swaylock and hyprlock ship. There is deliberately no unlock over IPC: a shell on
+this machine must not be able to open the physical screen. If it ever traps the
+session, the way out is Ctrl+Alt+F2, log in, `pkill niri`.
+
+## Idle
+
+`bin/yshell-idle.sh` drives swayidle: dim at 4 minutes, lock at 8, monitors off
+at 9, suspend at 20 and only on battery. Dimming first is the warning — a screen
+that goes straight from working to black is indistinguishable from a crash.
+
+## Budget
+
+The shell is held under 20% of one core on the desktop. Measure with two
+interleaved passes and a long settle, never one sample: setting a wallpaper
+re-runs the palette extractor and every panel animates to the new colours, so a
+sample taken four seconds later measures the transition. The first attempt at
+this reported a 1080p source as cheaper than its own downscale, which is
+impossible and was the giveaway.
+
+```
+~/.claude/jobs/*/tmp/wallbench.sh <wallpaper> [wallpaper...]
+```
