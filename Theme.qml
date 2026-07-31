@@ -75,18 +75,30 @@ QtObject {
     readonly property real elevModalBlur: 72
     readonly property real elevModalSpread: 8
 
-    // 10 matches niri's own geometry-corner-radius (40-window-rules.kdl) —
-    // every quickshell panel uses the same radius as real windows so the
-    // shell doesn't read as a separate layer bolted on top of the DE.
-    readonly property int radius: 10
-    // Popup panels round much harder than niri's own windows — at window
-    // radius they read as plain dialogs rather than part of the shell.
-    readonly property int radiusLarge: 24
+    // ── Shape ──
+    // Editorial: the interface is set, not moulded. Rounding is what makes a
+    // surface read as a pill or a card, and this language has neither — it has
+    // columns, rules and air. 3px is the most a corner gets, and only so a hit
+    // target does not look like a mistake at 1x.
+    readonly property int radius: 3
+    readonly property int radiusLarge: 6
     readonly property int spacing: 8
-    // Islands need more presence than a hairline strip — at 28 the frosted
-    // glass and its glow had no room to read as an actual surface.
-    readonly property int barHeight: 34
-    readonly property int barMargin: 8
+
+    // The horizontal rhythm everything aligns to. A margin that is a multiple
+    // of this is the difference between a grid and a pile.
+    readonly property int gutter: 22
+
+    // A rule is the main structural device here: it separates without boxing.
+    // Two weights — a hairline for internal divisions, a heavier one under the
+    // masthead, which is the only edge that has to hold against a wallpaper.
+    readonly property real ruleHair: 1
+    readonly property real ruleBold: 1.5
+    readonly property color ruleColor: Qt.alpha(text, 0.13)
+    readonly property color ruleStrong: Qt.alpha(text, 0.26)
+
+    // Two rows and the rule between them.
+    readonly property int barHeight: 58
+    readonly property int barMargin: 0
 
     readonly property int animFast: 120
     readonly property int animNormal: 220
