@@ -77,6 +77,13 @@ Item {
         implicitHeight: body.implicitHeight + 26
         color: "transparent"
 
+        // Window coordinates are screen coordinates here: the bar is a
+        // layer-shell surface pinned to the top edge, so its origin is the
+        // display's.
+        readonly property point anchorPos: root.anchorItem
+            ? root.anchorItem.mapToItem(null, 0, 0)
+            : Qt.point(0, 0)
+
         anchor {
             item: root.anchorItem
             edges: Edges.Bottom
@@ -132,10 +139,16 @@ Item {
                 id: glass
                 anchors.fill: parent
                 radius: Theme.radiusLarge
-                // The backing samples the wallpaper where the card actually is,
-                // which for a popup means where the compositor put it.
-                screenX: popup.x
-                screenY: popup.y
+                // The backing samples the wallpaper where the card actually
+                // is. A PopupWindow does not report its own placement, so the
+                // position is derived from the anchor the same way the
+                // compositor derives it: centred under the item, below it by
+                // the anchor margin.
+                screenX: popup.anchorPos.x
+                    + (root.anchorItem ? root.anchorItem.width : 0) / 2
+                    - popup.width / 2
+                screenY: popup.anchorPos.y
+                    + (root.anchorItem ? root.anchorItem.height : 0) + 10
                 tintOpacity: 0.86
             }
 

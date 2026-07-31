@@ -30,6 +30,10 @@ ClippingRectangle {
 
     implicitWidth: root.cellWidth
     implicitHeight: root.cellHeight
+    // Exposed so groups at different sizes can share a baseline. The cell is
+    // exactly the face's implicit height, so a centred glyph's baseline is the
+    // font ascent — which is what the probe reports.
+    baselineOffset: probe.baselineOffset
     color: "transparent"
     radius: 0
 

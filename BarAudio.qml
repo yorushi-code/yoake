@@ -226,28 +226,42 @@ Item {
                 color: Qt.alpha(Theme.text, 0.12)
             }
 
-            Row {
-                spacing: 8
+            // The hit area is a sibling of the row rather than a child of it:
+            // a MouseArea inside a Row is laid out as another column of it,
+            // which both breaks the row and puts the target in the wrong place.
+            Item {
+                width: 218
+                height: 22
 
-                Text {
+                Row {
+                    id: micRow
                     anchors.verticalCenter: parent.verticalCenter
-                    text: root.micMuted ? Glyphs.microphoneOff : Glyphs.microphone
-                    font.family: Theme.fontIconFamily
-                    font.pixelSize: 13
-                    color: root.micMuted ? Theme.red : Theme.subtext1
-                }
+                    spacing: 8
 
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: root.micMuted ? "Микрофон выключен" : "Микрофон включён"
-                    color: Theme.subtext0
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontLabel
+                    Text {
+                        height: 18
+                        verticalAlignment: Text.AlignVCenter
+                        text: root.micMuted ? Glyphs.microphoneOff : Glyphs.microphone
+                        font.family: Theme.fontIconFamily
+                        font.pixelSize: 13
+                        color: root.micMuted ? Theme.red : Theme.subtext1
+                        Behavior on color { ColorAnimation { duration: Theme.animNormal } }
+                    }
+
+                    Text {
+                        height: 18
+                        verticalAlignment: Text.AlignVCenter
+                        text: root.micMuted ? "Микрофон выключен" : "Микрофон включён"
+                        color: micHit.containsMouse ? Theme.text : Theme.subtext0
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontLabel
+                        Behavior on color { ColorAnimation { duration: Theme.animNormal } }
+                    }
                 }
 
                 MouseArea {
+                    id: micHit
                     anchors.fill: parent
-                    anchors.margins: -4
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {

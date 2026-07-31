@@ -16,6 +16,8 @@ Row {
     property string family: Theme.fontDisplayFamily
     property int weight: Font.DemiBold
     property color ink: Theme.text
+    // The minutes can be tinted apart from the hours; by default they are not.
+    property color minuteInk: root.ink
     property real tracking: 0
     // The gap between hours and minutes; the separator sits inside it.
     property real groupGap: 6
@@ -25,6 +27,8 @@ Row {
 
     spacing: 0
 
+    baselineOffset: h1.baselineOffset
+
     component Place: RollDigit {
         pixelSize: root.pixelSize
         family: root.family
@@ -33,7 +37,7 @@ Row {
         tracking: root.tracking
     }
 
-    Place { value: Math.floor(root.hours / 10) }
+    Place { id: h1; value: Math.floor(root.hours / 10) }
     Place { value: root.hours % 10 }
 
     Item {
@@ -72,6 +76,6 @@ Row {
         }
     }
 
-    Place { value: Math.floor(root.minutes / 10) }
-    Place { value: root.minutes % 10 }
+    Place { value: Math.floor(root.minutes / 10); ink: root.minuteInk }
+    Place { value: root.minutes % 10; ink: root.minuteInk }
 }

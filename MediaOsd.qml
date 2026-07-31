@@ -23,8 +23,8 @@ PanelWindow {
     // Wider than the card on purpose: layer-shell surfaces cannot be dragged
     // outside their own geometry, so the slack to the card's left is the
     // travel the dismiss gesture needs.
-    readonly property int cardWidth: 420
-    readonly property int cardHeight: 92
+    readonly property int cardWidth: 440
+    readonly property int cardHeight: 116
 
     anchors.bottom: true
     anchors.right: true
@@ -167,79 +167,12 @@ PanelWindow {
                 easing.bezierCurve: Theme.easeSpringBig
             }
 
-            Row {
+            // The same card the desktop widget draws. Two copies of one
+            // player is how they end up different players.
+            MediaCard {
                 anchors.fill: parent
-                anchors.margins: 14
-                spacing: 14
-
-                // The same record as the desktop widget and the dashboard, at
-                // the size this card allows. Three different pictures of the
-                // same track was the thing that made the popup feel like a
-                // different program's notification.
-                MediaOrb {
-                    anchors.verticalCenter: parent.verticalCenter
-                    coverSize: 66
-                    barLength: 7
-                    barWidth: 2
-                    gap: 4
-                    // At this size a ring is two pixels of arc and reads as a
-                    // rendering artefact; the wave below carries the position.
-                    showProgress: false
-                }
-
-                Column {
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: parent.width - 90 - 14 - controls.width - 14
-                    spacing: 5
-
-                    Text {
-                        width: parent.width
-                        text: Media.title
-                        color: Theme.text
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontTitle
-                        font.weight: Font.DemiBold
-                        elide: Text.ElideRight
-                    }
-                    Text {
-                        width: parent.width
-                        text: Media.artist
-                        color: Theme.subtext1
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontBody
-                        elide: Text.ElideRight
-                    }
-
-                    SeekWave {
-                        width: parent.width
-                        implicitHeight: 18
-                        barCount: 36
-                    }
-                }
-
-                Row {
-                    id: controls
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 4
-
-                    MediaButton {
-                        glyph: Glyphs.skipPrevious
-                        enabled: Media.player !== null && Media.player.canGoPrevious
-                        onActivated: Media.previous()
-                    }
-                    MediaButton {
-                        glyph: Media.playing ? Glyphs.pause : Glyphs.play
-                        size: 40
-                        accented: true
-                        enabled: Media.player !== null && Media.player.canTogglePlaying
-                        onActivated: Media.togglePlay()
-                    }
-                    MediaButton {
-                        glyph: Glyphs.skipNext
-                        enabled: Media.player !== null && Media.player.canGoNext
-                        onActivated: Media.next()
-                    }
-                }
+                showGlass: false
+                radius: card.radius
             }
         }
 
