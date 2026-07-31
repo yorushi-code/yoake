@@ -41,6 +41,39 @@ Singleton {
         }
     }
 
+    // Stopping by name as well as by handle.
+    //
+    // wf-recorder outlives this shell: when quickshell is restarted or crashes,
+    // the script it launched dies, `recording` resets to false, and the encoder
+    // keeps writing to disk forever. The stop button then did nothing at all,
+    // because stop() returned early on a flag that no longer described reality
+    // -- two recordings had been running for forty minutes that way, one of
+    // them 748 MB.
+    //
+    // SIGINT, never SIGKILL: wf-recorder writes the moov atom on interrupt and
+    // a killed recording is an unplayable file.
+    Process { id: reaper }
+
+    // What the machine is actually doing, asked at startup rather than assumed.
+    // etimes gives the recording its real age, so an adopted one does not
+    // restart its clock at zero.
+    Process {
+        id: adopt
+        command: ["sh", "-c", "ps -o etimes= -C wf-recorder 2>/dev/null | head -1 | tr -d ' '"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const secs = parseInt(text.trim());
+                if (!isNaN(secs)) {
+                    root.recording = true;
+                    root.elapsed = secs;
+                    elapsedTimer.restart();
+                }
+            }
+        }
+    }
+
+    Component.onCompleted: adopt.running = true
+
     Timer {
         id: elapsedTimer
         interval: 1000
@@ -67,13 +100,26 @@ Singleton {
     }
 
     function stop() {
-        if (!root.recording) return;
-        proc.signal(2); // SIGINT
+        if (proc.running) proc.signal(2); // SIGINT
+        // Also by name, because the encoder may have been orphaned by a shell
+        // restart and there is then no handle to signal.
+        reaper.command = ["pkill", "-INT", "-x", "wf-recorder"];
+        reaper.running = true;
+        root.recording = false;
+        elapsedTimer.stop();
+        root.elapsed = 0;
     }
 
     function toggle() {
         if (root.recording) stop();
         else start();
+    }
+
+    // Asked again whenever the indicator is looked at, so a recording that
+    // ended outside the shell -- disk full, encoder crash -- stops claiming to
+    // be running.
+    function refresh() {
+        if (!proc.running) adopt.running = true;
     }
 
     // Mic can be toggled mid-recording; it takes effect on the next start,
