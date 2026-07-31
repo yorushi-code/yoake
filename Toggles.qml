@@ -11,7 +11,6 @@ QtObject {
     id: root
 
     property bool notifCenterOpen: false
-    property bool controlCenterOpen: false
     property bool cheatSheetOpen: false
     property bool calendarOpen: false
     property bool wallpaperPickerOpen: false
@@ -25,7 +24,7 @@ QtObject {
     // Panels are dismissed by the same gestures as menus (desktop click,
     // Escape, focus moving to a window), so the desktop catcher needs one
     // question answered rather than a growing list of them.
-    readonly property bool anyOpen: root.notifCenterOpen || root.controlCenterOpen
+    readonly property bool anyOpen: root.notifCenterOpen
         || root.cheatSheetOpen || root.calendarOpen || root.wallpaperPickerOpen
         || root.vpnPanelOpen || root.launcherOpen
 
@@ -43,13 +42,20 @@ QtObject {
 
     function closeAll() {
         root.notifCenterOpen = false;
-        root.controlCenterOpen = false;
         root.cheatSheetOpen = false;
         root.calendarOpen = false;
         root.wallpaperPickerOpen = false;
         root.vpnPanelOpen = false;
         root.dashboardOpen = false;
         root.launcherOpen = false;
+    }
+
+    readonly property var dashPages: ["overview", "media", "system", "control", "desks"]
+
+    function dash(page) {
+        const at = root.dashPages.indexOf(page);
+        if (at >= 0) root.dashPage = at;
+        root.exclusive("dashboard");
     }
 
     // Opening one panel closes the others: two frosted sheets overlapping read
@@ -66,14 +72,11 @@ QtObject {
         function launcher() { root.exclusive("launcher"); }
         function dashboard() { root.exclusive("dashboard"); }
 
-        function dash(page: string): void {
-            const pages = ["overview", "media", "system", "desks"];
-            const at = pages.indexOf(page);
-            if (at >= 0) root.dashPage = at;
-            root.exclusive("dashboard");
-        }
+        function dash(page: string): void { root.dash(page); }
         function notifCenter() { root.exclusive("notifCenter"); }
-        function controlCenter() { root.exclusive("controlCenter"); }
+        // The controls are a dashboard page now, so the old binding lands
+        // there rather than on a second sheet beside it.
+        function controlCenter() { root.dash("control"); }
         function cheatSheet() { root.exclusive("cheatSheet"); }
         function calendar() { root.exclusive("calendar"); }
         function wallpaper() { root.exclusive("wallpaperPicker"); }

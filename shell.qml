@@ -54,10 +54,6 @@ ShellRoot {
         CheatSheet {}
     }
     LazyPanel {
-        shown: Toggles.controlCenterOpen
-        ControlCenter {}
-    }
-    LazyPanel {
         shown: Toggles.calendarOpen
         Calendar {}
     }

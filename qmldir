@@ -66,7 +66,6 @@ NotificationIcon 1.0 NotificationIcon.qml
 NotificationActions 1.0 NotificationActions.qml
 Osd 1.0 Osd.qml
 CheatSheet 1.0 CheatSheet.qml
-ControlCenter 1.0 ControlCenter.qml
 CcTile 1.0 CcTile.qml
 CcTileGrid 1.0 CcTileGrid.qml
 CcPager 1.0 CcPager.qml
@@ -108,3 +107,4 @@ MediaCard 1.0 MediaCard.qml
 
 StatGauge 1.0 StatGauge.qml
 singleton MediaTint 1.0 MediaTint.qml
+DashControl 1.0 DashControl.qml

@@ -100,19 +100,15 @@ PanelWindow {
         // single control, so it is where the summary of everything belongs --
         // and reaching it should not require remembering a key.
         //
-        // Below the widgets, so their own hover, clicks and menus still win;
-        // this only sees the pointer when it is on the island and not on
-        // something inside it.
-        MouseArea {
+        // A HoverHandler, not a MouseArea under the widgets. Underneath, it
+        // only saw the pointer in the gaps between the clock and the media
+        // widget -- pointing at the island's actual contents did nothing, and
+        // finding the strip that worked was the whole complaint. A
+        // HoverHandler sees the pointer whatever is drawn above it, and it
+        // takes no clicks, so the widgets keep their own.
+        HoverHandler {
             id: dashHover
-            anchors.fill: parent
-            z: -1
-            hoverEnabled: true
-            acceptedButtons: Qt.NoButton
-            onContainsMouseChanged: {
-                if (dashHover.containsMouse) dashOpen.restart();
-                else dashOpen.stop();
-            }
+            onHoveredChanged: hovered ? dashOpen.restart() : dashOpen.stop()
         }
 
         Timer {
@@ -120,7 +116,7 @@ PanelWindow {
             // Long enough that crossing the bar on the way somewhere else does
             // not summon it.
             interval: 420
-            onTriggered: if (dashHover.containsMouse && !Menus.anyOpen) {
+            onTriggered: if (dashHover.hovered && !Menus.anyOpen) {
                 Toggles.exclusive("dashboard");
             }
         }

@@ -24,7 +24,7 @@ Item {
     // rather than centred: reading .width here while the row centres itself
     // in that same width is a cycle, and Qt resolves it in no fixed order.
     // Whenever the content changed width -- VPN going from "вкл" to a speed,
-    // volume from 50%% to 100%% -- the row sat off-centre inside the old width
+    // volume from 50% to 100% -- the row sat off-centre inside the old width
     // for a frame, which is the clipped percentage at the island's edge.
     implicitWidth: netRow.implicitWidth
     width: implicitWidth
@@ -36,6 +36,14 @@ Item {
     // cases, so a disconnected machine looked connected.
     property int signalPercent: -1
     property string ssid: ""
+    property int freqMhz: 0
+    property real bitrate: 0
+    property string address: ""
+
+    // 2.4 and 5 are the only two this radio has, and which one you are on is
+    // the difference between "slow" and "far from the router".
+    readonly property string band: root.freqMhz >= 4900 ? "5 ГГц"
+        : (root.freqMhz > 0 ? "2,4 ГГц" : "")
 
     readonly property var wifiDevice: {
         for (const d of Networking.devices.values) {
@@ -48,15 +56,22 @@ Item {
         id: netProc
         command: ["sh", "-c",
             "i=$(iw dev 2>/dev/null | awk '/Interface/{print $2; exit}'); " +
-            "s=$(iw dev \"$i\" link 2>/dev/null | awk '/signal:/{print $2}'); " +
-            "n=$(iw dev \"$i\" link 2>/dev/null | sed -n 's/^\\tSSID: //p'); " +
+            "l=$(iw dev \"$i\" link 2>/dev/null); " +
+            "s=$(echo \"$l\" | awk '/signal:/{print $2}'); " +
+            "n=$(echo \"$l\" | sed -n 's/^\\tSSID: //p'); " +
+            "f=$(echo \"$l\" | awk '/freq:/{print $2}'); " +
+            "r=$(echo \"$l\" | awk '/tx bitrate:/{print $3}'); " +
+            "a=$(ip -4 -br addr show \"$i\" 2>/dev/null | awk '{print $3}' | cut -d/ -f1); " +
             "if [ -n \"$s\" ]; then p=$((2*(s+100))); [ $p -gt 100 ] && p=100; [ $p -lt 0 ] && p=0; " +
-            "echo \"$p|$n\"; else echo \"-1|\"; fi"]
+            "echo \"$p|$n|$f|$r|$a\"; else echo \"-1||||\"; fi"]
         stdout: StdioCollector {
             onStreamFinished: {
                 const parts = text.trim().split("|");
                 root.signalPercent = parseInt(parts[0]);
                 root.ssid = parts[1] || "";
+                root.freqMhz = parseInt(parts[2]) || 0;
+                root.bitrate = parseFloat(parts[3]) || 0;
+                root.address = parts[4] || "";
             }
         }
     }
@@ -156,10 +171,146 @@ Item {
         }
     }
 
-    Tooltip {
+    // A tooltip named the network and stopped there, so pointing at the Wi-Fi
+    // icon looked like nothing had happened at all. The card says what the link
+    // actually is -- band, rate, address -- and can switch the radio off, which
+    // is the one thing people reach for without wanting the whole list.
+    Popover {
         anchorItem: root
-        active: ma.containsMouse && !Menus.isOpen(root.menuId)
-        text: root.ssid !== "" ? root.ssid : "Не подключено"
-        subtext: "ПКМ — выбор сети"
+        hovered: ma.containsMouse && !Menus.isOpen(root.menuId)
+        minWidth: 244
+
+        Column {
+            spacing: 11
+
+            Row {
+                spacing: 9
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: Networking.wifiEnabled ? Glyphs.wifiFor(root.signalPercent)
+                                                 : Glyphs.wifiOff
+                    font.family: Theme.fontIconFamily
+                    font.pixelSize: 17
+                    color: (root.signalPercent >= 0 && Networking.wifiEnabled)
+                        ? Theme.accent : Theme.subtext0
+                }
+
+                Column {
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 1
+
+                    Text {
+                        text: !Networking.wifiEnabled ? "Wi-Fi выключен"
+                            : (root.ssid !== "" ? root.ssid : "Не подключено")
+                        color: Theme.text
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSmall
+                        font.weight: Font.Medium
+                    }
+
+                    Text {
+                        width: 176
+                        text: {
+                            if (!Networking.wifiEnabled || root.signalPercent < 0) return "";
+                            const bits = [root.signalPercent + "%"];
+                            if (root.band !== "") bits.push(root.band);
+                            if (root.bitrate > 0) bits.push(Math.round(root.bitrate) + " Мбит/с");
+                            return bits.join("  ·  ");
+                        }
+                        color: Theme.subtext0
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontLabel
+                        font.features: ({ "tnum": 1 })
+                        elide: Text.ElideRight
+                    }
+                }
+            }
+
+            // Signal as a bar as well as a number: 62% means nothing until you
+            // have seen what 80% looks like in the same place.
+            Rectangle {
+                width: 218
+                height: 4
+                radius: 2
+                visible: Networking.wifiEnabled && root.signalPercent >= 0
+                color: Qt.alpha(Theme.text, 0.13)
+
+                Rectangle {
+                    width: parent.width * Math.max(0, Math.min(1, root.signalPercent / 100))
+                    height: parent.height
+                    radius: parent.radius
+                    color: root.signalPercent < 30 ? Theme.yellow : Theme.accent
+                    Behavior on width {
+                        NumberAnimation {
+                            duration: Theme.animSlow
+                            easing.type: Easing.Bezier
+                            easing.bezierCurve: Theme.easeEmphasized
+                        }
+                    }
+                    Behavior on color { ColorAnimation { duration: Theme.animNormal } }
+                }
+            }
+
+            Rectangle {
+                width: 218
+                height: 1
+                color: Qt.alpha(Theme.text, 0.12)
+            }
+
+            Text {
+                visible: root.address !== ""
+                text: root.address
+                color: Theme.subtext0
+                font.family: Theme.fontMonoFamily
+                font.pixelSize: Theme.fontLabel
+            }
+
+            // The hit area is a sibling of the row, not a child: a MouseArea
+            // inside a Row is laid out as another column of it.
+            Item {
+                width: 218
+                height: 22
+
+                Row {
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 8
+
+                    Text {
+                        height: 18
+                        verticalAlignment: Text.AlignVCenter
+                        text: Networking.wifiEnabled ? Glyphs.wifiOff : Glyphs.wifi
+                        font.family: Theme.fontIconFamily
+                        font.pixelSize: 13
+                        color: Theme.subtext1
+                    }
+
+                    Text {
+                        height: 18
+                        verticalAlignment: Text.AlignVCenter
+                        text: Networking.wifiEnabled ? "Выключить Wi-Fi" : "Включить Wi-Fi"
+                        color: radioHit.containsMouse ? Theme.text : Theme.subtext0
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontLabel
+                        Behavior on color { ColorAnimation { duration: Theme.animNormal } }
+                    }
+                }
+
+                MouseArea {
+                    id: radioHit
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: Networking.wifiEnabled = !Networking.wifiEnabled
+                }
+            }
+
+            Text {
+                text: "ПКМ — выбор сети"
+                color: Qt.alpha(Theme.subtext0, 0.75)
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontMicro
+            }
+        }
     }
 }

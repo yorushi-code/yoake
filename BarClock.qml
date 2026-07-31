@@ -24,7 +24,7 @@ Row {
         {
             text: "Панель управления",
             glyph: Glyphs.tune,
-            action: () => Toggles.controlCenterOpen = true
+            action: () => Toggles.dash("control")
         },
         {
             text: "Календарь",
@@ -80,7 +80,7 @@ Row {
                     return;
                 }
                 Menus.closeAll();
-                Toggles.controlCenterOpen = !Toggles.controlCenterOpen;
+                Toggles.dash("control");
             }
         }
 

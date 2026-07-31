@@ -36,7 +36,8 @@ Grid {
     columns: 2
     spacing: 8
 
-    readonly property real cellWidth: (root.width - root.spacing) / 2
+    readonly property real cellWidth:
+        (root.width - root.spacing * (root.columns - 1)) / root.columns
 
     CcTile {
         width: root.cellWidth
@@ -131,7 +132,7 @@ Grid {
         // panel, so leaving it up would hide the thing being arranged.
         onToggled: {
             DesktopWidgets.toggleEditing();
-            Toggles.controlCenterOpen = false;
+            Toggles.dashboardOpen = false;
         }
     }
 

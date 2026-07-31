@@ -33,7 +33,7 @@ Singleton {
             {
                 text: "Панель управления",
                 glyph: Glyphs.tune,
-                action: () => Toggles.controlCenterOpen = true
+                action: () => Toggles.dash("control")
             }
         ];
 

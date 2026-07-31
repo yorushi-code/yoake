@@ -30,6 +30,7 @@ Item {
         { key: "overview", label: "Обзор", glyph: Glyphs.apps },
         { key: "media", label: "Медиа", glyph: Glyphs.music },
         { key: "system", label: "Система", glyph: Glyphs.speedometer },
+        { key: "control", label: "Управление", glyph: Glyphs.cog },
         { key: "desks", label: "Столы", glyph: Glyphs.monitor }
     ]
     // Held in Toggles so the page survives the panel being destroyed, and so
@@ -295,10 +296,18 @@ Item {
                         Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
                     }
 
+                    DashControl {
+                        anchors.fill: parent
+                        visible: opacity > 0
+                        revealed: root.open && root.tab === 3
+                        opacity: root.tab === 3 ? 1 : 0
+                        Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
+                    }
+
                     DashDesks {
                         anchors.fill: parent
                         visible: opacity > 0
-                        opacity: root.tab === 3 ? 1 : 0
+                        opacity: root.tab === 4 ? 1 : 0
                         Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
                     }
                 }

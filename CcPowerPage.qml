@@ -169,7 +169,7 @@ Flickable {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            Toggles.controlCenterOpen = false;
+                            Toggles.dashboardOpen = false;
                             action.modelData.act();
                         }
                     }

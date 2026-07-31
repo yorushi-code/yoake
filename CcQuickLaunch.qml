@@ -91,7 +91,7 @@ Flow {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
                     Quickshell.execDetached(app.modelData.command);
-                    Toggles.controlCenterOpen = false;
+                    Toggles.dashboardOpen = false;
                 }
             }
         }
