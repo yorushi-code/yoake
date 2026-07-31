@@ -143,12 +143,14 @@ PALETTE_SRC="${STILL:-$IMG}"
 # wallpaper switches. Doing it once here reduces each panel to a plain textured
 # quad sharing a single small texture.
 #
-# 512px wide with sigma 8 lands close to the MultiEffect blur it replaces once
-# the GPU scales it back up; the upscale is itself a bilinear smooth, which is
-# why storing it small is free quality-wise as well as cheap.
+# 1024px wide with sigma 16 is the same visual blur as the 512/sigma-8 this
+# replaces — both scale together — but it is no longer being stretched nearly
+# four times to fill a screen. Behind a bar island the difference was invisible;
+# behind the whole lock screen the old one was a smear with no wallpaper left in
+# it. One 1024x576 texture shared by every panel costs 2.4 MB.
 BLUR="$CACHE/wallpaper-blur.png"
-magick -define jpeg:size=1024x1024 "$PALETTE_SRC" \
-  -resize 512x -gaussian-blur 0x8 -strip "$BLUR"
+magick -define jpeg:size=2048x2048 "$PALETTE_SRC" \
+  -resize 1024x -gaussian-blur 0x16 -strip "$BLUR"
 
 ln -sf "$IMG" ~/.config/current-wallpaper
 

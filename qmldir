@@ -18,6 +18,7 @@ singleton MihomoApi 1.0 MihomoApi.qml
 singleton Mihomo 1.0 Mihomo.qml
 singleton NightLight 1.0 NightLight.qml
 singleton Prefs 1.0 Prefs.qml
+singleton LockState 1.0 LockState.qml
 singleton DesktopWidgets 1.0 DesktopWidgets.qml
 ManagedProcess 1.0 ManagedProcess.qml
 MenuSurface 1.0 MenuSurface.qml
@@ -85,3 +86,4 @@ WidgetSpectrum 1.0 WidgetSpectrum.qml
 WidgetStats 1.0 WidgetStats.qml
 WidgetMedia 1.0 WidgetMedia.qml
 Calendar 1.0 Calendar.qml
+LockScreen 1.0 LockScreen.qml

@@ -58,10 +58,14 @@ Row {
         Text {
             id: timeLabel
             anchors.centerIn: parent
-            text: Qt.formatDateTime(clock.date, "hh:mm")
+            text: Qt.formatDateTime(clock.date, "HH:mm")
             color: Theme.text
-            font.pixelSize: 13
-            font.bold: true
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontLead
+            font.weight: Font.DemiBold
+            // Proportional digits make the clock breathe in and out as the
+            // minute changes, and every widget to its left shifts with it.
+            font.features: ({ "tnum": 1 })
         }
 
         MouseArea {
@@ -108,7 +112,9 @@ Row {
             anchors.centerIn: parent
             text: Qt.formatDateTime(clock.date, "ddd, d MMM")
             color: dateArea.containsMouse ? Theme.text : Theme.subtext0
-            font.pixelSize: 11
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSmall
+            font.weight: Font.Medium
             Behavior on color { ColorAnimation { duration: Theme.animFast } }
         }
 

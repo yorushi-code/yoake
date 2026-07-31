@@ -26,6 +26,55 @@ QtObject {
 
     readonly property color accent: mauve
 
+    // ── Type ──
+    // One scale, named by role rather than by size, so a label in the bar and a
+    // label in the control centre are the same thing by construction instead of
+    // by two people picking 10 on separate days. Every size in the shell used to
+    // be a literal: 12 and 11 appeared 78 times between them, 9/13/14/15/17/19
+    // once or twice each, which is what a scale looks like when there isn't one.
+    //
+    // Inter is the interface face and Inter Display the optical size cut for
+    // anything large — Display's tighter spacing and smaller apertures are what
+    // stop a 132px clock reading as a blown-up body font. JetBrains Mono is kept
+    // for genuinely tabular material.
+    readonly property string fontFamily: "Inter"
+    readonly property string fontDisplayFamily: "Inter Display"
+    readonly property string fontMonoFamily: "JetBrains Mono"
+    readonly property string fontIconFamily: "Symbols Nerd Font"
+
+    readonly property int fontMicro: 9
+    readonly property int fontLabel: 10
+    readonly property int fontSmall: 11
+    readonly property int fontBody: 12
+    readonly property int fontLead: 13
+    readonly property int fontTitle: 15
+    readonly property int fontDisplay: 22
+    readonly property int fontHero: 40
+
+    // Tracking. Small type needs opening up and large type needs closing in;
+    // both are what separates set type from defaulted type.
+    readonly property real trackLabel: 1.2
+    readonly property real trackBody: 0
+    readonly property real trackDisplay: -0.6
+
+    // ── Elevation ──
+    // Three levels rather than one shadow reused everywhere: the bar sits on the
+    // desktop, panels sit above the bar, and anything modal sits above those.
+    // Reading the depth is how the eye knows which surface answers a click.
+    // The base values mirror niri's own shadow block in 25-appearance.kdl, so
+    // the shell's surfaces and real windows cast the same light.
+    readonly property color shadowColor: "#11111b90"
+    readonly property real shadowBlur: 40
+    readonly property real shadowSpread: 4
+    readonly property point shadowOffset: Qt.point(0, 6)
+
+    readonly property real elevBarBlur: 22
+    readonly property real elevBarSpread: 1
+    readonly property real elevPanelBlur: 40
+    readonly property real elevPanelSpread: 4
+    readonly property real elevModalBlur: 72
+    readonly property real elevModalSpread: 8
+
     // 10 matches niri's own geometry-corner-radius (40-window-rules.kdl) —
     // every quickshell panel uses the same radius as real windows so the
     // shell doesn't read as a separate layer bolted on top of the DE.
@@ -38,13 +87,6 @@ QtObject {
     // glass and its glow had no room to read as an actual surface.
     readonly property int barHeight: 34
     readonly property int barMargin: 8
-
-    // Mirrors niri's shadow block in 25-appearance.kdl exactly (color,
-    // softness -> blur, spread, offset) for the same reason.
-    readonly property color shadowColor: "#11111b90"
-    readonly property real shadowBlur: 40
-    readonly property real shadowSpread: 4
-    readonly property point shadowOffset: Qt.point(0, 6)
 
     readonly property int animFast: 120
     readonly property int animNormal: 220

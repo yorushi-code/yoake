@@ -30,6 +30,10 @@ ShellRoot {
         Bar {}
     }
 
+    // The lock has to exist before it is needed: creating the surface at the
+    // moment of locking would show the desktop for the frame it takes to build.
+    LockScreen {}
+
     // The OSDs stay eager: they answer a volume or brightness keypress, where
     // even an asynchronous load would be a visible lag on the first press.
     Osd {}
