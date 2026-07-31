@@ -28,8 +28,17 @@ Item {
     property real gap: 16
     property bool showProgress: true
     // Doubled and mirrored, so the lows meet at the top and the highs at the
-    // bottom and the figure is symmetrical rather than reading like a graph.
-    readonly property int bars: Cava.barCount * 2
+    // bottom and the figure is symmetrical rather than reading like a graph —
+    // but only as many as the circumference can actually show. On the popup's
+    // 66px disc, fifty-six bars land two pixels apart and overlap into a fringe:
+    // the work is done and the result is a ring. One bar per four pixels of
+    // circumference keeps them separate at every size the shell uses.
+    readonly property int bars: {
+        const room = Math.floor(Math.PI * 2 * root.barRadius / 4);
+        // Even, so the mirror has a partner for every band, and never more than
+        // the spectrum has to give.
+        return Math.max(12, Math.min(Cava.barCount * 2, room - (room % 2)));
+    }
 
     readonly property real ringRadius: root.coverSize / 2 + 7
     readonly property real barRadius: root.coverSize / 2 + root.gap
