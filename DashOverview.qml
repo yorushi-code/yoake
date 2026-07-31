@@ -237,13 +237,11 @@ Item {
             }
         }
 
-        Text {
+        EmptyState {
             anchors.centerIn: parent
             visible: !Media.hasPlayer
             text: "Ничего не играет"
-            color: Theme.subtext0
-            font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontBody
+            catSize: 92
         }
 
         Item {

@@ -172,6 +172,13 @@ PanelWindow {
                 }
             }
 
+            EmptyState {
+                anchors.centerIn: parent
+                visible: Notifs.tracked.length === 0
+                text: "Тихо"
+                catSize: 118
+            }
+
             Flickable {
                 anchors.top: header.bottom
                 anchors.left: parent.left

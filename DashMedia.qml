@@ -20,13 +20,11 @@ Item {
         revealed: root.revealed
         anchors.fill: parent
 
-        Text {
+        EmptyState {
             anchors.centerIn: parent
             visible: !Media.hasPlayer
             text: "Ничего не играет"
-            color: Theme.subtext0
-            font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontTitle
+            catSize: 150
         }
 
         Item {

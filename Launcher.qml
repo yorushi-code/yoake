@@ -382,32 +382,10 @@ Item {
                     }
                 }
 
-                Column {
+                EmptyState {
                     anchors.centerIn: parent
                     visible: root.results.length === 0
-                    spacing: 6
-
-                    // The cat, asleep, because nothing turned up. A line of grey
-                    // type is the correct amount of information and none of the
-                    // right amount of character.
-                    Image {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        source: Qt.resolvedUrl("assets/bongo/bongo-sleeping.png")
-                        sourceSize.width: 256
-                        sourceSize.height: 256
-                        width: 104
-                        height: 104
-                        fillMode: Image.PreserveAspectFit
-                        opacity: 0.55
-                    }
-
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: "Ничего не найдено"
-                        color: Theme.subtext0
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontBody
-                    }
+                    text: "Ничего не найдено"
                 }
             }
         }
