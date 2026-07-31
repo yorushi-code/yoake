@@ -87,3 +87,5 @@ WidgetStats 1.0 WidgetStats.qml
 WidgetMedia 1.0 WidgetMedia.qml
 Calendar 1.0 Calendar.qml
 LockScreen 1.0 LockScreen.qml
+Launcher 1.0 Launcher.qml
+LauncherRow 1.0 LauncherRow.qml
