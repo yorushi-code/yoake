@@ -172,33 +172,49 @@ PanelWindow {
                 anchors.margins: 14
                 spacing: 14
 
-                AlbumArt {
-                    size: 64
+                // The same record as the desktop widget and the dashboard, at
+                // the size this card allows. Three different pictures of the
+                // same track was the thing that made the popup feel like a
+                // different program's notification.
+                MediaOrb {
                     anchors.verticalCenter: parent.verticalCenter
+                    coverSize: 66
+                    barLength: 7
+                    barWidth: 2
+                    gap: 4
+                    // At this size a ring is two pixels of arc and reads as a
+                    // rendering artefact; the wave below carries the position.
+                    showProgress: false
                 }
 
                 Column {
                     anchors.verticalCenter: parent.verticalCenter
-                    width: parent.width - 64 - 14 - controls.width - 14
-                    spacing: 6
+                    width: parent.width - 90 - 14 - controls.width - 14
+                    spacing: 5
 
                     Text {
                         width: parent.width
                         text: Media.title
                         color: Theme.text
-                        font.pixelSize: 14
-                        font.bold: true
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontTitle
+                        font.weight: Font.DemiBold
                         elide: Text.ElideRight
                     }
                     Text {
                         width: parent.width
                         text: Media.artist
                         color: Theme.subtext1
-                        font.pixelSize: 12
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontBody
                         elide: Text.ElideRight
                     }
 
-                    SeekBar { width: parent.width }
+                    SeekWave {
+                        width: parent.width
+                        implicitHeight: 18
+                        barCount: 36
+                    }
                 }
 
                 Row {
