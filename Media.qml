@@ -43,6 +43,14 @@ Singleton {
     property string artist: ""
     property string artUrl: ""
 
+    // Firefox publishes no mpris:artUrl for most sites, but the extension that
+    // controls playback does send a notification carrying the cover. When the
+    // two agree on the track, that image is the art -- and it is the only place
+    // in the system it exists.
+    property string notificationArt: ""
+
+    readonly property string cover: root.artUrl !== "" ? root.artUrl : root.notificationArt
+
     // Whether this player has ever reported a non-empty artist. Used to tell
     // "Firefox glitch frame" from "a player that genuinely has no artist"
     // (podcasts, radio streams) — without it, the filter below would leave
@@ -197,6 +205,25 @@ Singleton {
     // Alt-tabbing into the player while the popup is still up is the same
     // situation as the popup never having been shown.
     onOwnerFocusedChanged: if (root.ownerFocused) root.hideOsd()
+
+    // Takes the newest notification whose text matches the track and keeps its
+    // image. Matching on the title rather than trusting any notification with a
+    // picture: a mail client's avatar is not album art.
+    function _adoptNotificationArt(values) {
+        if (root.artUrl !== "" || root.title === "") return;
+        for (let i = values.length - 1; i >= 0; i--) {
+            const n = values[i];
+            if (!n || !n.image || n.image === "") continue;
+            const text = ((n.summary || "") + " " + (n.body || "")).toLowerCase();
+            if (text.indexOf(root.title.toLowerCase()) >= 0) {
+                root.notificationArt = n.image;
+                return;
+            }
+        }
+    }
+
+    // A new track invalidates whatever the last notification handed over.
+    onTitleChanged: root.notificationArt = ""
 
     // ── Controls ──
     function togglePlay() {

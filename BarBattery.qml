@@ -111,12 +111,110 @@ Item {
         }
     }
 
-    Tooltip {
+    // Replaces the plain tooltip. A tooltip can carry two lines of text; this
+    // holds the charge estimate and the three power profiles as buttons, so
+    // switching profile no longer requires knowing that right-click exists.
+    Popover {
         anchorItem: root
-        active: ma.containsMouse && !Menus.isOpen(root.menuId)
-        text: root.charging ? "Заряжается" : "От батареи"
-        subtext: root.remaining !== ""
-            ? (root.charging ? "До полного: " + root.remaining : "Осталось: " + root.remaining)
-            : "ПКМ — профиль питания"
+        hovered: ma.containsMouse && !Menus.isOpen(root.menuId)
+        minWidth: 236
+
+        Column {
+            spacing: 10
+
+            Row {
+                spacing: 9
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: root.low ? Glyphs.batteryAlert
+                        : Glyphs.batteryFor(root.fraction, root.charging)
+                    font.family: Theme.fontIconFamily
+                    font.pixelSize: 17
+                    color: root.low ? Theme.red : (root.charging ? Theme.green : Theme.accent)
+                }
+
+                Column {
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 1
+
+                    Text {
+                        text: Math.round(root.fraction * 100) + "% · "
+                            + (root.charging ? "заряжается" : "от батареи")
+                        color: Theme.text
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSmall
+                        font.weight: Font.Medium
+                    }
+
+                    Text {
+                        visible: root.remaining !== ""
+                        text: root.charging
+                            ? "до полного " + root.remaining
+                            : "осталось " + root.remaining
+                        color: Theme.subtext0
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontLabel
+                    }
+                }
+            }
+
+            Rectangle {
+                width: 210
+                height: 1
+                color: Qt.alpha(Theme.text, 0.12)
+                visible: Power.available
+            }
+
+            Row {
+                spacing: 6
+                visible: Power.available
+
+                Repeater {
+                    model: Power.profiles
+
+                    delegate: Rectangle {
+                        id: chip
+                        required property var modelData
+
+                        readonly property bool current: Power.activeProfile === chip.modelData
+                        width: 68
+                        height: 30
+                        radius: Theme.radius + 3
+                        color: chip.current ? Qt.alpha(Theme.accent, 0.9)
+                            : (chipArea.containsMouse ? Qt.alpha(Theme.text, 0.14)
+                                                      : Qt.alpha(Theme.text, 0.07))
+                        Behavior on color { ColorAnimation { duration: Theme.animFast } }
+
+                        Column {
+                            anchors.centerIn: parent
+                            spacing: 0
+
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: Power.glyphFor(chip.modelData)
+                                font.family: Theme.fontIconFamily
+                                font.pixelSize: 13
+                                color: chip.current ? Theme.crust : Theme.subtext1
+                            }
+                        }
+
+                        MouseArea {
+                            id: chipArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: Power.setProfile(chip.modelData)
+                        }
+
+                        Tooltip {
+                            anchorItem: chip
+                            active: chipArea.containsMouse
+                            text: Power.labelFor(chip.modelData)
+                        }
+                    }
+                }
+            }
+        }
     }
 }

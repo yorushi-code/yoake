@@ -19,7 +19,7 @@ ClippingRectangle {
     Image {
         id: art
         anchors.fill: parent
-        source: Media.artUrl
+        source: Media.cover
         fillMode: Image.PreserveAspectCrop
         // Cap decode size — cover art is displayed small, and this bounds the
         // per-image cost when tracks are switched rapidly.

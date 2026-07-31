@@ -229,7 +229,7 @@ Item {
         anchors.rightMargin: root.gap
         anchors.bottom: parent.bottom
         interactive: Media.hasPlayer
-        onActivated: Media.playPause()
+        onActivated: Media.togglePlay()
 
         Text {
             anchors.centerIn: parent
@@ -291,7 +291,7 @@ Item {
                     MediaButton {
                         glyph: Media.playing ? Glyphs.pause : Glyphs.play
                         accented: true
-                        onActivated: Media.playPause()
+                        onActivated: Media.togglePlay()
                     }
                     MediaButton { glyph: Glyphs.skipNext; onActivated: Media.next() }
                 }

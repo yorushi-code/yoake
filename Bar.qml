@@ -94,6 +94,36 @@ PanelWindow {
             BarMedia { barWindow: bar }
             BarClock { barWindow: bar }
         }
+
+        // Pointing at the centre island opens the dashboard. It is the one
+        // island that is already about "what is going on" rather than about a
+        // single control, so it is where the summary of everything belongs --
+        // and reaching it should not require remembering a key.
+        //
+        // Below the widgets, so their own hover, clicks and menus still win;
+        // this only sees the pointer when it is on the island and not on
+        // something inside it.
+        MouseArea {
+            id: dashHover
+            anchors.fill: parent
+            z: -1
+            hoverEnabled: true
+            acceptedButtons: Qt.NoButton
+            onContainsMouseChanged: {
+                if (dashHover.containsMouse) dashOpen.restart();
+                else dashOpen.stop();
+            }
+        }
+
+        Timer {
+            id: dashOpen
+            // Long enough that crossing the bar on the way somewhere else does
+            // not summon it.
+            interval: 420
+            onTriggered: if (dashHover.containsMouse && !Menus.anyOpen) {
+                Toggles.exclusive("dashboard");
+            }
+        }
     }
 
     // ── Right island: tray + status ──

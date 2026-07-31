@@ -135,10 +135,128 @@ Item {
         }
     }
 
-    Tooltip {
+    // A tooltip could name the sink; this can also set the level and mute the
+    // microphone, which is what people actually reach for.
+    Popover {
         anchorItem: root
-        active: ma.containsMouse && !Menus.isOpen(root.menuId)
-        text: root.sink ? root.nameFor(root.sink) : "Нет устройства вывода"
-        subtext: "ЛКМ — звук вкл/выкл · колесо — громкость · ПКМ — устройство"
+        hovered: ma.containsMouse && !Menus.isOpen(root.menuId)
+        minWidth: 244
+
+        Column {
+            spacing: 11
+
+            Row {
+                spacing: 9
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: Glyphs.volumeFor(root.volume, root.muted)
+                    font.family: Theme.fontIconFamily
+                    font.pixelSize: 17
+                    color: root.muted ? Theme.subtext0 : Theme.accent
+                }
+
+                Column {
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 1
+
+                    Text {
+                        text: root.muted ? "Звук выключен"
+                                         : Math.round(root.volume * 100) + "%"
+                        color: Theme.text
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSmall
+                        font.weight: Font.Medium
+                        font.features: ({ "tnum": 1 })
+                    }
+
+                    Text {
+                        width: 176
+                        text: root.sink ? root.nameFor(root.sink) : "Нет устройства вывода"
+                        color: Theme.subtext0
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontLabel
+                        elide: Text.ElideRight
+                    }
+                }
+            }
+
+            // Draggable, so the card is a control and not a readout. The step
+            // matches the volume keys so keyboard and pointer agree.
+            Item {
+                width: 218
+                height: 16
+
+                Rectangle {
+                    id: track
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width
+                    height: levelArea.containsMouse || levelArea.pressed ? 7 : 4
+                    radius: height / 2
+                    color: Qt.alpha(Theme.text, 0.14)
+                    Behavior on height { NumberAnimation { duration: Theme.animFast } }
+
+                    Rectangle {
+                        height: parent.height
+                        radius: parent.radius
+                        width: parent.width * Math.max(0, Math.min(1, root.volume))
+                        color: root.muted ? Theme.subtext0 : Theme.accent
+                        Behavior on color { ColorAnimation { duration: Theme.animFast } }
+                    }
+                }
+
+                MouseArea {
+                    id: levelArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    function apply(x) {
+                        if (!root.sink || !root.sink.audio) return;
+                        root.sink.audio.volume = Math.max(0, Math.min(1, x / width));
+                        root.sink.audio.muted = false;
+                    }
+                    onPressed: mouse => apply(mouse.x)
+                    onPositionChanged: mouse => { if (pressed) apply(mouse.x); }
+                }
+            }
+
+            Rectangle {
+                width: 218
+                height: 1
+                color: Qt.alpha(Theme.text, 0.12)
+            }
+
+            Row {
+                spacing: 8
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: root.micMuted ? Glyphs.microphoneOff : Glyphs.microphone
+                    font.family: Theme.fontIconFamily
+                    font.pixelSize: 13
+                    color: root.micMuted ? Theme.red : Theme.subtext1
+                }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: root.micMuted ? "Микрофон выключен" : "Микрофон включён"
+                    color: Theme.subtext0
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontLabel
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    anchors.margins: -4
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        if (root.source && root.source.audio) {
+                            root.source.audio.muted = !root.source.audio.muted;
+                        }
+                    }
+                }
+            }
+        }
     }
 }

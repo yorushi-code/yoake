@@ -29,6 +29,18 @@ QtObject {
         || root.cheatSheetOpen || root.calendarOpen || root.wallpaperPickerOpen
         || root.vpnPanelOpen || root.launcherOpen
 
+    // Panels that take keyboard focus for themselves. niri reports a window
+    // focus change when they open, and closing on that signal means a panel
+    // dismisses itself the moment it is used. They close on Escape or on a
+    // click outside, which they already handle.
+    readonly property bool holdsFocus: root.dashboardOpen || root.launcherOpen
+
+    // Everything the compositor's attention signal should take with it.
+    function closeTransient() {
+        if (root.holdsFocus) return;
+        root.closeAll();
+    }
+
     function closeAll() {
         root.notifCenterOpen = false;
         root.controlCenterOpen = false;

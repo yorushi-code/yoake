@@ -117,6 +117,7 @@ Item {
             // assigning it directly hands out a reference that compares equal
             // to itself after every change and never redraws.
             Notifs.tracked = values.slice();
+            Media._adoptNotificationArt(values);
         }
     }
 

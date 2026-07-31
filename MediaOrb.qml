@@ -127,7 +127,7 @@ Item {
         Image {
             id: art
             anchors.fill: parent
-            source: Media.artUrl
+            source: Media.cover
             fillMode: Image.PreserveAspectCrop
             sourceSize.width: 320
             sourceSize.height: 320

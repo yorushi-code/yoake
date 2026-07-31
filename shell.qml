@@ -85,7 +85,7 @@ ShellRoot {
         target: Niri
         function onAttentionMoved() {
             Menus.closeAll();
-            Toggles.closeAll();
+            Toggles.closeTransient();
         }
     }
 }
