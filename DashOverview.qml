@@ -10,6 +10,9 @@ import Quickshell
 Item {
     id: root
 
+    // Set by the dashboard when the sheet opens.
+    property bool revealed: true
+
     readonly property int gap: 14
 
     SystemClock {
@@ -21,6 +24,8 @@ Item {
     // ── Clock ──
     DashCard {
         id: timeCard
+        order: 0
+        revealed: root.revealed
         anchors.top: parent.top
         anchors.left: parent.left
         width: 232
@@ -92,10 +97,12 @@ Item {
     // ── Calendar ──
     DashCard {
         id: calCard
+        order: 1
+        revealed: root.revealed
         anchors.top: parent.top
         anchors.left: timeCard.right
         anchors.leftMargin: root.gap
-        anchors.right: machineCard.left
+        anchors.right: weatherCard.left
         anchors.rightMargin: root.gap
         height: 202
 
@@ -105,56 +112,105 @@ Item {
         }
     }
 
-    // ── The machine ──
+    // ── Weather ──
+    // Where the machine actually is, not where the tunnel says it is: Weather
+    // locates over the physical interface for exactly that reason.
     DashCard {
-        id: machineCard
+        id: weatherCard
+        order: 2
+        revealed: root.revealed
         anchors.top: parent.top
         anchors.right: parent.right
         width: 244
         height: 202
-        title: "Машина"
+
+        Text {
+            anchors.centerIn: parent
+            visible: !Weather.valid
+            text: Weather.error !== "" ? Weather.error : "Погода загружается…"
+            color: Theme.subtext0
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSmall
+            width: parent.width - 32
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.WordWrap
+        }
 
         Column {
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.leftMargin: 16
-            anchors.rightMargin: 16
-            anchors.verticalCenterOffset: 14
-            spacing: 9
+            anchors.centerIn: parent
+            visible: Weather.valid
+            spacing: 2
 
-            Repeater {
-                model: [
-                    { glyph: Glyphs.terminal, value: SysInfo.distro },
-                    { glyph: Glyphs.cpu, value: SysInfo.kernel },
-                    { glyph: Glyphs.monitor, value: "niri · yshell" },
-                    { glyph: Glyphs.flash, value: SysInfo.uptimeText }
-                ]
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: Weather.glyph
+                font.family: Theme.fontIconFamily
+                font.pixelSize: 42
+                color: Theme.accent
+            }
 
-                delegate: Row {
-                    id: fact
-                    required property var modelData
-                    width: parent.width
-                    spacing: 10
-                    visible: fact.modelData.value !== ""
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                topPadding: 6
+                text: Math.round(Weather.temperature) + "°"
+                color: Theme.text
+                font.family: Theme.fontDisplayFamily
+                font.pixelSize: 40
+                font.weight: Font.Medium
+                font.letterSpacing: -1.5
+                font.features: ({ "tnum": 1 })
+            }
 
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 15
-                        text: fact.modelData.glyph
-                        font.family: Theme.fontIconFamily
-                        font.pixelSize: 12
-                        color: Theme.accent
-                    }
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: Weather.summary
+                color: Theme.subtext1
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontSmall
+                font.weight: Font.Medium
+            }
 
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: parent.width - 25
-                        text: fact.modelData.value
-                        color: Theme.subtext1
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSmall
-                        elide: Text.ElideRight
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                topPadding: 8
+                text: Weather.place
+                color: Theme.subtext0
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontLabel
+            }
+
+            Row {
+                anchors.horizontalCenter: parent.horizontalCenter
+                topPadding: 6
+                spacing: 14
+
+                Repeater {
+                    model: [
+                        { glyph: Glyphs.thermometer,
+                          value: "ощущается " + Math.round(Weather.feelsLike) + "°" },
+                        { glyph: Glyphs.wind, value: Math.round(Weather.wind) + " км/ч" }
+                    ]
+
+                    delegate: Row {
+                        id: detail
+                        required property var modelData
+                        spacing: 5
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: detail.modelData.glyph
+                            font.family: Theme.fontIconFamily
+                            font.pixelSize: 11
+                            color: Qt.alpha(Theme.subtext0, 0.8)
+                        }
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: detail.modelData.value
+                            color: Theme.subtext0
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.fontMicro
+                            font.features: ({ "tnum": 1 })
+                        }
                     }
                 }
             }
@@ -164,6 +220,8 @@ Item {
     // ── Now playing ──
     DashCard {
         id: mediaCard
+        order: 3
+        revealed: root.revealed
         anchors.top: timeCard.bottom
         anchors.topMargin: root.gap
         anchors.left: parent.left
@@ -244,7 +302,9 @@ Item {
     // ── Resources, in brief ──
     DashCard {
         id: statsCard
-        anchors.top: machineCard.bottom
+        order: 4
+        revealed: root.revealed
+        anchors.top: weatherCard.bottom
         anchors.topMargin: root.gap
         anchors.right: parent.right
         anchors.bottom: parent.bottom

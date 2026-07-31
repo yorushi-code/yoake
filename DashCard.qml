@@ -17,7 +17,42 @@ ClippingRectangle {
     // (a calendar, a readout) do not, because nothing happens if you click.
     property bool interactive: false
 
+    // Where this card sits in the reveal, and whether the reveal has been
+    // triggered. A dashboard whose cards all appear on the same frame reads as
+    // a screenshot being shown; one that builds itself in order reads as a
+    // thing assembling, and the eye follows the order it is given.
+    property int order: 0
+    property bool revealed: true
+
     signal activated()
+
+    opacity: root.revealed ? 1 : 0
+    // The Behavior lives inside the Translate: a Behavior on the item's own y
+    // would fight the anchors that place the card.
+    transform: Translate {
+        y: root.revealed ? 0 : 18
+        Behavior on y {
+            SequentialAnimation {
+                PauseAnimation { duration: root.revealed ? Theme.stagger(root.order) : 0 }
+                NumberAnimation {
+                    duration: Theme.animSlow
+                    easing.type: Easing.Bezier
+                    easing.bezierCurve: Theme.easeEmphasized
+                }
+            }
+        }
+    }
+
+    Behavior on opacity {
+        SequentialAnimation {
+            PauseAnimation { duration: root.revealed ? Theme.stagger(root.order) : 0 }
+            NumberAnimation {
+                duration: Theme.animSlow
+                easing.type: Easing.Bezier
+                easing.bezierCurve: Theme.easeEmphasized
+            }
+        }
+    }
 
     radius: 18
     color: root.interactive && area.containsMouse

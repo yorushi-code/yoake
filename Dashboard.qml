@@ -266,6 +266,10 @@ Item {
                     DashOverview {
                         anchors.fill: parent
                         visible: opacity > 0
+                        // Cards play their entrance when the sheet opens *and*
+                        // when this page becomes the one on screen, so switching
+                        // tabs is an arrival rather than a swap.
+                        revealed: root.open && root.tab === 0
                         opacity: root.tab === 0 ? 1 : 0
                         Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
                     }
@@ -273,6 +277,7 @@ Item {
                     DashSystem {
                         anchors.fill: parent
                         visible: opacity > 0
+                        revealed: root.open && root.tab === 1
                         opacity: root.tab === 1 ? 1 : 0
                         Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
                     }

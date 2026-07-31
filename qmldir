@@ -18,6 +18,7 @@ singleton MihomoApi 1.0 MihomoApi.qml
 singleton Mihomo 1.0 Mihomo.qml
 singleton NightLight 1.0 NightLight.qml
 singleton Prefs 1.0 Prefs.qml
+singleton Weather 1.0 Weather.qml
 singleton LockState 1.0 LockState.qml
 singleton DesktopWidgets 1.0 DesktopWidgets.qml
 ManagedProcess 1.0 ManagedProcess.qml

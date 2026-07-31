@@ -98,6 +98,20 @@ Singleton {
     readonly property string disk: "\u{F02CA}"
     readonly property string brightness: "\u{F00DF}"
 
+    // Weather — nf-md-weather-*
+    readonly property string weatherSunny: "\u{F0599}"
+    readonly property string weatherNight: "\u{F0594}"
+    readonly property string weatherPartly: "\u{F0595}"
+    readonly property string weatherNightPartly: "\u{F0F31}"
+    readonly property string weatherCloudy: "\u{F0590}"
+    readonly property string weatherFog: "\u{F0591}"
+    readonly property string weatherRain: "\u{F0597}"
+    readonly property string weatherPour: "\u{F0596}"
+    readonly property string weatherSnow: "\u{F0598}"
+    readonly property string weatherStorm: "\u{F067E}"
+    readonly property string wind: "\u{F059D}"
+    readonly property string humidity: "\u{F058E}"
+
     // Apps / misc
     readonly property string bluetooth: "\u{F00AF}"
     readonly property string bluetoothOff: "\u{F00B2}"

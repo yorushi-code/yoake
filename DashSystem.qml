@@ -10,10 +10,14 @@ import Quickshell.Services.UPower
 Item {
     id: root
 
+    property bool revealed: true
+
     readonly property int gap: 14
 
     DashCard {
         id: rings
+        order: 0
+        revealed: root.revealed
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
@@ -53,6 +57,8 @@ Item {
 
     // ── Detail ──
     DashCard {
+        order: 1
+        revealed: root.revealed
         anchors.top: rings.bottom
         anchors.topMargin: root.gap
         anchors.left: parent.left
