@@ -93,7 +93,7 @@ Item {
 
                 Item { width: 1; height: 14 }
 
-                SeekBar { width: parent.width }
+                SeekWave { width: parent.width }
 
                 Item {
                     width: parent.width
