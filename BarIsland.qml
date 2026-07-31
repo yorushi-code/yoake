@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Effects
+import Quickshell.Widgets
 
 // One of the bar's floating glass islands.
 //
@@ -68,6 +69,40 @@ Item {
         radius: height / 2
         screenX: Theme.barMargin + root.x
         screenY: Theme.barMargin
+    }
+
+    // A specular band along the top curve, the way light catches the lip of a
+    // real piece of glass. It is what stops the island reading as a flat
+    // rounded rectangle laid on the wallpaper — and it is clipped by a
+    // ClippingRectangle rather than a plain `clip: true`, which is a
+    // rectangular scissor and would cut the band square across the rounded ends.
+    ClippingRectangle {
+        anchors.fill: parent
+        radius: height / 2
+        color: "transparent"
+
+        Rectangle {
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: parent.height * 0.55
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: Qt.alpha("white", 0.13) }
+                GradientStop { position: 1.0; color: "transparent" }
+            }
+        }
+    }
+
+    // Drawn outside the backing so the stroke is not cut in half. Without it
+    // the islands dissolve into a bright wallpaper: the frosted glass is a tint
+    // over whatever is behind it, and over a pale frame of a video there is
+    // nothing left to separate shell from desktop.
+    Rectangle {
+        anchors.fill: parent
+        radius: height / 2
+        color: "transparent"
+        border.width: 1
+        border.color: Qt.alpha(Theme.text, 0.14)
     }
 
     // Behind the content, so widgets inside keep their own right-click
