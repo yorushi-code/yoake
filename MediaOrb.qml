@@ -124,11 +124,16 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: parent.height / 2 - root.barRadius - height
                 width: root.barWidth
-                // A third of the bar's travel is the resting length, not three
-                // pixels. On a quiet passage a three-pixel floor is a ring of
-                // dots and reads as a rendering fault; a short even corona
-                // reads as an instrument waiting.
-                height: root.barLength * 0.32 + spoke.value * root.barLength * 0.82
+                // The resting length follows the band rather than being one
+                // number for every spoke. An even floor is a ring of identical
+                // ticks -- a clock face, not an instrument -- and it also
+                // throws away the one thing the figure could say while nothing
+                // is playing: where the lows are. They meet at the top, so at
+                // rest the corona is already the shape the music will grow
+                // into.
+                height: root.barLength
+                    * (0.16 + 0.26 * (1 - spoke.band / Cava.barCount))
+                    + spoke.value * root.barLength * 0.78
                 radius: root.barWidth / 2
                 // The ramp runs between the sleeve's two colours rather than
                 // to the shell's blue: the whole figure should belong to the

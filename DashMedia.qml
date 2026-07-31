@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Widgets
 import Quickshell.Services.Mpris
 
 // The media page.
@@ -44,9 +45,14 @@ Item {
             MediaCat {
                 id: cat
                 anchors.right: parent.right
-                anchors.bottom: parent.bottom
                 anchors.rightMargin: 6
-                anchors.bottomMargin: 4
+                // Sits with the block it belongs to. On the card's bottom edge
+                // it read as having fallen out of the layout instead of being
+                // part of it.
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: 34
+                scale: 1.25
+                transformOrigin: Item.Bottom
             }
 
             Column {
@@ -109,8 +115,42 @@ Item {
                         font.features: ({ "tnum": 1 })
                     }
 
+                    // A stream has no length, and MPRIS reports that as zero.
+                    // Printing it as 0:00 next to a running elapsed time is a
+                    // clock that says the track is over while it plays.
+                    Row {
+                        anchors.right: parent.right
+                        spacing: 5
+                        visible: Media.length <= 0
+
+                        Rectangle {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 6
+                            height: 6
+                            radius: 3
+                            color: Theme.red
+                            opacity: Media.playing ? 1 : 0.4
+
+                            SequentialAnimation on opacity {
+                                running: Media.playing
+                                loops: Animation.Infinite
+                                NumberAnimation { to: 0.3; duration: 900; easing.type: Easing.InOutQuad }
+                                NumberAnimation { to: 1.0; duration: 900; easing.type: Easing.InOutQuad }
+                            }
+                        }
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: "прямой эфир"
+                            color: Theme.subtext0
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.fontMicro
+                        }
+                    }
+
                     Text {
                         anchors.right: parent.right
+                        visible: Media.length > 0
                         text: root.clock(Media.length)
                         color: Theme.subtext0
                         font.family: Theme.fontFamily
@@ -142,6 +182,83 @@ Item {
                         glyph: Media.loopGlyph
                         size: 30
                         onActivated: Media.cycleLoop()
+                    }
+                }
+
+                Item { width: 1; height: 10; visible: sources.visible }
+
+                // Which application this is. The shell picks whatever is
+                // playing, which is right almost always and wrong exactly when
+                // two things are paused and you meant the other one -- so the
+                // choice is shown rather than inferred silently, and clicking a
+                // source pins it until you click it again.
+                Row {
+                    id: sources
+                    spacing: 7
+                    visible: Mpris.players.values.length > 1
+
+                    Repeater {
+                        model: Mpris.players.values
+
+                        delegate: Rectangle {
+                            id: chip
+                            required property var modelData
+
+                            readonly property bool current: Media.player === chip.modelData
+                            readonly property bool held: Media.pinned === chip.modelData
+
+                            width: chipRow.implicitWidth + 18
+                            height: 26
+                            radius: 13
+                            color: chip.current ? Qt.alpha(MediaTint.accent, 0.22)
+                                : (chipHit.containsMouse ? Qt.alpha(Theme.text, 0.10)
+                                                         : Qt.alpha(Theme.text, 0.05))
+                            border.width: 1
+                            border.color: chip.held ? Qt.alpha(MediaTint.accent, 0.8) : "transparent"
+                            Behavior on color { ColorAnimation { duration: Theme.animFast } }
+                            Behavior on border.color { ColorAnimation { duration: Theme.animFast } }
+
+                            Row {
+                                id: chipRow
+                                anchors.centerIn: parent
+                                spacing: 6
+
+                                IconImage {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    implicitSize: 14
+                                    source: chip.modelData.desktopEntry
+                                        ? Quickshell.iconPath(String(chip.modelData.desktopEntry),
+                                                              "application-x-executable")
+                                        : Quickshell.iconPath("application-x-executable")
+                                }
+
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    // The desktop entry's name first: MPRIS
+                                    // identity is whatever the application felt
+                                    // like publishing, and Firefox publishes
+                                    // "Mozilla org.mozilla.firefox".
+                                    text: {
+                                        const id = chip.modelData.desktopEntry;
+                                        const entry = id ? DesktopEntries.byId(String(id)) : null;
+                                        if (entry && entry.name) return entry.name;
+                                        return chip.modelData.identity || "?";
+                                    }
+                                    color: chip.current ? Theme.text : Theme.subtext0
+                                    font.family: Theme.fontFamily
+                                    font.pixelSize: Theme.fontLabel
+                                    font.weight: chip.current ? Font.Medium : Font.Normal
+                                }
+                            }
+
+                            MouseArea {
+                                id: chipHit
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: Media.pin(chip.modelData)
+                            }
+                        }
                     }
                 }
             }

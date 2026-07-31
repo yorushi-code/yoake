@@ -45,12 +45,23 @@ Item {
 
     // ── Table ──
     Rectangle {
+        // Inset, and only as wide as the cat needs: run to the full width and
+        // it stops reading as the surface the paws land on and starts reading
+        // as an underline somebody left behind.
         anchors.left: parent.left
         anchors.right: parent.right
+        anchors.leftMargin: 12
+        anchors.rightMargin: 12
         anchors.bottom: parent.bottom
         height: 3
         radius: 1.5
-        color: Qt.alpha(Theme.text, 0.18)
+        gradient: Gradient {
+            orientation: Gradient.Horizontal
+            GradientStop { position: 0.0; color: "transparent" }
+            GradientStop { position: 0.2; color: Qt.alpha(Theme.text, 0.18) }
+            GradientStop { position: 0.8; color: Qt.alpha(Theme.text, 0.18) }
+            GradientStop { position: 1.0; color: "transparent" }
+        }
     }
 
     // ── Body ──
