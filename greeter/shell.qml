@@ -160,8 +160,22 @@ ShellRoot {
     // against a screen that was not the display, which is why the login screen
     // did not work on the real machine while it rendered fine nested inside a
     // session that already had one.
+    // Latched: once a screen has appeared the window stays, whatever happens to
+    // the output afterwards. Switching to another VT and back takes cage's
+    // output away and brings it back, and a Loader bound straight to the screen
+    // count tore the whole login screen down on the way out -- which is how a
+    // greeter that was working ended up handing over to the fallback.
+    property bool sawScreen: false
+    Connections {
+        target: Quickshell
+        function onScreensChanged() {
+            if (Quickshell.screens.length > 0) root.sawScreen = true;
+        }
+    }
+    Component.onCompleted: if (Quickshell.screens.length > 0) root.sawScreen = true;
+
     Loader {
-        active: Quickshell.screens.length > 0
+        active: root.sawScreen
         sourceComponent: greeterWindow
     }
 

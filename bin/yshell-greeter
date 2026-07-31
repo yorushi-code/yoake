@@ -2,24 +2,55 @@
 # The greetd entrypoint.
 #
 # greetd has no recovery of its own: if the greeter will not start, the machine
-# simply cannot be logged into, and finding that out means a rescue VT and a
-# text editor. That happened once already.
+# cannot be logged into, and finding that out means a rescue VT and a text
+# editor. So there is a fallback -- but a fallback that fires on the first
+# stumble is its own bug. Switching to another VT and back is enough to end a
+# compositor session, and handing the screen to a different greeter because
+# somebody looked at tty2 is not recovery, it is a second failure.
 #
-# So the fallback is not a guess about timing. greetd terminates the greeter
-# with a signal once a session has been started, and a shell reports a
-# signalled child as 128+N -- so an exit above 128 is the success case and
-# anything else, at any point, is a greeter that gave up without logging anyone
-# in. The stock greeter takes over in that case.
+# So: our greeter is restarted a few times first, and only a run that keeps
+# dying immediately gives up to the stock one. greetd terminates the greeter
+# with a signal once a session has started, which a shell reports as 128+N, so
+# an exit above 128 is the success case and this script is done either way.
 
 CONFIG=/usr/share/yshell/greeter/shell.qml
 FALLBACK=/usr/bin/gtkgreet
+ATTEMPTS=4
+MIN_RUN=5
+# A greeter that keeps dying after a working run is still restarted, but not
+# forever: without a ceiling a slow crash loop spins here until the machine is
+# rebooted, which looks exactly like a frozen login screen.
+MAX_RUNS=12
 
-qs -p "$CONFIG"
-rc=$?
+attempt=0
+runs=0
+while [ "$attempt" -lt "$ATTEMPTS" ] && [ "$runs" -lt "$MAX_RUNS" ]; do
+    attempt=$((attempt + 1))
+    runs=$((runs + 1))
+    start=$SECONDS
+    qs -p "$CONFIG"
+    rc=$?
+    ran=$(( SECONDS - start ))
 
-if [ "$rc" -le 128 ] && [ -x "$FALLBACK" ]; then
-    echo "yshell greeter exited with $rc without starting a session; falling back" >&2
+    if [ "$rc" -gt 128 ]; then
+        # Signalled by greetd: a session is starting.
+        exit 0
+    fi
+
+    echo "yshell greeter attempt $attempt exited rc=$rc after ${ran}s" >&2
+
+    # A run that lasted a while was working and something ended it -- a VT
+    # switch, the display going away. Start it again without counting it
+    # against the budget.
+    if [ "$ran" -ge "$MIN_RUN" ]; then
+        attempt=$((attempt - 1))
+        continue
+    fi
+done
+
+if [ -x "$FALLBACK" ]; then
+    echo "yshell greeter failed to stay up; falling back to $FALLBACK" >&2
     exec "$FALLBACK"
 fi
 
-exit "$rc"
+exit 1
