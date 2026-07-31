@@ -102,3 +102,5 @@ DashMedia 1.0 DashMedia.qml
 Popover 1.0 Popover.qml
 MediaCat 1.0 MediaCat.qml
 SeekWave 1.0 SeekWave.qml
+RollDigit 1.0 RollDigit.qml
+RollClock 1.0 RollClock.qml

@@ -34,55 +34,19 @@ Item {
 
         Column {
             anchors.centerIn: parent
-            spacing: -6
+            spacing: 10
 
-            Text {
+            RollClock {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: Qt.formatDateTime(clock.date, "HH")
-                color: Theme.text
-                font.family: Theme.fontDisplayFamily
-                font.pixelSize: 56
-                font.weight: Font.DemiBold
-                font.letterSpacing: -3
-                font.features: ({ "tnum": 1 })
-            }
-
-            // Three dots rather than a colon: a colon between stacked figures
-            // has nothing to sit against and reads as a stray mark.
-            Row {
-                anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 5
-                topPadding: 8
-                bottomPadding: 8
-
-                Repeater {
-                    model: 3
-                    delegate: Rectangle {
-                        required property int index
-                        width: 4
-                        height: 4
-                        radius: 2
-                        color: Theme.accent
-                        opacity: 0.35 + 0.3 * ((clock.date.getSeconds() + index) % 3)
-                        Behavior on opacity { NumberAnimation { duration: 400 } }
-                    }
-                }
+                hours: clock.date.getHours()
+                minutes: clock.date.getMinutes()
+                pixelSize: 52
+                tracking: -2
+                groupGap: 5
             }
 
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: Qt.formatDateTime(clock.date, "mm")
-                color: Theme.text
-                font.family: Theme.fontDisplayFamily
-                font.pixelSize: 56
-                font.weight: Font.DemiBold
-                font.letterSpacing: -3
-                font.features: ({ "tnum": 1 })
-            }
-
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                topPadding: 14
                 text: {
                     const d = clock.date.toLocaleDateString(Qt.locale("ru_RU"), "ddd, d MMMM");
                     return d.charAt(0).toUpperCase() + d.slice(1);

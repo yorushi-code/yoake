@@ -98,17 +98,17 @@ WlSessionLock {
             transform: Translate { y: surface.entered ? 0 : 26 }
             Behavior on opacity { NumberAnimation { duration: 620; easing.type: Easing.OutCubic } }
 
-            Text {
+            RollClock {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: Qt.formatDateTime(clock.date, "HH:mm")
-                color: Theme.text
-                font.family: Theme.fontDisplayFamily
-                font.pixelSize: 132
-                font.weight: Font.Medium
-                font.letterSpacing: -6
-                // Without tabular figures every digit change nudges the whole
-                // clock sideways, which on a 132px face is impossible to miss.
-                font.features: ({ "tnum": 1 })
+                hours: clock.date.getHours()
+                minutes: clock.date.getMinutes()
+                pixelSize: 132
+                weight: Font.Medium
+                tracking: -6
+                groupGap: 10
+                // The minute arriving is the only thing that happens on a lock
+                // screen. Rolling it is the difference between a screen that
+                // shows the time and one that is keeping it.
             }
 
             Text {
