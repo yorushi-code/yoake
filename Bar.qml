@@ -1,22 +1,21 @@
 import QtQuick
 import Quickshell
+import QtQuick.Effects
 
-// The masthead.
+// Split into separate floating islands rather than one full-width strip: the
+// wallpaper shows through between them, which is what makes the shell read as
+// sitting *on* the desktop instead of cropping it.
 //
-// Two rows and a rule between them, edge to edge, no islands and no glass. The
-// three floating pills this replaces were the same shape every other Wayland
-// rice arrives at, and they made the bar an object sitting on the desktop.
-// A masthead is not an object — it is the top of the page, and what holds it
-// there is the rule under it, not a border around it.
-//
-// Row one is the record: time, date, the state of the machine. Row two is what
-// is happening right now: which desks have windows, what is playing. Numbers
-// are set in tabular figures throughout, because a masthead that reflows every
-// minute is not set, it is animated.
+// This file is now only layout and window plumbing — each widget lives in its
+// own Bar*.qml. It had grown to 620 lines with hit areas, poll loops, tray
+// D-Bus handling and menu logic all inline, which is how the tray's broken
+// right-click went unnoticed for as long as it did.
 PanelWindow {
     id: bar
 
     // Injected by the Variants in shell.qml, one bar per connected output.
+    // The workspace list is filtered by this screen's name, so a second monitor
+    // no longer shows the laptop panel's workspaces.
     required property var modelData
     readonly property ShellScreen barScreen: modelData
     screen: modelData
@@ -26,34 +25,23 @@ PanelWindow {
         left: true
         right: true
     }
+    margins {
+        top: Theme.barMargin
+        left: Theme.barMargin
+        right: Theme.barMargin
+    }
     implicitHeight: Theme.barHeight
-    exclusiveZone: Theme.barHeight
+    exclusiveZone: Theme.barHeight + Theme.barMargin * 2
     color: "transparent"
 
+    // Only while a menu is up. Left permanently on, the compositor warps the
+    // cursor back to the bar on every workspace switch; left permanently off,
+    // menus get no keyboard focus and Escape does nothing.
     focusable: Menus.anyOpen
 
-    // A masthead needs to hold its type against whatever the wallpaper is
-    // doing, and a flat plate the width of the screen is heavy. A gradient
-    // solves both: opaque enough to read at the top, letting the picture back
-    // in as it approaches the rule.
-    Rectangle {
-        anchors.fill: parent
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: Qt.alpha(Theme.crust, 0.92) }
-            GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, 0.62) }
-        }
-    }
-
-    // The one edge that has to hold. Everything else in this language separates
-    // with air.
-    Rectangle {
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        height: Theme.ruleBold
-        color: Theme.ruleStrong
-    }
-
+    // Any click that isn't on a menu should dismiss it. The islands don't cover
+    // the whole bar, so this sits underneath them and catches the gaps.
+    // Clicks on bare desktop are DesktopLayer's job.
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
@@ -70,82 +58,76 @@ PanelWindow {
         }
     }
 
-    readonly property int rowOne: 30
-    readonly property int rowTwo: Theme.barHeight - bar.rowOne - Theme.ruleHair
-
-    // ── Row one: time, date, machine ──
-    Item {
-        id: top
-        anchors.top: parent.top
+    // ── Left island: workspaces ──
+    BarIsland {
+        id: leftIsland
         anchors.left: parent.left
-        anchors.right: parent.right
-        height: bar.rowOne
+        anchors.verticalCenter: parent.verticalCenter
+        barWindow: bar
+        islandName: "left"
 
-        BarClock {
-            anchors.left: parent.left
-            anchors.leftMargin: Theme.gutter
+        BarWorkspaces {
             anchors.verticalCenter: parent.verticalCenter
-            barWindow: bar
+            output: bar.barScreen.name
         }
+    }
 
-        BarDateline {
-            anchors.centerIn: parent
-            barWindow: bar
-        }
+    // ── Centre island: now-playing + clock ──
+    BarIsland {
+        id: centerIsland
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        barWindow: bar
+        islandName: "centre"
+
+        pulseWithAudio: true
+
+        // No Behavior on width here. Animating the island's own width relayouts
+        // every widget inside it on each frame of the animation, and its width
+        // is driven by the mini spectrum, which already animates its own. The
+        // island follows for free and nothing has to be laid out twice.
 
         Row {
-            anchors.right: parent.right
-            anchors.rightMargin: Theme.gutter
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 18
+            spacing: 10
+
+            BarMedia { barWindow: bar }
+            BarClock { barWindow: bar }
+        }
+    }
+
+    // ── Right island: tray + status ──
+    BarIsland {
+        id: rightIsland
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        barWindow: bar
+        islandName: "right"
+
+        Row {
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 12
 
             BarRecorder {
                 barWindow: bar
+                // Without this the capture script falls back to the first
+                // output it finds, which is only right by luck on one monitor.
                 Component.onCompleted: Recorder.output = bar.barScreen.name
             }
+            BarNotifications { barWindow: bar }
+            BarTray { barWindow: bar }
+
+            Rectangle {
+                width: 1
+                height: 12
+                anchors.verticalCenter: parent.verticalCenter
+                color: Qt.alpha(Theme.text, 0.15)
+            }
+
             BarVpn { barWindow: bar }
             BarNetwork { barWindow: bar }
             BarAudio { barWindow: bar }
             BarBattery { barWindow: bar }
-        }
-    }
-
-    // The internal division is a hairline, not the bold rule: inside one
-    // surface a heavy line would read as two surfaces.
-    Rectangle {
-        id: innerRule
-        anchors.top: top.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.leftMargin: Theme.gutter
-        anchors.rightMargin: Theme.gutter
-        height: Theme.ruleHair
-        color: Theme.ruleColor
-    }
-
-    // ── Row two: what is happening ──
-    Item {
-        anchors.top: innerRule.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-
-        BarWorkspaces {
-            anchors.left: parent.left
-            anchors.leftMargin: Theme.gutter
-            anchors.verticalCenter: parent.verticalCenter
-            output: bar.barScreen.name
-        }
-
-        Row {
-            anchors.right: parent.right
-            anchors.rightMargin: Theme.gutter
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: 18
-
-            BarMedia { barWindow: bar }
-            BarNotifications { barWindow: bar }
-            BarTray { barWindow: bar }
         }
     }
 }

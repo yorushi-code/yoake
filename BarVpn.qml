@@ -10,7 +10,14 @@ Item {
 
     property var barWindow: null
 
-    width: vpnRow.width
+        // implicitWidth off the row's *implicit* width, and the row anchored
+    // rather than centred: reading .width here while the row centres itself
+    // in that same width is a cycle, and Qt resolves it in no fixed order.
+    // Whenever the content changed width -- VPN going from "вкл" to a speed,
+    // volume from 50%% to 100%% -- the row sat off-centre inside the old width
+    // for a frame, which is the clipped percentage at the island's edge.
+    implicitWidth: vpnRow.implicitWidth
+    width: implicitWidth
     height: Theme.barHeight
     anchors.verticalCenter: parent ? parent.verticalCenter : undefined
 
@@ -29,7 +36,8 @@ Item {
 
     Row {
         id: vpnRow
-        anchors.centerIn: parent
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
         spacing: 5
 
         BarIcon {

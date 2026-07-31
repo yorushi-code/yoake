@@ -1,19 +1,18 @@
 import QtQuick
 import Quickshell
 
-// The time, set large enough to be the first thing read on the page.
-//
-// The date moved out to BarDateline, in the centre of row one: in a masthead
-// the time is the anchor at the left edge and the dateline is the centred
-// caption, not a smaller word beside it.
-Item {
+// Time and date. Split into two hit areas deliberately — one island, but each
+// half opens the panel its label suggests.
+Row {
     id: root
 
     property var barWindow: null
+    // Scoped to the output so the same widget on a second monitor
+    // does not share one open-menu key with this one.
     readonly property string menuId: Menus.idFor(root.barWindow, "clock")
 
-    implicitWidth: label.implicitWidth
-    implicitHeight: label.implicitHeight
+    spacing: 10
+    anchors.verticalCenter: parent ? parent.verticalCenter : undefined
 
     SystemClock {
         id: clock
@@ -51,49 +50,95 @@ Item {
         }
     ]
 
-    Text {
-        id: label
-        anchors.verticalCenter: parent.verticalCenter
-        text: Qt.formatDateTime(clock.date, "HH:mm")
-        color: Theme.text
-        font.family: Theme.fontDisplayFamily
-        font.pixelSize: Theme.fontDisplay
-        font.weight: Font.Medium
-        font.letterSpacing: Theme.trackDisplay
-        // Proportional digits make the time breathe in and out as the minute
-        // changes, and at this size the whole left edge of the masthead moves
-        // with it.
-        font.features: ({ "tnum": 1 })
-    }
+    Item {
+        id: timeItem
+        width: timeLabel.width
+        height: Theme.barHeight
 
-    MouseArea {
-        id: clockArea
-        anchors.fill: parent
-        anchors.margins: -6
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        acceptedButtons: Qt.LeftButton | Qt.RightButton
-        onClicked: mouse => {
-            if (mouse.button === Qt.RightButton) {
-                Menus.toggle(root.menuId);
-                return;
+        Text {
+            id: timeLabel
+            anchors.centerIn: parent
+            text: Qt.formatDateTime(clock.date, "HH:mm")
+            color: Theme.text
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontLead
+            font.weight: Font.DemiBold
+            // Proportional digits make the clock breathe in and out as the
+            // minute changes, and every widget to its left shifts with it.
+            font.features: ({ "tnum": 1 })
+        }
+
+        MouseArea {
+            id: clockArea
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onClicked: mouse => {
+                if (mouse.button === Qt.RightButton) {
+                    Menus.toggle(root.menuId);
+                    return;
+                }
+                Menus.closeAll();
+                Toggles.controlCenterOpen = !Toggles.controlCenterOpen;
             }
-            Menus.closeAll();
-            Toggles.controlCenterOpen = !Toggles.controlCenterOpen;
+        }
+
+        // Shared by both halves so the menu appears under whichever was
+        // right-clicked without duplicating the model.
+        ActionMenu {
+            id: menu
+            menuId: root.menuId
+            anchorItem: timeItem
+            model: Menus.isOpen(root.menuId) ? root.menuModel : []
+            open: Menus.isOpen(root.menuId)
+        }
+
+        Tooltip {
+            anchorItem: timeItem
+            active: clockArea.containsMouse && !Menus.isOpen(root.menuId)
+            text: Qt.formatDateTime(clock.date, "dddd, d MMMM yyyy")
+            subtext: "ЛКМ — панель управления · ПКМ — меню"
         }
     }
 
-    ActionMenu {
-        menuId: root.menuId
-        anchorItem: root
-        model: Menus.isOpen(root.menuId) ? root.menuModel : []
-        open: Menus.isOpen(root.menuId)
-    }
+    Item {
+        id: dateItem
+        width: dateLabel.width
+        height: Theme.barHeight
 
-    Tooltip {
-        anchorItem: root
-        active: clockArea.containsMouse && !Menus.isOpen(root.menuId)
-        text: Qt.formatDateTime(clock.date, "dddd, d MMMM yyyy")
-        subtext: "ЛКМ — панель управления · ПКМ — меню"
+        Text {
+            id: dateLabel
+            anchors.centerIn: parent
+            text: Qt.formatDateTime(clock.date, "ddd, d MMM")
+            color: dateArea.containsMouse ? Theme.text : Theme.subtext0
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSmall
+            font.weight: Font.Medium
+            Behavior on color { ColorAnimation { duration: Theme.animFast } }
+        }
+
+        MouseArea {
+            id: dateArea
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onClicked: mouse => {
+                if (mouse.button === Qt.RightButton) {
+                    Menus.toggle(root.menuId);
+                    return;
+                }
+                Menus.closeAll();
+                Toggles.calendarOpen = !Toggles.calendarOpen;
+            }
+        }
+
+        Tooltip {
+            anchorItem: dateItem
+            active: dateArea.containsMouse && !Menus.isOpen(root.menuId)
+            text: "Календарь"
+            subtext: "ПКМ — меню"
+        }
     }
 }
