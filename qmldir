@@ -107,3 +107,4 @@ RollClock 1.0 RollClock.qml
 MediaCard 1.0 MediaCard.qml
 
 StatGauge 1.0 StatGauge.qml
+singleton MediaTint 1.0 MediaTint.qml

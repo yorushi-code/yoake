@@ -126,7 +126,7 @@ Item {
             width: 5
             height: 3.5
             radius: 1.75
-            color: Qt.alpha(Theme.accent, 0.85)
+            color: Qt.alpha(MediaTint.accent, 0.85)
             anchors.horizontalCenter: parent.horizontalCenter
             y: 27
         }
@@ -185,7 +185,7 @@ Item {
                 width: paw.down ? 22 : 6
                 height: 2
                 radius: 1
-                color: Theme.accent
+                color: MediaTint.accent
                 opacity: paw.down ? 0.75 : 0
                 Behavior on width { NumberAnimation { duration: 160; easing.type: Easing.OutQuad } }
                 Behavior on opacity { NumberAnimation { duration: 200 } }

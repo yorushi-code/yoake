@@ -151,7 +151,7 @@ Item {
                 visible: fallback.visible
                 gradient: Gradient {
                     orientation: Gradient.Vertical
-                    GradientStop { position: 0.0; color: Qt.alpha(Theme.accent, 0.32) }
+                    GradientStop { position: 0.0; color: Qt.alpha(MediaTint.accent, 0.32) }
                     GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, 0.5) }
                 }
             }

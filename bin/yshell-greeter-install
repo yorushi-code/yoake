@@ -1,0 +1,29 @@
+#!/usr/bin/bash
+# Installs the greeter where the greeter user can read it.
+#
+# RollClock and RollDigit are taken from the shell rather than kept in a second
+# copy: the greeter is meant to be the lock screen's twin, and two copies of
+# the clock is exactly how twins stop matching.
+set -euo pipefail
+
+SRC=$(cd "$(dirname "$0")/.." && pwd)
+DEST=/usr/share/yshell/greeter
+
+if [ "$(id -u)" -ne 0 ]; then
+    exec sudo "$0" "$@"
+fi
+
+install -d -m 0755 "$DEST"
+install -m 0644 "$SRC/greeter/shell.qml" "$SRC/greeter/Theme.qml" "$SRC/greeter/qmldir" "$DEST/"
+install -m 0644 "$SRC/RollDigit.qml" "$SRC/RollClock.qml" "$DEST/"
+install -m 0755 "$SRC/bin/yshell-greeter" "$SRC/bin/yshell-greeter-sync" /usr/local/bin/
+
+# The greeter account has no home on a stock Fedora install, and Qt wants a
+# writable one for its shader and icon caches.
+if ! getent passwd greeter >/dev/null; then
+    echo "no greeter account; is greetd installed?" >&2
+    exit 1
+fi
+install -d -m 0700 -o greeter -g greeter /home/greeter
+
+echo "installed to $DEST"

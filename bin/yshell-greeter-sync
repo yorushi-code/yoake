@@ -1,0 +1,50 @@
+#!/usr/bin/bash
+# Gives the login screen the same wallpaper and palette as the desktop.
+#
+# The greeter runs as its own unprivileged user and the home directory it would
+# have to read is 700, so matching the desktop is only possible through a
+# snapshot placed somewhere both accounts can reach. set-wallpaper.sh calls
+# this after every change.
+#
+# The image is converted as the invoking user and only installed as root: this
+# runs with sudo, and decoding a user-supplied file is not work root needs to
+# be doing.
+set -euo pipefail
+
+DEST=/var/lib/yshell-greeter
+OWNER=${SUDO_USER:-$(id -un)}
+HOME_DIR=$(getent passwd "$OWNER" | cut -d: -f6)
+RECORD="$HOME_DIR/.config/quickshell/.wallpaper-path"
+COLORS="$HOME_DIR/.config/quickshell/generated-colors.json"
+
+if [ ! -r "$RECORD" ]; then
+    echo "no wallpaper record at $RECORD" >&2
+    exit 1
+fi
+
+# Line 1 is the wallpaper, line 2 the still frame extracted from it when the
+# wallpaper is a video. A video file is not something the greeter can show.
+wallpaper=$(sed -n 1p "$RECORD")
+still=$(sed -n 2p "$RECORD")
+src=${still:-$wallpaper}
+
+if [ ! -r "$src" ]; then
+    echo "wallpaper not readable: $src" >&2
+    exit 1
+fi
+
+tmp=$(runuser -u "$OWNER" -- mktemp /tmp/yshell-greeter-wall.XXXXXX.jpg)
+trap 'rm -f "$tmp"' EXIT
+
+runuser -u "$OWNER" -- magick "$src" \
+    -resize 1920x1080^ -gravity center -extent 1920x1080 \
+    -quality 88 "$tmp"
+
+install -d -m 0755 -o root -g root "$DEST"
+install -m 0644 -o root -g root "$tmp" "$DEST/wallpaper.jpg"
+
+if [ -r "$COLORS" ]; then
+    install -m 0644 -o root -g root "$COLORS" "$DEST/colors.json"
+fi
+
+echo "greeter assets updated from $src"

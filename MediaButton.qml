@@ -19,7 +19,7 @@ Rectangle {
 
     color: {
         if (!enabled) return Qt.alpha(Theme.text, 0.06);
-        if (accented) return ma.containsMouse ? Qt.lighter(Theme.accent, 1.2) : Theme.accent;
+        if (accented) return ma.containsMouse ? Qt.lighter(MediaTint.accent, 1.2) : MediaTint.accent;
         return ma.containsMouse ? Qt.alpha(Theme.text, 0.16) : Qt.alpha(Theme.text, 0.08);
     }
     Behavior on color { ColorAnimation { duration: Theme.animFast } }

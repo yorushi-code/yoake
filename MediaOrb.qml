@@ -85,7 +85,7 @@ Item {
         height: root.coverSize
         radius: root.coverSize * 0.16
         visible: haloSource.status !== Image.Ready
-        color: Theme.accent
+        color: MediaTint.accent
         blur: 48
         spread: 2 + root.swell * 18
         opacity: 0.18 + root.swell * 0.40
@@ -118,8 +118,11 @@ Item {
                 width: root.barWidth
                 height: 3 + spoke.value * root.barLength
                 radius: root.barWidth / 2
-                color: Qt.tint(Theme.accent,
-                    Qt.alpha(Theme.blue, 0.4 * (spoke.band / Cava.barCount)))
+                // The ramp runs between the sleeve's two colours rather than
+                // to the shell's blue: the whole figure should belong to the
+                // record, not half of it.
+                color: Qt.tint(MediaTint.accent,
+                    Qt.alpha(MediaTint.accentAlt, 0.55 * (spoke.band / Cava.barCount)))
                 opacity: root.live ? 0.5 + spoke.value * 0.5 : 0.18
                 Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
             }
@@ -149,7 +152,7 @@ Item {
         }
 
         ShapePath {
-            strokeColor: Theme.accent
+            strokeColor: MediaTint.accent
             strokeWidth: 2.5
             fillColor: "transparent"
             capStyle: ShapePath.RoundCap
@@ -197,7 +200,7 @@ Item {
             visible: fallback.visible
             gradient: Gradient {
                 orientation: Gradient.Vertical
-                GradientStop { position: 0.0; color: Qt.alpha(Theme.accent, 0.30) }
+                GradientStop { position: 0.0; color: Qt.alpha(MediaTint.accent, 0.30) }
                 GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, 0.55) }
             }
         }
