@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Wayland
 import Quickshell.Services.Pipewire
 
 // The control centre: window plumbing and layout only.
@@ -67,6 +68,10 @@ Item {
 
     PanelWindow {
         id: win
+        // Overlay, not the default Top: niri draws a fullscreen window above
+        // the Top layer, so a panel the user just asked for would open behind
+        // the video they were watching and read as a dead keystroke.
+        WlrLayershell.layer: WlrLayer.Overlay
         // Mapping is driven by an explicit bool, never bound to
         // Toggles.controlCenterOpen directly. A binding like
         // `visible: open || hideDelay.running` races: when open flips false the

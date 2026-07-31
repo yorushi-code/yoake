@@ -44,6 +44,14 @@ Item {
     implicitWidth: (root.ringRadius + 6) * 2
     implicitHeight: implicitWidth
 
+    // The cover that makes the whole figure fit a box this tall. Callers know
+    // the room they have; they do not know the arithmetic between the cover,
+    // the bars and the ring, and the caller that worked it out by hand got it
+    // wrong -- the ring was drawn 29px outside the card and clipped flat.
+    function coverFor(diameter) {
+        return Math.max(24, (diameter / 2 - root.gap - root.barLength - 13) / 0.707);
+    }
+
     readonly property bool live: Cava.active
     readonly property real swell: root.live ? Cava.bass : 0
 
@@ -116,7 +124,11 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: parent.height / 2 - root.barRadius - height
                 width: root.barWidth
-                height: 3 + spoke.value * root.barLength
+                // A third of the bar's travel is the resting length, not three
+                // pixels. On a quiet passage a three-pixel floor is a ring of
+                // dots and reads as a rendering fault; a short even corona
+                // reads as an instrument waiting.
+                height: root.barLength * 0.32 + spoke.value * root.barLength * 0.82
                 radius: root.barWidth / 2
                 // The ramp runs between the sleeve's two colours rather than
                 // to the shell's blue: the whole figure should belong to the

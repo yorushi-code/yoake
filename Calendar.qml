@@ -1,11 +1,16 @@
 import QtQuick
 import Quickshell
+import Quickshell.Wayland
 
 // Month grid hanging under the bar's date readout. Written by hand rather
 // than pulled from QtQuick.Controls: the Controls calendar drags in a styling
 // stack that would fight the rest of the shell's look.
 PanelWindow {
     id: win
+    // Overlay, not the default Top: niri draws a fullscreen window above
+    // the Top layer, so a panel the user just asked for would open behind
+    // the video they were watching and read as a dead keystroke.
+    WlrLayershell.layer: WlrLayer.Overlay
 
     // Animations bind to this, not to the toggle. The panel is created lazily,
     // which means it is born with the toggle already true — an entry animation

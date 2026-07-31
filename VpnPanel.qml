@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Wayland
 
 // yworld — VPN control, in the shell.
 //
@@ -77,6 +78,10 @@ Item {
 
     PanelWindow {
         id: win
+        // Overlay, not the default Top: niri draws a fullscreen window above
+        // the Top layer, so a panel the user just asked for would open behind
+        // the video they were watching and read as a dead keystroke.
+        WlrLayershell.layer: WlrLayer.Overlay
         // See ControlCenter: mapping is an explicit bool so the exit animation
         // is never cut off by a visible-binding race.
         property bool mapped: false

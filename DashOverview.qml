@@ -255,7 +255,8 @@ Item {
                 id: orb
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                coverSize: Math.min(parent.height - 46, 116)
+                // Sized from the room the whole figure gets, ring included.
+                coverSize: Math.min(orb.coverFor(parent.height), 116)
                 barLength: 18
                 gap: 9
             }
@@ -288,7 +289,12 @@ Item {
 
                 Item { width: 1; height: 8 }
 
-                SeekBar { width: parent.width }
+                SeekWave {
+                    width: parent.width
+                    implicitHeight: 26
+                    barCount: 46
+                    barGap: 3
+                }
 
                 Item { width: 1; height: 4 }
 

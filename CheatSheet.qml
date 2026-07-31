@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Wayland
 import Quickshell.Io
 
 // Parses 50-binds.kdl directly so this overlay can never drift out of sync
@@ -128,6 +129,10 @@ Item {
 
     PanelWindow {
         id: win
+        // Overlay, not the default Top: niri draws a fullscreen window above
+        // the Top layer, so a panel the user just asked for would open behind
+        // the video they were watching and read as a dead keystroke.
+        WlrLayershell.layer: WlrLayer.Overlay
         // Explicit mapping bool — see ControlCenter.qml. Stays mapped through
         // the whole close so the card fade and screen-dim fade can play;
         // binding visible to the toggle raced the unmap ahead of the fade.

@@ -37,7 +37,8 @@ Item {
                 id: orb
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                coverSize: Math.min(parent.height - 40, 168)
+                // Sized from the room the whole figure gets, ring included.
+                coverSize: Math.min(orb.coverFor(parent.height), 168)
             }
 
             MediaCat {

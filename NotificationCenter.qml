@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Wayland
 import Quickshell.Services.Notifications
 
 Item {
@@ -131,6 +132,11 @@ Item {
 
     // ── Toast popups: top-right, auto-dismiss, slide+fade in ──
     PanelWindow {
+        // Overlay, not the default Top: niri draws a fullscreen window above
+        // the Top layer, so a panel the user just asked for would open behind
+        // the video they were watching and read as a dead keystroke.
+        WlrLayershell.layer: WlrLayer.Overlay
+
         anchors {
             top: true
             right: true

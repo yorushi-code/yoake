@@ -99,6 +99,10 @@ Item {
 
     PanelWindow {
         id: win
+        // Overlay, not the default Top: niri draws a fullscreen window above
+        // the Top layer, so a panel the user just asked for would open behind
+        // the video they were watching and read as a dead keystroke.
+        WlrLayershell.layer: WlrLayer.Overlay
         property bool mapped: false
         visible: mapped
 
