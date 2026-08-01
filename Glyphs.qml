@@ -58,6 +58,8 @@ Singleton {
     readonly property string close: "\u{F0156}"
     readonly property string chevronDown: "\u{F0140}"
     readonly property string chevronUp: "\u{F0143}"
+    readonly property string download: "\u{F0045}"
+    readonly property string upload: "\u{F0552}"
     readonly property string chevronLeft: "\u{F0141}"
     readonly property string chevronRight: "\u{F0142}"
     readonly property string dot: "\u{F09DF}"

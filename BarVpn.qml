@@ -82,10 +82,178 @@ Item {
         onClicked: Toggles.exclusive("vpnPanel")
     }
 
-    Tooltip {
+    // A card, not a tooltip. This is the widget in the bar with the most to say
+    // and it was saying the least: the tunnel's node, its latency, where it
+    // comes out and how much is moving through it are four facts a tooltip has
+    // no room for, and the audio, network and battery chips already answer on
+    // hover this way.
+    //
+    // The egress IP is deliberately not here. It is in the panel, which is
+    // opened on purpose; this card appears whenever the pointer crosses the bar
+    // and lands in every screenshot taken of it.
+    Popover {
         anchorItem: root
-        active: ma.containsMouse && !Toggles.vpnPanelOpen
-        text: root.up ? (Mihomo.currentNode || Mihomo.active) : "VPN отключён"
-        subtext: root.up ? "ЛКМ — ноды и подписки" : "ЛКМ — подключить"
+        hovered: ma.containsMouse && !Toggles.vpnPanelOpen
+        minWidth: 248
+
+        Column {
+            spacing: 11
+
+            Row {
+                spacing: 9
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: Glyphs.vpn
+                    font.family: Theme.fontIconFamily
+                    font.pixelSize: 17
+                    color: root.stateColor
+                }
+
+                Column {
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 1
+
+                    Text {
+                        width: 190
+                        text: {
+                            if (Mihomo.busy) return "Подключаюсь…";
+                            if (!root.up) return "VPN отключён";
+                            return Mihomo.currentNode || Mihomo.active || "Туннель поднят";
+                        }
+                        color: Theme.text
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSmall
+                        font.weight: Font.Medium
+                        elide: Text.ElideRight
+                    }
+
+                    Text {
+                        width: 190
+                        visible: text !== ""
+                        text: {
+                            if (!root.up) return "";
+                            const bits = [];
+                            if (Mihomo.currentDelay !== undefined && Mihomo.currentDelay !== null) {
+                                bits.push(Mihomo.currentDelay + " мс");
+                            } else {
+                                bits.push("нет отклика");
+                            }
+                            // Country only, never the address.
+                            if (Mihomo.egress && Mihomo.egress.country) {
+                                bits.push(Mihomo.egress.country);
+                            }
+                            return bits.join("  ·  ");
+                        }
+                        color: Mihomo.currentDelay === null ? Theme.red : Theme.subtext0
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontLabel
+                        font.features: ({ "tnum": 1 })
+                        elide: Text.ElideRight
+                    }
+                }
+            }
+
+            // Shown even at zero here, unlike in the bar. The bar hides an idle
+            // number to keep the island from carrying a permanent "0 Б/с"; a
+            // card the user asked for should answer the question it was opened
+            // to answer.
+            Row {
+                spacing: 18
+                visible: root.up
+
+                Repeater {
+                    model: [
+                        { glyph: Glyphs.download, value: Mihomo.formatSpeed(Mihomo.downSpeed) },
+                        { glyph: Glyphs.upload, value: Mihomo.formatSpeed(Mihomo.upSpeed) }
+                    ]
+
+                    delegate: Row {
+                        id: flow
+                        required property var modelData
+                        spacing: 6
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: flow.modelData.glyph
+                            font.family: Theme.fontIconFamily
+                            font.pixelSize: 12
+                            color: Theme.subtext0
+                        }
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: flow.modelData.value
+                            color: Theme.subtext1
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.fontLabel
+                            font.features: ({ "tnum": 1 })
+                        }
+                    }
+                }
+            }
+
+            Text {
+                width: 222
+                visible: Mihomo.leaking
+                text: "Трафик идёт мимо туннеля"
+                color: Theme.red
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontLabel
+                wrapMode: Text.Wrap
+            }
+
+            Rectangle {
+                width: 222
+                height: 1
+                color: Qt.alpha(Theme.text, 0.12)
+            }
+
+            // Sibling of the row, not a child of it: a MouseArea inside a Row
+            // is laid out as another column of it.
+            Item {
+                width: 222
+                height: 22
+
+                Row {
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 8
+
+                    Text {
+                        height: 18
+                        verticalAlignment: Text.AlignVCenter
+                        text: root.up ? Glyphs.close : Glyphs.vpn
+                        font.family: Theme.fontIconFamily
+                        font.pixelSize: 13
+                        color: Theme.subtext1
+                    }
+
+                    Text {
+                        height: 18
+                        verticalAlignment: Text.AlignVCenter
+                        text: root.up ? "Отключить туннель" : "Подключить"
+                        color: powerHit.containsMouse ? Theme.text : Theme.subtext0
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontLabel
+                        Behavior on color { ColorAnimation { duration: Theme.animNormal } }
+                    }
+                }
+
+                MouseArea {
+                    id: powerHit
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    enabled: !Mihomo.busy
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.up ? Mihomo.stop() : Mihomo.start(Mihomo.active)
+                }
+            }
+
+            Text {
+                text: "ЛКМ — ноды и подписки"
+                color: Qt.alpha(Theme.subtext0, 0.75)
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontMicro
+            }
+        }
     }
 }
