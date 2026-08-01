@@ -109,3 +109,4 @@ StatGauge 1.0 StatGauge.qml
 singleton MediaTint 1.0 MediaTint.qml
 DashControl 1.0 DashControl.qml
 EmptyState 1.0 EmptyState.qml
+singleton Idle 1.0 Idle.qml

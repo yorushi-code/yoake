@@ -30,6 +30,13 @@ ShellRoot {
         Bar {}
     }
 
+    // Singletons whose only job is to answer over IPC have to be touched from
+    // somewhere, or they are never constructed and their handler never
+    // registers -- `qs ipc call idle state` answered "Target not found" until
+    // this line existed, because the only reference was inside a dashboard page
+    // that is built lazily.
+    property var _alive: [Idle]
+
     // The lock has to exist before it is needed: creating the surface at the
     // moment of locking would show the desktop for the frame it takes to build.
     LockScreen {}

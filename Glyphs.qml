@@ -75,6 +75,7 @@ Singleton {
     readonly property string power: "\u{F0425}"
     readonly property string restart: "\u{F0709}"
     readonly property string sleep: "\u{F04B2}"
+    readonly property string coffee: "\u{F0176}"
     readonly property string lock: "\u{F033E}"
     readonly property string speedometer: "\u{F04C5}"
     readonly property string leaf: "\u{F032A}"

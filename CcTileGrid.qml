@@ -115,6 +115,15 @@ Grid {
 
     CcTile {
         width: root.cellWidth
+        glyph: Idle.keepAwake ? Glyphs.coffee : Glyphs.sleep
+        label: "Не засыпать"
+        detail: Idle.keepAwake ? "экран не гаснет" : "по таймеру"
+        active: Idle.keepAwake
+        onToggled: Idle.toggle()
+    }
+
+    CcTile {
+        width: root.cellWidth
         glyph: Recorder.recording ? Glyphs.stop : Glyphs.record
         label: "Запись"
         detail: Recorder.recording ? Recorder.elapsedText : "экран"
