@@ -313,9 +313,38 @@ Singleton {
     }
 
     // fraction is 0..1 of total length.
+    //
+    // Never quite to the end: setting the position to the length itself ends
+    // the track, so dragging the wave all the way right skipped to the next
+    // song instead of seeking. Half a second short is indistinguishable to look
+    // at and does what was asked.
     function seek(fraction) {
         if (!player || !player.canSeek || root.length <= 0) return;
-        player.position = Math.max(0, Math.min(1, fraction)) * root.length;
+        const target = Math.max(0, Math.min(1, fraction)) * root.length;
+        player.position = Math.min(target, Math.max(0, root.length - 0.5));
+        // The poll below only asks once a second, so without this the position
+        // shown after a seek is the one from before it for up to a second --
+        // which reads as the seek having been ignored.
+        seekSettle.restart();
+    }
+
+    // Asks the player where it is, several times, right after being told to
+    // move. Players answer a SetPosition at their own pace and some only report
+    // the new position on the next tick of their own clock.
+    property Timer _seekSettle: Timer {
+        id: seekSettle
+        interval: 90
+        repeat: true
+        property int ticks: 0
+        onTriggered: {
+            if (root.player) root.player.positionChanged();
+            seekSettle.ticks++;
+            if (seekSettle.ticks > 12) {
+                seekSettle.stop();
+                seekSettle.ticks = 0;
+            }
+        }
+        onRunningChanged: if (running) seekSettle.ticks = 0
     }
 
     // MPRIS position is only refreshed on demand, so without this poll every

@@ -119,8 +119,11 @@ Item {
     MouseArea {
         id: ma
         anchors.fill: parent
-        anchors.topMargin: -4
-        anchors.bottomMargin: -4
+        // Generous vertically: the wave is twenty-two pixels tall in the
+        // compact card, and a target that small is one people miss and then
+        // conclude the control does not work.
+        anchors.topMargin: -8
+        anchors.bottomMargin: -8
         hoverEnabled: true
         enabled: Media.player !== null && Media.player.canSeek && Media.length > 0
         cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
@@ -130,16 +133,39 @@ Item {
             if (pressed) root.dragValue = root.fractionAt(mouse.x);
         }
         onReleased: mouse => {
-            Media.seek(root.fractionAt(mouse.x));
-            // Held until the next position poll lands, or the bar snaps back to
-            // the stale pre-seek value for a frame.
-            releaseHold.restart();
+            root.pendingSeek = root.fractionAt(mouse.x);
+            root.dragValue = root.pendingSeek;
+            Media.seek(root.pendingSeek);
+            settle.restart();
         }
     }
 
+    // What was asked for, held on screen until the player agrees.
+    //
+    // This used to be a flat 500ms, and the position poll only runs once a
+    // second: the bar dropped back to the pre-seek position, sat there, and
+    // then jumped -- which looks exactly like a seek that was ignored, and is
+    // why it seemed to work only sometimes. Now the drag value is held until
+    // the player reports somewhere near where it was sent, and released on a
+    // deadline only if it never does.
+    property real pendingSeek: -1
+
     Timer {
-        id: releaseHold
-        interval: 500
-        onTriggered: root.dragValue = -1
+        id: settle
+        interval: 60
+        repeat: true
+        property int ticks: 0
+        onTriggered: {
+            settle.ticks++;
+            const close = root.pendingSeek >= 0
+                && Math.abs(Media.progress - root.pendingSeek) < 0.015;
+            if (close || settle.ticks > 40) {
+                root.dragValue = -1;
+                root.pendingSeek = -1;
+                settle.stop();
+                settle.ticks = 0;
+            }
+        }
+        onRunningChanged: if (running) settle.ticks = 0
     }
 }
