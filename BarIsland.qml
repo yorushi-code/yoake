@@ -55,8 +55,13 @@ Item {
         visible: root.pulseWithAudio
         color: Theme.accent
         blur: 28
-        spread: -2 + root.bass * 6
-        opacity: Math.min(0.85, 0.22 + root.bass * 0.55)
+        // Fixed. Spread is geometry, and changing it re-rasterises a blur-28
+        // shadow -- thirty times a second, in the always-visible bar. Measured
+        // at 4.4 points of a core against the same glow pulsing on opacity
+        // alone, which the scene graph changes for free and which carries the
+        // beat just as visibly.
+        spread: 1
+        opacity: Math.min(0.85, 0.18 + root.bass * 0.62)
         offset: Qt.vector2d(0, 0)
         // No Behaviors. Two 90ms animations restarting on every cava frame
         // never finished, and each restart re-rendered a blur-28 shadow.
