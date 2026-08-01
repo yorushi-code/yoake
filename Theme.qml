@@ -26,6 +26,27 @@ QtObject {
 
     readonly property color accent: mauve
 
+    // ── Drawing straight onto the wallpaper ──
+    // Panels sit on their own frosted glass and can use `text` safely. The
+    // desktop widgets have nothing behind them but the picture, and the accent
+    // is derived from that same picture -- so on a bright wallpaper they were
+    // being drawn light on light and all but disappeared.
+    readonly property bool wallpaperIsLight: GeneratedColors.meanL > 0.55
+
+    // What to draw on the bare desktop with.
+    readonly property color deskInk: wallpaperIsLight
+        ? Qt.darker(GeneratedColors.background, 1.6)
+        : GeneratedColors.foreground
+    readonly property color deskAccent: wallpaperIsLight
+        ? Qt.darker(GeneratedColors.accent, 1.9)
+        : GeneratedColors.accent
+    // Behind the marks rather than on them: a soft dark halo on a light
+    // wallpaper and a soft light one on a dark wallpaper, so an edge survives
+    // whatever the picture does locally even when the mean says otherwise.
+    readonly property color deskHalo: wallpaperIsLight
+        ? Qt.alpha("#000000", 0.30)
+        : Qt.alpha("#000000", 0.45)
+
     // ── Type ──
     // One scale, named by role rather than by size, so a label in the bar and a
     // label in the control centre are the same thing by construction instead of

@@ -55,7 +55,7 @@ Item {
                 // is legible whatever the music is doing, and it makes the low
                 // end and the high end tell themselves apart at a glance.
                 readonly property color tint: Qt.tint(
-                    Theme.accent,
+                    Theme.deskAccent,
                     Qt.alpha(Theme.blue, (bar.index + 0.5) / Cava.barCount))
 
                 width: root.barWidth

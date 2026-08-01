@@ -21,7 +21,7 @@ Item {
     readonly property color levelColor: {
         if (root.level > 0.85) return Theme.red;
         if (root.level > 0.65) return Theme.yellow;
-        return Theme.accent;
+        return Theme.deskAccent;
     }
 
     implicitWidth: root.ringSize
@@ -40,7 +40,7 @@ Item {
             preferredRendererType: Shape.CurveRenderer
 
             ShapePath {
-                strokeColor: Qt.alpha(Theme.text, 0.16)
+                strokeColor: Qt.alpha(Theme.deskInk, 0.22)
                 strokeWidth: root.thickness
                 fillColor: "transparent"
                 capStyle: ShapePath.RoundCap
@@ -85,7 +85,7 @@ Item {
         Text {
             anchors.centerIn: parent
             text: root.value
-            color: Theme.text
+            color: Theme.deskInk
             font.family: Theme.fontDisplayFamily
             font.pixelSize: 15
             font.weight: Font.Medium

@@ -32,9 +32,10 @@ Column {
             minutes: clock.date.getMinutes()
             pixelSize: 96
             weight: Font.Bold
+            ink: Theme.deskInk
             tracking: -2
             groupGap: 5
-            minuteInk: Theme.accent
+            minuteInk: Theme.deskAccent
         }
 
         // Its own group rather than a third place on the clock: seconds move
@@ -51,7 +52,8 @@ Column {
             component Tick: RollDigit {
                 pixelSize: 34
                 weight: Font.Bold
-                ink: Theme.subtext1
+                ink: Theme.wallpaperIsLight
+                    ? Qt.darker(Theme.subtext1, 2.2) : Theme.subtext1
             }
 
             Tick { id: s1; value: Math.floor(clock.date.getSeconds() / 10) }
@@ -62,7 +64,8 @@ Column {
     Text {
         anchors.right: timeGroup.right
         text: Qt.formatDateTime(clock.date, "dddd, d MMMM").toUpperCase()
-        color: Theme.subtext1
+        color: Theme.wallpaperIsLight
+            ? Qt.darker(Theme.subtext1, 2.2) : Theme.subtext1
         font.family: Theme.fontFamily
         font.pixelSize: 13
         font.letterSpacing: 3

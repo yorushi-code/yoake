@@ -61,6 +61,10 @@ Singleton {
     property real hue: 0
     property real chroma: 0
     property real confidence: 0
+    // Mean lightness of the wallpaper, 0..1. The palette generator already
+    // measures it; nothing read it, so anything drawn straight onto the
+    // wallpaper had no way to know whether it was drawing on black or on snow.
+    property real meanL: 0.5
     property bool muted: false
     property bool pinned: false
     // [{ hex, hue, chroma }] — candidate accents found in the image.
@@ -89,6 +93,7 @@ Singleton {
         root.hue = meta.hue || 0;
         root.chroma = meta.chroma || 0;
         root.confidence = meta.confidence || 0;
+        root.meanL = meta.meanL === undefined ? 0.5 : meta.meanL;
         root.muted = meta.muted === true;
         root.pinned = meta.pinned === true;
         root.swatches = meta.swatches || [];
