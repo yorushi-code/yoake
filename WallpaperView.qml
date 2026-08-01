@@ -57,8 +57,10 @@ PanelWindow {
         id: player
         source: Wallpaper.isVideo ? Wallpaper.playSource : ""
         loops: MediaPlayer.Infinite
-        // Wallpapers are decoration, never a sound source.
-        audioOutput: AudioOutput { muted: true; volume: 0 }
+        // No audioOutput at all, rather than a muted one. A muted sink still
+        // opens the stream: Qt kept a QFFmpeg audio renderer thread and a
+        // PipeWire data loop running to produce silence, which measured 3.0
+        // points of a core for a wallpaper that is decoration by definition.
         videoOutput: videoOut
 
         // Playback is gated rather than the source being cleared: clearing it

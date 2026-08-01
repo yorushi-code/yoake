@@ -67,6 +67,20 @@ case "${1:-run}" in
     fi
     ;;
   run)
+    # Only ever one of these. Two swayidle daemons on the same chain fight over
+    # the screen -- one asserts screen-off while the other has just powered the
+    # monitors back on -- and there were two running, which is what made sleep
+    # and wake behave differently on different days. Startup commands have to be
+    # idempotent, because something re-runs them.
+    for pid in $(pgrep -x swayidle 2>/dev/null); do
+      [ "$pid" = "$$" ] && continue
+      kill "$pid" 2>/dev/null || true
+    done
+    for _ in $(seq 1 20); do
+      pgrep -x swayidle >/dev/null 2>&1 || break
+      sleep 0.1
+    done
+
     exec swayidle -w \
       timeout "$T_DIM"     "$0 dim"        resume "$0 undim" \
       timeout "$T_LOCK"    "$0 lock" \
