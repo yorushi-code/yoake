@@ -55,10 +55,19 @@ Singleton {
     readonly property string playSource: root.playPath !== "" ? root.playPath : root.path
 
     // ── Video playback policy ──
-    property bool pauseOnBattery: true
+    property bool pauseOnBattery: Prefs.get("wallpaper.pauseOnBattery", true)
 
-    readonly property bool onBattery: UPower.displayDevice.isLaptopBattery
-        && UPower.displayDevice.state === UPowerDeviceState.Discharging
+    function setPauseOnBattery(value) {
+        root.pauseOnBattery = value;
+        Prefs.set("wallpaper.pauseOnBattery", value);
+    }
+
+    // The system's own answer to "is there mains power", not the battery's
+    // answer to "am I charging". A laptop sitting on the charger at 100% stops
+    // charging, and UPower reports that device state as discharging -- so on a
+    // full battery, plugged in, which is most of the time, video wallpapers
+    // were paused and never played at all. That was the freeze.
+    readonly property bool onBattery: UPower.onBattery
 
     readonly property bool batteryPaused: root.pauseOnBattery && root.onBattery
 
@@ -118,6 +127,36 @@ Singleton {
     readonly property bool videoPaused: !root.desktopVisible || root.batteryPaused
         || root.previewingVideo
 
+    // Why the wallpaper is or is not moving, in one command.
+    //
+    // Every freeze so far has been a pause reason that could not be seen from
+    // outside: a flag that outlived its panel, a still image left on top, a map
+    // entry belonging to a monitor that had gone. Guessing at those from a
+    // screenshot cost hours; `qs ipc call wallpaper state` answers directly.
+    IpcHandler {
+        target: "wallpaper"
+
+        function pauseOnBattery(value: string): string {
+            root.setPauseOnBattery(value === "on" || value === "true" || value === "1");
+            return root.pauseOnBattery ? "on" : "off";
+        }
+
+        function state(): string {
+            const parts = [
+                "path=" + root.path,
+                "isVideo=" + root.isVideo,
+                "playSource=" + root.playSource,
+                "still=" + root.stillPath,
+                "desktopVisible=" + root.desktopVisible,
+                "occluded=" + JSON.stringify(root.occluded),
+                "battery=" + root.batteryPaused,
+                "preview=" + root.previewingVideo,
+                "videoPaused=" + root.videoPaused
+            ];
+            return parts.join("\n");
+        }
+    }
+
     FileView {
         id: trigger
         path: Quickshell.env("HOME") + "/.config/quickshell/.wallpaper-path"
@@ -136,7 +175,17 @@ Singleton {
             // `path` while stillPath is empty, so setting path first hands every
             // panel's Image the raw video file for one evaluation and each logs
             // an "unsupported image format" decode error before correcting.
-            root.stillPath = still !== "" ? "file://" + still : "";
+            // Cache-busted, exactly as the blur is below, and for a worse
+            // reason. Every video's extracted frame is written to the same
+            // path, so switching from one video wallpaper to another assigned
+            // the overlay a source string it already had: the Image never
+            // reloaded, its statusChanged never fired, and the reveal that ends
+            // with the still being taken away never ran. The previous video's
+            // frozen frame then sat on top of the new one, decoding underneath,
+            // for the rest of the session.
+            root.stillPath = still !== ""
+                ? "file://" + still + "?v=" + Date.now()
+                : "";
             // Cache-busted: the path is constant across wallpaper changes, so
             // without this the panels keep showing the previous blur.
             root.blurPath = blur !== ""

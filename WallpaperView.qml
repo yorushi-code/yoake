@@ -227,6 +227,26 @@ PanelWindow {
         }
     }
 
+    // A reveal that never starts is a wallpaper that never moves.
+    //
+    // Every exit from `revealingVideo` runs inside some animation's onFinished,
+    // and an animation that was never started has no onFinished to run -- which
+    // is precisely how the still of the previous video ended up sitting on top
+    // of the new one for good. The cache-busted still path fixes the cause;
+    // this makes the state machine unable to hang whatever else goes wrong with
+    // it, by asking once a second whether the video is plainly playing while a
+    // still is still covering it.
+    Timer {
+        interval: 1000
+        repeat: true
+        running: win.revealingVideo && Wallpaper.isVideo
+        onTriggered: {
+            if (reveal.running || stillHandoff.running) return;
+            if (!player.shouldPlay || player.position <= 0) return;
+            stillHandoff.restart();
+        }
+    }
+
     // Short cross-dissolve from the frozen still to the live video, so playback
     // doesn't begin with a visible jump.
     ParallelAnimation {
