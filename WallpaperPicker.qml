@@ -301,6 +301,16 @@ PanelWindow {
 
         // Exactly one decoder for the whole library, and only for the entry the
         // user has settled on.
+        Connections {
+            target: Toggles
+            function onWallpaperPickerOpenChanged() {
+                if (!Toggles.wallpaperPickerOpen) {
+                    player.stop();
+                    Wallpaper._previewing = false;
+                }
+            }
+        }
+
         MediaPlayer {
             id: player
             source: win.previewIsVideo ? "file://" + win.previewEntry.path : ""
@@ -314,9 +324,9 @@ PanelWindow {
 
             // The desktop's own copy is hidden behind this window and does not
             // need decoding while this one is up.
-            onPlaybackStateChanged: Wallpaper.previewingVideo =
+            onPlaybackStateChanged: Wallpaper._previewing =
                 (playbackState === MediaPlayer.PlayingState)
-            Component.onDestruction: Wallpaper.previewingVideo = false
+            Component.onDestruction: Wallpaper._previewing = false
         }
 
         VideoOutput {

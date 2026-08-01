@@ -48,6 +48,7 @@ PanelWindow {
     readonly property bool occluded: Niri.desktopOccludedOn(win.modelData.name)
     onOccludedChanged: Wallpaper.setOccluded(win.modelData.name, win.occluded)
     Component.onCompleted: Wallpaper.setOccluded(win.modelData.name, win.occluded)
+    Component.onDestruction: Wallpaper.forgetOccluded(win.modelData.name)
 
     // ── Video layer ──
     // Below the images: while a still is crossfading in on top, the video is

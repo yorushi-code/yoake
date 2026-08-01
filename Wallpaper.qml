@@ -67,7 +67,14 @@ Singleton {
     // underneath it -- and the desktop's copy is completely hidden behind the
     // picker anyway. Two decoders at once is what made the wallpaper stutter
     // exactly while somebody was choosing one.
-    property bool previewingVideo: false
+    //
+    // Gated on the picker actually being open, and not merely on what the
+    // picker last said. The panel is lazily loaded and stays alive hidden, so
+    // its player kept its Playing state after the panel went away and the flag
+    // outlived the thing that set it -- which is a wallpaper that never moves
+    // again. A pause reason that can outlive its cause is a freeze.
+    property bool _previewing: false
+    readonly property bool previewingVideo: root._previewing && Toggles.wallpaperPickerOpen
 
     // Which outputs are certainly covered, by name. A map rather than one bool
     // because there is one WallpaperView per screen and they all used to assign
@@ -83,6 +90,17 @@ Singleton {
         if (root.occluded[output] === value) return;
         const next = Object.assign({}, root.occluded);
         next[output] = value;
+        root.occluded = next;
+    }
+
+    // An output that goes away has to take its entry with it. Entries were only
+    // ever added, so unplugging a monitor that happened to be covered left a
+    // permanent "covered" vote behind it and the desk was never visible again
+    // -- the same shape of fault as a pause reason outliving its cause.
+    function forgetOccluded(output) {
+        if (!(output in root.occluded)) return;
+        const next = Object.assign({}, root.occluded);
+        delete next[output];
         root.occluded = next;
     }
 
