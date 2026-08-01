@@ -184,6 +184,20 @@ def sample_pixels(path):
 # ── analysis ──────────────────────────────────────────────────────────────
 
 
+def _mean_lightness(pixels):
+    """How bright the picture is, over every pixel.
+
+    Separate from _usable on purpose: hue and chroma have to ignore washed-out
+    regions or a large flat grey area votes on a question it has no opinion
+    about, but brightness is not that question. A black-and-white photograph
+    has no usable pixels at all and used to report 0.5, so anything drawn
+    straight onto the wallpaper could not tell white from black.
+    """
+    if not pixels:
+        return 0.5
+    return sum(p[0] for p in pixels) / len(pixels)
+
+
 def _usable(pixels):
     # Near-black and near-white pixels carry a hue that is mostly sensor noise
     # and codec ringing, and they are usually the largest areas in the frame.
@@ -198,8 +212,14 @@ def dominant(pixels):
     one. The mean chroma comes back as the confidence in the answer.
     """
     usable = _usable(pixels)
+    # Lightness over every pixel, not only the colourful ones. Hue and chroma
+    # have to ignore washed-out regions or a large flat grey area votes on a
+    # question it has no opinion about -- but how bright the picture is is not
+    # that question. A black-and-white photograph has no usable pixels at all
+    # and reported 0.5, so anything drawn straight onto it could not tell a
+    # white wallpaper from a black one.
     if not usable:
-        return 0.0, 0.0, 0.5, 0.9
+        return 0.0, 0.0, _mean_lightness(pixels), 0.9
 
     x = y = weight = 0.0
     for L, C, H in usable:
@@ -211,7 +231,7 @@ def dominant(pixels):
 
     hue = math.degrees(math.atan2(y, x)) % 360 if weight > 0 else 0.0
     mean_c = sum(p[1] for p in usable) / len(usable)
-    mean_l = sum(p[0] for p in usable) / len(usable)
+    mean_l = _mean_lightness(pixels)
     return hue, mean_c, mean_l, max(p[0] for p in usable)
 
 

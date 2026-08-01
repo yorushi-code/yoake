@@ -31,21 +31,31 @@ QtObject {
     // desktop widgets have nothing behind them but the picture, and the accent
     // is derived from that same picture -- so on a bright wallpaper they were
     // being drawn light on light and all but disappeared.
-    readonly property bool wallpaperIsLight: GeneratedColors.meanL > 0.55
+    // Only for a still picture. A video's brightness is measured from one
+    // extracted frame, which said 0.31 while the frame actually on screen was
+    // 0.82 -- so for video the light treatment is not claimed and the halo
+    // below does the work instead.
+    readonly property bool wallpaperIsLight:
+        !Wallpaper.isVideo && GeneratedColors.meanL > 0.55
 
-    // What to draw on the bare desktop with.
+    // What to draw on the bare desktop with, in two coherent modes.
+    //
+    // Light ink with a scrim under it is the default and the only thing that
+    // works for video, whose brightness the estimate cannot know. Dark ink with
+    // no scrim is used when a still picture is measurably bright, where dark on
+    // light is better than either.
+    //
+    // The dark values are absolute rather than derived: darkening a background
+    // that is already near-white gives light grey, which was the first attempt
+    // and was unreadable on the white it was meant to fix.
     readonly property color deskInk: wallpaperIsLight
-        ? Qt.darker(GeneratedColors.background, 1.6)
+        ? Qt.hsla(0, 0, 0.13, 1)
         : GeneratedColors.foreground
     readonly property color deskAccent: wallpaperIsLight
-        ? Qt.darker(GeneratedColors.accent, 1.9)
+        ? Qt.hsla(GeneratedColors.accent.hslHue, 0.55, 0.30, 1)
         : GeneratedColors.accent
-    // Behind the marks rather than on them: a soft dark halo on a light
-    // wallpaper and a soft light one on a dark wallpaper, so an edge survives
-    // whatever the picture does locally even when the mean says otherwise.
-    readonly property color deskHalo: wallpaperIsLight
-        ? Qt.alpha("#000000", 0.30)
-        : Qt.alpha("#000000", 0.45)
+    // Only under light ink. Darkening the ground under dark ink only muddies it.
+    readonly property real deskScrim: wallpaperIsLight ? 0 : 0.45
 
     // ── Type ──
     // One scale, named by role rather than by size, so a label in the bar and a
