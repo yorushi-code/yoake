@@ -99,7 +99,13 @@ PanelWindow {
             anchors.topMargin: Theme.barHeight + Theme.barMargin * 2
             anchors.rightMargin: Theme.barMargin
             width: 340
-            height: 500
+            // As tall as it needs to be. A fixed 500 meant one notification sat
+            // at the top of a panel with four fifths of nothing under it, which
+            // reads as a list that failed to load rather than a quiet day. The
+            // floor leaves room for the cat when there is nothing at all.
+            height: Notifs.tracked.length === 0
+                ? 260
+                : Math.min(500, header.height + historyColumn.height + 26)
             screenX: Screen.width - Theme.barMargin - width
             screenY: Theme.barHeight + Theme.barMargin * 2
             opacity: win.open ? 1 : 0

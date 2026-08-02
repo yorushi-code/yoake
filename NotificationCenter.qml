@@ -150,7 +150,10 @@ Item {
         color: "transparent"
         exclusiveZone: 0
         focusable: false
-        visible: root.activeToasts.length > 0
+        // Nothing to pop up about while the list is open: the toast landed on
+        // top of the very same notification in the centre underneath it, so the
+        // one arrival was shown twice and each copy hid half of the other.
+        visible: root.activeToasts.length > 0 && !Toggles.notifCenterOpen
 
         Column {
             id: toastColumn
