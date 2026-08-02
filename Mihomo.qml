@@ -37,6 +37,20 @@ Singleton {
 
     // ── live state, from the controller ──
     readonly property bool controllerUp: MihomoApi.reachable
+    // Every proxy's type by name, groups and nodes alike. A group's member list
+    // mixes real servers with the built-ins, and only the type tells them apart.
+    property var proxyTypes: ({})
+
+    // A member of a group that is not a server: DIRECT, REJECT and the nested
+    // groups. These are always usable and never measured, so counting them
+    // among the nodes that might be down is counting the wrong thing.
+    function isSelectable(name) {
+        const t = root.proxyTypes[name] || "";
+        return t === "Selector" || t === "URLTest" || t === "Fallback"
+            || t === "Direct" || t === "Reject" || t === "Compatible"
+            || t === "LoadBalance" || t === "Pass";
+    }
+
     // [{ name, type, now, nodes }] for every selectable group.
     property var groups: []
     readonly property string primaryGroup: "PROXY"
@@ -102,8 +116,10 @@ Singleton {
                 return;
             }
             const out = [];
+            const types = {};
             for (const name in data.proxies) {
                 const entry = data.proxies[name];
+                types[name] = entry.type || "";
                 // Only groups the user can act on. Every individual node is in
                 // this map too, and GLOBAL lists all of them a second time.
                 if (entry.type !== "Selector" && entry.type !== "URLTest"
@@ -122,6 +138,7 @@ Singleton {
                 if (b.name === root.primaryGroup) return 1;
                 return a.name.localeCompare(b.name);
             });
+            root.proxyTypes = types;
             root.groups = out;
         });
     }

@@ -57,9 +57,14 @@ Item {
         return (d === null || d === undefined) ? -1 : d;
     }
 
+    // The servers among the group's members. AUTO and DIRECT sit in the same
+    // list and are always usable, so "живых 5 из 7" was counting two things
+    // that cannot be dead as if they were down.
+    readonly property var serverNodes: root.allNodes.filter(n => !Mihomo.isSelectable(n))
+
     readonly property int aliveCount: {
         let n = 0;
-        for (const node of root.allNodes) {
+        for (const node of root.serverNodes) {
             // Not a truthy test: a node answering in under a millisecond
             // reports 0, and counting that as dead is the one case where the
             // number on screen would disagree with the list under it.
@@ -599,9 +604,9 @@ Item {
                             Text {
                                 anchors.left: parent.left
                                 anchors.verticalCenter: parent.verticalCenter
-                                text: "Живых " + root.aliveCount + " из " + root.allNodes.length
+                                text: "Живых " + root.aliveCount + " из " + root.serverNodes.length
                                 color: root.aliveCount === 0 ? Theme.red
-                                    : (root.aliveCount * 3 < root.allNodes.length ? Theme.yellow : Theme.subtext0)
+                                    : (root.aliveCount * 3 < root.serverNodes.length ? Theme.yellow : Theme.subtext0)
                                 font.pixelSize: 10
                                 font.bold: true
                                 font.letterSpacing: 1
