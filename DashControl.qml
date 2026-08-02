@@ -27,12 +27,25 @@ Item {
     // came for.
     onRevealedChanged: if (!root.revealed) root.page = "";
 
+    // Both ends have to be tracked, or PipeWire never sends their properties
+    // and the sliders sit at zero.
     PwObjectTracker {
-        objects: Pipewire.defaultAudioSink ? [Pipewire.defaultAudioSink] : []
+        objects: {
+            const list = [];
+            if (Pipewire.defaultAudioSink) list.push(Pipewire.defaultAudioSink);
+            if (Pipewire.defaultAudioSource) list.push(Pipewire.defaultAudioSource);
+            return list;
+        }
     }
 
     readonly property real volume: Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.audio
         ? Pipewire.defaultAudioSink.audio.volume : 0
+
+    readonly property var micSource: Pipewire.defaultAudioSource
+    readonly property real micVolume: root.micSource && root.micSource.audio
+        ? root.micSource.audio.volume : 0
+    readonly property bool micMuted: root.micSource && root.micSource.audio
+        ? root.micSource.audio.muted : false
 
     Component { id: wifiPage; CcWifiPage {} }
     Component { id: bluetoothPage; CcBluetoothPage {} }
@@ -105,7 +118,7 @@ Item {
             anchors.left: tileCard.right
             anchors.leftMargin: root.gap
             anchors.right: parent.right
-            height: 152
+            height: 206
 
             Column {
                 anchors.left: parent.left
@@ -132,6 +145,25 @@ Item {
                     value: Brightness.value
                     onMoved: v => Brightness.set(v)
                 }
+
+                // The third level anyone actually reaches for, and the only one
+                // that was reachable solely through a right-click menu on the
+                // bar. A card called "Уровни" that omits the microphone is
+                // asking to be looked past.
+                SliderRow {
+                    width: parent.width
+                    visible: root.micSource !== null
+                    label: root.micMuted
+                        ? "Микрофон выключен"
+                        : "Микрофон " + Math.round(root.micVolume * 100) + "%"
+                    value: root.micMuted ? 0 : root.micVolume
+                    onMoved: v => {
+                        if (root.micSource && root.micSource.audio) {
+                            root.micSource.audio.muted = false;
+                            root.micSource.audio.volume = v;
+                        }
+                    }
+                }
             }
         }
 
@@ -143,18 +175,25 @@ Item {
             title: "Приложения"
             anchors.top: levelCard.bottom
             anchors.topMargin: root.gap
-            anchors.bottom: parent.bottom
             anchors.left: tileCard.right
             anchors.leftMargin: root.gap
             anchors.right: parent.right
             visible: launcher.entries.length > 0
+            // Sized to the chips rather than stretched to the bottom of the
+            // sheet. A right column shorter than the left is a layout; a card
+            // with a void under its content is a mistake.
+            height: 36 + 6 + launcher.height + 16
 
+            // Anchored to the top, not centred: the list grows as habits do,
+            // and a centred one left a hand's width of nothing directly under
+            // the heading -- the gap that reads as broken rather than as room.
             CcQuickLaunch {
                 id: launcher
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.top: parent.top
                 anchors.margins: 16
+                anchors.topMargin: 6
             }
         }
     }
