@@ -35,6 +35,36 @@ Item {
         }
     }
 
+    // What is written on the key, not what X calls it.
+    //
+    // The volume and brightness column was a list of XF86AudioRaiseVolume and
+    // XF86MonBrightnessDown: strings nobody can press, in a sheet whose whole
+    // job is to say what to press. The rest of the chips are already Latin
+    // (Mod, Shift, Page_Down), so these stay Latin too and match the legend on
+    // the keyboard itself.
+    readonly property var keyNames: ({
+        "XF86AudioRaiseVolume": "Vol +",
+        "XF86AudioLowerVolume": "Vol −",
+        "XF86AudioMute": "Mute",
+        "XF86AudioMicMute": "Mic",
+        "XF86AudioPlay": "Play",
+        "XF86AudioStop": "Stop",
+        "XF86AudioPrev": "Prev",
+        "XF86AudioNext": "Next",
+        "XF86MonBrightnessUp": "Bright +",
+        "XF86MonBrightnessDown": "Bright −"
+    })
+
+    function prettyKey(key) {
+        return key.split("+").map(part => {
+            const named = root.keyNames[part];
+            if (named) return named;
+            // Page_Down and WheelScrollUp are the config's spelling, not the
+            // keyboard's.
+            return part.replace(/_/g, " ").replace(/([a-z])([A-Z])/g, "$1 $2");
+        }).join(" + ");
+    }
+
     function parse(text) {
         const lines = text.split("\n");
         const result = [];
@@ -69,17 +99,97 @@ Item {
                 // The argument matters for the ones that take one: nine binds
                 // are all "focus-workspace" and would otherwise be nine
                 // identical lines.
-                const arg = action.split(" ").slice(1).join(" ").trim();
+                let arg = action.split(" ").slice(1).join(" ").trim();
                 const named = root.actionNames[verb];
                 label = named ? named : verb.replace(/-/g, " ");
+                // niri quotes every word of a spawn, so an untitled bind read
+                // `spawn "qs" "ipc" "call" "toggles" "wallpaper"` and took three
+                // lines to say less than its own title would have.
+                if (verb === "spawn") arg = arg.replace(/"/g, "");
                 if (arg !== "") label += " " + arg;
             }
             if (!label) continue;
 
-            current.binds.push({ key: key.replace(/\+/g, " + "), label });
+            current.binds.push({ key: root.prettyKey(key), label });
         }
         if (current.binds.length > 0) result.push(current);
+        for (const category of result) category.binds = root.collapseRuns(category.binds);
         return [...result, ...root.mouseCategories];
+    }
+
+    // Categories dealt into columns, shortest column first.
+    //
+    // A Flow lays them out in rows, and a row is as tall as its tallest member:
+    // with one long section and four short ones that leaves half a screen of
+    // nothing under the short ones, and pushes the mouse sections off the
+    // bottom entirely. Dealing into columns instead spends that space on the
+    // content that was hidden.
+    //
+    // The heights are estimated rather than measured -- a binding on the real
+    // heights would have to lay out to decide the layout. Being a row or two
+    // out only makes the columns slightly uneven, which is invisible; waiting
+    // for a measurement would not be.
+    function balanced(count) {
+        const columns = [];
+        const heights = [];
+        for (let i = 0; i < count; i++) {
+            columns.push([]);
+            heights.push(0);
+        }
+        for (const category of root.categories) {
+            let cost = 26;
+            for (const bind of category.binds) {
+                // Roughly where a 320px column wraps a 12px label, counted per
+                // line rather than as wrapped-or-not: the raw fallback labels
+                // run to three.
+                cost += Math.max(1, Math.ceil(bind.label.length / 26)) * 16 + 6;
+            }
+            let target = 0;
+            for (let i = 1; i < count; i++) {
+                if (heights[i] < heights[target]) target = i;
+            }
+            columns[target].push(category);
+            heights[target] += cost + 20;
+        }
+        return columns;
+    }
+
+    // Nine binds that differ by one digit are one bind with a range in it.
+    //
+    // "Mod + 1 На рабочий стол 1" through "Mod + 9" filled a third of the sheet
+    // with a pattern the reader works out from the first two lines, and pushed
+    // the sections that actually need reading off the bottom of the screen.
+    function collapseRuns(binds) {
+        const out = [];
+        let i = 0;
+        while (i < binds.length) {
+            const m = binds[i].key.match(/^(.*\+ )(\d)$/);
+            if (!m) {
+                out.push(binds[i]);
+                i += 1;
+                continue;
+            }
+            let j = i;
+            while (j + 1 < binds.length) {
+                const next = binds[j + 1].key.match(/^(.*\+ )(\d)$/);
+                if (!next || next[1] !== m[1]) break;
+                if (parseInt(next[2]) !== parseInt(binds[j].key.slice(-1)) + 1) break;
+                j += 1;
+            }
+            // Two of them are shorter written out than explained as a range.
+            if (j - i < 2) {
+                out.push(binds[i]);
+                i += 1;
+                continue;
+            }
+            const last = binds[j].key.slice(-1);
+            out.push({
+                key: m[1] + m[2] + "…" + last,
+                label: binds[i].label.replace(/\d+\s*$/, m[2] + "–" + last)
+            });
+            i = j + 1;
+        }
+        return out;
     }
 
     // niri's own action names, in Russian.
@@ -297,11 +407,17 @@ Item {
             PanelChrome {
                 id: chrome
                 anchors.centerIn: parent
-                // 1100 fits only three 320px columns, which pushed the last
-                // third of the sheet — including the mouse sections — below the
-                // fold on a 1920 screen.
-                width: Math.min(parent.width - 80, 1500)
-                height: Math.min(parent.height - 80, 700)
+                // The columns are a fixed 320, so the width decides how many of
+                // them the Flow gets: 1100 gave three and 1500 gives four, and
+                // at four the workspace binds still ran past the bottom of the
+                // screen once labels wrapped. Five fits the whole sheet, which
+                // is the entire point of a sheet.
+                width: Math.min(parent.width - 80, 1800)
+                // As tall as the bindings need, capped by the screen. A fixed
+                // 700 was right until the labels started wrapping, and then the
+                // last workspace binds sat below the fold in a sheet whose
+                // point is that everything is visible at once.
+                height: Math.min(parent.height - 80, grid.height + 48)
                 screenX: (Screen.width - width) / 2
                 screenY: (Screen.height - height) / 2
                 opacity: root.open ? 1 : 0
@@ -361,13 +477,20 @@ Item {
                     contentHeight: grid.height
                     clip: true
 
-                    Flow {
+                    Row {
                         id: grid
                         width: parent.width
                         spacing: 20
 
                         Repeater {
-                            model: root.categories
+                        model: root.balanced(Math.max(1, Math.floor((parent.width + 20) / 340)))
+                        delegate: Column {
+                        required property var modelData
+                        width: 320
+                        spacing: 20
+
+                        Repeater {
+                            model: modelData
                             delegate: Column {
                                 id: categoryDelegate
                                 required property var modelData
@@ -431,12 +554,13 @@ Item {
                                         }
                                         Text {
                                             anchors.verticalCenter: parent.verticalCenter
-                                            // Bound and elided: labels that fall
-                                            // back to the raw niri action name
-                                            // ("move column to monitor left") ran
-                                            // straight over the next column.
+                                            // Bound and wrapped: the long labels
+                                            // ran straight over the next column,
+                                            // and eliding them turned the one
+                                            // place where the full wording
+                                            // matters into "Колонку на монито…".
                                             width: bindRow.width - keyChip.width - bindRow.spacing
-                                            elide: Text.ElideRight
+                                            wrapMode: Text.Wrap
                                             text: bindRow.modelData.label
                                             color: Theme.text
                                             font.pixelSize: 12
@@ -444,6 +568,8 @@ Item {
                                     }
                                 }
                             }
+                        }
+                        }
                         }
                     }
                 }
