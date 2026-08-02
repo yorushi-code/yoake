@@ -112,7 +112,12 @@ Column {
     Flow {
         width: parent.width
         spacing: 8
-        visible: root.swatches.length > 0
+        // Two or more, because the strip's job is to offer the alternatives.
+        // On a wallpaper that is genuinely one broad hue the analysis returns a
+        // single candidate, which is the accent already shown above it, and the
+        // strip became one small square with a card's width of nothing beside
+        // it -- a hole that looked like a failure to load rather than an answer.
+        visible: root.swatches.length > 1
 
         Repeater {
             model: root.swatches
