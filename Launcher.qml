@@ -33,6 +33,24 @@ Item {
     // login is just a list.
     readonly property var usage: Prefs.get("launcher.usage", {})
 
+    // ЙЦУКЕН against QWERTY, key for key.
+    //
+    // Win+D does not switch the layout, so on a machine that types Russian all
+    // day the launcher is opened with the wrong one about as often as with the
+    // right one, and "аштупщч" found nothing at all. The mapping is by physical
+    // key, not by sound: this is a typo to undo, not a transliteration.
+    readonly property string _cyrillicKeys: "йцукенгшщзхъфывапролджэячсмитьбю.ё"
+    readonly property string _latinKeys: "qwertyuiop[]asdfghjkl;'zxcvbnm,./`"
+
+    function swapLayout(text) {
+        let out = "";
+        for (const ch of text) {
+            const at = root._cyrillicKeys.indexOf(ch);
+            out += at >= 0 ? root._latinKeys.charAt(at) : ch;
+        }
+        return out;
+    }
+
     function score(entry, needle) {
         if (needle === "") return 0;
         const name = (entry.name || "").toLowerCase();
@@ -60,10 +78,15 @@ Item {
 
     readonly property var results: {
         const needle = root.query.trim().toLowerCase();
+        // Only when the swap changes something, so a Latin query costs nothing
+        // and a Russian app name is still matched by what was actually typed.
+        const swapped = root.swapLayout(needle);
         const out = [];
         for (const entry of DesktopEntries.applications.values) {
             if (entry.noDisplay) continue;
-            const s = root.score(entry, needle);
+            const s = swapped === needle
+                ? root.score(entry, needle)
+                : Math.max(root.score(entry, needle), root.score(entry, swapped));
             if (s < 0) continue;
             const seen = root.usage[entry.id] || 0;
             out.push({ entry: entry, score: s, uses: seen });
