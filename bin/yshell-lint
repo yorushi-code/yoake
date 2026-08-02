@@ -1,0 +1,153 @@
+#!/usr/bin/env python3
+"""Patterns that have already been bugs in this shell, looked for everywhere.
+
+Each of these cost real debugging time once, and each was invisible: nothing
+was logged, nothing threw, something simply did not appear. Finding the next
+instance by reading is cheaper than finding it by noticing a cat that vanishes
+between beats.
+
+Direct children only, by brace depth. A scanner that reports a grandchild is a
+scanner that gets ignored, and an ignored lint is worse than none.
+
+Run with no arguments from anywhere; prints one line per finding and exits
+non-zero if there are any.
+"""
+
+import pathlib
+import re
+import sys
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+
+
+def blocks(text):
+    """Every `TypeName {` block, as (type, id, body, start_line, depth).
+
+    Braces inside strings and comments would break the count, so both are
+    blanked first rather than parsed -- this only needs structure, not meaning.
+    """
+    clean = re.sub(r'"[^"\n]*"', lambda m: '"' + " " * (len(m.group(0)) - 2) + '"', text)
+    clean = re.sub(r"//[^\n]*", lambda m: " " * len(m.group(0)), clean)
+
+    out = []
+    for m in re.finditer(r"\b([A-Z]\w*)\s*\{", clean):
+        start = m.end() - 1
+        depth = 0
+        i = start
+        while i < len(clean):
+            if clean[i] == "{":
+                depth += 1
+            elif clean[i] == "}":
+                depth -= 1
+                if depth == 0:
+                    break
+            i += 1
+        body = text[start + 1:i]
+        line = text[:m.start()].count("\n") + 1
+        # Not anchored to the start of a line: a one-line declaration puts
+        # the id after the brace, and that is exactly the shape the
+        # MultiEffect check needs to resolve.
+        ident = re.search(r"(?:^|[{;\s])id:\s*(\w+)", body)
+        out.append((m.group(1), ident.group(1) if ident else None, body, line, start))
+    return out
+
+
+def direct_children(body):
+    """The blocks one level down, not their descendants."""
+    out = []
+    depth = 0
+    i = 0
+    while i < len(body):
+        c = body[i]
+        if c == "{":
+            depth += 1
+        elif c == "}":
+            depth -= 1
+        elif depth == 0:
+            m = re.match(r"\b([A-Z]\w*)\s*\{", body[i:])
+            if m:
+                out.append((m.group(1), i))
+                # Skip its body so its own children are not counted as ours.
+                j = i + m.end() - 1
+                d = 0
+                while j < len(body):
+                    if body[j] == "{":
+                        d += 1
+                    elif body[j] == "}":
+                        d -= 1
+                        if d == 0:
+                            break
+                    j += 1
+                i = j
+        i += 1
+    return out
+
+
+def check(path):
+    text = path.read_text()
+    found = []
+
+    def report(line, what):
+        found.append((path.name, line, what))
+
+    all_blocks = blocks(text)
+
+    # A MouseArea that is a direct child of a Row or Column is laid out as
+    # another cell of it: it takes space, sits beside the content instead of
+    # over it, and the thing it was meant to make clickable is not.
+    for kind, _, body, line, _ in all_blocks:
+        if kind not in ("Row", "Column"):
+            continue
+        for child, offset in direct_children(body):
+            if child in ("MouseArea", "TapHandler"):
+                report(line + body[:offset].count("\n"),
+                       f"{child} is a direct child of a {kind}; it is laid out as a cell")
+
+    # A Row positions its children; horizontal anchors on one are refused
+    # outright and Qt disables the whole row.
+    for kind, _, body, line, _ in all_blocks:
+        if kind != "Row":
+            continue
+        # Only the anchors written one level down belong to direct children.
+        for m in re.finditer(r"anchors\.(left|right|horizontalCenter|fill|centerIn)\s*:", body):
+            d = body[:m.start()].count("{") - body[:m.start()].count("}")
+            if d == 1:
+                report(line + body[:m.start()].count("\n"),
+                       f"anchors.{m.group(1)} on a direct child of a Row")
+
+    # `parent` inside a GradientStop is the Gradient, which has no such
+    # property; the undefined colour resolves to opaque black.
+    for m in re.finditer(r"GradientStop\s*\{[^}]*\bparent\.(\w+)", text):
+        report(text[:m.start()].count("\n") + 1,
+               f"GradientStop reads parent.{m.group(1)}; parent there is the Gradient")
+
+    # A MultiEffect draws nothing while its source has no texture of its own.
+    ids = {i: b for _, i, b, _, _ in all_blocks if i}
+    for kind, _, body, line, _ in all_blocks:
+        if kind != "MultiEffect":
+            continue
+        m = re.search(r"(?:^|[{;\s])source:\s*(\w+)\s*(?:$|[;\n])", body, re.M)
+        if not m:
+            continue
+        src = ids.get(m.group(1))
+        if src is None:
+            continue
+        if re.search(r"(?:^|[{;\s])visible:\s*false", src) and "layer.enabled" not in src:
+            report(line, f"MultiEffect source '{m.group(1)}' is hidden and has no layer")
+
+    return found
+
+
+def main():
+    findings = []
+    for path in sorted(list(ROOT.glob("*.qml")) + list((ROOT / "greeter").glob("*.qml"))):
+        findings.extend(check(path))
+
+    for name, line, what in findings:
+        print(f"{name}:{line}: {what}")
+    print(f"\n{len(findings)} finding{'' if len(findings) == 1 else 's'}")
+    return 1 if findings else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
