@@ -135,6 +135,42 @@ def check(path):
         if re.search(r"(?:^|[{;\s])visible:\s*false", src) and "layer.enabled" not in src:
             report(line, f"MultiEffect source '{m.group(1)}' is hidden and has no layer")
 
+    # Month and weekday names come from the system locale, and this session runs
+    # under en_US: the bar read "Sun, 2 Aug" under a clock while the panel beside
+    # it said "Воскресенье". Purely numeric formats are not affected, so only the
+    # patterns that actually produce a name are worth reporting.
+    for m in re.finditer(r"Qt\.format(?:DateTime|Date|Time)\s*\(([^)]*)\)", text):
+        args = m.group(1)
+        if re.search(r"MMM|ddd", args) and "locale" not in args.lower():
+            report(text[:m.start()].count("\n") + 1,
+                   "Qt.formatDate* with a name format and no locale; use Lang")
+    for m in re.finditer(r"\.toLocale(?:Date|Time)?String\s*\(([^)]*)\)", text):
+        args = m.group(1)
+        if re.search(r"MMM|ddd", args) and not re.search(r"locale|Lang\b", args, re.I):
+            report(text[:m.start()].count("\n") + 1,
+                   "toLocaleString with a name format and no locale argument")
+
+    # A Behavior on a property that the spectrum drives is an animation that is
+    # restarted before it can finish, thirty times a second, forever. It never
+    # reaches its target, it smears the reaction it was added to smooth, and it
+    # was most of this shell's idle cost the first time it happened.
+    # Only the three that carry a new number every frame. Cava.active and
+    # Cava.barCount change when playback starts or the config does, and those
+    # are exactly what a Behavior is for -- a rule that flags them is a rule
+    # that gets switched off.
+    live = re.compile(r"\bCava\.(values|peaks|bass)\b")
+    for kind, _, body, line, _ in all_blocks:
+        for m in re.finditer(r"Behavior\s+on\s+(\w+)", body):
+            prop = m.group(1)
+            depth = body[:m.start()].count("{") - body[:m.start()].count("}")
+            if depth != 0:
+                continue
+            for b in re.finditer(rf"(?:^|[{{;\s]){prop}:\s*([^\n]*)", body):
+                if b.start() < len(body) and live.search(b.group(1)):
+                    report(line + body[:m.start()].count("\n"),
+                           f"Behavior on {prop}, which is bound to the spectrum")
+                    break
+
     return found
 
 
