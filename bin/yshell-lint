@@ -174,10 +174,37 @@ def check(path):
     return found
 
 
+def unregistered():
+    """Component files this shell's qmldir does not list.
+
+    Quickshell resolves the directory through the qmldir rather than by
+    scanning it, so a new .qml file is simply not a type until it is named
+    there -- and the failure arrives as "X is not a type" at load, with the
+    whole config refusing to start.
+    """
+    qmldir = ROOT / "qmldir"
+    if not qmldir.exists():
+        return []
+    listed = set()
+    for line in qmldir.read_text().splitlines():
+        parts = line.split()
+        # Plain and singleton entries differ only in a leading keyword, and the
+        # file is the last field of both.
+        if parts and parts[-1].endswith(".qml"):
+            listed.add(parts[-1])
+    out = []
+    for path in sorted(ROOT.glob("*.qml")):
+        if path.name in ("shell.qml",) or path.name in listed:
+            continue
+        out.append((path.name, 1, "not listed in qmldir; it will not be a type"))
+    return out
+
+
 def main():
     findings = []
     for path in sorted(list(ROOT.glob("*.qml")) + list((ROOT / "greeter").glob("*.qml"))):
         findings.extend(check(path))
+    findings.extend(unregistered())
 
     for name, line, what in findings:
         print(f"{name}:{line}: {what}")

@@ -323,13 +323,33 @@ Item {
         width: 244
         title: "Нагрузка"
 
-        Column {
+        // The card is as tall as the player beside it, and three rows do not
+        // fill that; centring them left a hand's width of nothing under the
+        // heading. The history goes there — it is the thing the card was
+        // missing anyway, since a percentage on its own cannot say whether the
+        // machine is settling down or winding up.
+        Sparkline {
+            id: cpuChart
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
+            anchors.top: parent.top
+            anchors.bottom: meters.top
             anchors.leftMargin: 16
             anchors.rightMargin: 16
-            anchors.verticalCenterOffset: 12
+            anchors.topMargin: 4
+            anchors.bottomMargin: 14
+            values: SysInfo.cpuHistory
+            capacity: SysInfo.historyLength
+        }
+
+        Column {
+            id: meters
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.leftMargin: 16
+            anchors.rightMargin: 16
+            anchors.bottomMargin: 16
             spacing: 13
 
             Repeater {

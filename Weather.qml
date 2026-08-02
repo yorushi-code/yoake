@@ -102,6 +102,42 @@ curl -s -m 8 https://ipapi.co/json/ 2>/dev/null
                     lat: root.latitude, lon: root.longitude, name: root.place
                 });
                 forecast.running = true;
+                // The locator answers in Latin, so the card read "Shchekino"
+                // under a heading that said "Малооблачно". Asking once for the
+                // local spelling is cheaper than living with the seam.
+                if (root.place !== "") localise.running = true;
+            }
+        }
+    }
+
+    // Same search the map sites use, asked in Russian. The coordinates are
+    // checked before the answer is accepted: there is a Moscow in Idaho, and a
+    // name match alone would happily move the user to it.
+    Process {
+        id: localise
+        command: ["sh", "-c",
+            "curl -s -m 8 'https://geocoding-api.open-meteo.com/v1/search"
+            + "?name=" + encodeURIComponent(root.place)
+            + "&count=5&language=ru&format=json'"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                let data = null;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    return;
+                }
+                const hits = (data && data.results) || [];
+                for (const hit of hits) {
+                    if (!hit.name) continue;
+                    if (Math.abs(hit.latitude - root.latitude) > 0.5) continue;
+                    if (Math.abs(hit.longitude - root.longitude) > 0.5) continue;
+                    root.place = hit.name;
+                    Prefs.set("weather.place", {
+                        lat: root.latitude, lon: root.longitude, name: root.place
+                    });
+                    return;
+                }
             }
         }
     }
@@ -149,6 +185,10 @@ curl -s -m 8 https://ipapi.co/json/ 2>/dev/null
             root.longitude = saved.lon;
             root.place = saved.name || "";
             root.located = true;
+            // A name cached before the shell learned to ask for the local
+            // spelling is still in Latin, and nothing would ever look it up
+            // again: the location is only fetched once.
+            if (/^[\x20-\x7e]+$/.test(root.place)) localise.running = true;
         }
         root.refresh();
     }

@@ -18,6 +18,12 @@ Singleton {
 
     property real cpu: 0    // 0..1
     property real memory: 0 // 0..1
+
+    // A minute and a half of history at the two-second poll. Long enough to
+    // show a build finishing, short enough that the line still visibly moves.
+    readonly property int historyLength: 45
+    property var cpuHistory: []
+    property var memoryHistory: []
     property int temperature: 0 // degrees C, 0 when no sensor was found
 
     property real memoryUsedGb: 0
@@ -39,6 +45,13 @@ Singleton {
     property string distro: ""
     property string kernel: ""
     property string host: ""
+
+    function _appended(history, sample) {
+        const out = history.slice();
+        out.push(sample);
+        while (out.length > root.historyLength) out.shift();
+        return out;
+    }
 
     readonly property string uptimeText: {
         const s = root.uptimeSeconds;
@@ -175,6 +188,11 @@ done
                 if (p.length < 3) return;
                 root.cpu = Math.max(0, Math.min(1, parseInt(p[0]) / 100));
                 root.memory = Math.max(0, Math.min(1, parseInt(p[1]) / 100));
+                // Reassigned rather than pushed into: a var array mutated in
+                // place notifies nothing, and the chart bound to it never
+                // redraws.
+                root.cpuHistory = root._appended(root.cpuHistory, root.cpu);
+                root.memoryHistory = root._appended(root.memoryHistory, root.memory);
                 root.temperature = parseInt(p[2]) || 0;
                 if (p.length < 9) return;
                 const mib = 1024 * 1024;
