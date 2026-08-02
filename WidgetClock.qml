@@ -63,7 +63,7 @@ Column {
 
     Text {
         anchors.right: timeGroup.right
-        text: Qt.formatDateTime(clock.date, "dddd, d MMMM").toUpperCase()
+        text: Lang.date(clock.date, "dddd, d MMMM").toUpperCase()
         color: Theme.wallpaperIsLight
             ? Qt.darker(Theme.subtext1, 2.2) : Theme.subtext1
         font.family: Theme.fontFamily

@@ -97,7 +97,7 @@ Row {
         Tooltip {
             anchorItem: timeItem
             active: clockArea.containsMouse && !Menus.isOpen(root.menuId)
-            text: Qt.formatDateTime(clock.date, "dddd, d MMMM yyyy")
+            text: Lang.dateCapitalised(clock.date, "dddd, d MMMM yyyy")
             subtext: "ЛКМ — панель управления · ПКМ — меню"
         }
     }
@@ -110,7 +110,7 @@ Row {
         Text {
             id: dateLabel
             anchors.centerIn: parent
-            text: Qt.formatDateTime(clock.date, "ddd, d MMM")
+            text: Lang.dateCapitalised(clock.date, "ddd, d MMM")
             color: dateArea.containsMouse ? Theme.text : Theme.subtext0
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSmall

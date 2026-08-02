@@ -332,7 +332,7 @@ PanelWindow {
                         text: {
                             if (win.selectedDay === 0) return "Выберите день";
                             const d = new Date(win.viewDate.getFullYear(), win.viewDate.getMonth(), win.selectedDay);
-                            const label = Qt.formatDateTime(d, "dddd, d MMMM yyyy");
+                            const label = Lang.dateCapitalised(d, "dddd, d MMMM yyyy");
                             const today = new Date();
                             const days = Math.round((d - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / 86400000);
                             if (days === 0) return label + " · сегодня";

@@ -113,13 +113,10 @@ WlSessionLock {
 
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
-                // The session runs under en_US, so the default locale would
-                // print "Thursday, 30 July" under a screen whose every other
-                // word is Russian.
-                text: {
-                    const d = clock.date.toLocaleDateString(Qt.locale("ru_RU"), "dddd, d MMMM");
-                    return d.charAt(0).toUpperCase() + d.slice(1);
-                }
+                // Through Lang, like every other date in the shell. This was
+                // the first place the locale had to be passed by hand, and
+                // passing it by hand is how the bar came to disagree with it.
+                text: Lang.dateCapitalised(clock.date, "dddd, d MMMM")
                 color: Theme.subtext1
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontTitle

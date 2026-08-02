@@ -48,7 +48,7 @@ Item {
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: {
-                    const d = clock.date.toLocaleDateString(Qt.locale("ru_RU"), "ddd, d MMMM");
+                    const d = Lang.date(clock.date, "ddd, d MMMM");
                     return d.charAt(0).toUpperCase() + d.slice(1);
                 }
                 color: Theme.subtext0
