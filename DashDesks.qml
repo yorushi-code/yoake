@@ -38,7 +38,7 @@ Item {
                         .filter(w => w.workspace_id === card.modelData.id)
 
                     width: column.width
-                    height: 74
+                    height: 84
                     interactive: true
                     onActivated: {
                         Niri.focusWorkspace(card.modelData.idx);
@@ -80,11 +80,33 @@ Item {
                         font.pixelSize: Theme.fontSmall
                     }
 
-                    Row {
-                        anchors.left: number.right
-                        anchors.leftMargin: 22
+                    // What is actually in front on that desk. Six icons tell
+                    // you a terminal is there; they do not tell you which one,
+                    // and that is the thing you are looking for when you open
+                    // this page at all.
+                    Text {
+                        id: focusedTitle
                         anchors.right: parent.right
                         anchors.rightMargin: 18
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: Math.max(0, parent.width - number.width - icons.width - 120)
+                        horizontalAlignment: Text.AlignRight
+                        visible: text !== ""
+                        text: {
+                            const focused = card.windows.find(w => w.is_focused);
+                            const w = focused || card.windows[0];
+                            return w ? (w.title || w.app_id || "") : "";
+                        }
+                        color: card.modelData.is_focused ? Theme.subtext1 : Theme.subtext0
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSmall
+                        elide: Text.ElideRight
+                    }
+
+                    Row {
+                        id: icons
+                        anchors.left: number.right
+                        anchors.leftMargin: 22
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: 10
 
@@ -114,11 +136,19 @@ Item {
                                     subtext: entry.modelData.app_id || ""
                                 }
 
+                                // Clicking the window goes to the window, not
+                                // merely to the desk it is on. The tooltip
+                                // already names it, so the row was one step
+                                // short of being useful.
                                 MouseArea {
                                     id: hover
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    acceptedButtons: Qt.NoButton
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        Niri.focusWindow(entry.modelData.id);
+                                        Toggles.dashboardOpen = false;
+                                    }
                                 }
                             }
                         }

@@ -192,4 +192,10 @@ Singleton {
     function focusWorkspace(idx) {
         root.action("focus-workspace", String(idx));
     }
+
+    // By id, so a window can be reached without first going to the desk it is
+    // on and hunting for it there.
+    function focusWindow(id) {
+        root.action("focus-window", "--id", String(id));
+    }
 }
