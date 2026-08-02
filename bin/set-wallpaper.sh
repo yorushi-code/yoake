@@ -223,3 +223,15 @@ start_pending_transcode
 # that slot held a colour — on a near-monochrome wallpaper it was grey, which
 # the template then saturated into a cyan that appeared nowhere in the image.
 ~/.local/bin/wallpaper-palette.py "$PALETTE_SRC"
+
+# The login screen wears the same picture, but it runs as its own user and
+# cannot read a 700 home directory -- so it needs a copy taken for it. Done here
+# rather than by hand, because a greeter still showing last month's wallpaper is
+# how you find out this step was never wired up.
+#
+# -n: never prompt. A wallpaper change must not stop and ask for a password, and
+# the sudoers rule that makes this work is narrow enough to be optional -- if it
+# is missing, the desktop still changes and only the login screen lags.
+if command -v yshell-greeter-sync >/dev/null 2>&1; then
+  sudo -n /usr/local/bin/yshell-greeter-sync >/dev/null 2>&1 || true
+fi
