@@ -10,7 +10,11 @@ Item {
 
     property var barWindow: null
 
-        // implicitWidth off the row's *implicit* width, and the row anchored
+    // One menu key per bar, so the copy of this widget on a second monitor does
+    // not share one open-menu key with this one.
+    readonly property string menuId: Menus.idFor(root.barWindow, "vpn")
+
+    // implicitWidth off the row's *implicit* width, and the row anchored
     // rather than centred: reading .width here while the row centres itself
     // in that same width is a cycle, and Qt resolves it in no fixed order.
     // Whenever the content changed width -- VPN going from "вкл" to a speed,
@@ -79,7 +83,70 @@ Item {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onClicked: Toggles.exclusive("vpnPanel")
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: mouse => {
+            if (mouse.button === Qt.RightButton) {
+                Mihomo.probeDelaysIfStale(Mihomo.primaryGroup);
+                Menus.toggle(root.menuId);
+                return;
+            }
+            Toggles.exclusive("vpnPanel");
+        }
+    }
+
+    // The tunnel was the one status widget in the bar with no menu, in a shell
+    // whose own cheat sheet promises one on every widget -- and it is the widget
+    // where the two things people actually want, switching node and turning the
+    // thing off, otherwise cost opening a whole panel.
+    ActionMenu {
+        id: menu
+        menuId: root.menuId
+        anchorItem: root
+        open: Menus.isOpen(root.menuId)
+        model: {
+            if (!Menus.isOpen(root.menuId)) return [];
+
+            const out = [{
+                text: root.up ? "Отключить" : "Включить",
+                glyph: Glyphs.vpn,
+                action: () => root.up ? Mihomo.stop() : Mihomo.start(Mihomo.active)
+            }];
+
+            const group = Mihomo.primary;
+            if (root.up && group) {
+                // Servers only, quickest first. AUTO and DIRECT belong in the
+                // panel: this list is for picking a way out, not a policy.
+                const nodes = (group.nodes || [])
+                    .filter(n => !Mihomo.isSelectable(n))
+                    .filter(n => Mihomo.delays[n] !== null && Mihomo.delays[n] !== undefined)
+                    .sort((a, b) => Mihomo.delays[a] - Mihomo.delays[b])
+                    .slice(0, 6);
+                if (nodes.length > 0) out.push({ separator: true });
+                for (const node of nodes) {
+                    out.push({
+                        text: node + "  " + Mihomo.delays[node] + " мс",
+                        checkable: true,
+                        checked: node === Mihomo.currentNode,
+                        action: () => Mihomo.select(group.name, node)
+                    });
+                }
+            }
+
+            out.push({ separator: true });
+            if (root.up) {
+                out.push({
+                    text: "Проверить задержки",
+                    glyph: Glyphs.refresh,
+                    action: () => Mihomo.probeDelays(Mihomo.primaryGroup)
+                });
+            }
+            out.push({
+                text: "Панель VPN",
+                glyph: Glyphs.cog,
+                action: () => Toggles.exclusive("vpnPanel")
+            });
+            return out;
+        }
     }
 
     // A card, not a tooltip. This is the widget in the bar with the most to say
@@ -93,7 +160,7 @@ Item {
     // and lands in every screenshot taken of it.
     Popover {
         anchorItem: root
-        hovered: ma.containsMouse && !Toggles.vpnPanelOpen
+        hovered: ma.containsMouse && !Toggles.vpnPanelOpen && !Menus.isOpen(root.menuId)
         minWidth: 248
 
         Column {

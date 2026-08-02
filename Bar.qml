@@ -39,14 +39,49 @@ PanelWindow {
     // menus get no keyboard focus and Escape does nothing.
     focusable: Menus.anyOpen
 
+    readonly property string barMenuId: Menus.idFor(bar, "bar")
+
     // Any click that isn't on a menu should dismiss it. The islands don't cover
     // the whole bar, so this sits underneath them and catches the gaps.
     // Clicks on bare desktop are DesktopLayer's job.
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
-        enabled: Menus.anyOpen
-        onClicked: Menus.closeAll()
+        onClicked: mouse => {
+            if (mouse.button === Qt.RightButton) {
+                barMenuAnchor.x = mouse.x;
+                Menus.toggle(bar.barMenuId);
+                return;
+            }
+            Menus.closeAll();
+        }
+    }
+
+    // The menu opens where it was asked for rather than at a fixed spot, so it
+    // behaves like every other right-click on the bar.
+    Item {
+        id: barMenuAnchor
+        y: 0
+        width: 1
+        height: bar.height
+    }
+
+    // The cheat sheet has always promised a menu "on any widget and on the
+    // empty part of the bar", and the empty part did nothing at all. These are
+    // the four things reached for most that otherwise need a key nobody
+    // remembers on a machine they have just sat down at.
+    ActionMenu {
+        menuId: bar.barMenuId
+        anchorItem: barMenuAnchor
+        open: Menus.isOpen(bar.barMenuId)
+        model: [
+            { text: "Дашборд", glyph: Glyphs.apps, action: () => Toggles.dash("overview") },
+            { text: "Уведомления", glyph: Glyphs.bell, action: () => Toggles.exclusive("notifCenter") },
+            { text: "Обои", glyph: Glyphs.image, action: () => Toggles.exclusive("wallpaperPicker") },
+            { separator: true },
+            { text: "Двигать виджеты", glyph: Glyphs.cog, action: () => DesktopWidgets.toggleEditing() },
+            { text: "Горячие клавиши", glyph: Glyphs.keyboard, action: () => Toggles.exclusive("cheatSheet") }
+        ]
     }
 
     Item {
