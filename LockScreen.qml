@@ -308,6 +308,50 @@ WlSessionLock {
             }
         }
 
+        // Asleep where the player would be, when there is no player.
+        //
+        // The greeter has one and this screen is meant to be its twin; having
+        // it on one and not the other was a difference with no reason behind
+        // it. It takes the corner the media card leaves empty rather than
+        // sitting beside it, so neither surface ever shows a hole.
+        Image {
+            anchors.left: parent.left
+            anchors.bottom: parent.bottom
+            anchors.leftMargin: 34
+            anchors.bottomMargin: 26
+            visible: !Media.hasPlayer
+            source: Qt.resolvedUrl("assets/bongo/bongo-sleeping.png")
+            sourceSize.width: 256
+            sourceSize.height: 256
+            width: 128
+            height: 128
+            fillMode: Image.PreserveAspectFit
+            opacity: surface.entered ? 0.45 : 0
+            Behavior on opacity {
+                SequentialAnimation {
+                    PauseAnimation { duration: 420 }
+                    NumberAnimation { duration: 900; easing.type: Easing.OutCubic }
+                }
+            }
+
+            Text {
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.topMargin: 12
+                text: "z"
+                color: Qt.alpha(Theme.text, 0.65)
+                font.family: Theme.fontFamily
+                font.pixelSize: 13
+
+                SequentialAnimation on y {
+                    running: parent.visible
+                    loops: Animation.Infinite
+                    NumberAnimation { from: 22; to: 2; duration: 2400; easing.type: Easing.InOutQuad }
+                    PauseAnimation { duration: 500 }
+                }
+            }
+        }
+
         // ── Now playing ──
         Rectangle {
             id: mediaCard
