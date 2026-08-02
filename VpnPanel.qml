@@ -52,16 +52,44 @@ Item {
         }
         return n;
     }
+    function _delayOf(node) {
+        const d = Mihomo.delays[node];
+        return (d === null || d === undefined) ? -1 : d;
+    }
+
     readonly property int aliveCount: {
         let n = 0;
         for (const node of root.allNodes) {
-            if (Mihomo.delays[node]) n++;
+            // Not a truthy test: a node answering in under a millisecond
+            // reports 0, and counting that as dead is the one case where the
+            // number on screen would disagree with the list under it.
+            if (root._delayOf(node) >= 0) n++;
         }
         return n;
     }
+
+    // Answering nodes first, quickest first; everything else keeps its order
+    // underneath.
+    //
+    // The same reasoning that puts the running subscription at the top of the
+    // footer, and it matters more here: with eleven nodes and two of them
+    // alive, the two you can actually pick were scattered through nine you
+    // cannot, and the list is a scroller.
+    readonly property var orderedNodes: {
+        const list = root.allNodes.slice();
+        list.sort((a, b) => {
+            const da = root._delayOf(a), db = root._delayOf(b);
+            const aliveA = da >= 0, aliveB = db >= 0;
+            if (aliveA !== aliveB) return aliveA ? -1 : 1;
+            if (aliveA && da !== db) return da - db;
+            return 0;
+        });
+        return list;
+    }
+
     readonly property var shownNodes: {
-        if (!root.hideDead) return root.allNodes;
-        return root.allNodes.filter(n => Mihomo.delays[n] !== null);
+        if (!root.hideDead) return root.orderedNodes;
+        return root.orderedNodes.filter(n => Mihomo.delays[n] !== null);
     }
 
     property bool adding: false
