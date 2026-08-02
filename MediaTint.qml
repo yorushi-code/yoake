@@ -41,14 +41,37 @@ Singleton {
 
     ColorQuantizer {
         id: quantizer
-        source: Media.cover
+        // Not the notification-owned handles. The quantizer failed on every
+        // image://qsimage cover it was given -- twice out of twice, across a
+        // restart -- while the same source drew fine as an Image, so it reads
+        // files and not QML image providers. Handing it one buys a warning in
+        // the log and nothing else; the watchdog below turns the silence that
+        // follows into a reset.
+        source: Media.cover.startsWith("image://") ? "" : Media.cover
         // Sixteen buckets: enough that a sleeve with one bright detail on a
         // dark field still surfaces the detail, few enough that the pass is
         // cheap and runs once per track.
         depth: 4
         rescaleSize: 64
 
-        onColorsChanged: root._pick(quantizer.colors)
+        onColorsChanged: {
+            stale.stop();
+            root._pick(quantizer.colors);
+        }
+    }
+
+    // A cover that never resolves leaves the previous record's colour on screen.
+    //
+    // The art can be an image://qsimage handle owned by a notification, and the
+    // quantizer has been seen to fail on one -- "Failed to load image from
+    // image://qsimage/4/1" in the log, while the same source drew fine as an
+    // Image. A failure emits nothing at all, so without this the tint simply
+    // keeps whatever the last sleeve gave it, which is worse than no tint: it
+    // says something confident and wrong about the track now playing.
+    Timer {
+        id: stale
+        interval: 1500
+        onTriggered: root._reset()
     }
 
     // Art can vanish mid-track — a notification's image handle dies with the
@@ -57,7 +80,12 @@ Singleton {
     Connections {
         target: Media
         function onCoverChanged() {
-            if (Media.cover === "") root._reset();
+            if (Media.cover === "") {
+                stale.stop();
+                root._reset();
+            } else {
+                stale.restart();
+            }
         }
     }
 
