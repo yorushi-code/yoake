@@ -63,9 +63,16 @@ Item {
 
             if (titleNullRe.test(line)) continue;
             const titleMatch = line.match(titleRe);
-            let label = titleMatch ? titleMatch[1] : action;
+            let label = titleMatch ? titleMatch[1] : "";
             if (!titleMatch) {
-                label = action.split(" ")[0].replace(/-/g, " ");
+                const verb = action.split(" ")[0];
+                // The argument matters for the ones that take one: nine binds
+                // are all "focus-workspace" and would otherwise be nine
+                // identical lines.
+                const arg = action.split(" ").slice(1).join(" ").trim();
+                const named = root.actionNames[verb];
+                label = named ? named : verb.replace(/-/g, " ");
+                if (arg !== "") label += " " + arg;
             }
             if (!label) continue;
 
@@ -74,6 +81,71 @@ Item {
         if (current.binds.length > 0) result.push(current);
         return [...result, ...root.mouseCategories];
     }
+
+    // niri's own action names, in Russian.
+    //
+    // A bind without a hotkey-overlay-title falls back to the action, and niri
+    // names actions in English -- so half the sheet read "focus column left"
+    // under a heading that said "Фокус между окнами". Translating here rather
+    // than titling every bind in the config keeps one list instead of eighty,
+    // and covers binds added later without touching this file again.
+    readonly property var actionNames: ({
+        "focus-column-left": "Колонка левее",
+        "focus-column-right": "Колонка правее",
+        "focus-column-first": "Первая колонка",
+        "focus-column-last": "Последняя колонка",
+        "focus-window-up": "Окно выше",
+        "focus-window-down": "Окно ниже",
+        "move-column-left": "Двинуть колонку влево",
+        "move-column-right": "Двинуть колонку вправо",
+        "move-column-to-first": "Колонку в начало",
+        "move-column-to-last": "Колонку в конец",
+        "move-window-up": "Двинуть окно вверх",
+        "move-window-down": "Двинуть окно вниз",
+        "focus-workspace": "На рабочий стол",
+        "focus-workspace-up": "Рабочий стол выше",
+        "focus-workspace-down": "Рабочий стол ниже",
+        "move-workspace-up": "Стол выше",
+        "move-workspace-down": "Стол ниже",
+        "move-column-to-workspace": "Колонку на стол",
+        "move-column-to-workspace-up": "Колонку на стол выше",
+        "move-column-to-workspace-down": "Колонку на стол ниже",
+        "focus-monitor-left": "Монитор слева",
+        "focus-monitor-right": "Монитор справа",
+        "focus-monitor-up": "Монитор выше",
+        "focus-monitor-down": "Монитор ниже",
+        "move-column-to-monitor-left": "Колонку на монитор слева",
+        "move-column-to-monitor-right": "Колонку на монитор справа",
+        "move-column-to-monitor-up": "Колонку на монитор выше",
+        "move-column-to-monitor-down": "Колонку на монитор ниже",
+        "close-window": "Закрыть окно",
+        "fullscreen-window": "Во весь экран",
+        "maximize-column": "Развернуть колонку",
+        "maximize-window-to-edges": "Развернуть до краёв",
+        "center-column": "Колонку по центру",
+        "center-visible-columns": "Видимые по центру",
+        "expand-column-to-available-width": "Растянуть колонку",
+        "consume-window-into-column": "Втянуть окно в колонку",
+        "expel-window-from-column": "Вытолкнуть окно из колонки",
+        "consume-or-expel-window-left": "Втянуть или вытолкнуть влево",
+        "consume-or-expel-window-right": "Втянуть или вытолкнуть вправо",
+        "switch-preset-column-width": "Ширина колонки далее",
+        "switch-preset-column-width-back": "Ширина колонки назад",
+        "switch-preset-window-height": "Высота окна далее",
+        "set-column-width": "Ширина колонки",
+        "set-window-height": "Высота окна",
+        "reset-window-height": "Сбросить высоту",
+        "toggle-window-floating": "Плавающее окно",
+        "switch-focus-between-floating-and-tiling": "Плавающие или плитка",
+        "toggle-column-tabbed-display": "Колонка вкладками",
+        "toggle-overview": "Обзор столов",
+        "toggle-keyboard-shortcuts-inhibit": "Отдать горячие клавиши окну",
+        "power-off-monitors": "Погасить экраны",
+        "screenshot": "Снимок области",
+        "screenshot-screen": "Снимок экрана",
+        "screenshot-window": "Снимок окна",
+        "quit": "Выйти из сессии"
+    })
 
     // Mouse actions can't be parsed out of the niri config — they live in the
     // bar's own widgets — so they're listed here by hand and merged with the

@@ -23,8 +23,10 @@ ClippingRectangle {
         fillMode: Image.PreserveAspectCrop
         // Cap decode size — cover art is displayed small, and this bounds the
         // per-image cost when tracks are switched rapidly.
-        sourceSize.width: 128
-        sourceSize.height: 128
+        // 128 was sized for the 52px lock-screen slot alone; the same
+        // component is used at larger sizes elsewhere.
+        sourceSize.width: 256
+        sourceSize.height: 256
         asynchronous: true
         // Qt 6.8+: holds the previous frame on screen while the next URL
         // loads, instead of blanking for the duration of the fetch. This is

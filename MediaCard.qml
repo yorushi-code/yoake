@@ -170,8 +170,12 @@ Item {
                 anchors.fill: parent
                 source: Media.cover
                 fillMode: Image.PreserveAspectCrop
-                sourceSize.width: 320
-                sourceSize.height: 320
+                // Decoded well above the 92px it is drawn at. The same image is
+                // the one the dashboard shows at 168, and a cache entry that is
+                // only just big enough for the smallest surface is the one every
+                // larger surface then has to upscale.
+                sourceSize.width: 512
+                sourceSize.height: 512
                 asynchronous: true
                 retainWhileLoading: true
                 visible: status === Image.Ready
