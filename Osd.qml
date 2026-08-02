@@ -61,6 +61,17 @@ Item {
         function brightness() { Brightness.refresh(); }
     }
 
+    // What the label says, as opposed to what it is called. The kind is an
+    // internal key -- the icon is chosen by it -- so it stays English while
+    // the caption does not; the rest of the shell is in Russian and this was
+    // the one surface still announcing itself in another language.
+    readonly property var _captions: ({
+        "Volume": "Громкость",
+        "Muted": "Звук выключен",
+        "Brightness": "Яркость"
+    })
+    readonly property string caption: root._captions[root.label] || root.label
+
     function show(label_, value_) {
         root.label = label_;
         root.value = value_;
@@ -176,10 +187,32 @@ Item {
                     width: 160
                     spacing: 6
 
-                    Text {
-                        text: root.label
-                        color: Theme.subtext1
-                        font.pixelSize: 11
+                    Item {
+                        width: parent.width
+                        height: caption.implicitHeight
+
+                        Text {
+                            id: caption
+                            anchors.left: parent.left
+                            text: root.caption
+                            color: Theme.subtext1
+                            font.family: Theme.fontFamily
+                            font.pixelSize: 11
+                        }
+
+                        // The number as well as the bar. A bar says "about
+                        // here"; the value is what you are actually setting,
+                        // and every other readout in the shell shows it.
+                        Text {
+                            anchors.right: parent.right
+                            visible: root.label !== "Muted"
+                            text: Math.round(root.value * 100) + "%"
+                            color: Theme.text
+                            font.family: Theme.fontFamily
+                            font.pixelSize: 11
+                            font.weight: Font.Medium
+                            font.features: ({ "tnum": 1 })
+                        }
                     }
                     Rectangle {
                         width: parent.width
