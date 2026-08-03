@@ -34,21 +34,13 @@ Item {
         return m + ":" + (s < 10 ? "0" : "") + s;
     }
 
-    RectangularShadow {
-        anchors.fill: glass
-        radius: glass.radius
-        visible: root.showGlass
-        color: Theme.shadowColor
-        blur: Theme.shadowBlur
-        spread: Theme.shadowSpread
-        offset: Qt.vector2d(Theme.shadowOffset.x, Theme.shadowOffset.y)
-    }
-
-    FrostedBackground {
+    // The same object the islands, the panels and the cards are made of.
+    Surface {
         id: glass
         anchors.fill: parent
         radius: root.radius
         visible: root.showGlass
+        elevation: "panel"
         screenX: root.screenX
         screenY: root.screenY
     }
@@ -96,22 +88,6 @@ Item {
                 GradientStop { position: 0.34; color: Qt.alpha(Theme.crust, 0.72) }
                 GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, 0.84) }
             }
-        }
-    }
-
-    // The specular the bar islands carry, so the card belongs to the same
-    // set of surfaces rather than being a differently-lit rectangle near them.
-    Rectangle {
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.margins: root.radius * 0.55
-        height: 1
-        gradient: Gradient {
-            orientation: Gradient.Horizontal
-            GradientStop { position: 0.0; color: "transparent" }
-            GradientStop { position: 0.5; color: Qt.alpha(Theme.text, Theme.fillActive) }
-            GradientStop { position: 1.0; color: "transparent" }
         }
     }
 
