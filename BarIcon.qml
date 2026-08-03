@@ -108,7 +108,7 @@ Item {
         // threshold registers as a change rather than a silent swap.
         SequentialAnimation {
             id: pop
-            NumberAnimation { target: icon; property: "scale"; to: 1.28; duration: 90; easing.type: Easing.OutQuad }
+            NumberAnimation { target: icon; property: "scale"; to: 1.28; duration: Theme.animFlick; easing.type: Easing.OutQuad }
             NumberAnimation {
                 target: icon; property: "scale"; to: 1.0; duration: 160
                 easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig

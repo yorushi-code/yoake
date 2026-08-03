@@ -129,7 +129,7 @@ Item {
     // them, and it is what stops four still pictures reading as a slideshow.
     y: root.strike !== "" ? 3 : 0
     Behavior on y {
-        NumberAnimation { duration: 90; easing.type: Easing.OutQuad }
+        NumberAnimation { duration: Theme.animFlick; easing.type: Easing.OutQuad }
     }
 
     scale: root.asleep ? 1 : 1 + root.beat * 0.03

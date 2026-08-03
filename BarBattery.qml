@@ -60,8 +60,8 @@ Item {
             SequentialAnimation on opacity {
                 running: root.low
                 loops: Animation.Infinite
-                NumberAnimation { to: 0.35; duration: 900; easing.type: Easing.InOutQuad }
-                NumberAnimation { to: 1.0; duration: 900; easing.type: Easing.InOutQuad }
+                NumberAnimation { to: 0.35; duration: Theme.animBreath; easing.type: Easing.InOutQuad }
+                NumberAnimation { to: 1.0; duration: Theme.animBreath; easing.type: Easing.InOutQuad }
             }
         }
 

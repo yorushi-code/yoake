@@ -57,8 +57,8 @@ Item {
                 running: Mihomo.busy
                 loops: Animation.Infinite
                 onStopped: vpnIcon.opacity = 1
-                NumberAnimation { to: 0.35; duration: 520; easing.type: Easing.InOutQuad }
-                NumberAnimation { to: 1.0; duration: 520; easing.type: Easing.InOutQuad }
+                NumberAnimation { to: 0.35; duration: Theme.animBusy; easing.type: Easing.InOutQuad }
+                NumberAnimation { to: 1.0; duration: Theme.animBusy; easing.type: Easing.InOutQuad }
             }
         }
 

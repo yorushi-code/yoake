@@ -179,6 +179,10 @@ QtObject {
     readonly property int barHeight: 34
     readonly property int barMargin: 8
 
+    // Faster than a response: the pop of an icon under a click, the shake of
+    // the bell. These are not the shell answering, they are the shell
+    // acknowledging, and at 120 an acknowledgement reads as a slow answer.
+    readonly property int animFlick: 90
     readonly property int animFast: 120
     readonly property int animNormal: 220
     readonly property int animSlow: 420
@@ -186,6 +190,15 @@ QtObject {
     // and an accelerating curve reaches true 0 before the window unmaps so
     // there's no visible snap at the end (see easeExit).
     readonly property int animExit: 170
+
+    // Ambient motion, which is not response motion. The three rungs above say
+    // how fast the shell answers; these two say how fast something breathes to
+    // show it is alive, and the difference between them carries meaning:
+    // `busy` is a thing working and worth waiting for, `breath` is a thing
+    // simply running. Three separate widgets had invented 520, 700 and 900 for
+    // the same infinite opacity pulse, and only one of them said why.
+    readonly property int animBusy: 520
+    readonly property int animBreath: 800
 
     // Material-3-style "emphasized" decelerate curve — everything that
     // settles into place (panel open, hover fill, list reveal) uses this

@@ -40,8 +40,8 @@ Item {
             SequentialAnimation on opacity {
                 running: Recorder.recording
                 loops: Animation.Infinite
-                NumberAnimation { to: 0.25; duration: 700; easing.type: Easing.InOutQuad }
-                NumberAnimation { to: 1.0; duration: 700; easing.type: Easing.InOutQuad }
+                NumberAnimation { to: 0.25; duration: Theme.animBreath; easing.type: Easing.InOutQuad }
+                NumberAnimation { to: 1.0; duration: Theme.animBreath; easing.type: Easing.InOutQuad }
             }
         }
         Text {
