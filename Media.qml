@@ -261,6 +261,23 @@ Singleton {
         }
     }
 
+    // Whether this notification is the player saying what the shell is already
+    // saying in the corner.
+    //
+    // Every track change arrived twice: the corner card at the bottom right and
+    // the player's own notification at the top right, two announcements of one
+    // event in two corners. The same title test that adopts a notification's
+    // cover identifies it, and the guards keep it narrow -- only while the card
+    // is actually up, and never on a title short enough to appear in unrelated
+    // text by accident. The notification is only kept out of the toast stack;
+    // it is still in the history like any other.
+    function announcesTrack(notification) {
+        if (!root.osdShown || root.title.length < 5) return false;
+        if (!notification) return false;
+        const text = ((notification.summary || "") + " " + (notification.body || "")).toLowerCase();
+        return text.indexOf(root.title.toLowerCase()) >= 0;
+    }
+
     // A new track invalidates whatever the last notification handed over.
     onTitleChanged: {
         root.notificationArt = "";
