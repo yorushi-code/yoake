@@ -41,7 +41,7 @@ Column {
             anchors.rightMargin: 11
             verticalAlignment: Text.AlignVCenter
             color: Theme.text
-            font.pixelSize: 12
+            font.pixelSize: Theme.fontBody
             selectByMouse: true
             selectionColor: Qt.alpha(Theme.accent, 0.4)
             clip: true
@@ -51,7 +51,7 @@ Column {
                 verticalAlignment: Text.AlignVCenter
                 text: field.placeholder
                 color: Theme.subtext0
-                font.pixelSize: 12
+                font.pixelSize: Theme.fontBody
                 visible: input.text === ""
             }
         }
@@ -89,7 +89,7 @@ Column {
             anchors.centerIn: parent
             text: root.busy ? "Загрузка…" : "Добавить"
             color: submitButton.ready && !root.busy ? Theme.crust : Theme.subtext0
-            font.pixelSize: 12
+            font.pixelSize: Theme.fontBody
             font.bold: true
         }
 

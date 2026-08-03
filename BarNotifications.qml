@@ -110,7 +110,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     text: Notifs.dnd ? Glyphs.bellOff : Glyphs.bell
                     font.family: Theme.fontIconFamily
-                    font.pixelSize: 17
+                    font.pixelSize: Theme.fontIcon
                     color: Notifs.dnd ? Theme.subtext0
                         : (Notifs.count > 0 ? Theme.accent : Theme.subtext1)
                 }

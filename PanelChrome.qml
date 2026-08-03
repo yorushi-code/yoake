@@ -50,7 +50,7 @@ Item {
             anchors.centerIn: parent
             text: "✕"
             color: Theme.text
-            font.pixelSize: 11
+            font.pixelSize: Theme.fontSmall
         }
 
         MouseArea {

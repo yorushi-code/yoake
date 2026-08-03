@@ -201,7 +201,7 @@ Item {
         text: "z"
         color: Qt.alpha(Theme.subtext0, 0.8)
         font.family: Theme.fontFamily
-        font.pixelSize: 13
+        font.pixelSize: Theme.fontLead
         opacity: root.asleep ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: Theme.animSlow } }

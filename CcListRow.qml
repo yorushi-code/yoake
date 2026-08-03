@@ -46,7 +46,7 @@ Rectangle {
             width: parent.width
             text: root.label
             color: Theme.text
-            font.pixelSize: 12
+            font.pixelSize: Theme.fontBody
             font.bold: root.connected
             elide: Text.ElideRight
         }
@@ -56,7 +56,7 @@ Rectangle {
             visible: root.detail !== ""
             text: root.detail
             color: Theme.subtext0
-            font.pixelSize: 10
+            font.pixelSize: Theme.fontLabel
             elide: Text.ElideRight
         }
     }

@@ -68,7 +68,7 @@ Item {
         Text {
             anchors.verticalCenter: parent.verticalCenter
             color: root.low ? Theme.red : (root.charging ? Theme.green : Theme.text)
-            font.pixelSize: 11
+            font.pixelSize: Theme.fontSmall
             text: Math.round(root.fraction * 100) + "%"
         }
     }
@@ -130,7 +130,7 @@ Item {
                     text: root.low ? Glyphs.batteryAlert
                         : Glyphs.batteryFor(root.fraction, root.charging)
                     font.family: Theme.fontIconFamily
-                    font.pixelSize: 17
+                    font.pixelSize: Theme.fontIcon
                     color: root.low ? Theme.red : (root.charging ? Theme.green : Theme.accent)
                 }
 

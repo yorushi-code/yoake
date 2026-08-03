@@ -148,7 +148,7 @@ PanelWindow {
                     text: Notifs.tracked.length === 0
                         ? "Нет уведомлений" : "Уведомления"
                     color: Theme.subtext1
-                    font.pixelSize: 12
+                    font.pixelSize: Theme.fontBody
                 }
 
                 Rectangle {
@@ -165,7 +165,7 @@ PanelWindow {
                         anchors.centerIn: parent
                         text: "Очистить"
                         color: Theme.text
-                        font.pixelSize: 10
+                        font.pixelSize: Theme.fontLabel
                     }
                     MouseArea {
                         id: clearMa
@@ -190,7 +190,7 @@ PanelWindow {
                         anchors.centerIn: parent
                         text: "Не беспокоить"
                         color: Notifs.dnd ? Theme.crust : Theme.text
-                        font.pixelSize: 10
+                        font.pixelSize: Theme.fontLabel
                     }
                     MouseArea {
                         id: dndMa
@@ -301,7 +301,7 @@ PanelWindow {
                                         width: parent.width
                                         text: modelData.summary
                                         color: Theme.text
-                                        font.pixelSize: 12
+                                        font.pixelSize: Theme.fontBody
                                         font.bold: true
                                         wrapMode: Text.WordWrap
                                     }
@@ -311,7 +311,7 @@ PanelWindow {
                                         text: modelData.body
                                         textFormat: Text.StyledText
                                         color: Theme.subtext0
-                                        font.pixelSize: 11
+                                        font.pixelSize: Theme.fontSmall
                                         wrapMode: Text.WordWrap
                                     }
                                     NotificationActions {

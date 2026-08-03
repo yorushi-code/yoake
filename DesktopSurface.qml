@@ -115,7 +115,7 @@ PanelWindow {
             anchors.centerIn: parent
             text: "Перетащите виджеты · Mod+Shift+E — готово"
             color: Theme.text
-            font.pixelSize: 11
+            font.pixelSize: Theme.fontSmall
         }
     }
 }

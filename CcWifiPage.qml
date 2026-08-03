@@ -41,7 +41,7 @@ Flickable {
             visible: !Networking.wifiEnabled
             text: "Wi-Fi выключен"
             color: Theme.subtext0
-            font.pixelSize: 12
+            font.pixelSize: Theme.fontBody
         }
 
         Text {
@@ -49,7 +49,7 @@ Flickable {
             visible: Networking.wifiEnabled && root.sorted.length === 0
             text: "Сети не найдены"
             color: Theme.subtext0
-            font.pixelSize: 12
+            font.pixelSize: Theme.fontBody
         }
 
         Repeater {

@@ -103,7 +103,7 @@ Flow {
                     anchors.verticalCenter: parent.verticalCenter
                     text: app.modelData.name
                     color: Theme.text
-                    font.pixelSize: 11
+                    font.pixelSize: Theme.fontSmall
                 }
             }
 

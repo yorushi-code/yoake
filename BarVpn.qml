@@ -74,7 +74,7 @@ Item {
                 return "вкл";
             }
             color: root.up ? Theme.text : Theme.subtext0
-            font.pixelSize: 11
+            font.pixelSize: Theme.fontSmall
         }
     }
 
@@ -173,7 +173,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     text: Glyphs.vpn
                     font.family: Theme.fontIconFamily
-                    font.pixelSize: 17
+                    font.pixelSize: Theme.fontIcon
                     color: root.stateColor
                 }
 

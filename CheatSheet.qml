@@ -549,7 +549,7 @@ Item {
                                                 anchors.centerIn: parent
                                                 text: bindRow.modelData.key
                                                 color: Theme.subtext1
-                                                font.pixelSize: 11
+                                                font.pixelSize: Theme.fontSmall
                                                 font.family: "monospace"
                                             }
                                         }
@@ -564,7 +564,7 @@ Item {
                                             wrapMode: Text.Wrap
                                             text: bindRow.modelData.label
                                             color: Theme.text
-                                            font.pixelSize: 12
+                                            font.pixelSize: Theme.fontBody
                                         }
                                     }
                                 }

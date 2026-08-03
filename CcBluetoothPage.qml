@@ -38,7 +38,7 @@ Flickable {
             visible: !root.on
             text: "Bluetooth выключен"
             color: Theme.subtext0
-            font.pixelSize: 12
+            font.pixelSize: Theme.fontBody
         }
 
         Text {
@@ -46,7 +46,7 @@ Flickable {
             visible: root.on && root.sorted.length === 0
             text: "Поиск устройств…"
             color: Theme.subtext0
-            font.pixelSize: 12
+            font.pixelSize: Theme.fontBody
         }
 
         Repeater {

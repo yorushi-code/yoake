@@ -86,14 +86,14 @@ PopupWindow {
             Text {
                 text: root.text
                 color: Theme.text
-                font.pixelSize: 11
+                font.pixelSize: Theme.fontSmall
                 font.bold: root.subtext !== ""
             }
             Text {
                 visible: root.subtext !== ""
                 text: root.subtext
                 color: Theme.subtext0
-                font.pixelSize: 10
+                font.pixelSize: Theme.fontLabel
                 width: Math.min(implicitWidth, 260)
                 elide: Text.ElideRight
             }

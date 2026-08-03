@@ -87,7 +87,7 @@ Item {
             text: root.value
             color: Theme.deskInk
             font.family: Theme.fontDisplayFamily
-            font.pixelSize: 15
+            font.pixelSize: Theme.fontTitle
             font.weight: Font.Medium
             font.features: ({ "tnum": 1 })
         }

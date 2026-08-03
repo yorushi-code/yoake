@@ -51,7 +51,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         text: root.name
         color: root.current ? Theme.text : Theme.subtext1
-        font.pixelSize: 12
+        font.pixelSize: Theme.fontBody
         font.bold: root.current
         elide: Text.ElideRight
     }
@@ -82,7 +82,7 @@ Rectangle {
                 return root.delay + " мс";
             }
             color: root.delayColor
-            font.pixelSize: 10
+            font.pixelSize: Theme.fontLabel
             font.bold: true
         }
     }

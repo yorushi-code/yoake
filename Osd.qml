@@ -190,7 +190,7 @@ Item {
                             text: root.caption
                             color: Theme.subtext1
                             font.family: Theme.fontFamily
-                            font.pixelSize: 11
+                            font.pixelSize: Theme.fontSmall
                         }
 
                         // The number as well as the bar. A bar says "about
@@ -202,7 +202,7 @@ Item {
                             text: Math.round(root.value * 100) + "%"
                             color: Theme.text
                             font.family: Theme.fontFamily
-                            font.pixelSize: 11
+                            font.pixelSize: Theme.fontSmall
                             font.weight: Font.Medium
                             font.features: ({ "tnum": 1 })
                         }

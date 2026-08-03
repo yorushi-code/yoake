@@ -173,7 +173,7 @@ Item {
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: tab.modelData.glyph
                                         font.family: Theme.fontIconFamily
-                                        font.pixelSize: 14
+                                        font.pixelSize: Theme.fontIconSmall
                                         color: tab.current ? Theme.accent
                                             : (tabArea.containsMouse ? Theme.text : Theme.subtext0)
                                         Behavior on color { ColorAnimation { duration: Theme.animFast } }

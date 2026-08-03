@@ -69,7 +69,7 @@ Row {
                 visible: !icon.visible
                 text: Glyphs.apps
                 font.family: "Symbols Nerd Font"
-                font.pixelSize: 14
+                font.pixelSize: Theme.fontIconSmall
                 color: trayMa.containsMouse ? Theme.accent : Theme.subtext1
                 scale: icon.scale
                 Behavior on color { ColorAnimation { duration: Theme.animFast } }

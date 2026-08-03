@@ -55,7 +55,7 @@ Rectangle {
         anchors.topMargin: 12
         text: root.glyph
         font.family: "Symbols Nerd Font"
-        font.pixelSize: 17
+        font.pixelSize: Theme.fontIcon
         color: root.contentColor
         Behavior on color { ColorAnimation { duration: Theme.animFast } }
     }
@@ -69,7 +69,7 @@ Rectangle {
         anchors.topMargin: 5
         text: root.label
         color: root.contentColor
-        font.pixelSize: 12
+        font.pixelSize: Theme.fontBody
         font.bold: true
         elide: Text.ElideRight
         Behavior on color { ColorAnimation { duration: Theme.animFast } }
@@ -85,7 +85,7 @@ Rectangle {
         visible: root.detail !== ""
         text: root.detail
         color: root.active && root.stateful ? Qt.alpha(Theme.crust, 0.75) : Theme.subtext0
-        font.pixelSize: 10
+        font.pixelSize: Theme.fontLabel
         elide: Text.ElideRight
     }
 

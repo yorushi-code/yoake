@@ -96,7 +96,7 @@ Item {
             anchors.bottomMargin: 4
             text: root.name
             color: Theme.subtext0
-            font.pixelSize: 9
+            font.pixelSize: Theme.fontMicro
             font.letterSpacing: 1
         }
     }

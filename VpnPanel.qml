@@ -235,7 +235,7 @@ Item {
                     anchors.leftMargin: 16
                     text: "yworld"
                     color: Theme.subtext0
-                    font.pixelSize: 10
+                    font.pixelSize: Theme.fontLabel
                     font.bold: true
                     font.letterSpacing: 1.5
                 }
@@ -316,7 +316,7 @@ Item {
                                         return Mihomo.currentNode !== "" ? Mihomo.currentNode : "Нода не выбрана";
                                     }
                                     color: Theme.subtext0
-                                    font.pixelSize: 11
+                                    font.pixelSize: Theme.fontSmall
                                     elide: Text.ElideRight
                                     width: 210
                                 }
@@ -351,7 +351,7 @@ Item {
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: Mihomo.formatSpeed(rate.modelData.value)
                                         color: Theme.subtext1
-                                        font.pixelSize: 11
+                                        font.pixelSize: Theme.fontSmall
                                     }
                                 }
                             }
@@ -395,7 +395,7 @@ Item {
                                         return e.ip + (e.country ? " · " + e.country : "");
                                     }
                                     color: Mihomo.leaking ? Theme.red : Theme.subtext1
-                                    font.pixelSize: 11
+                                    font.pixelSize: Theme.fontSmall
                                     font.underline: egressArea.containsMouse && !Mihomo.checking
                                 }
                             }
@@ -441,7 +441,7 @@ Item {
                                     width: parent.width
                                     text: Mihomo.conflict + " держит маршрут по умолчанию — трафик пойдёт мимо туннеля"
                                     color: Theme.yellow
-                                    font.pixelSize: 11
+                                    font.pixelSize: Theme.fontSmall
                                     wrapMode: Text.WordWrap
                                 }
 
@@ -461,7 +461,7 @@ Item {
                                         anchors.centerIn: parent
                                         text: "Остановить " + Mihomo.conflict
                                         color: Theme.yellow
-                                        font.pixelSize: 11
+                                        font.pixelSize: Theme.fontSmall
                                         font.bold: true
                                     }
 
@@ -482,7 +482,7 @@ Item {
                             visible: Mihomo.lastError !== ""
                             text: Mihomo.lastError
                             color: Theme.red
-                            font.pixelSize: 11
+                            font.pixelSize: Theme.fontSmall
                             wrapMode: Text.WordWrap
                             maximumLineCount: 3
                             elide: Text.ElideRight
@@ -524,7 +524,7 @@ Item {
                                         color: !action.modelData.on || Mihomo.busy
                                             ? Theme.subtext0
                                             : (action.modelData.accent ? Theme.crust : Theme.text)
-                                        font.pixelSize: 12
+                                        font.pixelSize: Theme.fontBody
                                         font.bold: true
                                     }
 
@@ -577,7 +577,7 @@ Item {
                                         anchors.centerIn: parent
                                         text: tab.modelData.name
                                         color: tab.selected ? Theme.accent : Theme.subtext0
-                                        font.pixelSize: 11
+                                        font.pixelSize: Theme.fontSmall
                                         font.bold: tab.selected
                                     }
 
@@ -607,7 +607,7 @@ Item {
                                 text: "Живых " + root.aliveCount + " из " + root.serverNodes.length
                                 color: root.aliveCount === 0 ? Theme.red
                                     : (root.aliveCount * 3 < root.serverNodes.length ? Theme.yellow : Theme.subtext0)
-                                font.pixelSize: 10
+                                font.pixelSize: Theme.fontLabel
                                 font.bold: true
                                 font.letterSpacing: 1
                             }
@@ -617,7 +617,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: root.hideDead ? "показать все" : "скрыть недоступные"
                                 color: hideArea.containsMouse ? Theme.accent : Theme.subtext0
-                                font.pixelSize: 10
+                                font.pixelSize: Theme.fontLabel
                                 font.underline: hideArea.containsMouse
                                 Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
@@ -653,7 +653,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: "Подписки"
                                 color: Theme.subtext0
-                                font.pixelSize: 10
+                                font.pixelSize: Theme.fontLabel
                                 font.bold: true
                                 font.letterSpacing: 1
                             }
@@ -663,7 +663,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: root.adding ? "отмена" : "добавить"
                                 color: addArea.containsMouse ? Theme.accent : Theme.subtext0
-                                font.pixelSize: 10
+                                font.pixelSize: Theme.fontLabel
                                 font.underline: addArea.containsMouse
                                 Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
@@ -777,7 +777,7 @@ Item {
                         visible: Mihomo.running && Mihomo.groups.length === 0
                         text: Mihomo.controllerUp ? "Групп нет" : "Контроллер не отвечает"
                         color: Theme.subtext0
-                        font.pixelSize: 12
+                        font.pixelSize: Theme.fontBody
                     }
                 }
             }

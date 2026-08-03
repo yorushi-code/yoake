@@ -105,7 +105,7 @@ Item {
         Text {
             anchors.verticalCenter: parent.verticalCenter
             color: root.signalPercent >= 0 ? Theme.text : Theme.subtext0
-            font.pixelSize: 11
+            font.pixelSize: Theme.fontSmall
             text: !Networking.wifiEnabled ? "выкл"
                 : (root.signalPercent >= 0 ? root.signalPercent + "%" : "нет сети")
         }
@@ -191,7 +191,7 @@ Item {
                     text: Networking.wifiEnabled ? Glyphs.wifiFor(root.signalPercent)
                                                  : Glyphs.wifiOff
                     font.family: Theme.fontIconFamily
-                    font.pixelSize: 17
+                    font.pixelSize: Theme.fontIcon
                     color: (root.signalPercent >= 0 && Networking.wifiEnabled)
                         ? Theme.accent : Theme.subtext0
                 }

@@ -67,7 +67,7 @@ Column {
         color: Theme.wallpaperIsLight
             ? Qt.darker(Theme.subtext1, 2.2) : Theme.subtext1
         font.family: Theme.fontFamily
-        font.pixelSize: 13
+        font.pixelSize: Theme.fontLead
         font.letterSpacing: 3
         opacity: 0.85
     }

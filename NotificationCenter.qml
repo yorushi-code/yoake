@@ -300,7 +300,7 @@ Item {
                                     width: parent.width
                                     text: toastDelegate.summary
                                     color: Notifs.accentFor(toastDelegate.urgency)
-                                    font.pixelSize: 13
+                                    font.pixelSize: Theme.fontLead
                                     font.bold: true
                                     wrapMode: Text.WordWrap
                                 }
@@ -310,7 +310,7 @@ Item {
                                     text: toastDelegate.body
                                     textFormat: Text.StyledText
                                     color: Theme.text
-                                    font.pixelSize: 12
+                                    font.pixelSize: Theme.fontBody
                                     wrapMode: Text.WordWrap
                                     maximumLineCount: 3
                                     elide: Text.ElideRight

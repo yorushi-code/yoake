@@ -37,7 +37,7 @@ MenuSurface {
 
     TextMetrics {
         id: metrics
-        font.pixelSize: 12
+        font.pixelSize: Theme.fontBody
     }
 
     // 76 covers the icon column, paddings and the submenu chevron — the same

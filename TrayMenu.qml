@@ -45,7 +45,7 @@ MenuSurface {
 
     TextMetrics {
         id: metrics
-        font.pixelSize: 12
+        font.pixelSize: Theme.fontBody
     }
 
     function measure(entries) {

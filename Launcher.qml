@@ -290,7 +290,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         text: Glyphs.magnify
                         font.family: Theme.fontIconFamily
-                        font.pixelSize: 17
+                        font.pixelSize: Theme.fontIcon
                         color: root.query === "" ? Theme.subtext0 : Theme.accent
                         Behavior on color { ColorAnimation { duration: Theme.animFast } }
                     }

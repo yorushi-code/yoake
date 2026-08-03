@@ -38,7 +38,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 text: root.label
                 color: Theme.subtext1
-                font.pixelSize: 11
+                font.pixelSize: Theme.fontSmall
             }
         }
 

@@ -63,7 +63,7 @@ Item {
         Text {
             anchors.verticalCenter: parent.verticalCenter
             color: Theme.text
-            font.pixelSize: 11
+            font.pixelSize: Theme.fontSmall
             visible: !root.muted
             text: root.sink && root.sink.audio ? Math.round(root.volume * 100) + "%" : "--"
         }
@@ -152,7 +152,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     text: Glyphs.volumeFor(root.volume, root.muted)
                     font.family: Theme.fontIconFamily
-                    font.pixelSize: 17
+                    font.pixelSize: Theme.fontIcon
                     color: root.muted ? Theme.subtext0 : Theme.accent
                 }
 

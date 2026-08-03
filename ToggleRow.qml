@@ -45,7 +45,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             text: root.glyph
             font.family: "Symbols Nerd Font"
-            font.pixelSize: 14
+            font.pixelSize: Theme.fontIconSmall
             color: root.contentColor
         }
         Column {
@@ -54,13 +54,13 @@ Rectangle {
             Text {
                 text: root.label
                 color: root.contentColor
-                font.pixelSize: 12
+                font.pixelSize: Theme.fontBody
             }
             Text {
                 visible: root.detail !== ""
                 text: root.detail
                 color: root.active ? Qt.alpha(Theme.crust, 0.7) : Theme.subtext0
-                font.pixelSize: 10
+                font.pixelSize: Theme.fontLabel
                 width: Math.min(implicitWidth, 150)
                 elide: Text.ElideRight
             }

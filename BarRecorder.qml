@@ -48,7 +48,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             text: Recorder.elapsedText
             color: Theme.text
-            font.pixelSize: 11
+            font.pixelSize: Theme.fontSmall
             font.bold: true
         }
         // Mic glyph only while the mic is armed, so the recording audio source

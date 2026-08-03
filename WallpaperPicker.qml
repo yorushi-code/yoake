@@ -405,7 +405,7 @@ PanelWindow {
                     ? win.entries.length + " из " + Wallpapers.entries.length
                     : Wallpapers.entries.length + " шт."
                 color: Theme.subtext0
-                font.pixelSize: 12
+                font.pixelSize: Theme.fontBody
             }
 
             // Search reads as a field but is not one: keystrokes are routed by
@@ -443,7 +443,7 @@ PanelWindow {
                         ? Wallpapers.search
                         : (win.searching ? "" : "Начните печатать или нажмите /")
                     color: Wallpapers.search !== "" ? Theme.text : Theme.subtext0
-                    font.pixelSize: 12
+                    font.pixelSize: Theme.fontBody
                     elide: Text.ElideRight
                 }
 
@@ -492,7 +492,7 @@ PanelWindow {
                 anchors.centerIn: parent
                 text: Glyphs.close
                 font.family: "Symbols Nerd Font"
-                font.pixelSize: 14
+                font.pixelSize: Theme.fontIconSmall
                 color: Theme.text
             }
 
@@ -582,7 +582,7 @@ PanelWindow {
                                 anchors.centerIn: parent
                                 text: win.previewEntry && win.previewEntry.video ? "ВИДЕО" : "ФОТО"
                                 color: Theme.accent
-                                font.pixelSize: 9
+                                font.pixelSize: Theme.fontMicro
                                 font.bold: true
                                 font.letterSpacing: 1
                             }
@@ -592,14 +592,14 @@ PanelWindow {
                             anchors.verticalCenter: parent.verticalCenter
                             text: win.previewMeta ? win.previewMeta.size : "…"
                             color: Theme.subtext1
-                            font.pixelSize: 11
+                            font.pixelSize: Theme.fontSmall
                         }
 
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
                             text: win.previewMeta ? Wallpapers.formatBytes(win.previewMeta.bytes) : ""
                             color: Theme.subtext0
-                            font.pixelSize: 11
+                            font.pixelSize: Theme.fontSmall
                         }
                     }
 
@@ -644,7 +644,7 @@ PanelWindow {
                             anchors.centerIn: parent
                             text: applyButton.isApplied ? "Уже установлены" : "Установить"
                             color: applyButton.isApplied ? Theme.subtext0 : Theme.crust
-                            font.pixelSize: 13
+                            font.pixelSize: Theme.fontLead
                             font.bold: true
                         }
 
@@ -698,7 +698,7 @@ PanelWindow {
                             anchors.centerIn: parent
                             text: hint.modelData.keys
                             color: Theme.text
-                            font.pixelSize: 10
+                            font.pixelSize: Theme.fontLabel
                             font.bold: true
                         }
                     }
@@ -707,7 +707,7 @@ PanelWindow {
                         anchors.verticalCenter: parent.verticalCenter
                         text: hint.modelData.what
                         color: Theme.subtext0
-                        font.pixelSize: 11
+                        font.pixelSize: Theme.fontSmall
                     }
                 }
             }
@@ -815,7 +815,7 @@ PanelWindow {
                 ? "В ~/Pictures/Wallpapers пусто"
                 : "Ничего не найдено"
             color: Theme.subtext0
-            font.pixelSize: 15
+            font.pixelSize: Theme.fontTitle
         }
     }
 }

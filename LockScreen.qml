@@ -341,7 +341,7 @@ WlSessionLock {
                 text: "z"
                 color: Qt.alpha(Theme.text, 0.65)
                 font.family: Theme.fontFamily
-                font.pixelSize: 13
+                font.pixelSize: Theme.fontLead
 
                 SequentialAnimation on y {
                     running: parent.visible
@@ -444,7 +444,7 @@ WlSessionLock {
                         anchors.verticalCenter: parent.verticalCenter
                         text: chip.modelData.glyph
                         font.family: Theme.fontIconFamily
-                        font.pixelSize: 14
+                        font.pixelSize: Theme.fontIconSmall
                         color: Theme.subtext1
                     }
                     Text {

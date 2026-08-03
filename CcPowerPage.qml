@@ -29,7 +29,7 @@ Flickable {
             Text {
                 text: "Профиль"
                 color: Theme.subtext1
-                font.pixelSize: 11
+                font.pixelSize: Theme.fontSmall
             }
 
             Repeater {
@@ -56,7 +56,7 @@ Flickable {
             Text {
                 text: "Батарея"
                 color: Theme.subtext1
-                font.pixelSize: 11
+                font.pixelSize: Theme.fontSmall
             }
 
             Rectangle {
@@ -95,7 +95,7 @@ Flickable {
                         : pct + " · осталось " + left;
                 }
                 color: Theme.subtext0
-                font.pixelSize: 11
+                font.pixelSize: Theme.fontSmall
                 wrapMode: Text.WordWrap
             }
         }
@@ -146,14 +146,14 @@ Flickable {
                             anchors.verticalCenter: parent.verticalCenter
                             text: action.modelData.glyph
                             font.family: "Symbols Nerd Font"
-                            font.pixelSize: 14
+                            font.pixelSize: Theme.fontIconSmall
                             color: Theme.text
                         }
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
                             text: action.modelData.label
                             color: Theme.text
-                            font.pixelSize: 11
+                            font.pixelSize: Theme.fontSmall
                         }
                     }
 

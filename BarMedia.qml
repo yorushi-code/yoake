@@ -93,7 +93,7 @@ Item {
                 return Media.artist ? `${Media.artist} — ${Media.title}` : Media.title;
             }
             color: mediaArea.containsMouse ? Theme.text : Theme.subtext1
-            font.pixelSize: 11
+            font.pixelSize: Theme.fontSmall
             Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
             // A track change was the one thing in the bar that swapped with no

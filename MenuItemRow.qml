@@ -130,7 +130,7 @@ Item {
             elide: Text.ElideRight
             color: !root.enabled ? Qt.alpha(Theme.text, 0.35)
                 : (root.destructive ? Theme.red : Theme.text)
-            font.pixelSize: 12
+            font.pixelSize: Theme.fontBody
         }
     }
 

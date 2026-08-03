@@ -63,7 +63,7 @@ Rectangle {
             Text {
                 text: root.modelData.name
                 color: Theme.text
-                font.pixelSize: 12
+                font.pixelSize: Theme.fontBody
                 font.bold: true
                 elide: Text.ElideRight
             }
@@ -82,7 +82,7 @@ Rectangle {
             width: parent.width
             text: root.modelData.host
             color: Theme.subtext0
-            font.pixelSize: 10
+            font.pixelSize: Theme.fontLabel
             elide: Text.ElideRight
         }
 
@@ -94,7 +94,7 @@ Rectangle {
             // it is the reason nothing connects, not a detail.
             color: root.daysLeft < 0 || (root.quota > 0 && root.used >= root.quota)
                 ? Theme.red : Theme.subtext1
-            font.pixelSize: 10
+            font.pixelSize: Theme.fontLabel
             elide: Text.ElideRight
         }
     }

@@ -122,7 +122,7 @@ Item {
                 anchors.margins: 9
                 text: root.modelData.label
                 color: Theme.text
-                font.pixelSize: 11
+                font.pixelSize: Theme.fontSmall
                 font.bold: true
                 elide: Text.ElideRight
             }

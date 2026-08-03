@@ -243,7 +243,7 @@ PanelWindow {
                             // Weekend columns are dimmer so the working week
                             // reads as the default.
                             color: index >= 5 ? Theme.subtext0 : Theme.subtext1
-                            font.pixelSize: 10
+                            font.pixelSize: Theme.fontLabel
                             font.bold: true
                         }
                     }
@@ -298,7 +298,7 @@ PanelWindow {
                             Text {
                                 anchors.centerIn: parent
                                 text: modelData.day
-                                font.pixelSize: 12
+                                font.pixelSize: Theme.fontBody
                                 font.bold: dayCell.isToday || dayCell.isSelected
                                 color: {
                                     if (dayCell.isToday) return Theme.crust;
@@ -351,7 +351,7 @@ PanelWindow {
                             return label + ` · ${-days} дн. назад`;
                         }
                         color: win.selectedDay === 0 ? Theme.subtext0 : Theme.subtext1
-                        font.pixelSize: 11
+                        font.pixelSize: Theme.fontSmall
                         Behavior on color { ColorAnimation { duration: Theme.animFast } }
                     }
                 }

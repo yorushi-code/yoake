@@ -87,6 +87,14 @@ QtObject {
     readonly property int fontBody: 12
     readonly property int fontLead: 13
     readonly property int fontTitle: 15
+    // Glyphs sit a rung or two above the text they stand beside: a 12px icon
+    // next to 12px type reads as smaller than it is, because a letter fills
+    // its box and a symbol does not. Found by counting -- every icon in the
+    // tree had already been hand-set to 14 or 17 for exactly this reason, and
+    // naming it is the difference between a convention and a coincidence.
+    readonly property int fontIconSmall: 14
+    readonly property int fontIcon: 17
+
     readonly property int fontDisplay: 22
     readonly property int fontHero: 40
 

@@ -72,7 +72,7 @@ Column {
                     return "Оттенок обоев " + Math.round(root.hue) + "°";
                 }
                 color: Theme.text
-                font.pixelSize: 12
+                font.pixelSize: Theme.fontBody
                 font.bold: true
                 elide: Text.ElideRight
             }
@@ -85,7 +85,7 @@ Column {
                     ? "Мало цвета — акцент приглушён"
                     : "Насыщенность " + Math.round(root.confidence * 100) + "%"
                 color: Theme.subtext0
-                font.pixelSize: 11
+                font.pixelSize: Theme.fontSmall
                 elide: Text.ElideRight
             }
         }
@@ -178,7 +178,7 @@ Column {
     Text {
         text: "Вернуть цвет из обоев"
         color: resetArea.containsMouse ? Theme.accent : Theme.subtext0
-        font.pixelSize: 11
+        font.pixelSize: Theme.fontSmall
         font.underline: resetArea.containsMouse
         visible: root.live && GeneratedColors.pinned
         Behavior on color { ColorAnimation { duration: Theme.animFast } }

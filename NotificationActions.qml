@@ -48,7 +48,7 @@ Flow {
                 anchors.centerIn: parent
                 text: modelData.text
                 color: actionMa.containsMouse ? Theme.crust : Theme.text
-                font.pixelSize: 11
+                font.pixelSize: Theme.fontSmall
             }
 
             MouseArea {
