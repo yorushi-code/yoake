@@ -201,6 +201,36 @@ def check(path):
     return found
 
 
+def missing_imports():
+    """QtQuick types used in a file that does not import QtQuick.
+
+    This one does not fail quietly like the rest: the type is simply not a
+    type, so the whole configuration refuses to load and the desktop is gone
+    until it is fixed. Adding a Connections to a singleton that only imported
+    Quickshell is how it was found.
+    """
+    quick = ("Connections", "Timer", "Item", "Rectangle", "Text", "MouseArea",
+             "Row", "Column", "Repeater", "Component", "Behavior", "Image",
+             "Loader", "Flickable", "Canvas", "PropertyAnimation",
+             "NumberAnimation", "ColorAnimation", "SequentialAnimation",
+             "ParallelAnimation", "PauseAnimation")
+    out = []
+    for path in sorted(list(ROOT.glob("*.qml")) + list((ROOT / "greeter").glob("*.qml"))):
+        text = path.read_text()
+        if re.search(r"^\s*import\s+QtQuick\b", text, re.M):
+            continue
+        # Through blocks(), not a line-anchored match: `property Connections
+        # x: Connections {` puts the type in the middle of the line, and a
+        # rule that only looks at the start of one finds nothing at all --
+        # which is exactly how this rule failed its own first test.
+        for kind, _, _, line, _ in blocks(text):
+            if kind in quick:
+                out.append((path.name, line,
+                            f"{kind} needs `import QtQuick`; without it the whole config fails to load"))
+                break
+    return out
+
+
 def unregistered():
     """Component files this shell's qmldir does not list.
 
@@ -253,6 +283,7 @@ def main():
     for path in sorted(list(ROOT.glob("*.qml")) + list((ROOT / "greeter").glob("*.qml"))):
         findings.extend(check(path))
     findings.extend(unregistered())
+    findings.extend(missing_imports())
     findings.extend(raw_icon_lookups())
 
     for name, line, what in findings:

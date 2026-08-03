@@ -30,6 +30,20 @@ for pid in $(others); do
     kill "$pid" 2>/dev/null
 done
 
+# A notification daemon that is not this shell has to go first.
+#
+# mako was replaced by yshell in July, but its D-Bus activation file is still
+# installed: the moment the shell is not holding org.freedesktop.Notifications
+# and anything posts a notification, systemd starts mako and it keeps the name.
+# The shell then comes up with no notifications at all -- no toasts of its own,
+# no history, "do not disturb" applying to nothing -- and the only sign is one
+# line in the log saying registration failed. It happened during a restart and
+# took a while to notice, which is exactly how long it would take anyone else.
+#
+# Left activatable on purpose rather than masked, so it still stands in if this
+# shell dies; it just does not get to keep the name once the shell is back.
+pkill -x mako 2>/dev/null
+
 # Let them release their Wayland surfaces before taking the layer back.
 for _ in $(seq 1 30); do
     [ -z "$(others)" ] && break

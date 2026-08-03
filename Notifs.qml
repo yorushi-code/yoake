@@ -1,4 +1,5 @@
 pragma Singleton
+import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Notifications
@@ -28,7 +29,28 @@ Singleton {
     readonly property var newestFirst: root.tracked.slice().reverse()
     // Suppresses toasts while still recording everything in the history, so
     // nothing is lost — this is "don't interrupt me", not "discard".
+    //
+    // Kept across restarts like every other switch in this shell. A shell
+    // restart is invisible from the outside, and silence that ends without
+    // anyone asking it to is worse than no silence at all -- the whole point
+    // is not being interrupted. A DND left on by accident is visible: the bar
+    // carries a struck-through bell for as long as it lasts.
+    //
+    // Read once and written back explicitly rather than bound: a binding to
+    // Prefs plus a write-back handler is a loop, since storing the value
+    // changes the object the binding reads from.
     property bool dnd: false
+
+    Component.onCompleted: if (Prefs.loaded) root.dnd = Prefs.get("notifs.dnd", false)
+
+    property Connections _prefsReady: Connections {
+        target: Prefs
+        function onLoadedChanged() {
+            if (Prefs.loaded) root.dnd = Prefs.get("notifs.dnd", false);
+        }
+    }
+
+    onDndChanged: if (Prefs.loaded) Prefs.set("notifs.dnd", root.dnd)
 
     signal arrived()
     // NotificationCenter owns the list, so clearing is a request rather than
