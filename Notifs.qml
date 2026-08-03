@@ -20,6 +20,12 @@ Singleton {
     // in a different file and cannot see that file's ids — reaching for them
     // is exactly how it ended up rendering nothing at all.
     property var tracked: []
+
+    // Newest first, because that is the only order a list of things that just
+    // happened can be read in. The bar was already reversing the index by hand
+    // while the panel iterated the raw list, so the two surfaces disagreed
+    // about which notification was the latest one.
+    readonly property var newestFirst: root.tracked.slice().reverse()
     // Suppresses toasts while still recording everything in the history, so
     // nothing is lost — this is "don't interrupt me", not "discard".
     property bool dnd: false

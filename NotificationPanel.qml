@@ -225,7 +225,7 @@ PanelWindow {
                     spacing: 6
 
                     Repeater {
-                        model: Notifs.tracked
+                        model: Notifs.newestFirst
                         delegate: Rectangle {
                             id: histDelegate
                             required property var modelData

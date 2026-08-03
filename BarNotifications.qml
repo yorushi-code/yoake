@@ -134,13 +134,12 @@ Item {
                 visible: Notifs.tracked.length > 0
 
                 Repeater {
-                    model: Math.min(3, Notifs.tracked.length)
+                    model: Math.min(3, Notifs.newestFirst.length)
 
                     delegate: Row {
                         id: item
                         required property int index
-                        readonly property var entry:
-                            Notifs.tracked[Notifs.tracked.length - 1 - item.index]
+                        readonly property var entry: Notifs.newestFirst[item.index]
                         spacing: 8
 
                         Rectangle {
