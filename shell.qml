@@ -30,12 +30,16 @@ ShellRoot {
         Bar {}
     }
 
-    // Singletons whose only job is to answer over IPC have to be touched from
-    // somewhere, or they are never constructed and their handler never
-    // registers -- `qs ipc call idle state` answered "Target not found" until
-    // this line existed, because the only reference was inside a dashboard page
-    // that is built lazily.
-    property var _alive: [Idle]
+    // Singletons that have to exist whether or not anything is looking at them.
+    //
+    // A singleton is constructed on first reference, and a reference that only
+    // appears inside a lazily-built dashboard page is no reference at all until
+    // the page is opened. `qs ipc call idle state` answered "Target not found"
+    // until Idle was listed here; NightLight was worse, because it looks like
+    // it works -- the tile shows the right state the moment you open the page
+    // that constructs it, and the warm screen you asked for last night simply
+    // never came back after a restart.
+    property var _alive: [Idle, NightLight]
 
     // The lock has to exist before it is needed: creating the surface at the
     // moment of locking would show the desktop for the frame it takes to build.
