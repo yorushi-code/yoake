@@ -10,9 +10,11 @@ import Quickshell.Widgets
 // per card is what turns a dashboard into a pile of boxes.
 //
 // The root is an Item with the clipped rectangle inside it, rather than being
-// the rectangle. A default alias onto a ClippingRectangle's own `data` makes
-// Qt report the type as overriding a member of its base on every load, and the
-// content still has to be clipped, so the shape moved inwards instead.
+// the rectangle. That was done to silence "Member data ... overrides a member
+// of the base object", and it does not: a config containing nothing but a bare
+// ClippingRectangle logs the same line, so it comes from Quickshell's own type
+// declaration and no arrangement here can remove it. The shape stays as it is
+// because it reads no worse, not because it fixed anything.
 Item {
     id: root
 
