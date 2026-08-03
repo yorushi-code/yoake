@@ -130,7 +130,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             width: 6
                             height: 6
-                            radius: 3
+                            radius: Theme.radiusPip
                             color: Theme.red
                             opacity: Media.playing ? 1 : 0.4
 
@@ -212,9 +212,9 @@ Item {
 
                             width: chipRow.implicitWidth + 18
                             height: 26
-                            radius: 13
+                            radius: Theme.radiusChip
                             color: chip.current ? Qt.alpha(MediaTint.accent, 0.22)
-                                : (chipHit.containsMouse ? Qt.alpha(Theme.text, 0.10)
+                                : (chipHit.containsMouse ? Qt.alpha(Theme.text, Theme.fillMuted)
                                                          : Qt.alpha(Theme.text, 0.05))
                             border.width: 1
                             border.color: chip.held ? Qt.alpha(MediaTint.accent, 0.8) : "transparent"

@@ -23,7 +23,7 @@ Item {
         width: parent.width
         height: ma.containsMouse || ma.pressed ? 6 : 3
         radius: height / 2
-        color: Qt.alpha(Theme.text, 0.15)
+        color: Qt.alpha(Theme.text, Theme.strokeFirm)
         Behavior on height {
             NumberAnimation { duration: Theme.animFast; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeEmphasized }
         }

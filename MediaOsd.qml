@@ -172,7 +172,7 @@ PanelWindow {
             anchors.margins: 5
             width: 22
             height: 22
-            radius: 11
+            radius: Theme.radiusChip
             color: closeArea.containsMouse ? Theme.red : Theme.surface1
             opacity: hover.hovered ? 1 : 0
             visible: opacity > 0

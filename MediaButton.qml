@@ -18,7 +18,7 @@ Rectangle {
     opacity: enabled ? 1 : 0.35
 
     color: {
-        if (!enabled) return Qt.alpha(Theme.text, 0.06);
+        if (!enabled) return Qt.alpha(Theme.text, Theme.fillSubtle);
         if (accented) return ma.containsMouse ? Qt.lighter(MediaTint.accent, 1.2) : MediaTint.accent;
         return ma.containsMouse ? Qt.alpha(Theme.text, 0.16) : Qt.alpha(Theme.text, 0.08);
     }

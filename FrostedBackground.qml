@@ -72,6 +72,6 @@ ClippingRectangle {
         anchors.right: parent.right
         anchors.margins: root.radius * 0.6
         height: 1
-        color: Qt.alpha(Theme.text, 0.10)
+        color: Qt.alpha(Theme.text, Theme.fillMuted)
     }
 }

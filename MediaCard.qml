@@ -110,7 +110,7 @@ Item {
         gradient: Gradient {
             orientation: Gradient.Horizontal
             GradientStop { position: 0.0; color: "transparent" }
-            GradientStop { position: 0.5; color: Qt.alpha(Theme.text, 0.20) }
+            GradientStop { position: 0.5; color: Qt.alpha(Theme.text, Theme.fillActive) }
             GradientStop { position: 1.0; color: "transparent" }
         }
     }
@@ -187,7 +187,7 @@ Item {
             radius: cover.radius
             color: "transparent"
             border.width: 1
-            border.color: Qt.alpha(Theme.text, 0.16)
+            border.color: Qt.alpha(Theme.text, Theme.strokeFirm)
         }
 
         // ── Transport ──

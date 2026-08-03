@@ -149,7 +149,7 @@ Item {
                             radius: 1.5
                             color: item.index === 0
                                 ? Qt.alpha(Theme.accent, 0.9)
-                                : Qt.alpha(Theme.text, 0.18)
+                                : Qt.alpha(Theme.text, Theme.strokeFirm)
                         }
 
                         Column {
@@ -181,7 +181,7 @@ Item {
             Rectangle {
                 width: 238
                 height: 1
-                color: Qt.alpha(Theme.text, 0.12)
+                color: Qt.alpha(Theme.text, Theme.fillHover)
             }
 
             // Sibling of the row, not a child of it: a MouseArea inside a Row

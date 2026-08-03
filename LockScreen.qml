@@ -147,7 +147,7 @@ WlSessionLock {
                 width: 72
                 height: 72
                 radius: 36
-                color: Qt.alpha(Theme.text, 0.08)
+                color: Qt.alpha(Theme.text, Theme.fillSubtle)
                 border.width: 2
                 border.color: Qt.alpha(Theme.accent, LockState.busy ? 0.9 : 0.35)
                 Behavior on border.color { ColorAnimation { duration: Theme.animNormal } }
@@ -223,7 +223,7 @@ WlSessionLock {
                     border.width: 1.5
                     border.color: LockState.failed
                         ? Theme.red
-                        : (input.activeFocus ? Qt.alpha(Theme.accent, 0.85) : Qt.alpha(Theme.text, 0.18))
+                        : (input.activeFocus ? Qt.alpha(Theme.accent, 0.85) : Qt.alpha(Theme.text, Theme.strokeFirm))
                     Behavior on border.color { ColorAnimation { duration: Theme.animNormal } }
 
                     // Dots, drawn rather than echoed: a TextInput in password
@@ -239,7 +239,7 @@ WlSessionLock {
                             delegate: Rectangle {
                                 width: 8
                                 height: 8
-                                radius: 4
+                                radius: Theme.radiusPip
                                 color: Theme.text
                                 opacity: 0.9
                                 scale: 1
@@ -361,10 +361,10 @@ WlSessionLock {
             anchors.margins: 32
             width: 300
             height: 72
-            radius: 18
+            radius: Theme.radiusCard
             color: Qt.alpha(Theme.crust, 0.5)
             border.width: 1
-            border.color: Qt.alpha(Theme.text, 0.10)
+            border.color: Qt.alpha(Theme.text, Theme.fillMuted)
             opacity: surface.entered ? 1 : 0
             Behavior on opacity {
                 SequentialAnimation {

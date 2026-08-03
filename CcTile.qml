@@ -29,7 +29,7 @@ Rectangle {
     color: root.active && root.stateful
         ? Theme.accent
         : (body.containsMouse || chevronArea.containsMouse
-            ? Qt.alpha(Theme.text, 0.13) : Qt.alpha(Theme.text, 0.06))
+            ? Qt.alpha(Theme.text, 0.13) : Qt.alpha(Theme.text, Theme.fillSubtle))
     Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
     scale: body.pressed ? 0.97 : 1
@@ -98,7 +98,7 @@ Rectangle {
         anchors.margins: 8
         width: 24
         height: 24
-        radius: 12
+        radius: Theme.radiusChip
         visible: root.expandable
         color: chevronArea.containsMouse
             ? Qt.alpha(root.contentColor, 0.18) : "transparent"

@@ -46,7 +46,7 @@ Item {
             width: parent.width
             height: 3
             radius: 1.5
-            color: Qt.alpha(Theme.text, 0.13)
+            color: Qt.alpha(Theme.text, Theme.fillHover)
 
             Rectangle {
                 width: parent.width * Math.max(0, Math.min(1, root.level))

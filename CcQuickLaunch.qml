@@ -59,8 +59,8 @@ Flow {
 
             width: appLabel.implicitWidth + 36
             height: 34
-            radius: 17
-            color: appArea.containsMouse ? Qt.alpha(Theme.text, 0.16) : Qt.alpha(Theme.text, 0.06)
+            radius: Theme.pill(height)
+            color: appArea.containsMouse ? Qt.alpha(Theme.text, Theme.strokeFirm) : Qt.alpha(Theme.text, Theme.fillSubtle)
             Behavior on color { ColorAnimation { duration: Theme.animFast } }
             scale: appArea.pressed ? 0.94 : 1.0
             Behavior on scale {

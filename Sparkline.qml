@@ -30,7 +30,7 @@ Item {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         height: 1
-        color: Qt.alpha(Theme.text, 0.10)
+        color: Qt.alpha(Theme.text, Theme.fillMuted)
     }
 
     Canvas {

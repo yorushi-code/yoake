@@ -257,6 +257,6 @@ Item {
         radius: cover.radius
         color: "transparent"
         border.width: 1
-        border.color: Qt.alpha(Theme.text, 0.16)
+        border.color: Qt.alpha(Theme.text, Theme.strokeFirm)
     }
 }

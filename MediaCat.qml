@@ -160,7 +160,7 @@ Item {
         // in every frame.
         readonly property color lit: root.strike !== ""
             ? MediaTint.accent
-            : Qt.alpha(Theme.text, 0.20)
+            : Qt.alpha(Theme.text, Theme.fillActive)
         gradient: Gradient {
             orientation: Gradient.Horizontal
             GradientStop { position: 0.0; color: "transparent" }
@@ -182,7 +182,7 @@ Item {
         anchors.bottomMargin: art.height * 0.295 - height / 2 + 1.5
         width: art.width * (0.30 + root.beat * 0.28)
         height: 8
-        radius: 4
+        radius: Theme.radiusPip
         z: -2
         color: MediaTint.accent
         blur: 26

@@ -193,7 +193,7 @@ Item {
                     width: parent.width
                     height: levelArea.containsMouse || levelArea.pressed ? 7 : 4
                     radius: height / 2
-                    color: Qt.alpha(Theme.text, 0.14)
+                    color: Qt.alpha(Theme.text, Theme.fillHover)
                     Behavior on height { NumberAnimation { duration: Theme.animFast } }
 
                     Rectangle {
@@ -223,7 +223,7 @@ Item {
             Rectangle {
                 width: 218
                 height: 1
-                color: Qt.alpha(Theme.text, 0.12)
+                color: Qt.alpha(Theme.text, Theme.fillHover)
             }
 
             // The hit area is a sibling of the row rather than a child of it:

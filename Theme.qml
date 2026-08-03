@@ -121,7 +121,51 @@ QtObject {
     // Popup panels round much harder than niri's own windows — at window
     // radius they read as plain dialogs rather than part of the shell.
     readonly property int radiusLarge: 24
+
+    // ── The shape ladder ──
+    //
+    // Four steps, and everything on screen picks one. Counted before this
+    // existed: sixteen different radii across the tree, chosen one surface at
+    // a time. Nothing was individually wrong and the whole never looked like
+    // one object, because a family of shapes is what makes surfaces read as
+    // relatives rather than as neighbours.
+    //
+    // The steps grow with the thing they round: a 20px pip and a 400px sheet
+    // cannot share a radius and still look equally rounded.
+    readonly property int radiusPip: 4       // marks, bars, ticks
+    readonly property int radiusChip: 10     // chips, rows, small controls
+    readonly property int radiusCard: 16     // cards inside a panel
+    readonly property int radiusPanel: 24    // panels and sheets themselves
+
+    // A pill for anything whose height is its identity -- a chip, a toggle,
+    // a badge. Written as a function so the call site cannot drift from the
+    // height it is rounding.
+    function pill(height) {
+        return height / 2;
+    }
+
+    // ── The surface ladder ──
+    //
+    // Every raised thing is the same ink at a different strength, so the
+    // difference between resting, hovered and pressed is one step of one
+    // scale rather than a number picked per widget. There were twelve
+    // distinct alphas before this; twelve is not a scale, it is a habit.
+    readonly property real fillSubtle: 0.06   // a card at rest
+    readonly property real fillMuted: 0.10    // tracks, wells, hairlines
+    readonly property real fillHover: 0.14    // the pointer is on it
+    readonly property real fillActive: 0.20   // pressed, or selected
+    readonly property real strokeSoft: 0.10   // an edge that only separates
+    readonly property real strokeFirm: 0.18   // an edge that also lifts
+
+    // ── The spacing ladder ──
+    //
+    // Multiples of four, because the eye reads rhythm and not arithmetic: a
+    // 13 next to a 14 is noise that nobody can name but everybody feels.
+    readonly property int gapTight: 4
     readonly property int spacing: 8
+    readonly property int gapWide: 12
+    readonly property int gapCard: 16
+    readonly property int gapSection: 24
     // Islands need more presence than a hairline strip — at 28 the frosted
     // glass and its glow had no room to read as an actual surface.
     readonly property int barHeight: 34

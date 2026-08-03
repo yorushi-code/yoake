@@ -156,8 +156,8 @@ PanelWindow {
                     visible: Notifs.tracked.length > 0
                     width: clearText.implicitWidth + 16
                     height: 20
-                    radius: 10
-                    color: clearMa.containsMouse ? Qt.alpha(Theme.red, 0.3) : Qt.alpha(Theme.text, 0.08)
+                    radius: Theme.radiusChip
+                    color: clearMa.containsMouse ? Qt.alpha(Theme.red, 0.3) : Qt.alpha(Theme.text, Theme.fillSubtle)
                     Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
                     Text {
@@ -180,7 +180,7 @@ PanelWindow {
                     anchors.verticalCenter: parent.verticalCenter
                     width: dndText.implicitWidth + 16
                     height: 20
-                    radius: 10
+                    radius: Theme.radiusChip
                     color: Notifs.dnd ? Theme.accent
                         : (dndMa.containsMouse ? Qt.alpha(Theme.text, 0.16) : Qt.alpha(Theme.text, 0.08))
                     Behavior on color { ColorAnimation { duration: Theme.animFast } }
@@ -232,7 +232,7 @@ PanelWindow {
                             required property int index
                             width: historyColumn.width
                             height: histContent.height + 18
-                            radius: 16
+                            radius: Theme.radiusCard
                             color: Theme.surface0
 
                             // Same pop-in language as the toasts, capped

@@ -76,7 +76,7 @@ Flickable {
         Rectangle {
             width: parent.width
             height: 1
-            color: Qt.alpha(Theme.text, 0.10)
+            color: Qt.alpha(Theme.text, Theme.fillMuted)
         }
 
         PalettePreview {

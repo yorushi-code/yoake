@@ -110,7 +110,7 @@ Rectangle {
         anchors.bottomMargin: 4
         height: 2
         radius: 1
-        color: Qt.alpha(Theme.text, 0.10)
+        color: Qt.alpha(Theme.text, Theme.fillMuted)
         visible: root.quota > 0
 
         Rectangle {
@@ -143,7 +143,7 @@ Rectangle {
 
                 width: 26
                 height: 26
-                radius: 13
+                radius: Theme.radiusChip
                 color: buttonArea.containsMouse
                     ? (button.modelData.act === "remove" ? Theme.red : Qt.alpha(Theme.text, 0.16))
                     : "transparent"

@@ -370,7 +370,7 @@ Item {
                         anchors.leftMargin: 16
                         anchors.rightMargin: 16
                         height: 1
-                        color: Qt.alpha(Theme.text, 0.10)
+                        color: Qt.alpha(Theme.text, Theme.fillMuted)
                     }
                 }
 

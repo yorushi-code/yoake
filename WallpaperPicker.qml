@@ -415,10 +415,10 @@ PanelWindow {
                 anchors.verticalCenter: parent.verticalCenter
                 width: 300
                 height: 34
-                radius: 17
+                radius: Theme.pill(height)
                 color: Qt.alpha(Theme.crust, win.searching ? 0.9 : 0.6)
                 border.width: 1
-                border.color: win.searching ? Theme.accent : Qt.alpha(Theme.text, 0.14)
+                border.color: win.searching ? Theme.accent : Qt.alpha(Theme.text, Theme.fillHover)
                 Behavior on color { ColorAnimation { duration: Theme.animFast } }
                 Behavior on border.color { ColorAnimation { duration: Theme.animFast } }
 
@@ -478,7 +478,7 @@ PanelWindow {
             anchors.margins: 40
             width: 34
             height: 34
-            radius: 17
+            radius: Theme.pill(height)
             color: closeArea.containsMouse ? Theme.red : Qt.alpha(Theme.crust, 0.7)
             opacity: win.open ? 1 : 0
             Behavior on color { ColorAnimation { duration: Theme.animFast } }
@@ -547,7 +547,7 @@ PanelWindow {
                 // different one that mismatch is visible.
                 color: Qt.alpha(Theme.crust, 0.88)
                 border.width: 1
-                border.color: Qt.alpha(Theme.text, 0.12)
+                border.color: Qt.alpha(Theme.text, Theme.strokeSoft)
 
                 Column {
                     id: sideColumn
@@ -574,7 +574,7 @@ PanelWindow {
                         Rectangle {
                             width: kindText.width + 18
                             height: 22
-                            radius: 11
+                            radius: Theme.radiusChip
                             color: Qt.alpha(Theme.accent, 0.18)
 
                             Text {
@@ -606,7 +606,7 @@ PanelWindow {
                     Rectangle {
                         width: parent.width
                         height: 1
-                        color: Qt.alpha(Theme.text, 0.10)
+                        color: Qt.alpha(Theme.text, Theme.fillMuted)
                     }
 
                     // The live palette when the focused wallpaper is the one on
@@ -691,7 +691,7 @@ PanelWindow {
                         width: hintKey.width + 14
                         height: 21
                         radius: 6
-                        color: Qt.alpha(Theme.text, 0.12)
+                        color: Qt.alpha(Theme.text, Theme.fillHover)
 
                         Text {
                             id: hintKey

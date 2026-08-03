@@ -21,7 +21,7 @@ Rectangle {
     signal expandRequested()
 
     height: 44
-    radius: 22
+    radius: Theme.radiusPanel
     color: root.active ? Theme.accent : Theme.surface0
     Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
@@ -93,8 +93,8 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             width: 34
             height: 18
-            radius: 9
-            color: root.active ? Qt.alpha(Theme.crust, 0.45) : Qt.alpha(Theme.text, 0.18)
+            radius: Theme.radiusChip
+            color: root.active ? Qt.alpha(Theme.crust, 0.45) : Qt.alpha(Theme.text, Theme.strokeFirm)
             Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
             Rectangle {

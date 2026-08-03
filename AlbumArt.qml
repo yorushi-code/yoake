@@ -14,7 +14,7 @@ ClippingRectangle {
     width: size
     height: size
     radius: Math.round(size * 0.27)
-    color: Qt.alpha(Theme.text, 0.08)
+    color: Qt.alpha(Theme.text, Theme.fillSubtle)
 
     Image {
         id: art

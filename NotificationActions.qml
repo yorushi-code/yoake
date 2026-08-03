@@ -35,8 +35,8 @@ Flow {
 
             width: actionLabel.implicitWidth + 20
             height: 24
-            radius: 12
-            color: actionMa.containsMouse ? Theme.accent : Qt.alpha(Theme.text, 0.10)
+            radius: Theme.radiusChip
+            color: actionMa.containsMouse ? Theme.accent : Qt.alpha(Theme.text, Theme.fillMuted)
             Behavior on color { ColorAnimation { duration: Theme.animFast } }
             scale: actionMa.pressed ? 0.94 : 1.0
             Behavior on scale {

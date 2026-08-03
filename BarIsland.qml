@@ -37,15 +37,6 @@ Item {
 
     readonly property real bass: (root.pulseWithAudio && Cava.active) ? Cava.bass : 0
 
-    RectangularShadow {
-        anchors.fill: glass
-        radius: glass.radius
-        color: Theme.shadowColor
-        blur: Theme.shadowBlur
-        spread: Theme.shadowSpread
-        offset: Qt.vector2d(Theme.shadowOffset.x, Theme.shadowOffset.y)
-    }
-
     // Always-on accent glow marks the clock as the bar's focal point, and
     // pulses with the music: the three lowest cava bands (bass) drive its
     // intensity and spread, so the island visibly breathes to the beat.
@@ -68,46 +59,18 @@ Item {
         // Cava.bass is already damped on its falling edge.
     }
 
-    FrostedBackground {
+    // The same object the panels and the cards are made of. It also puts the
+    // bar on its own rung of the elevation ladder, which Theme has described
+    // since the ladder was written and nothing had ever used: the bar was
+    // casting a panel-sized shadow, so it sat as far off the desktop as the
+    // sheets that open above it.
+    Surface {
         id: glass
         anchors.fill: parent
-        radius: height / 2
+        radius: Theme.pill(height)
+        elevation: "bar"
         screenX: Theme.barMargin + root.x
         screenY: Theme.barMargin
-    }
-
-    // A specular band along the top curve, the way light catches the lip of a
-    // real piece of glass. It is what stops the island reading as a flat
-    // rounded rectangle laid on the wallpaper — and it is clipped by a
-    // ClippingRectangle rather than a plain `clip: true`, which is a
-    // rectangular scissor and would cut the band square across the rounded ends.
-    ClippingRectangle {
-        anchors.fill: parent
-        radius: height / 2
-        color: "transparent"
-
-        Rectangle {
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.right: parent.right
-            height: parent.height * 0.55
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: Qt.alpha("white", 0.13) }
-                GradientStop { position: 1.0; color: "transparent" }
-            }
-        }
-    }
-
-    // Drawn outside the backing so the stroke is not cut in half. Without it
-    // the islands dissolve into a bright wallpaper: the frosted glass is a tint
-    // over whatever is behind it, and over a pale frame of a video there is
-    // nothing left to separate shell from desktop.
-    Rectangle {
-        anchors.fill: parent
-        radius: height / 2
-        color: "transparent"
-        border.width: 1
-        border.color: Qt.alpha(Theme.text, 0.14)
     }
 
     // Behind the content, so widgets inside keep their own right-click

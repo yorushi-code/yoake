@@ -162,7 +162,7 @@ Item {
             Rectangle {
                 width: 210
                 height: 1
-                color: Qt.alpha(Theme.text, 0.12)
+                color: Qt.alpha(Theme.text, Theme.fillHover)
                 visible: Power.available
             }
 
@@ -182,7 +182,7 @@ Item {
                         height: 30
                         radius: Theme.radius + 3
                         color: chip.current ? Qt.alpha(Theme.accent, 0.9)
-                            : (chipArea.containsMouse ? Qt.alpha(Theme.text, 0.14)
+                            : (chipArea.containsMouse ? Qt.alpha(Theme.text, Theme.fillHover)
                                                       : Qt.alpha(Theme.text, 0.07))
                         Behavior on color { ColorAnimation { duration: Theme.animFast } }
 

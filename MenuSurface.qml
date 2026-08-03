@@ -111,7 +111,7 @@ PopupWindow {
         anchors.fill: glass
         radius: glass.radius
         color: "transparent"
-        border.color: Qt.alpha(Theme.text, 0.12)
+        border.color: Qt.alpha(Theme.text, Theme.strokeSoft)
         border.width: 1
         opacity: glass.opacity
     }

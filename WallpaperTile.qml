@@ -135,7 +135,7 @@ Item {
             anchors.margins: 7
             width: 22
             height: 22
-            radius: 11
+            radius: Theme.radiusChip
             visible: root.modelData.video
             color: Qt.alpha(Theme.crust, 0.8)
 
@@ -170,7 +170,7 @@ Item {
         anchors.margins: 7
         width: 22
         height: 22
-        radius: 11
+        radius: Theme.radiusChip
         visible: root.applied
         color: Theme.accent
 

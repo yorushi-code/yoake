@@ -102,7 +102,7 @@ PanelWindow {
         anchors.bottomMargin: 40
         width: hint.width + 28
         height: 32
-        radius: 16
+        radius: Theme.radiusCard
         color: Qt.alpha(Theme.crust, 0.9)
         border.width: 1
         border.color: Qt.alpha(Theme.accent, 0.5)

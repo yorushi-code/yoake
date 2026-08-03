@@ -209,25 +209,30 @@ def missing_imports():
     until it is fixed. Adding a Connections to a singleton that only imported
     Quickshell is how it was found.
     """
-    quick = ("Connections", "Timer", "Item", "Rectangle", "Text", "MouseArea",
-             "Row", "Column", "Repeater", "Component", "Behavior", "Image",
-             "Loader", "Flickable", "Canvas", "PropertyAnimation",
-             "NumberAnimation", "ColorAnimation", "SequentialAnimation",
-             "ParallelAnimation", "PauseAnimation")
+    needs = {
+        "QtQuick": ("Connections", "Timer", "Item", "Rectangle", "Text", "MouseArea",
+                    "Row", "Column", "Repeater", "Component", "Behavior", "Image",
+                    "Loader", "Flickable", "Canvas", "PropertyAnimation",
+                    "NumberAnimation", "ColorAnimation", "SequentialAnimation",
+                    "ParallelAnimation", "PauseAnimation"),
+        "QtQuick.Effects": ("RectangularShadow", "MultiEffect"),
+    }
     out = []
     for path in sorted(list(ROOT.glob("*.qml")) + list((ROOT / "greeter").glob("*.qml"))):
         text = path.read_text()
-        if re.search(r"^\s*import\s+QtQuick\b", text, re.M):
-            continue
+        for module, quick in needs.items():
+            if re.search(rf"^\s*import\s+{re.escape(module)}\s*$", text, re.M):
+                continue
         # Through blocks(), not a line-anchored match: `property Connections
         # x: Connections {` puts the type in the middle of the line, and a
         # rule that only looks at the start of one finds nothing at all --
         # which is exactly how this rule failed its own first test.
-        for kind, _, _, line, _ in blocks(text):
-            if kind in quick:
-                out.append((path.name, line,
-                            f"{kind} needs `import QtQuick`; without it the whole config fails to load"))
-                break
+            for kind, _, _, line, _ in blocks(text):
+                if kind in quick:
+                    out.append((path.name, line,
+                                f"{kind} needs `import {module}`; "
+                                "without it the whole config fails to load"))
+                    break
     return out
 
 

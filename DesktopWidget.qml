@@ -82,9 +82,9 @@ Item {
         radius: Theme.radius + 6
         color: drag.active
             ? Qt.alpha(Theme.accent, 0.22)
-            : (hover.hovered ? Qt.alpha(Theme.text, 0.12) : Qt.alpha(Theme.text, 0.06))
+            : (hover.hovered ? Qt.alpha(Theme.text, 0.12) : Qt.alpha(Theme.text, Theme.fillSubtle))
         border.width: 1
-        border.color: drag.active ? Theme.accent : Qt.alpha(Theme.text, 0.18)
+        border.color: drag.active ? Theme.accent : Qt.alpha(Theme.text, Theme.strokeFirm)
         opacity: root.editing ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }

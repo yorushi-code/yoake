@@ -260,8 +260,8 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: 34
                                 height: 34
-                                radius: 17
-                                color: Mihomo.running ? Qt.alpha(Theme.accent, 0.18) : Qt.alpha(Theme.text, 0.08)
+                                radius: Theme.pill(height)
+                                color: Mihomo.running ? Qt.alpha(Theme.accent, 0.18) : Qt.alpha(Theme.text, Theme.fillSubtle)
                                 Behavior on color { ColorAnimation { duration: Theme.animNormal } }
 
                                 Text {
@@ -451,7 +451,7 @@ Item {
                                 Rectangle {
                                     width: rivalText.width + 20
                                     height: 24
-                                    radius: 12
+                                    radius: Theme.radiusChip
                                     visible: Mihomo.conflictCanStop
                                     color: Qt.alpha(Theme.yellow, rivalArea.containsMouse ? 0.4 : 0.22)
                                     Behavior on color { ColorAnimation { duration: Theme.animFast } }
@@ -511,7 +511,7 @@ Item {
                                     height: 32
                                     radius: Theme.radius
                                     color: !action.modelData.on || Mihomo.busy
-                                        ? Qt.alpha(Theme.text, 0.06)
+                                        ? Qt.alpha(Theme.text, Theme.fillSubtle)
                                         : action.modelData.accent
                                             ? (actionArea.containsMouse ? Theme.accent : Qt.alpha(Theme.accent, 0.85))
                                             : Qt.alpha(Theme.text, actionArea.containsMouse ? 0.16 : 0.09)
@@ -569,7 +569,7 @@ Item {
                                     height: 25
                                     radius: 12.5
                                     color: tab.selected ? Qt.alpha(Theme.accent, 0.2)
-                                        : (tabArea.containsMouse ? Qt.alpha(Theme.text, 0.10) : "transparent")
+                                        : (tabArea.containsMouse ? Qt.alpha(Theme.text, Theme.fillMuted) : "transparent")
                                     Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
                                     Text {

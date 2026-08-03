@@ -30,7 +30,7 @@ Column {
             anchors.verticalCenter: parent.verticalCenter
             width: parent.width
             height: 10
-            radius: 5
+            radius: Theme.radiusPip
             color: Theme.surface0
             clip: true
 
@@ -38,7 +38,7 @@ Column {
                 id: fill
                 width: trackBg.width * Math.max(0, Math.min(1, root.value))
                 height: parent.height
-                radius: 5
+                radius: Theme.radiusPip
                 color: Theme.accent
                 Behavior on width {
                     NumberAnimation { duration: Theme.animFast; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeEmphasized }

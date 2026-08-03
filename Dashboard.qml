@@ -254,7 +254,7 @@ Item {
                         anchors.leftMargin: 18
                         anchors.rightMargin: 18
                         height: 1
-                        color: Qt.alpha(Theme.text, 0.09)
+                        color: Qt.alpha(Theme.text, Theme.fillMuted)
                     }
                 }
 

@@ -541,7 +541,7 @@ Item {
                                             id: keyChip
                                             width: keyText.width + 12
                                             height: 20
-                                            radius: 10
+                                            radius: Theme.radiusChip
                                             color: Theme.surface0
                                             anchors.verticalCenter: parent.verticalCenter
                                             Text {

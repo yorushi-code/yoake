@@ -65,14 +65,21 @@ Item {
     // simply fill this and never think about it.
     default property alias content: body.data
 
-    ClippingRectangle {
+    // The same object every raised thing in the shell is made of, at the one
+    // elevation that does not cast a shadow: the sheet these sit on already
+    // carries the depth, and repeating it per card is what turns a dashboard
+    // into a pile of boxes. What the cards do gain is the lit top edge, so
+    // they belong to the same family as the islands and the panels.
+    Surface {
         id: card
         anchors.fill: parent
-        radius: 18
-        color: root.interactive && area.containsMouse
-            ? Qt.alpha(Theme.text, 0.10)
-            : Qt.alpha(Theme.text, 0.055)
-        Behavior on color { ColorAnimation { duration: Theme.animFast } }
+        radius: Theme.radiusCard
+        elevation: "flat"
+        glass: false
+        fill: root.interactive && area.containsMouse
+            ? Qt.alpha(Theme.text, Theme.fillHover)
+            : Qt.alpha(Theme.text, Theme.fillSubtle)
+        Behavior on fill { ColorAnimation { duration: Theme.animFast } }
 
         Text {
             id: eyebrow

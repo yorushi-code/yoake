@@ -62,8 +62,8 @@ Flickable {
             Rectangle {
                 width: parent.width
                 height: 10
-                radius: 5
-                color: Qt.alpha(Theme.text, 0.10)
+                radius: Theme.radiusPip
+                color: Qt.alpha(Theme.text, Theme.fillMuted)
 
                 Rectangle {
                     width: parent.width * (root.hasBattery ? root.battery.percentage : 0)
@@ -103,7 +103,7 @@ Flickable {
         Rectangle {
             width: parent.width
             height: 1
-            color: Qt.alpha(Theme.text, 0.10)
+            color: Qt.alpha(Theme.text, Theme.fillMuted)
         }
 
         Grid {
@@ -131,7 +131,7 @@ Flickable {
                     // stands apart.
                     color: actionArea.containsMouse
                         ? (action.modelData.danger ? Theme.red : Qt.alpha(Theme.text, 0.16))
-                        : Qt.alpha(Theme.text, 0.06)
+                        : Qt.alpha(Theme.text, Theme.fillSubtle)
                     Behavior on color { ColorAnimation { duration: Theme.animFast } }
                     scale: actionArea.pressed ? 0.95 : 1
                     Behavior on scale {

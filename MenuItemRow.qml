@@ -31,7 +31,7 @@ Item {
         anchors.right: parent.right
         anchors.margins: 8
         height: 1
-        color: Qt.alpha(Theme.text, 0.12)
+        color: Qt.alpha(Theme.text, Theme.fillHover)
     }
 
     Rectangle {

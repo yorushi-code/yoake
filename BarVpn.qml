@@ -272,7 +272,7 @@ Item {
             Rectangle {
                 width: 222
                 height: 1
-                color: Qt.alpha(Theme.text, 0.12)
+                color: Qt.alpha(Theme.text, Theme.fillHover)
             }
 
             // Sibling of the row, not a child of it: a MouseArea inside a Row

@@ -176,7 +176,7 @@ PanelWindow {
                 width: 1
                 height: 12
                 anchors.verticalCenter: parent.verticalCenter
-                color: Qt.alpha(Theme.text, 0.15)
+                color: Qt.alpha(Theme.text, Theme.strokeFirm)
             }
 
             BarVpn { barWindow: bar }

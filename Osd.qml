@@ -217,12 +217,12 @@ Item {
                     Rectangle {
                         width: parent.width
                         height: 6
-                        radius: 3
+                        radius: Theme.radiusPip
                         color: Theme.surface0
                         Rectangle {
                             width: parent.width * Math.max(0, Math.min(1, root.value))
                             height: parent.height
-                            radius: 3
+                            radius: Theme.radiusPip
                             color: Theme.accent
                             Behavior on width {
                                 NumberAnimation { duration: Theme.animFast; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeEmphasized }

@@ -11,28 +11,19 @@ import QtQuick.Effects
 Item {
     id: root
     default property alias content: inner.children
-    property alias borderColor: border.border.color
     property real screenX: 0
     property real screenY: 0
     signal closeRequested()
 
-    RectangularShadow {
-        anchors.fill: glass
-        radius: glass.radius
-        color: Theme.shadowColor
-        blur: Theme.shadowBlur
-        spread: Theme.shadowSpread
-        offset: Qt.vector2d(Theme.shadowOffset.x, Theme.shadowOffset.y)
-    }
-
-    FrostedBackground {
+    // The same object the islands and the cards are made of, so a panel is a
+    // bigger relative of them rather than a different idea of a surface.
+    Surface {
         id: glass
         anchors.fill: parent
-        radius: Theme.radiusLarge
+        radius: Theme.radiusPanel
+        elevation: "panel"
         screenX: root.screenX
         screenY: root.screenY
-        // Denser than the bar's glass: these panels carry small body text that
-        // has to stay readable over arbitrary wallpaper detail.
         tintOpacity: 0.78
 
         Item {
@@ -41,24 +32,14 @@ Item {
         }
     }
 
-    // Drawn outside the clipping backing so the stroke isn't cut in half.
-    Rectangle {
-        id: border
-        anchors.fill: parent
-        radius: Theme.radiusLarge
-        color: "transparent"
-        border.color: Qt.alpha(Theme.text, 0.12)
-        border.width: 1
-    }
-
     Rectangle {
         width: 24
         height: 24
-        radius: 12
+        radius: Theme.radiusChip
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.margins: 10
-        color: closeMa.containsMouse ? Theme.red : Qt.alpha(Theme.text, 0.10)
+        color: closeMa.containsMouse ? Theme.red : Qt.alpha(Theme.text, Theme.fillMuted)
         Behavior on color { ColorAnimation { duration: Theme.animFast } }
         scale: closeMa.containsMouse ? 1.1 : 1.0
         Behavior on scale {

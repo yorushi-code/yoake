@@ -19,7 +19,7 @@ Rectangle {
     height: 52
     radius: Theme.radius
     color: root.selected ? Qt.alpha(Theme.accent, 0.16)
-        : (ma.containsMouse ? Qt.alpha(Theme.text, 0.06) : "transparent")
+        : (ma.containsMouse ? Qt.alpha(Theme.text, Theme.fillSubtle) : "transparent")
     Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
     // A rail on the selected row, so the selection reads at a glance in a list

@@ -74,8 +74,8 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 width: 26
                 height: 26
-                radius: 13
-                color: backArea.containsMouse ? Qt.alpha(Theme.text, 0.16) : Qt.alpha(Theme.text, 0.07)
+                radius: Theme.radiusChip
+                color: backArea.containsMouse ? Qt.alpha(Theme.text, Theme.strokeFirm) : Qt.alpha(Theme.text, 0.07)
                 Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
                 Text {

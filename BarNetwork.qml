@@ -234,7 +234,7 @@ Item {
                 height: 4
                 radius: 2
                 visible: Networking.wifiEnabled && root.signalPercent >= 0
-                color: Qt.alpha(Theme.text, 0.13)
+                color: Qt.alpha(Theme.text, Theme.fillHover)
 
                 Rectangle {
                     width: parent.width * Math.max(0, Math.min(1, root.signalPercent / 100))
@@ -255,7 +255,7 @@ Item {
             Rectangle {
                 width: 218
                 height: 1
-                color: Qt.alpha(Theme.text, 0.12)
+                color: Qt.alpha(Theme.text, Theme.fillHover)
             }
 
             Text {

@@ -91,7 +91,7 @@ Item {
                     width: parent.width
                     height: Math.max(2, bar.level * root.height)
                     radius: width / 2
-                    color: bar.played ? MediaTint.accent : Qt.alpha(Theme.text, 0.20)
+                    color: bar.played ? MediaTint.accent : Qt.alpha(Theme.text, Theme.fillActive)
                     opacity: bar.atHead ? 1 : (bar.played ? 0.92 : 1)
 
                     Behavior on height {

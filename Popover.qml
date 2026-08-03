@@ -157,7 +157,7 @@ Item {
                 radius: Theme.radiusLarge
                 color: "transparent"
                 border.width: 1
-                border.color: Qt.alpha(Theme.text, 0.13)
+                border.color: Qt.alpha(Theme.text, Theme.strokeSoft)
             }
 
             // The light along the top lip, the same one the bar islands have,

@@ -87,7 +87,7 @@ Column {
                     anchors.centerIn: parent
                     width: 26
                     height: 26
-                    radius: 13
+                    radius: Theme.radiusChip
                     visible: day.isToday
                     color: Theme.accent
                 }

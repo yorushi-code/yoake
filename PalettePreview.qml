@@ -53,7 +53,7 @@ Column {
                 radius: parent.radius
                 color: "transparent"
                 border.width: 1
-                border.color: Qt.alpha(Theme.text, 0.18)
+                border.color: Qt.alpha(Theme.text, Theme.strokeFirm)
             }
         }
 
@@ -97,7 +97,7 @@ Column {
         width: parent.width
         height: 3
         radius: 1.5
-        color: Qt.alpha(Theme.text, 0.10)
+        color: Qt.alpha(Theme.text, Theme.fillMuted)
 
         Rectangle {
             width: parent.width * Math.max(0.02, root.confidence)
