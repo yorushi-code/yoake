@@ -41,13 +41,36 @@ Rectangle {
         }
     }
 
+    // Resolved to a file here rather than handed to IconImage as a name with a
+    // fallback. An icon theme can hold a name at 16, 22 and 24 and nothing
+    // larger; asked for it at 30 by name the engine gives up -- and so does the
+    // generic fallback, which AdwaitaLegacy also stops at 24 -- and IconImage
+    // then draws Qt's magenta checkerboard while still reporting itself Ready,
+    // so no status check can catch it. Given the file, it simply scales the
+    // 24px art up.
+    readonly property string iconSource: {
+        const name = root.entry.icon || "";
+        const found = name !== "" ? Quickshell.iconPath(name, true) : "";
+        return found !== "" ? found : Quickshell.iconPath("application-x-executable", true);
+    }
+
+    Text {
+        anchors.horizontalCenter: icon.horizontalCenter
+        anchors.verticalCenter: icon.verticalCenter
+        visible: root.iconSource === ""
+        text: Glyphs.apps
+        font.family: Theme.fontIconFamily
+        font.pixelSize: 20
+        color: Theme.subtext0
+    }
+
     IconImage {
         id: icon
         anchors.left: parent.left
         anchors.leftMargin: 16
         anchors.verticalCenter: parent.verticalCenter
         implicitSize: 30
-        source: Quickshell.iconPath(root.entry.icon, "application-x-executable")
+        source: root.iconSource
         scale: root.selected ? 1.06 : 1
         Behavior on scale {
             NumberAnimation {

@@ -124,8 +124,26 @@ Item {
                                 IconImage {
                                     anchors.centerIn: parent
                                     implicitSize: 28
-                                    source: Quickshell.iconPath(entry.modelData.app_id,
-                                                                "application-x-executable")
+                                    // Through the desktop entry, not straight
+                                    // from the app_id. They are usually the
+                                    // same string, which is why this worked at
+                                    // all -- but an app_id is a window class
+                                    // and an icon name is an icon name, and
+                                    // Firefox is org.mozilla.firefox in the one
+                                    // and firefox in the other. Every window it
+                                    // owned drew nothing and logged a failure.
+                                    source: {
+                                        const id = entry.modelData.app_id || "";
+                                        const app = id ? DesktopEntries.byId(id) : null;
+                                        const name = app && app.icon ? app.icon : id;
+                                        // Resolved to a file, never handed over
+                                        // as a name with a fallback: see
+                                        // LauncherRow for what that costs.
+                                        const found = name ? Quickshell.iconPath(name, true) : "";
+                                        return found !== ""
+                                            ? found
+                                            : Quickshell.iconPath("application-x-executable", true);
+                                    }
                                     opacity: entry.modelData.is_focused ? 1 : 0.72
                                 }
 
