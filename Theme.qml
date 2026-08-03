@@ -54,6 +54,14 @@ QtObject {
     readonly property color deskAccent: wallpaperIsLight
         ? Qt.hsla(GeneratedColors.accent.hslHue, 0.55, 0.30, 1)
         : GeneratedColors.accent
+    // The same alpha does not read the same in the two modes. Measured off the
+    // gauge ring: 22% ink gives 1.90:1 against a dark wallpaper and only 1.57:1
+    // against a white one, because the ground it sits on is what changed. 30%
+    // brings the light mode back to the contrast the dark mode already had --
+    // and it is 30 rather than 27 because the dark ink is #212121, not black,
+    // so a given alpha lands lighter than the arithmetic on black suggests.
+    readonly property real deskInkFaint: wallpaperIsLight ? 0.30 : 0.22
+
     // Only under light ink. Darkening the ground under dark ink only muddies it.
     readonly property real deskScrim: wallpaperIsLight ? 0 : 0.45
 

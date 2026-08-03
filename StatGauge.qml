@@ -40,7 +40,7 @@ Item {
             preferredRendererType: Shape.CurveRenderer
 
             ShapePath {
-                strokeColor: Qt.alpha(Theme.deskInk, 0.22)
+                strokeColor: Qt.alpha(Theme.deskInk, Theme.deskInkFaint)
                 strokeWidth: root.thickness
                 fillColor: "transparent"
                 capStyle: ShapePath.RoundCap
