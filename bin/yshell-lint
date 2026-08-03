@@ -83,6 +83,20 @@ def direct_children(body):
     return out
 
 
+def _block_body(text, offset):
+    """The body of the block that starts at `offset`, braces balanced."""
+    start = text.index("{", offset)
+    depth = 0
+    for i in range(start, len(text)):
+        if text[i] == "{":
+            depth += 1
+        elif text[i] == "}":
+            depth -= 1
+            if depth == 0:
+                return text[start + 1:i]
+    return text[start + 1:]
+
+
 def check(path):
     text = path.read_text()
     found = []
@@ -95,13 +109,26 @@ def check(path):
     # A MouseArea that is a direct child of a Row or Column is laid out as
     # another cell of it: it takes space, sits beside the content instead of
     # over it, and the thing it was meant to make clickable is not.
+    #
+    # Only the two shapes that are always wrong, so the rule stays worth
+    # listening to. A MouseArea given a size of its own is a legitimate cell,
+    # and a TapHandler is not an Item at all -- a positioner never lays one out,
+    # so flagging it was simply incorrect.
     for kind, _, body, line, _ in all_blocks:
         if kind not in ("Row", "Column"):
             continue
         for child, offset in direct_children(body):
-            if child in ("MouseArea", "TapHandler"):
-                report(line + body[:offset].count("\n"),
-                       f"{child} is a direct child of a {kind}; it is laid out as a cell")
+            if child != "MouseArea":
+                continue
+            inner = _block_body(body, offset)
+            filled = re.search(r"anchors\.(fill|centerIn)\s*:", inner)
+            sized = re.search(r"(?:^|[{;\s])(implicit)?(width|height)\s*:", inner, re.I)
+            if not filled and sized:
+                continue
+            why = ("it is laid out as a cell, not over the row"
+                   if filled else "it has no size of its own and catches nothing")
+            report(line + body[:offset].count("\n"),
+                   f"MouseArea is a direct child of a {kind}; {why}")
 
     # A Row positions its children; horizontal anchors on one are refused
     # outright and Qt disables the whole row.
