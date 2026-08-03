@@ -36,4 +36,11 @@ for _ in $(seq 1 30); do
     sleep 0.1
 done
 
+# Anything still standing after three seconds is not going to leave politely,
+# and carrying on regardless would produce exactly the two shells this script
+# exists to prevent.
+for pid in $(others); do
+    kill -9 "$pid" 2>/dev/null
+done
+
 exec qs -p "$CONFIG"
