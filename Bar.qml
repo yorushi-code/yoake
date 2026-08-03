@@ -179,6 +179,7 @@ PanelWindow {
                 color: Qt.alpha(Theme.text, Theme.strokeFirm)
             }
 
+            BarLoad { barWindow: bar }
             BarVpn { barWindow: bar }
             BarNetwork { barWindow: bar }
             BarAudio { barWindow: bar }

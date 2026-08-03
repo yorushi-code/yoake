@@ -32,6 +32,7 @@ TrayMenu 1.0 TrayMenu.qml
 Tooltip 1.0 Tooltip.qml
 Ripple 1.0 Ripple.qml
 BarIsland 1.0 BarIsland.qml
+BarLoad 1.0 BarLoad.qml
 BarWorkspaces 1.0 BarWorkspaces.qml
 BarMedia 1.0 BarMedia.qml
 BarClock 1.0 BarClock.qml
