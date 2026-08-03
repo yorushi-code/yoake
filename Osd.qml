@@ -123,19 +123,12 @@ Item {
             }
         }
 
-        RectangularShadow {
-            anchors.fill: card
-            radius: card.radius
-            color: Theme.shadowColor
-            blur: Theme.shadowBlur
-            spread: Theme.shadowSpread
-            offset: Qt.vector2d(Theme.shadowOffset.x, Theme.shadowOffset.y)
-        }
-
-        FrostedBackground {
+        // The same object every raised thing in this shell is made of.
+        Surface {
             id: card
             anchors.fill: parent
-            radius: Theme.radiusLarge
+            radius: Theme.pill(height)
+            elevation: "modal"
             screenX: (Screen.width - width) / 2
             screenY: Screen.height - win.margins.bottom - height
             tintOpacity: 0.78
