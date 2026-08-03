@@ -2,3 +2,5 @@
 generated-colors.json
 .wallpaper-path
 palette-override.json
+__pycache__/
+*.pyc

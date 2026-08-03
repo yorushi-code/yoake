@@ -136,13 +136,7 @@ Item {
                                         const id = entry.modelData.app_id || "";
                                         const app = id ? DesktopEntries.byId(id) : null;
                                         const name = app && app.icon ? app.icon : id;
-                                        // Resolved to a file, never handed over
-                                        // as a name with a fallback: see
-                                        // LauncherRow for what that costs.
-                                        const found = name ? Quickshell.iconPath(name, true) : "";
-                                        return found !== ""
-                                            ? found
-                                            : Quickshell.iconPath("application-x-executable", true);
+                                        return Icons.forName(name);
                                     }
                                     opacity: entry.modelData.is_focused ? 1 : 0.72
                                 }

@@ -239,14 +239,7 @@ Item {
                                         const entry = id ? DesktopEntries.byId(String(id)) : null;
                                         const name = entry && entry.icon
                                             ? entry.icon : "application-x-executable";
-                                        // See LauncherRow: a name plus a
-                                        // fallback fails outright at a size the
-                                        // theme does not hold, a resolved file
-                                        // just scales.
-                                        const found = Quickshell.iconPath(name, true);
-                                        return found !== ""
-                                            ? found
-                                            : Quickshell.iconPath("application-x-executable", true);
+                                        return Icons.forName(name);
                                     }
                                 }
 

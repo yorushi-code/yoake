@@ -111,7 +111,7 @@ Item {
                     if (root.iconSource.indexOf("://") >= 0 && !root.iconSource.startsWith("image://icon/")) {
                         return root.iconSource;
                     }
-                    return Quickshell.hasThemeIcon(name) ? Quickshell.iconPath(name) : "";
+                    return Icons.forName(name, "");
                 }
                 visible: !root.checkable && root.glyph === "" && source != "" && status === Image.Ready
                 sourceSize.width: 16

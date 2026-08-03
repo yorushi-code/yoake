@@ -79,7 +79,7 @@ Flow {
                     Image {
                         id: appIcon
                         anchors.fill: parent
-                        source: app.modelData.icon ? Quickshell.iconPath(app.modelData.icon, true) : ""
+                        source: Icons.forName(app.modelData.icon, "")
                         sourceSize.width: 32
                         sourceSize.height: 32
                         asynchronous: true

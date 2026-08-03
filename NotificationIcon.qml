@@ -31,7 +31,7 @@ ClippingRectangle {
             if (!root.notification) return "";
             if (root.notification.image) return root.notification.image;
             const icon = root.notification.appIcon;
-            if (icon && Quickshell.hasThemeIcon(icon)) return Quickshell.iconPath(icon);
+            if (icon) return Icons.forName(icon, "");
             return "";
         } catch (e) {
             return "";

@@ -23,7 +23,6 @@ Singleton {
     // show a build finishing, short enough that the line still visibly moves.
     readonly property int historyLength: 45
     property var cpuHistory: []
-    property var memoryHistory: []
     property int temperature: 0 // degrees C, 0 when no sensor was found
 
     property real memoryUsedGb: 0
@@ -192,7 +191,6 @@ done
                 // place notifies nothing, and the chart bound to it never
                 // redraws.
                 root.cpuHistory = root._appended(root.cpuHistory, root.cpu);
-                root.memoryHistory = root._appended(root.memoryHistory, root.memory);
                 root.temperature = parseInt(p[2]) || 0;
                 if (p.length < 9) return;
                 const mib = 1024 * 1024;

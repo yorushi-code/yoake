@@ -48,11 +48,7 @@ Rectangle {
     // then draws Qt's magenta checkerboard while still reporting itself Ready,
     // so no status check can catch it. Given the file, it simply scales the
     // 24px art up.
-    readonly property string iconSource: {
-        const name = root.entry.icon || "";
-        const found = name !== "" ? Quickshell.iconPath(name, true) : "";
-        return found !== "" ? found : Quickshell.iconPath("application-x-executable", true);
-    }
+    readonly property string iconSource: Icons.forName(root.entry.icon)
 
     Text {
         anchors.horizontalCenter: icon.horizontalCenter
