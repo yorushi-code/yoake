@@ -200,11 +200,33 @@ def unregistered():
     return out
 
 
+def raw_icon_lookups():
+    """Icon lookups that bypass the one helper.
+
+    A theme can hold a name at 16, 22 and 24 and nothing larger; asked for it at
+    a larger size by name the engine fails, and IconImage draws Qt's magenta
+    checkerboard while still reporting itself Ready. Icons.forName is the only
+    call that gets this right, and the bug survived one fix precisely because
+    there were three spellings of the lookup to find.
+    """
+    out = []
+    for path in sorted(ROOT.glob("*.qml")):
+        if path.name == "Icons.qml":
+            continue
+        for n, line in enumerate(path.read_text().splitlines(), 1):
+            if line.lstrip().startswith("//"):
+                continue
+            if "Quickshell.iconPath" in line or "Quickshell.hasThemeIcon" in line:
+                out.append((path.name, n, "icon looked up directly; use Icons.forName"))
+    return out
+
+
 def main():
     findings = []
     for path in sorted(list(ROOT.glob("*.qml")) + list((ROOT / "greeter").glob("*.qml"))):
         findings.extend(check(path))
     findings.extend(unregistered())
+    findings.extend(raw_icon_lookups())
 
     for name, line, what in findings:
         print(f"{name}:{line}: {what}")
