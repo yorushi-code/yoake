@@ -206,13 +206,19 @@ Item {
                     // One indicator that slides between tabs, rather than a
                     // marker per tab appearing and disappearing: the movement is
                     // what tells the eye the two tabs are the same control.
+                    //
+                    // A pill rather than the underline it used to be. Every
+                    // other selected thing in this shell is a chip, and a hairline
+                    // under a word was the last element still speaking its own
+                    // language. It sits behind the label, so the sliding that
+                    // made the underline worth having is unchanged.
                     Rectangle {
                         id: indicator
-                        anchors.bottom: parent.bottom
-                        anchors.bottomMargin: 10
-                        height: 2.5
-                        radius: 1.25
-                        color: Theme.accent
+                        anchors.verticalCenter: parent.verticalCenter
+                        height: 38
+                        radius: Theme.pill(height)
+                        color: Qt.alpha(Theme.text, Theme.fillHover)
+                        z: -1
 
                         // Found by the delegate's own index rather than by
                         // position in children: a Repeater is itself a child of
@@ -226,10 +232,8 @@ Item {
                             }
                             return null;
                         }
-                        width: indicator.target ? indicator.target.width - 22 : 0
-                        x: indicator.target
-                            ? tabRow.x + indicator.target.x + 11
-                            : 0
+                        width: indicator.target ? indicator.target.width : 0
+                        x: indicator.target ? tabRow.x + indicator.target.x : 0
 
                         Behavior on x {
                             NumberAnimation {
