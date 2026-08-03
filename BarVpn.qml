@@ -42,7 +42,7 @@ Item {
         id: vpnRow
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
-        spacing: 5
+        spacing: Theme.gapTight
 
         BarIcon {
             id: vpnIcon
@@ -164,10 +164,10 @@ Item {
         minWidth: 248
 
         Column {
-            spacing: 11
+            spacing: Theme.gapWide
 
             Row {
-                spacing: 9
+                spacing: Theme.gapWide
 
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
@@ -226,7 +226,7 @@ Item {
             // card the user asked for should answer the question it was opened
             // to answer.
             Row {
-                spacing: 18
+                spacing: Theme.gapSection
                 visible: root.up
 
                 Repeater {
@@ -238,7 +238,7 @@ Item {
                     delegate: Row {
                         id: flow
                         required property var modelData
-                        spacing: 6
+                        spacing: Theme.spacing
 
                         Text {
                             anchors.verticalCenter: parent.verticalCenter

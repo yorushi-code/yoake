@@ -48,7 +48,7 @@ Item {
         id: audioRow
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
-        spacing: 5
+        spacing: Theme.gapTight
 
         BarIcon {
             anchors.verticalCenter: parent.verticalCenter
@@ -143,10 +143,10 @@ Item {
         minWidth: 244
 
         Column {
-            spacing: 11
+            spacing: Theme.gapWide
 
             Row {
-                spacing: 9
+                spacing: Theme.gapWide
 
                 Text {
                     anchors.verticalCenter: parent.verticalCenter

@@ -131,7 +131,7 @@ WlSessionLock {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: hero.bottom
             anchors.topMargin: 52
-            spacing: 14
+            spacing: Theme.gapCard
             opacity: surface.entered ? 1 : 0
             Behavior on opacity {
                 SequentialAnimation {
@@ -231,7 +231,7 @@ WlSessionLock {
                     // and unevenly spaced.
                     Row {
                         anchors.centerIn: parent
-                        spacing: 9
+                        spacing: Theme.gapWide
                         visible: LockState.entry.length > 0
 
                         Repeater {
@@ -415,7 +415,7 @@ WlSessionLock {
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             anchors.margins: 32
-            spacing: 18
+            spacing: Theme.gapSection
             opacity: surface.entered ? 1 : 0
             Behavior on opacity {
                 SequentialAnimation {
@@ -438,7 +438,7 @@ WlSessionLock {
                     id: chip
                     required property var modelData
                     visible: chip.modelData.show
-                    spacing: 7
+                    spacing: Theme.spacing
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter

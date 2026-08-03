@@ -222,7 +222,7 @@ PanelWindow {
                 Column {
                     id: historyColumn
                     width: parent.width
-                    spacing: 6
+                    spacing: Theme.spacing
 
                     Repeater {
                         model: Notifs.newestFirst
@@ -286,7 +286,7 @@ PanelWindow {
                                 anchors.leftMargin: 18
                                 anchors.rightMargin: 10
                                 anchors.topMargin: 9
-                                spacing: 9
+                                spacing: Theme.gapWide
 
                                 NotificationIcon {
                                     size: 24

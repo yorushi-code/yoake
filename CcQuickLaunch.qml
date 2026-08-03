@@ -69,7 +69,7 @@ Flow {
 
             Row {
                 anchors.centerIn: parent
-                spacing: 7
+                spacing: Theme.spacing
 
                 Item {
                     anchors.verticalCenter: parent.verticalCenter

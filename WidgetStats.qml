@@ -2,7 +2,7 @@ import QtQuick
 
 // CPU, memory and temperature.
 Row {
-    spacing: 18
+    spacing: Theme.gapSection
 
     StatGauge {
         glyph: Glyphs.cpu

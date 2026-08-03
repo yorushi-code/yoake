@@ -19,7 +19,7 @@ Flickable {
     Column {
         id: list
         width: parent.width
-        spacing: 14
+        spacing: Theme.gapCard
 
         Column {
             width: parent.width
@@ -50,7 +50,7 @@ Flickable {
 
         Column {
             width: parent.width
-            spacing: 6
+            spacing: Theme.spacing
             visible: root.hasBattery
 
             Text {

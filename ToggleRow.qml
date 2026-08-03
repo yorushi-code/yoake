@@ -39,7 +39,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.leftMargin: 14
         anchors.verticalCenter: parent.verticalCenter
-        spacing: 9
+        spacing: Theme.gapWide
 
         Text {
             anchors.verticalCenter: parent.verticalCenter
@@ -71,7 +71,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.rightMargin: 12
         anchors.verticalCenter: parent.verticalCenter
-        spacing: 10
+        spacing: Theme.gapWide
 
         Text {
             anchors.verticalCenter: parent.verticalCenter

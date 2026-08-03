@@ -11,7 +11,7 @@ Column {
 
     required property var today
 
-    spacing: 6
+    spacing: Theme.spacing
 
     readonly property int year: root.today.getFullYear()
     readonly property int month: root.today.getMonth()

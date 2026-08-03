@@ -254,7 +254,7 @@ Item {
                         spacing: 12
 
                         Row {
-                            spacing: 10
+                            spacing: Theme.gapWide
 
                             Rectangle {
                                 anchors.verticalCenter: parent.verticalCenter
@@ -338,7 +338,7 @@ Item {
                                 delegate: Row {
                                     id: rate
                                     required property var modelData
-                                    spacing: 6
+                                    spacing: Theme.spacing
 
                                     Text {
                                         anchors.verticalCenter: parent.verticalCenter
@@ -374,7 +374,7 @@ Item {
 
                             Row {
                                 id: egressContent
-                                spacing: 6
+                                spacing: Theme.spacing
 
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
@@ -435,7 +435,7 @@ Item {
                                 anchors.right: parent.right
                                 anchors.margins: 10
                                 anchors.verticalCenter: parent.verticalCenter
-                                spacing: 7
+                                spacing: Theme.spacing
 
                                 Text {
                                     width: parent.width
@@ -554,7 +554,7 @@ Item {
                         // common case and a single tab is furniture.
                         Row {
                             width: parent.width
-                            spacing: 6
+                            spacing: Theme.spacing
                             visible: Mihomo.groups.length > 1
 
                             Repeater {
@@ -702,7 +702,7 @@ Item {
                             Column {
                                 id: subsColumn
                                 width: parent.width
-                                spacing: 5
+                                spacing: Theme.gapTight
 
                                 Repeater {
                                     model: root.orderedSubscriptions

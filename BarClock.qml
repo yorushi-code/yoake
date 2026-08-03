@@ -11,7 +11,7 @@ Row {
     // does not share one open-menu key with this one.
     readonly property string menuId: Menus.idFor(root.barWindow, "clock")
 
-    spacing: 10
+    spacing: Theme.gapWide
     anchors.verticalCenter: parent ? parent.verticalCenter : undefined
 
     SystemClock {

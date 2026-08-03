@@ -118,7 +118,7 @@ PanelWindow {
 
         Row {
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 10
+            spacing: Theme.gapWide
 
             BarMedia { barWindow: bar }
             BarClock { barWindow: bar }

@@ -31,7 +31,7 @@ Flickable {
     Column {
         id: list
         width: parent.width
-        spacing: 5
+        spacing: Theme.gapTight
 
         Text {
             width: parent.width

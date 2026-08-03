@@ -36,10 +36,10 @@ Column {
         ? ((root.probe.meta && root.probe.meta.swatches) || [])
         : GeneratedColors.swatches
 
-    spacing: 10
+    spacing: Theme.gapWide
 
     Row {
-        spacing: 10
+        spacing: Theme.gapWide
 
         Rectangle {
             width: root.swatchSize * 1.6

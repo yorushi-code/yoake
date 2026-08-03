@@ -34,7 +34,7 @@ Item {
 
         Column {
             anchors.centerIn: parent
-            spacing: 10
+            spacing: Theme.gapWide
 
             RollClock {
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -147,7 +147,7 @@ Item {
             Row {
                 anchors.horizontalCenter: parent.horizontalCenter
                 topPadding: 6
-                spacing: 14
+                spacing: Theme.gapCard
 
                 Repeater {
                     model: [
@@ -159,7 +159,7 @@ Item {
                     delegate: Row {
                         id: detail
                         required property var modelData
-                        spacing: 5
+                        spacing: Theme.gapTight
 
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
@@ -264,7 +264,7 @@ Item {
                 anchors.right: parent.right
                 anchors.leftMargin: 16
                 anchors.verticalCenter: parent.verticalCenter
-                spacing: 5
+                spacing: Theme.gapTight
 
                 Text {
                     width: parent.width
@@ -297,7 +297,7 @@ Item {
                 Item { width: 1; height: 4 }
 
                 Row {
-                    spacing: 6
+                    spacing: Theme.spacing
 
                     MediaButton { glyph: Glyphs.skipPrevious; onActivated: Media.previous() }
                     MediaButton {
@@ -350,7 +350,7 @@ Item {
             anchors.leftMargin: 16
             anchors.rightMargin: 16
             anchors.bottomMargin: 16
-            spacing: 13
+            spacing: Theme.gapCard
 
             Repeater {
                 model: [
@@ -368,7 +368,7 @@ Item {
                     id: meter
                     required property var modelData
                     width: parent.width
-                    spacing: 6
+                    spacing: Theme.spacing
 
                     Item {
                         width: parent.width

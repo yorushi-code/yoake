@@ -108,7 +108,7 @@ Item {
                         anchors.left: number.right
                         anchors.leftMargin: 22
                         anchors.verticalCenter: parent.verticalCenter
-                        spacing: 10
+                        spacing: Theme.gapWide
 
                         Repeater {
                             // Six is what fits; the count beside them carries the

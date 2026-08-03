@@ -44,7 +44,7 @@ Item {
         id: batRow
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
-        spacing: 5
+        spacing: Theme.gapTight
 
         BarIcon {
             id: glyph
@@ -120,10 +120,10 @@ Item {
         minWidth: 236
 
         Column {
-            spacing: 10
+            spacing: Theme.gapWide
 
             Row {
-                spacing: 9
+                spacing: Theme.gapWide
 
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
@@ -167,7 +167,7 @@ Item {
             }
 
             Row {
-                spacing: 6
+                spacing: Theme.spacing
                 visible: Power.available
 
                 Repeater {

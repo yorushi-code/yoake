@@ -57,7 +57,7 @@ Item {
                 anchors.leftMargin: 26
                 anchors.rightMargin: 14
                 anchors.verticalCenter: parent.verticalCenter
-                spacing: 6
+                spacing: Theme.spacing
 
                 Text {
                     width: parent.width
@@ -123,7 +123,7 @@ Item {
                     // clock that says the track is over while it plays.
                     Row {
                         anchors.right: parent.right
-                        spacing: 5
+                        spacing: Theme.gapTight
                         visible: Media.length <= 0
 
                         Rectangle {
@@ -165,7 +165,7 @@ Item {
                 Item { width: 1; height: 8 }
 
                 Row {
-                    spacing: 10
+                    spacing: Theme.gapWide
 
                     MediaButton {
                         glyph: Media.shuffleOn ? Glyphs.shuffle : Glyphs.shuffleOff
@@ -197,7 +197,7 @@ Item {
                 // source pins it until you click it again.
                 Row {
                     id: sources
-                    spacing: 7
+                    spacing: Theme.spacing
                     visible: Mpris.players.values.length > 1
 
                     Repeater {
@@ -224,7 +224,7 @@ Item {
                             Row {
                                 id: chipRow
                                 anchors.centerIn: parent
-                                spacing: 6
+                                spacing: Theme.spacing
 
                                 IconImage {
                                     anchors.verticalCenter: parent.verticalCenter

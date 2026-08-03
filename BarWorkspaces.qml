@@ -13,7 +13,7 @@ Row {
 
     property string output: ""
 
-    spacing: 7
+    spacing: Theme.spacing
     anchors.verticalCenter: parent ? parent.verticalCenter : undefined
 
     // Positioner transitions rather than a Component.onCompleted animation in

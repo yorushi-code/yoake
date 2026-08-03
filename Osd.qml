@@ -185,7 +185,7 @@ Item {
                 Column {
                     anchors.verticalCenter: parent.verticalCenter
                     width: 160
-                    spacing: 6
+                    spacing: Theme.spacing
 
                     Item {
                         width: parent.width

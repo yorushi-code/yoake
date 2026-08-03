@@ -282,7 +282,7 @@ Item {
                             anchors.leftMargin: 22
                             anchors.rightMargin: 12
                             anchors.topMargin: 11
-                            spacing: 10
+                            spacing: Theme.gapWide
 
                             // The server advertises image support, so anything
                             // an application sends has to actually be drawn —

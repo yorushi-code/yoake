@@ -25,7 +25,7 @@ Item {
         spacing: 4
 
         Row {
-            spacing: 5
+            spacing: Theme.gapTight
             Text {
                 anchors.verticalCenter: parent.verticalCenter
                 text: root.glyph

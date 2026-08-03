@@ -12,7 +12,7 @@ Flow {
     property var notification: null
     signal invoked()
 
-    spacing: 6
+    spacing: Theme.spacing
     topPadding: visible ? 6 : 0
     // Same guard as NotificationIcon — the object can go away underneath a
     // toast that is still on screen.

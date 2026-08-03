@@ -58,7 +58,7 @@ Rectangle {
         spacing: 3
 
         Row {
-            spacing: 7
+            spacing: Theme.spacing
 
             Text {
                 text: root.modelData.name

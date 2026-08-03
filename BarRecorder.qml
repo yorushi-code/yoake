@@ -27,7 +27,7 @@ Item {
         id: recRow
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
-        spacing: 5
+        spacing: Theme.gapTight
 
         Rectangle {
             width: 9

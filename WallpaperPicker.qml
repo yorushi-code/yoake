@@ -555,7 +555,7 @@ PanelWindow {
                     anchors.right: parent.right
                     anchors.top: parent.top
                     anchors.margins: 22
-                    spacing: 14
+                    spacing: Theme.gapCard
 
                     Text {
                         width: parent.width
@@ -668,7 +668,7 @@ PanelWindow {
             anchors.leftMargin: 44
             anchors.bottom: strip.top
             anchors.bottomMargin: 34
-            spacing: 18
+            spacing: Theme.gapSection
 
             opacity: win.open ? 0.8 : 0
             Behavior on opacity { NumberAnimation { duration: Theme.animSlow } }
@@ -684,7 +684,7 @@ PanelWindow {
                 delegate: Row {
                     id: hint
                     required property var modelData
-                    spacing: 7
+                    spacing: Theme.spacing
 
                     Rectangle {
                         anchors.verticalCenter: parent.verticalCenter
@@ -726,7 +726,7 @@ PanelWindow {
             anchors.bottomMargin: 34
             height: 178
             orientation: ListView.Horizontal
-            spacing: 20
+            spacing: Theme.gapSection
             clip: false
 
             opacity: win.open ? 1 : 0

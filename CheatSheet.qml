@@ -481,14 +481,14 @@ Item {
                     Row {
                         id: grid
                         width: parent.width
-                        spacing: 20
+                        spacing: Theme.gapSection
 
                         Repeater {
                         model: root.balanced(Math.max(1, Math.floor((parent.width + 20) / 340)))
                         delegate: Column {
                         required property var modelData
                         width: 320
-                        spacing: 20
+                        spacing: Theme.gapSection
 
                         Repeater {
                             model: modelData
@@ -497,7 +497,7 @@ Item {
                                 required property var modelData
                                 required property int index
                                 width: 320
-                                spacing: 6
+                                spacing: Theme.spacing
 
                                 opacity: 0
                                 scale: 0.94
@@ -536,7 +536,7 @@ Item {
                                         id: bindRow
                                         required property var modelData
                                         width: categoryDelegate.width
-                                        spacing: 10
+                                        spacing: Theme.gapWide
                                         Rectangle {
                                             id: keyChip
                                             width: keyText.width + 12

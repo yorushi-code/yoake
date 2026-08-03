@@ -21,7 +21,7 @@ Item {
     Row {
         id: mediaRow
         anchors.centerIn: parent
-        spacing: 10
+        spacing: Theme.gapWide
 
         // Spectrum collapses to zero width when nothing is playing rather than
         // leaving a dead gap in the island.

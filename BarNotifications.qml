@@ -101,10 +101,10 @@ Item {
         minWidth: 264
 
         Column {
-            spacing: 10
+            spacing: Theme.gapWide
 
             Row {
-                spacing: 9
+                spacing: Theme.gapWide
 
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
@@ -130,7 +130,7 @@ Item {
             // becoming a second notification centre -- the panel is one click
             // away and is the place for the whole list.
             Column {
-                spacing: 7
+                spacing: Theme.spacing
                 visible: Notifs.tracked.length > 0
 
                 Repeater {

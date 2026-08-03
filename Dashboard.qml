@@ -166,7 +166,7 @@ Item {
 
                                 Row {
                                     anchors.centerIn: parent
-                                    spacing: 9
+                                    spacing: Theme.gapWide
 
                                     Text {
                                         id: tabGlyph
