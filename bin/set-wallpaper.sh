@@ -102,7 +102,21 @@ except (ValueError, ZeroDivisionError):
     return 0
   fi
 
-  # Old prepared copies are dead the moment a new one is named.
+  # Old prepared copies are dead the moment a new one is named, and so is the
+  # encoder still making one. Changing wallpaper twice inside the ten seconds a
+  # transcode takes otherwise leaves the first ffmpeg running against a file
+  # that has just been deleted: it burns a core to produce something the
+  # staleness check below will refuse, and then leaves it on disk until the
+  # next change sweeps it.
+  #
+  # Matched by reading /proc rather than with `pkill -f`, which matches its own
+  # caller's command line as readily as its target -- that mistake has already
+  # killed the wrong process on this machine once.
+  for pid in $(pgrep -x ffmpeg 2>/dev/null); do
+    if tr '\0' ' ' < "/proc/$pid/cmdline" 2>/dev/null | grep -q 'wallpaper-play-'; then
+      kill "$pid" 2>/dev/null || true
+    fi
+  done
   find "$CACHE" -maxdepth 1 -name 'wallpaper-play-*.mp4' -delete 2>/dev/null || true
 
   # The wallpaper does not wait for the encoder.
