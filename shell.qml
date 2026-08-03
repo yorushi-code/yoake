@@ -39,7 +39,7 @@ ShellRoot {
     // it works -- the tile shows the right state the moment you open the page
     // that constructs it, and the warm screen you asked for last night simply
     // never came back after a restart.
-    property var _alive: [Idle, NightLight]
+    property var _alive: [Idle, NightLight, Context]
 
     // The lock has to exist before it is needed: creating the surface at the
     // moment of locking would show the desktop for the frame it takes to build.

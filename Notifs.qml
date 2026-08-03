@@ -52,6 +52,18 @@ Singleton {
 
     onDndChanged: if (Prefs.loaded) Prefs.set("notifs.dnd", root.dnd)
 
+    // Quiet the shell decides on by itself, kept separate from the switch the
+    // user threw. Interrupting someone while a microphone is open is the
+    // costliest thing this shell can do -- a toast slides over the window they
+    // are sharing -- and it is also the one case the machine can be sure of,
+    // because a capture stream is a fact rather than a guess about intent.
+    //
+    // Nothing is discarded and nothing is silent about being silent: the
+    // history takes everything, the bar wears the struck-through bell, and its
+    // card says which of the two kinds of quiet is in force.
+    readonly property bool contextQuiet: Context.mode === "meeting"
+    readonly property bool quiet: root.dnd || root.contextQuiet
+
     signal arrived()
     // NotificationCenter owns the list, so clearing is a request rather than
     // something this singleton can carry out itself.

@@ -101,7 +101,7 @@ Item {
             notification.closed.connect(() => root.dismissToast(notification));
             // Do-not-disturb suppresses the popup only; the notification is
             // still tracked, so nothing is lost from the history.
-            if (!Notifs.dnd && !Media.announcesTrack(notification)) root.appendToast(notification);
+            if (!Notifs.quiet && !Media.announcesTrack(notification)) root.appendToast(notification);
             Notifs.arrived();
         }
     }

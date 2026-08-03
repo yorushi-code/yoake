@@ -19,11 +19,11 @@ Item {
     BarIcon {
         id: bell
         anchors.centerIn: parent
-        glyph: Notifs.dnd ? Glyphs.bellOff : Glyphs.bell
+        glyph: Notifs.quiet ? Glyphs.bellOff : Glyphs.bell
         glyphSize: 14
-        color: Notifs.dnd ? Theme.subtext0
+        color: Notifs.quiet ? Theme.subtext0
             : (notifArea.containsMouse ? Theme.accent : Theme.text)
-        badge: (Notifs.count > 0 && !Notifs.dnd) ? (Notifs.count > 9 ? "9+" : String(Notifs.count)) : ""
+        badge: (Notifs.count > 0 && !Notifs.quiet) ? (Notifs.count > 9 ? "9+" : String(Notifs.count)) : ""
         hovered: notifArea.containsMouse
         pressed: notifArea.pressed
 
@@ -108,17 +108,22 @@ Item {
 
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
-                    text: Notifs.dnd ? Glyphs.bellOff : Glyphs.bell
+                    text: Notifs.quiet ? Glyphs.bellOff : Glyphs.bell
                     font.family: Theme.fontIconFamily
                     font.pixelSize: Theme.fontIcon
-                    color: Notifs.dnd ? Theme.subtext0
+                    color: Notifs.quiet ? Theme.subtext0
                         : (Notifs.count > 0 ? Theme.accent : Theme.subtext1)
                 }
 
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
-                    text: Notifs.dnd ? "Не беспокоить"
-                        : (Notifs.count > 0 ? "Уведомлений: " + Notifs.count : "Тихо")
+                    // Which of the two kinds of quiet, never merely that it is
+                    // quiet: a shell that stops interrupting you without saying
+                    // why is a shell you stop trusting with the message you
+                    // were waiting for.
+                    text: Notifs.contextQuiet ? "Тихо: занят микрофон"
+                        : (Notifs.dnd ? "Не беспокоить"
+                        : (Notifs.count > 0 ? "Уведомлений: " + Notifs.count : "Тихо"))
                     color: Theme.text
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSmall
