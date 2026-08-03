@@ -66,22 +66,16 @@ PanelWindow {
         height: bar.height
     }
 
-    // The cheat sheet has always promised a menu "on any widget and on the
-    // empty part of the bar", and the empty part did nothing at all. These are
-    // the four things reached for most that otherwise need a key nobody
-    // remembers on a machine they have just sat down at.
+    // The same menu the islands carry, not a second one beside it. The cheat
+    // sheet has always promised a menu "on any widget and on the empty part of
+    // the bar", and the empty part did nothing at all -- but ShellActions
+    // exists precisely so the bar and the desktop cannot drift apart, and
+    // inventing a different list here would have been the drift it warns about.
     ActionMenu {
         menuId: bar.barMenuId
         anchorItem: barMenuAnchor
         open: Menus.isOpen(bar.barMenuId)
-        model: [
-            { text: "Дашборд", glyph: Glyphs.apps, action: () => Toggles.dash("overview") },
-            { text: "Уведомления", glyph: Glyphs.bell, action: () => Toggles.exclusive("notifCenter") },
-            { text: "Обои", glyph: Glyphs.image, action: () => Toggles.exclusive("wallpaperPicker") },
-            { separator: true },
-            { text: "Двигать виджеты", glyph: Glyphs.cog, action: () => DesktopWidgets.toggleEditing() },
-            { text: "Горячие клавиши", glyph: Glyphs.keyboard, action: () => Toggles.exclusive("cheatSheet") }
-        ]
+        model: Menus.isOpen(bar.barMenuId) ? ShellActions.shellMenu : []
     }
 
     Item {

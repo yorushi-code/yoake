@@ -189,6 +189,20 @@ Item {
                 }
             }
             if (out.length > 0) out.push({ separator: true });
+            // Always available, unlike everything above it. A player that
+            // supports neither shuffle nor loop and is the only one running --
+            // which is every browser -- left this menu with a single item, and
+            // a one-item menu is not worth the right-click it costs.
+            out.push({
+                text: "Скопировать название",
+                glyph: Glyphs.copy,
+                enabled: Media.title !== "",
+                action: () => {
+                    Quickshell.clipboardText = Media.artist !== ""
+                        ? Media.artist + " — " + Media.title
+                        : Media.title;
+                }
+            });
             out.push({
                 text: "Открыть плеер",
                 glyph: Glyphs.openExternal,
