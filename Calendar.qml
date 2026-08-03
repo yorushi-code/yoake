@@ -213,7 +213,7 @@ PanelWindow {
                         anchors.centerIn: parent
                         text: `${win.monthNames[win.viewDate.getMonth()]} ${win.viewDate.getFullYear()}`
                         color: Theme.text
-                        font.pixelSize: 14
+                        font.pixelSize: Theme.fontTitle
                         font.bold: true
                     }
 

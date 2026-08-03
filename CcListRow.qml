@@ -30,7 +30,7 @@ Rectangle {
         width: 15
         text: root.connected ? Glyphs.check : root.glyph
         font.family: "Symbols Nerd Font"
-        font.pixelSize: 12
+        font.pixelSize: Theme.fontIconMicro
         color: root.connected ? Theme.accent : Theme.subtext0
     }
 

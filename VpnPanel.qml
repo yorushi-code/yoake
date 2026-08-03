@@ -268,7 +268,7 @@ Item {
                                     anchors.centerIn: parent
                                     text: Glyphs.vpn
                                     font.family: "Symbols Nerd Font"
-                                    font.pixelSize: 15
+                                    font.pixelSize: Theme.fontIconSmall
                                     color: Mihomo.running ? Theme.accent : Theme.subtext0
                                     Behavior on color { ColorAnimation { duration: Theme.animNormal } }
                                 }
@@ -305,7 +305,7 @@ Item {
                                         ? "Подключение…"
                                         : (Mihomo.running ? (Mihomo.active || "Подключено") : "Отключено")
                                     color: Theme.text
-                                    font.pixelSize: 14
+                                    font.pixelSize: Theme.fontTitle
                                     font.bold: true
                                 }
 
@@ -344,7 +344,7 @@ Item {
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: rate.modelData.glyph
                                         font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 12
+                                        font.pixelSize: Theme.fontIconMicro
                                         color: Theme.accent
                                     }
                                     Text {
@@ -380,7 +380,7 @@ Item {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: Glyphs.earth
                                     font.family: "Symbols Nerd Font"
-                                    font.pixelSize: 11
+                                    font.pixelSize: Theme.fontIconMicro
                                     color: Mihomo.leaking ? Theme.red : Theme.accent
                                     opacity: Mihomo.checking ? 0.5 : 1
                                     Behavior on opacity { NumberAnimation { duration: Theme.animFast } }

@@ -165,7 +165,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             text: detail.modelData.glyph
                             font.family: Theme.fontIconFamily
-                            font.pixelSize: 11
+                            font.pixelSize: Theme.fontIconMicro
                             color: Qt.alpha(Theme.subtext0, 0.8)
                         }
                         Text {

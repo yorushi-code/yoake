@@ -72,7 +72,7 @@ Item {
                 visible: root.checkable
                 text: Glyphs.check
                 font.family: "Symbols Nerd Font"
-                font.pixelSize: 12
+                font.pixelSize: Theme.fontIconMicro
                 color: Theme.accent
                 opacity: root.checked ? 1 : 0
                 scale: root.checked ? 1 : 0.4
@@ -87,7 +87,7 @@ Item {
                 visible: !root.checkable && root.glyph !== ""
                 text: root.glyph
                 font.family: "Symbols Nerd Font"
-                font.pixelSize: 13
+                font.pixelSize: Theme.fontIconMicro
                 color: root.destructive ? Theme.red : Theme.subtext1
             }
 
@@ -141,7 +141,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         text: Glyphs.chevronRight
         font.family: "Symbols Nerd Font"
-        font.pixelSize: 12
+        font.pixelSize: Theme.fontIconMicro
         color: Theme.subtext0
     }
 

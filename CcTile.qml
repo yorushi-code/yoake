@@ -108,7 +108,7 @@ Rectangle {
             anchors.centerIn: parent
             text: Glyphs.chevronRight
             font.family: "Symbols Nerd Font"
-            font.pixelSize: 12
+            font.pixelSize: Theme.fontIconMicro
             color: root.active && root.stateful ? Theme.crust : Theme.subtext1
         }
 

@@ -526,7 +526,7 @@ Item {
                                 Text {
                                     text: modelData.name
                                     color: Theme.accent
-                                    font.pixelSize: 14
+                                    font.pixelSize: Theme.fontTitle
                                     font.bold: true
                                 }
 

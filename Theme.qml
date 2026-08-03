@@ -92,6 +92,7 @@ QtObject {
     // its box and a symbol does not. Found by counting -- every icon in the
     // tree had already been hand-set to 14 or 17 for exactly this reason, and
     // naming it is the difference between a convention and a coincidence.
+    readonly property int fontIconMicro: 12
     readonly property int fontIconSmall: 14
     readonly property int fontIcon: 17
 

@@ -153,7 +153,7 @@ Rectangle {
                     anchors.centerIn: parent
                     text: button.modelData.glyph
                     font.family: "Symbols Nerd Font"
-                    font.pixelSize: 12
+                    font.pixelSize: Theme.fontIconMicro
                     color: buttonArea.containsMouse ? Theme.text : Theme.subtext0
                 }
 

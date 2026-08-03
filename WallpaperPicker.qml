@@ -429,7 +429,7 @@ PanelWindow {
                     anchors.verticalCenter: parent.verticalCenter
                     text: Glyphs.magnify
                     font.family: "Symbols Nerd Font"
-                    font.pixelSize: 13
+                    font.pixelSize: Theme.fontIconMicro
                     color: win.searching ? Theme.accent : Theme.subtext0
                     Behavior on color { ColorAnimation { duration: Theme.animFast } }
                 }

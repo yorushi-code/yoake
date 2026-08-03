@@ -93,7 +93,7 @@ Flow {
                         visible: !appIcon.visible
                         text: Glyphs.apps
                         font.family: "Symbols Nerd Font"
-                        font.pixelSize: 13
+                        font.pixelSize: Theme.fontIconMicro
                         color: Theme.subtext1
                     }
                 }

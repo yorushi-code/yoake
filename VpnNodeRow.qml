@@ -39,7 +39,7 @@ Rectangle {
         width: 16
         text: root.current ? Glyphs.check : ""
         font.family: "Symbols Nerd Font"
-        font.pixelSize: 12
+        font.pixelSize: Theme.fontIconMicro
         color: Theme.accent
     }
 

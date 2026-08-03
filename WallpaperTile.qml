@@ -143,7 +143,7 @@ Item {
                 anchors.centerIn: parent
                 text: Glyphs.video
                 font.family: "Symbols Nerd Font"
-                font.pixelSize: 12
+                font.pixelSize: Theme.fontIconMicro
                 color: Theme.accent
             }
         }
@@ -178,7 +178,7 @@ Item {
             anchors.centerIn: parent
             text: Glyphs.check
             font.family: "Symbols Nerd Font"
-            font.pixelSize: 12
+            font.pixelSize: Theme.fontIconMicro
             color: Theme.crust
         }
     }

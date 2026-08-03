@@ -99,7 +99,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         text: root.glyph
         font.family: Theme.fontIconFamily
-        font.pixelSize: 12
+        font.pixelSize: Theme.fontIconMicro
         color: root.levelColor
         Behavior on color { ColorAnimation { duration: Theme.animNormal } }
     }

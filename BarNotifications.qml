@@ -199,7 +199,7 @@ Item {
                         verticalAlignment: Text.AlignVCenter
                         text: Notifs.dnd ? Glyphs.bell : Glyphs.bellOff
                         font.family: Theme.fontIconFamily
-                        font.pixelSize: 13
+                        font.pixelSize: Theme.fontIconMicro
                         color: Theme.subtext1
                     }
 

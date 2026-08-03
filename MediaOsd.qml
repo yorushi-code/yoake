@@ -176,7 +176,7 @@ PanelWindow {
                 anchors.centerIn: parent
                 text: Glyphs.close
                 font.family: "Symbols Nerd Font"
-                font.pixelSize: 11
+                font.pixelSize: Theme.fontIconMicro
                 color: Theme.text
             }
 

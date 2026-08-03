@@ -281,7 +281,7 @@ Item {
                         verticalAlignment: Text.AlignVCenter
                         text: Networking.wifiEnabled ? Glyphs.wifiOff : Glyphs.wifi
                         font.family: Theme.fontIconFamily
-                        font.pixelSize: 13
+                        font.pixelSize: Theme.fontIconMicro
                         color: Theme.subtext1
                     }
 

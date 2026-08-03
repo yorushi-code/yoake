@@ -244,7 +244,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             text: flow.modelData.glyph
                             font.family: Theme.fontIconFamily
-                            font.pixelSize: 12
+                            font.pixelSize: Theme.fontIconMicro
                             color: Theme.subtext0
                         }
                         Text {
@@ -290,7 +290,7 @@ Item {
                         verticalAlignment: Text.AlignVCenter
                         text: root.up ? Glyphs.close : Glyphs.vpn
                         font.family: Theme.fontIconFamily
-                        font.pixelSize: 13
+                        font.pixelSize: Theme.fontIconMicro
                         color: Theme.subtext1
                     }
 

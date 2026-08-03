@@ -76,7 +76,7 @@ Item {
             visible: root.micMuted
             text: Glyphs.microphoneOff
             font.family: "Symbols Nerd Font"
-            font.pixelSize: 12
+            font.pixelSize: Theme.fontIconMicro
             color: Theme.red
         }
     }
@@ -243,7 +243,7 @@ Item {
                         verticalAlignment: Text.AlignVCenter
                         text: root.micMuted ? Glyphs.microphoneOff : Glyphs.microphone
                         font.family: Theme.fontIconFamily
-                        font.pixelSize: 13
+                        font.pixelSize: Theme.fontIconMicro
                         color: root.micMuted ? Theme.red : Theme.subtext1
                         Behavior on color { ColorAnimation { duration: Theme.animNormal } }
                     }

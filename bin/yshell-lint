@@ -262,6 +262,42 @@ def unregistered():
     return out
 
 
+def off_ladder():
+    """Values written by hand where Theme has a rung for exactly that value.
+
+    The shell was counted once: sixteen radii, twelve surface alphas, ten gaps
+    and a hundred and forty font sizes, each chosen a surface at a time. None
+    was individually wrong and the whole never read as one object. The ladders
+    exist so that never happens again, and a ladder nobody is held to is a
+    comment.
+
+    Only the values a rung already covers are reported. A hero clock at 52 and
+    a weather glyph at 42 are per-surface decisions, and a radius under four is
+    half the height of a thin bar -- geometry, not a choice.
+    """
+    sizes = {"9", "10", "11", "12", "13", "15", "17"}
+    radii = {"9", "10", "11", "12", "13", "16", "18", "22", "24"}
+    out = []
+    for path in sorted(ROOT.glob("*.qml")):
+        if path.name == "Theme.qml":
+            continue
+        for n, line in enumerate(path.read_text().splitlines(), 1):
+            if line.lstrip().startswith("//"):
+                continue
+            m = re.search(r"font\.pixelSize:\s*(\d+)\s*$", line)
+            if m and m.group(1) in sizes:
+                out.append((path.name, n, f"font size {m.group(1)} has a rung in Theme"))
+                continue
+            m = re.search(r"\bradius:\s*(\d+)\s*$", line)
+            if m and m.group(1) in radii:
+                out.append((path.name, n, f"radius {m.group(1)} has a rung in Theme"))
+                continue
+            m = re.search(r"Qt\.alpha\(Theme\.text,\s*(0\.\d+)\)", line)
+            if m and m.group(1) in ("0.06", "0.10", "0.14", "0.18", "0.20"):
+                out.append((path.name, n, f"surface alpha {m.group(1)} has a rung in Theme"))
+    return out
+
+
 def raw_icon_lookups():
     """Icon lookups that bypass the one helper.
 
@@ -290,6 +326,7 @@ def main():
     findings.extend(unregistered())
     findings.extend(missing_imports())
     findings.extend(raw_icon_lookups())
+    findings.extend(off_ladder())
 
     for name, line, what in findings:
         print(f"{name}:{line}: {what}")

@@ -78,7 +78,7 @@ Rectangle {
             visible: root.expandable
             text: Glyphs.chevronDown
             font.family: "Symbols Nerd Font"
-            font.pixelSize: 12
+            font.pixelSize: Theme.fontIconMicro
             rotation: root.expanded ? 180 : 0
             Behavior on rotation {
                 NumberAnimation { duration: Theme.animNormal; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig }

@@ -194,7 +194,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: Power.glyphFor(chip.modelData)
                                 font.family: Theme.fontIconFamily
-                                font.pixelSize: 13
+                                font.pixelSize: Theme.fontIconMicro
                                 color: chip.current ? Theme.crust : Theme.subtext1
                             }
                         }

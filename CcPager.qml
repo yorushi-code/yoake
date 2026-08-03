@@ -82,7 +82,7 @@ Item {
                     anchors.centerIn: parent
                     text: Glyphs.chevronLeft
                     font.family: "Symbols Nerd Font"
-                    font.pixelSize: 12
+                    font.pixelSize: Theme.fontIconMicro
                     color: Theme.text
                 }
 
@@ -102,7 +102,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 text: root.title
                 color: Theme.text
-                font.pixelSize: 14
+                font.pixelSize: Theme.fontTitle
                 font.bold: true
                 elide: Text.ElideRight
             }
