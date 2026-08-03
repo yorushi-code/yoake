@@ -72,7 +72,10 @@ PanelWindow {
     // Day-of-month the user picked, or 0 for none. The cells used to have a
     // hover-enabled MouseArea with no onClicked whatsoever: they highlighted
     // under the pointer and then did nothing at all.
-    property int selectedDay: 0
+    // Set here as well as on open: the panel is created lazily, so on the very
+    // first open it is born after the toggle has already flipped and the
+    // handler for that change never runs.
+    property int selectedDay: new Date().getDate()
 
     readonly property date viewDate: {
         const now = new Date();
@@ -128,7 +131,11 @@ PanelWindow {
                 hideDelay.stop();
                 win.mapped = true;
                 win.monthOffset = 0;
-                win.selectedDay = 0;
+                // Today, not nothing. The line under the grid counts the days
+                // to whatever is selected, and opening on "Выберите день" spent
+                // that line on an instruction instead of on the one date the
+                // panel already knows the reader cares about.
+                win.selectedDay = new Date().getDate();
             } else {
                 hideDelay.restart();
             }
@@ -312,7 +319,11 @@ PanelWindow {
                                     if (!modelData.inMonth) {
                                         win.monthOffset += (dayCell.index < 7) ? -1 : 1;
                                     }
-                                    win.selectedDay = win.selectedDay === modelData.day ? 0 : modelData.day;
+                                    // Always selects. Clicking the selected day
+                                    // used to clear it, which now only puts the
+                                    // line back to an instruction -- there is no
+                                    // state under it worth returning to.
+                                    win.selectedDay = modelData.day;
                                 }
                             }
                         }
