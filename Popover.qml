@@ -126,19 +126,12 @@ Item {
                 }
             }
 
-            RectangularShadow {
-                anchors.fill: glass
-                radius: glass.radius
-                color: Theme.shadowColor
-                blur: Theme.shadowBlur
-                spread: Theme.shadowSpread
-                offset: Qt.vector2d(0, 4)
-            }
-
-            FrostedBackground {
+            // The same object every raised thing in this shell is made of.
+            Surface {
                 id: glass
                 anchors.fill: parent
-                radius: Theme.radiusLarge
+                radius: Theme.radiusPanel
+                elevation: "panel"
                 // The backing samples the wallpaper where the card actually
                 // is. A PopupWindow does not report its own placement, so the
                 // position is derived from the anchor the same way the
@@ -150,33 +143,6 @@ Item {
                 screenY: popup.anchorPos.y
                     + (root.anchorItem ? root.anchorItem.height : 0) + 10
                 tintOpacity: 0.86
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                radius: Theme.radiusLarge
-                color: "transparent"
-                border.width: 1
-                border.color: Qt.alpha(Theme.text, Theme.strokeSoft)
-            }
-
-            // The light along the top lip, the same one the bar islands have,
-            // so a card reads as the same material the bar is made of.
-            ClippingRectangle {
-                anchors.fill: parent
-                radius: Theme.radiusLarge
-                color: "transparent"
-
-                Rectangle {
-                    anchors.top: parent.top
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    height: 26
-                    gradient: Gradient {
-                        GradientStop { position: 0.0; color: Qt.alpha("white", 0.10) }
-                        GradientStop { position: 1.0; color: "transparent" }
-                    }
-                }
             }
 
             Item {

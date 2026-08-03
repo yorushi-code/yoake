@@ -63,21 +63,14 @@ PopupWindow {
         if (!root.visible && root.open) root.dismissed();
     }
 
-    RectangularShadow {
-        anchors.fill: glass
-        radius: glass.radius
-        color: Theme.shadowColor
-        blur: Theme.shadowBlur
-        spread: Theme.shadowSpread
-        offset: Qt.vector2d(Theme.shadowOffset.x, Theme.shadowOffset.y)
-        opacity: glass.opacity
-    }
-
-    FrostedBackground {
+    // The same object every raised thing in this shell is made of. It used to
+    // round to Theme.radius + 4, a number that belonged to nothing.
+    Surface {
         id: glass
         anchors.fill: parent
         anchors.margins: 10
-        radius: Theme.radius + 4
+        radius: Theme.radiusCard
+        elevation: "modal"
         screenX: root.sampleX
         screenY: root.sampleY
         tintOpacity: 0.84
@@ -105,15 +98,6 @@ PopupWindow {
             anchors.fill: parent
             anchors.margins: 6
         }
-    }
-
-    Rectangle {
-        anchors.fill: glass
-        radius: glass.radius
-        color: "transparent"
-        border.color: Qt.alpha(Theme.text, Theme.strokeSoft)
-        border.width: 1
-        opacity: glass.opacity
     }
 
     Item {
