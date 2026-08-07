@@ -2,6 +2,8 @@ singleton GeneratedColors 1.0 GeneratedColors.qml
 singleton Theme 1.0 Theme.qml
 singleton Bus 1.0 Bus.qml
 singleton Context 1.0 Context.qml
+singleton Perception 1.0 Perception.qml
+singleton Direction 1.0 Direction.qml
 singleton Glyphs 1.0 Glyphs.qml
 singleton Icons 1.0 Icons.qml
 singleton Menus 1.0 Menus.qml

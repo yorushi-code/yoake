@@ -273,7 +273,7 @@ PanelWindow {
                                 anchors.centerIn: parent
                                 width: 28
                                 height: 28
-                                radius: 14
+                                radius: Theme.pill(height)
                                 // Today keeps the accent fill; the picked day
                                 // gets a ring; everything else a soft circle
                                 // that scales in on hover.

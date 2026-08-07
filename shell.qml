@@ -39,7 +39,12 @@ ShellRoot {
     // it works -- the tile shows the right state the moment you open the page
     // that constructs it, and the warm screen you asked for last night simply
     // never came back after a restart.
-    property var _alive: [Idle, NightLight, Context]
+    // Perception belongs here for the same reason and more sharply: it is
+    // referenced by nothing at all -- it writes into Theme rather than being
+    // read -- so without this line it is never constructed and the entire
+    // semantic layer is simply absent, with every token sitting at its default
+    // and nothing to indicate anything is missing.
+    property var _alive: [Idle, NightLight, Context, Perception]
 
     // The lock has to exist before it is needed: creating the surface at the
     // moment of locking would show the desktop for the frame it takes to build.

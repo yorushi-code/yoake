@@ -7,7 +7,7 @@
 set -euo pipefail
 
 SRC=$(cd "$(dirname "$0")/.." && pwd)
-DEST=/usr/share/yshell/greeter
+DEST=/usr/share/yoake/greeter
 
 if [ "$(id -u)" -ne 0 ]; then
     exec sudo "$0" "$@"
@@ -19,9 +19,9 @@ install -m 0644 "$SRC/RollDigit.qml" "$SRC/RollClock.qml" "$DEST/"
 
 # The greeter account cannot read the shell's config directory, so the one
 # sprite it uses goes where its own assets live.
-install -d -m 0755 /var/lib/yshell-greeter
-install -m 0644 "$SRC/assets/bongo/bongo-sleeping.png" /var/lib/yshell-greeter/
-install -m 0755 "$SRC/bin/yshell-greeter" "$SRC/bin/yshell-greeter-sync" /usr/local/bin/
+install -d -m 0755 /var/lib/yoake-greeter
+install -m 0644 "$SRC/assets/bongo/bongo-sleeping.png" /var/lib/yoake-greeter/
+install -m 0755 "$SRC/bin/yoake-greeter" "$SRC/bin/yoake-greeter-sync" /usr/local/bin/
 
 # The greeter account has no home on a stock Fedora install, and Qt wants a
 # writable one for its shader and icon caches.

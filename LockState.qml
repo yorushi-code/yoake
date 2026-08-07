@@ -49,11 +49,11 @@ Singleton {
 
     PamContext {
         id: pam
-        // /etc/pam.d/yshell, which is `auth include login` — the same shape
+        // /etc/pam.d/yoake, which is `auth include login` — the same shape
         // swaylock and hyprlock ship. Its own file rather than borrowing
         // theirs, so this lock is not authenticating as something it is not,
         // and so the stack can be changed for it alone.
-        config: "yshell"
+        config: "yoake"
         user: Quickshell.env("USER")
 
         onPamMessage: {

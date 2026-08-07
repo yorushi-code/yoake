@@ -690,7 +690,10 @@ PanelWindow {
                         anchors.verticalCenter: parent.verticalCenter
                         width: hintKey.width + 14
                         height: 21
-                        radius: 6
+                        // A keycap, so the pip rung rather than the chip one:
+                        // at chip radius a 21px-high hint is most of a pill and
+                        // stops reading as a key.
+                        radius: Theme.radiusPip
                         color: Qt.alpha(Theme.text, Theme.fillHover)
 
                         Text {

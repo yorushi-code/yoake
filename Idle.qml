@@ -6,7 +6,7 @@ import Quickshell.Io
 // Whether the session is allowed to give up on you.
 //
 // The flag itself lives in the runtime directory and is owned by
-// bin/yshell-idle.sh, which is what actually acts on it -- this only reflects
+// bin/yoake-idle.sh, which is what actually acts on it -- this only reflects
 // and flips it. Keeping the state in the script rather than here means the
 // keybind and the tile cannot disagree, and the chain still obeys it when the
 // shell is restarted underneath.
@@ -14,7 +14,7 @@ Singleton {
     id: root
 
     readonly property string script:
-        Quickshell.env("HOME") + "/.config/quickshell/bin/yshell-idle.sh"
+        Quickshell.env("HOME") + "/.config/quickshell/bin/yoake-idle.sh"
 
     property bool keepAwake: false
 

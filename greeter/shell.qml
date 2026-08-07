@@ -197,7 +197,7 @@ ShellRoot {
             onTriggered: win.entered = true
         }
 
-        // The wallpaper snapshot, already blurred by yshell-greeter-sync. Doing
+        // The wallpaper snapshot, already blurred by yoake-greeter-sync. Doing
         // it here needed a MultiEffect over a hidden source, which rendered
         // nothing and left the login screen a flat void -- and the picture only
         // changes when the sync runs, so there was never a reason to redo the
@@ -594,7 +594,7 @@ ShellRoot {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 26
-            text: "yshell"
+            text: "yoake"
             color: Qt.alpha(Theme.text, 0.28)
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontLabel

@@ -24,7 +24,12 @@ Item {
     property string elevation: "panel"
     // Frosted glass samples the wallpaper, which costs a blur; a card sitting
     // on a panel that is already glass wants a plain tint instead.
+    // Whether this surface *wants* glass. Whether it gets it is also the
+    // mood's call: under load the shell drops the frost everywhere at once,
+    // which is both the cheapest thing it can do for the machine and the most
+    // visible way of saying it noticed.
     property bool glass: true
+    readonly property bool _frosted: root.glass && Theme.frost
     property bool specular: true
     // Panels carry small body text over arbitrary wallpaper detail and need a
     // denser frost than the bar, which only has to keep glyphs legible.
@@ -58,7 +63,7 @@ Item {
 
     FrostedBackground {
         anchors.fill: parent
-        visible: root.glass
+        visible: root._frosted
         radius: root.radius
         screenX: root.screenX
         screenY: root.screenY
@@ -67,7 +72,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        visible: !root.glass
+        visible: !root._frosted
         radius: root.radius
         color: root.fill
     }
@@ -87,7 +92,7 @@ Item {
             anchors.right: parent.right
             height: parent.height * 0.55
             gradient: Gradient {
-                GradientStop { position: 0.0; color: Qt.alpha("white", root.glass ? 0.13 : 0.07) }
+                GradientStop { position: 0.0; color: Qt.alpha("white", root._frosted ? 0.13 : 0.07) }
                 GradientStop { position: 1.0; color: "transparent" }
             }
         }

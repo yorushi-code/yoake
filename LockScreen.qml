@@ -146,7 +146,7 @@ WlSessionLock {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: 72
                 height: 72
-                radius: 36
+                radius: Theme.pill(height)
                 color: Qt.alpha(Theme.text, Theme.fillSubtle)
                 border.width: 2
                 border.color: Qt.alpha(Theme.accent, LockState.busy ? 0.9 : 0.35)
@@ -464,7 +464,7 @@ WlSessionLock {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 26
-            text: "yshell"
+            text: "yoake"
             color: Qt.alpha(Theme.text, 0.28)
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontLabel

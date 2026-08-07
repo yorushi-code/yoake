@@ -106,13 +106,13 @@ MenuSurface {
                 enabled: modelData.enabled !== false
 
                 // Staggered reveal, capped so a long device list doesn't
-                // cascade slowly on open. The cap lives in Theme.stagger so
+                // cascade slowly on open. The cap lives in Direction.stagger so
                 // every cascade in the shell has the same rhythm.
                 opacity: 0
                 Component.onCompleted: entry.start()
                 SequentialAnimation {
                     id: entry
-                    PauseAnimation { duration: Theme.stagger(index) }
+                    PauseAnimation { duration: Direction.stagger(index) }
                     // Targets the row explicitly: `parent` inside an
                     // animation resolves to the enclosing Item's parent — the
                     // Column — so this animated the wrong object's opacity and

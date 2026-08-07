@@ -52,7 +52,11 @@ Item {
         // alone, which the scene graph changes for free and which carries the
         // beat just as visibly.
         spread: 1
-        opacity: Math.min(0.85, 0.18 + root.bass * 0.62)
+        // Scaled by hierarchy: this glow is decoration, and decoration is the
+        // first thing that should step back when someone has been sitting in
+        // one window for a while. It stays a beat -- the bass still drives it
+        // -- but a quieter one.
+        opacity: Math.min(0.85, 0.18 + root.bass * 0.62) * Theme.chromeEmphasis
         offset: Qt.vector2d(0, 0)
         // No Behaviors. Two 90ms animations restarting on every cava frame
         // never finished, and each restart re-rendered a blur-28 shadow.

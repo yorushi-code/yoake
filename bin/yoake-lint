@@ -286,11 +286,11 @@ def off_ladder():
                 continue
             m = re.search(r"font\.pixelSize:\s*(\d+)\s*$", line)
             if m and m.group(1) in sizes:
-                out.append((path.name, n, f"font size {m.group(1)} has a rung in Theme"))
+                out.append((rel, n, f"font size {m.group(1)} has a rung in Theme"))
                 continue
             m = re.search(r"\bradius:\s*(\d+)\s*$", line)
             if m and m.group(1) in radii:
-                out.append((path.name, n, f"radius {m.group(1)} has a rung in Theme"))
+                out.append((rel, n, f"radius {m.group(1)} has a rung in Theme"))
                 continue
             m = re.search(r"Qt\.alpha\(Theme\.text,\s*(0\.\d+)\)", line)
             if m and m.group(1) in ("0.06", "0.10", "0.14", "0.18", "0.20"):
@@ -319,6 +319,96 @@ def raw_icon_lookups():
     return out
 
 
+# ── Rungs, named once so the drift scan and the on-ladder scan agree ──
+LADDER_RADII = {4, 10, 16, 24}
+LADDER_SIZES = {9, 10, 11, 12, 13, 15, 22, 40, 12, 14, 17}
+LADDER_ALPHAS = {"0.06", "0.10", "0.14", "0.18", "0.20"}
+
+
+def drift():
+    """Values that belong to no rung at all.
+
+    off_ladder() above catches a rung written as a number -- `radius: 10` where
+    Theme.radiusChip says the same thing. It cannot catch the opposite and much
+    commoner mistake, a value that is on no rung whatsoever, because it works by
+    matching against the rungs themselves. That blind spot is why this file
+    reported zero for months while the tree carried forty-four distinct surface
+    alphas against a six-rung ladder -- the exact condition Theme.qml says it
+    was written to end, back at four times the size it was when someone counted.
+
+    Reported separately and not counted toward the exit status. These are design
+    debt, not bugs: a scanner that turns one broken cat into a hundred and fifty
+    spacing complaints is a scanner nobody runs, and this file's own rule is
+    that an ignored lint is worse than none. Green still means the shell works.
+    """
+    out = []
+    for path in sorted(list(ROOT.glob("*.qml")) + list((ROOT / "greeter").glob("*.qml"))):
+        if path.name == "Theme.qml":
+            continue
+        # greeter/shell.qml and shell.qml share a basename, and a report that
+        # cannot tell them apart sends you to the wrong file.
+        rel = str(path.relative_to(ROOT))
+        text = path.read_text()
+
+        # A radius on a RectangularShadow is not a shape. It is the corner of
+        # the blur, and it has to match whatever it sits under -- inset by the
+        # shadow's own negative margin, which is how DesktopWidget arrives at 26
+        # for a 20-radius widget pushed out by 6. Flagging those taught the
+        # reader to "fix" correct code, which is the one thing this file must
+        # never do.
+        shadow_lines = set()
+        for kind, _, body, line, _ in blocks(text):
+            if kind == "RectangularShadow":
+                shadow_lines.update(range(line, line + body.count("\n") + 2))
+
+        for n, line in enumerate(text.splitlines(), 1):
+            stripped = line.lstrip()
+            if stripped.startswith("//"):
+                continue
+
+            # Anything under four is half the height of a thin bar: geometry,
+            # not a choice, and the same exemption off_ladder() already makes.
+            m = re.search(r"\bradius:\s*(\d+)\s*$", line)
+            if (m and n not in shadow_lines
+                    and int(m.group(1)) >= 4 and int(m.group(1)) not in LADDER_RADII):
+                out.append((rel, n, f"radius {m.group(1)} is on no rung of the shape ladder"))
+
+            # Every duration in the shell should now be a Theme rung, because
+            # the rungs are the only ones that scale with Perception's tempo. A
+            # literal here does not merely drift from the ladder -- it stands
+            # still while the whole shell speeds up and slows down around it.
+            # Not anchored to end of line: half the shell writes its animations
+            # inline as `{ duration: 900 }`, and an anchored rule found eight of
+            # them out of sixty -- which is how a measurement quietly agrees
+            # with whoever wrote it. A trailing `0` is exempt because that is
+            # the `shown ? delay : 0` idiom, an absence of animation rather than
+            # a duration chosen by hand.
+            for m in re.finditer(r"\bduration:\s*(\d+)\s*(?=[};\n]|$)", line):
+                if m.group(1) == "0":
+                    continue
+                out.append((rel, n, f"duration {m.group(1)} is a literal; it will not follow the tempo"))
+
+            m = re.search(r"font\.pixelSize:\s*(\d+)\s*$", line)
+            if m and int(m.group(1)) not in LADDER_SIZES:
+                out.append((rel, n, f"font size {m.group(1)} is on no rung of the type scale"))
+
+            for m in re.finditer(r"Qt\.alpha\(\s*Theme\.\w+\s*,\s*(0?\.\d+)\s*\)", line):
+                v = m.group(1)
+                norm = f"{float(v):.2f}"
+                if norm not in LADDER_ALPHAS:
+                    out.append((rel, n, f"surface alpha {v} is on no rung of the surface ladder"))
+    return out
+
+
+def summarise(rows):
+    """Counts by kind, so the size of each problem is legible without scrolling."""
+    kinds = {}
+    for _, _, what in rows:
+        key = what.split(" is ")[0].split(" ")[0]
+        kinds[key] = kinds.get(key, 0) + 1
+    return kinds
+
+
 def main():
     findings = []
     for path in sorted(list(ROOT.glob("*.qml")) + list((ROOT / "greeter").glob("*.qml"))):
@@ -331,6 +421,17 @@ def main():
     for name, line, what in findings:
         print(f"{name}:{line}: {what}")
     print(f"\n{len(findings)} finding{'' if len(findings) == 1 else 's'}")
+
+    rows = drift()
+    if rows:
+        if "--drift" in sys.argv:
+            print()
+            for name, line, what in rows:
+                print(f"{name}:{line}: {what}")
+        print("\ndrift (not counted; run with --drift for the list):")
+        for kind, count in sorted(summarise(rows).items(), key=lambda kv: -kv[1]):
+            print(f"  {count:4d}  {kind}")
+
     return 1 if findings else 0
 
 

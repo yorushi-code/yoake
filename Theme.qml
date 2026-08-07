@@ -6,13 +6,74 @@ import QtQuick
 // that's what makes the whole DE (bar, panels, fuzzel) recolor itself
 // automatically on wallpaper change instead of needing a manual retheme.
 QtObject {
+    // ── Driven by Perception ──
+    //
+    // Written from outside, not read from Perception, so this file keeps
+    // depending on nothing: Context reaches Notifs and Notifs reads Theme, so a
+    // Theme that reached for Perception would close that ring while the
+    // singletons are still being built. The defaults below are the shell with
+    // no interpretation applied, which is also what it looks like if Perception
+    // is never constructed.
+    //
+    // These are the whole of the "living surface": nothing moves a widget, the
+    // ladders move, and the several hundred bindings already standing on them
+    // carry the change outward. Deliberately not on this list are barHeight and
+    // barMargin -- they set the layer-shell exclusive zone, and breathing that
+    // would shove every real window on the output back and forth.
+    //
+    // One semantic owner each, and the ownership is the architecture rather
+    // than a convention: if two axes ever wanted the same scalar, they would be
+    // one axis. Written down because the next person to add a token will be
+    // tempted to reach for whichever one is already in scope.
+    //
+    //   densityScale  <- spatial     motionScale  <- temporal
+    //   inkScale      <- optical     frost        <- optical
+    //   emphasis      <- hierarchy
+    property real motionScale: 1.0
+    property real densityScale: 1.0
+    property real inkScale: 1.0
+    property bool frost: true
+    property real emphasis: 1.0
+
+    // Where deciding ends and presenting begins.
+    //
+    // Perception emits a number and stops; making that number physical is this
+    // file's job. Putting these Behaviors upstream would have made the semantic
+    // layer read its own last output to interpolate from it, which is the one
+    // thing it is not allowed to do -- and the split is what keeps "what should
+    // be true" separable from "how it becomes visible".
+    //
+    // Long, because none of this is the shell answering an input. Nobody
+    // pressed anything, so it must not be timed like a response, and it cannot
+    // be timed by the very motion scale it is setting.
+    Behavior on motionScale { NumberAnimation { duration: 1400; easing.type: Easing.Bezier; easing.bezierCurve: easeEmphasized } }
+    Behavior on densityScale { NumberAnimation { duration: 1400; easing.type: Easing.Bezier; easing.bezierCurve: easeEmphasized } }
+    Behavior on inkScale { NumberAnimation { duration: 1400; easing.type: Easing.Bezier; easing.bezierCurve: easeEmphasized } }
+    Behavior on emphasis { NumberAnimation { duration: 1400; easing.type: Easing.Bezier; easing.bezierCurve: easeEmphasized } }
+
+    // Hierarchy's own token, and the reason it needed one. The obvious way to
+    // pull decorative chrome back was to lower its ink -- but ink belongs to
+    // optical, and a second axis writing it would have been two owners for one
+    // token. Emphasis therefore gets a scalar of its own rather than borrowing
+    // one, which is the ownership rule catching a real mistake rather than
+    // describing a hypothetical.
+    // Inverted: emphasis rising means the focal thing gets more of the eye, so
+    // the decorative chrome gets less. Bottoms out well short of zero -- chrome
+    // that disappears entirely reads as the shell having broken, not as the
+    // shell being tactful.
+    readonly property real chromeEmphasis: Math.max(0.55, Math.min(1.0, 1.70 - emphasis))
+
     readonly property color crust: Qt.darker(GeneratedColors.background, 1.15)
     readonly property color mantle: GeneratedColors.background
     readonly property color base: Qt.lighter(GeneratedColors.background, 1.12)
 
-    readonly property color text: GeneratedColors.foreground
-    readonly property color subtext1: GeneratedColors.subtext1
-    readonly property color subtext0: GeneratedColors.subtext0
+    // Ink carries the mood's contrast. Qt.alpha sets alpha absolutely rather
+    // than multiplying it, so the derived fills below -- Qt.alpha(text, 0.06)
+    // and its neighbours -- are untouched by this and keep their own ladder.
+    // Only type drawn in `text` itself pulls back.
+    readonly property color text: Qt.alpha(GeneratedColors.foreground, inkScale)
+    readonly property color subtext1: Qt.alpha(GeneratedColors.subtext1, inkScale)
+    readonly property color subtext0: Qt.alpha(GeneratedColors.subtext0, inkScale)
 
     readonly property color surface0: GeneratedColors.surface0
     readonly property color surface1: GeneratedColors.surface1
@@ -170,11 +231,14 @@ QtObject {
     //
     // Multiples of four, because the eye reads rhythm and not arithmetic: a
     // 13 next to a 14 is noise that nobody can name but everybody feels.
-    readonly property int gapTight: 4
-    readonly property int spacing: 8
-    readonly property int gapWide: 12
-    readonly property int gapCard: 16
-    readonly property int gapSection: 24
+    //
+    // Scaled by the mood, and rounded: a fractional gap lands type on a half
+    // pixel and the whole shell goes soft mid-transition.
+    readonly property int gapTight: Math.round(4 * densityScale)
+    readonly property int spacing: Math.round(8 * densityScale)
+    readonly property int gapWide: Math.round(12 * densityScale)
+    readonly property int gapCard: Math.round(16 * densityScale)
+    readonly property int gapSection: Math.round(24 * densityScale)
     // Islands need more presence than a hairline strip — at 28 the frosted
     // glass and its glow had no room to read as an actual surface.
     readonly property int barHeight: 34
@@ -183,14 +247,14 @@ QtObject {
     // Faster than a response: the pop of an icon under a click, the shake of
     // the bell. These are not the shell answering, they are the shell
     // acknowledging, and at 120 an acknowledgement reads as a slow answer.
-    readonly property int animFlick: 90
-    readonly property int animFast: 120
-    readonly property int animNormal: 220
-    readonly property int animSlow: 420
+    readonly property int animFlick: Math.round(90 * motionScale)
+    readonly property int animFast: Math.round(120 * motionScale)
+    readonly property int animNormal: Math.round(220 * motionScale)
+    readonly property int animSlow: Math.round(420 * motionScale)
     // Panels leave faster than they arrive: a slow exit reads as sluggish,
     // and an accelerating curve reaches true 0 before the window unmaps so
     // there's no visible snap at the end (see easeExit).
-    readonly property int animExit: 170
+    readonly property int animExit: Math.round(170 * motionScale)
 
     // Ambient motion, which is not response motion. The three rungs above say
     // how fast the shell answers; these two say how fast something breathes to
@@ -198,8 +262,8 @@ QtObject {
     // `busy` is a thing working and worth waiting for, `breath` is a thing
     // simply running. Three separate widgets had invented 520, 700 and 900 for
     // the same infinite opacity pulse, and only one of them said why.
-    readonly property int animBusy: 520
-    readonly property int animBreath: 800
+    readonly property int animBusy: Math.round(520 * motionScale)
+    readonly property int animBreath: Math.round(800 * motionScale)
 
     // Material-3-style "emphasized" decelerate curve — everything that
     // settles into place (panel open, hover fill, list reveal) uses this
@@ -231,10 +295,9 @@ QtObject {
     readonly property real revealScale: 0.90
     readonly property real revealSlide: 18
 
-    // Per-item delay for a cascade. Capped: a fifty-node VPN list staggered
-    // linearly would still be arriving a second and a half after it opened,
-    // which reads as the shell being slow rather than as motion.
-    function stagger(index) {
-        return Math.min(Math.max(0, index), 9) * 34;
-    }
+    // stagger() used to live here and is now Direction.stagger(). The contract
+    // says this file holds no timing policy beyond animation parameters, and a
+    // cascade is not a parameter -- it is an order of events, which is the one
+    // thing Direction exists to own. It was also the only number in the shell
+    // that stayed fixed while the motion scale moved underneath it.
 }

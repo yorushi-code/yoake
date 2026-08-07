@@ -13,7 +13,7 @@
 # with a signal once a session has started, which a shell reports as 128+N, so
 # an exit above 128 is the success case and this script is done either way.
 
-CONFIG=/usr/share/yshell/greeter/shell.qml
+CONFIG=/usr/share/yoake/greeter/shell.qml
 FALLBACK=/usr/bin/gtkgreet
 ATTEMPTS=4
 MIN_RUN=5
@@ -37,7 +37,7 @@ while [ "$attempt" -lt "$ATTEMPTS" ] && [ "$runs" -lt "$MAX_RUNS" ]; do
         exit 0
     fi
 
-    echo "yshell greeter attempt $attempt exited rc=$rc after ${ran}s" >&2
+    echo "yoake greeter attempt $attempt exited rc=$rc after ${ran}s" >&2
 
     # A run that lasted a while was working and something ended it -- a VT
     # switch, the display going away. Start it again without counting it
@@ -49,7 +49,7 @@ while [ "$attempt" -lt "$ATTEMPTS" ] && [ "$runs" -lt "$MAX_RUNS" ]; do
 done
 
 if [ -x "$FALLBACK" ]; then
-    echo "yshell greeter failed to stay up; falling back to $FALLBACK" >&2
+    echo "yoake greeter failed to stay up; falling back to $FALLBACK" >&2
     exec "$FALLBACK"
 fi
 

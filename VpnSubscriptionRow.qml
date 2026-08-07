@@ -14,6 +14,16 @@ Rectangle {
     signal connectRequested()
     signal refreshRequested()
     signal removeRequested()
+    signal coreRequested(string core)
+
+    // The three cores, in the order the chip cycles through them. Which one a
+    // subscription runs on is part of the subscription: providers differ in
+    // what they hand out, and a key that needs xhttp cannot run on sing-box
+    // while one built on hysteria2 cannot run on Xray at all.
+    readonly property var cores: ["mihomo", "sing-box", "xray"]
+    readonly property string core: root.modelData.core || "mihomo"
+    readonly property string nextCore:
+        root.cores[(Math.max(0, root.cores.indexOf(root.core)) + 1) % root.cores.length]
 
     // Node count, quota and expiry as the provider reported them during the
     // last download. It only sends them in the headers of that download, so
@@ -129,6 +139,52 @@ Rectangle {
         anchors.rightMargin: 8
         anchors.verticalCenter: parent.verticalCenter
         spacing: 2
+
+        // The core, and the only place to change it. Xray is marked because it
+        // has no TUN: on that core nothing is tunnelled except what points at
+        // the proxy port, which is otherwise indistinguishable from a tunnel
+        // that came up and carries nothing.
+        Rectangle {
+            id: coreChip
+            anchors.verticalCenter: parent.verticalCenter
+            width: coreLabel.implicitWidth + 14
+            height: 20
+            radius: Theme.radiusChip
+            color: coreArea.containsMouse
+                ? Qt.alpha(Theme.accent, 0.24)
+                : Qt.alpha(Theme.text, 0.08)
+            Behavior on color { ColorAnimation { duration: Theme.animFast } }
+
+            Text {
+                id: coreLabel
+                anchors.centerIn: parent
+                text: root.core
+                // Yellow rather than a badge: the chip is 20px tall and the
+                // fact it carries is "this core does not tunnel the system".
+                color: root.core === "xray"
+                    ? Theme.yellow
+                    : (coreArea.containsMouse ? Theme.text : Theme.subtext0)
+                font.pixelSize: Theme.fontLabel
+            }
+
+            MouseArea {
+                id: coreArea
+                anchors.fill: parent
+                hoverEnabled: true
+                enabled: !root.busy
+                cursorShape: Qt.PointingHandCursor
+                onClicked: root.coreRequested(root.nextCore)
+            }
+
+            Tooltip {
+                anchorItem: coreChip
+                active: coreArea.containsMouse
+                text: "Ядро: " + root.core + " → " + root.nextCore
+                subtext: root.core === "xray"
+                    ? "Xray без TUN: в туннель идёт только то, что смотрит в порт 7890"
+                    : "Переключение пересобирает конфиг при следующем подключении"
+            }
+        }
 
         Repeater {
             model: [

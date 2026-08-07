@@ -1,0 +1,13 @@
+{
+  "enabled": false,
+  "type": "snow",
+  "count": 80,
+  "speed": 1.0,
+  "size": 1.0,
+  "opacity": 0.85,
+  "sway": true,
+  "spin": true,
+  "onlyOverAyuGram": false,
+  "appId": "com.ayugram.desktop",
+  "layer": "top"
+}

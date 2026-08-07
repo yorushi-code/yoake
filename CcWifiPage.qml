@@ -72,7 +72,7 @@ Flickable {
                 Component.onCompleted: opacity = 1
                 Behavior on opacity {
                     SequentialAnimation {
-                        PauseAnimation { duration: Theme.stagger(index) }
+                        PauseAnimation { duration: Direction.stagger(index) }
                         NumberAnimation { duration: Theme.animNormal }
                     }
                 }

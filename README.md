@@ -1,11 +1,20 @@
-# yshell
+# Yoake
 
 The desktop shell for this machine. Quickshell on niri: the bar, the wallpaper,
 the notification stack, the control centre, the launcher, the session lock and
 the desktop widgets are all one program drawing one design.
 
-Named to match `~/yworld`, the VPN backend — `y` for yorushi, the rest of the
-word left alone.
+夜明け — daybreak. It keeps the `y` that pairs this with `~/yworld`, the VPN
+backend, and the rest of the word is the arc the shell actually runs: the
+greeter, the lock and the idle chain are all about a machine going dark and
+coming back. It was called `yshell` until the semantic layer landed, at which
+point "shell" had stopped describing what it was.
+
+Colours, spacing, pace and light are not constants. `Perception.qml` derives
+them from what the machine is doing, `Theme.qml` computes the tokens, and the
+bindings already in the tree carry the change outward — see
+[PerformanceContract.md](PerformanceContract.md) for the rules that keeps
+honest.
 
 ## What it is made of
 
@@ -63,14 +72,14 @@ Pausing itself changes nothing on screen — VideoOutput keeps its last frame.
 Authenticating per surface would open a conversation per monitor and count a
 wrong password twice.
 
-The PAM service is `/etc/pam.d/yshell` — `auth include login`, the same shape
+The PAM service is `/etc/pam.d/yoake` — `auth include login`, the same shape
 swaylock and hyprlock ship. There is deliberately no unlock over IPC: a shell on
 this machine must not be able to open the physical screen. If it ever traps the
 session, the way out is Ctrl+Alt+F2, log in, `pkill niri`.
 
 ## Idle
 
-`bin/yshell-idle.sh` drives swayidle: dim at 4 minutes, lock at 8, monitors off
+`bin/yoake-idle.sh` drives swayidle: dim at 4 minutes, lock at 8, monitors off
 at 9, suspend at 20 and only on battery. Dimming first is the warning — a screen
 that goes straight from working to black is indistinguishable from a crash.
 

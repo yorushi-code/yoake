@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# The idle chain for yshell.
+# The idle chain for yoake.
 #
 # There was none: swayidle was installed and never started, so the screen sat
 # lit at full brightness indefinitely and the session never locked itself. Four
@@ -17,7 +17,7 @@
 # comes back.
 set -u
 
-STATE_DIR="${XDG_RUNTIME_DIR:-/tmp}/yshell"
+STATE_DIR="${XDG_RUNTIME_DIR:-/tmp}/yoake"
 mkdir -p "$STATE_DIR"
 DIM_FILE="$STATE_DIR/pre-dim-brightness"
 # Present means every stage is a no-op. A runtime path rather than a config
@@ -80,7 +80,7 @@ case "${1:-run}" in
     fi
     ;;
   lock)
-    # Through the shell, so it is the yshell surface and not swaylock's
+    # Through the shell, so it is the yoake surface and not swaylock's
     # defaults. If the shell is not running there is nothing to lock with, and
     # falling back to swaylock is better than leaving the session open.
     if qs ipc call lock state >/dev/null 2>&1; then

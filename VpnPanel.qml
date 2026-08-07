@@ -418,7 +418,31 @@ Item {
                                 anchorItem: egressRow
                                 active: egressArea.containsMouse && !Mihomo.checking
                                 text: "Проверить выход заново"
-                                subtext: "Запрос идёт через сам mihomo"
+                                subtext: "Запрос идёт через само ядро"
+                            }
+                        }
+
+                        // A core without a TUN is up, healthy and carrying only
+                        // what points at its port — which looks exactly like a
+                        // working tunnel from everywhere else in this panel.
+                        Rectangle {
+                            width: parent.width
+                            height: noTunLabel.implicitHeight + 16
+                            radius: Theme.radius
+                            visible: Mihomo.running && !Mihomo.tunCapable
+                            color: Qt.alpha(Theme.yellow, 0.16)
+
+                            Text {
+                                id: noTunLabel
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.margins: 10
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: Mihomo.core + " не умеет TUN — системный трафик идёт мимо, "
+                                    + "в туннель попадает только то, что настроено на 127.0.0.1:7890"
+                                color: Theme.yellow
+                                font.pixelSize: Theme.fontSmall
+                                wrapMode: Text.WordWrap
                             }
                         }
 
@@ -714,6 +738,7 @@ Item {
                                         onConnectRequested: Mihomo.start(modelData.name)
                                         onRefreshRequested: Mihomo.refreshSubscription(modelData.name)
                                         onRemoveRequested: Mihomo.removeSubscription(modelData.name)
+                                        onCoreRequested: core => Mihomo.setCore(modelData.name, core)
                                     }
                                 }
                             }
@@ -751,13 +776,13 @@ Item {
                                     probing: Mihomo.probing
 
                                     // A cascade rather than a wall of rows
-                                    // arriving at once. Theme.stagger caps the
+                                    // arriving at once. Direction.stagger caps the
                                     // delay, so a fifty-node list is not still
                                     // arriving a second and a half later.
                                     opacity: root.open ? 1 : 0
                                     Behavior on opacity {
                                         SequentialAnimation {
-                                            PauseAnimation { duration: root.open ? Theme.stagger(index) : 0 }
+                                            PauseAnimation { duration: root.open ? Direction.stagger(index) : 0 }
                                             NumberAnimation {
                                                 duration: Theme.animNormal
                                                 easing.type: Easing.Bezier

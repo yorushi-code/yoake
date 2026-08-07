@@ -100,7 +100,7 @@ Rectangle {
             Rectangle {
                 width: 14
                 height: 14
-                radius: 7
+                radius: Theme.pill(height)
                 y: 2
                 x: root.active ? track.width - width - 2 : 2
                 color: root.active ? Theme.crust : Theme.text

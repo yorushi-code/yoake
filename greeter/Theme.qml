@@ -8,7 +8,7 @@ import Quickshell.Io
 // A trimmed copy of the session's Theme rather than an import of it: the
 // greeter runs as its own unprivileged user and the home directory it would
 // have to read is 700. What it gets instead is a snapshot, written to
-// /var/lib/yshell-greeter by yshell-greeter-sync whenever the wallpaper
+// /var/lib/yoake-greeter by yoake-greeter-sync whenever the wallpaper
 // changes, so the login screen keeps wearing the same palette as the desktop
 // without ever reading the desktop's files.
 //
@@ -18,7 +18,7 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    readonly property string assetDir: "/var/lib/yshell-greeter"
+    readonly property string assetDir: "/var/lib/yoake-greeter"
 
     property color background: "#16131E"
     property color foreground: "#E2E1E8"

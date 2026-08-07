@@ -25,6 +25,13 @@ Singleton {
     property bool running: false
     property string active: ""
     property string lastError: ""
+    // Which of the three cores is carrying this, and whether that core can
+    // take over system routing at all. Xray cannot: it tunnels only what is
+    // pointed at its listener port, and a panel that showed it as a tunnel
+    // like the other two would be lying about where the traffic goes.
+    property string core: "mihomo"
+    property bool tunCapable: true
+    property bool tunActive: false
     // Another TUN client owning the default route. The worst failure mode
     // there is: both tunnels stay up and look healthy, and the one that lost
     // simply carries nothing.
@@ -169,12 +176,12 @@ Singleton {
         if (!target) return;
 
         root.probing = true;
-        // Generous, because mihomo probes the whole group in parallel: this is
-        // one 5s wait for the slowest node, not five seconds per node. At 3s
-        // several perfectly usable nodes were coming back as dead.
+        // Generous, because the group is probed in parallel: this is one 5s
+        // wait for the slowest node, not five seconds per node. At 3s several
+        // perfectly usable nodes were coming back as dead.
         MihomoApi.groupDelay(name, 5000, (data, err) => {
-            root.probing = false;
             if (err) {
+                root.probing = false;
                 root.lastError = err;
                 return;
             }
@@ -182,12 +189,40 @@ Singleton {
             // reported as zero, so a miss has to be written down explicitly or
             // the previous reading would silently stand in for it.
             const next = Object.assign({}, root.delays);
+            const missing = [];
             for (const node of target.nodes) {
                 if (!root.measurable(node)) continue;
-                next[node] = (data && data[node] !== undefined) ? data[node] : null;
+                if (data && data[node] !== undefined) next[node] = data[node];
+                else missing.push(node);
             }
             root.delays = next;
+            if (missing.length === 0) {
+                root.probing = false;
+                return;
+            }
+            root._probeEach(missing);
         });
+    }
+
+    // What a group probe left out, asked for one node at a time.
+    //
+    // sing-box answers a group probe for the group's own members — AUTO,
+    // DIRECT — and leaves the nodes themselves out of it, so on that core
+    // every row stayed blank. A node the group did report as missing is worth
+    // asking about individually anyway: absent from a group reply means "no
+    // measurement", which is not the same as "dead".
+    function _probeEach(names) {
+        const next = Object.assign({}, root.delays);
+        let pending = names.length;
+        for (const node of names) {
+            MihomoApi.nodeDelay(node, 5000, (data, err) => {
+                next[node] = (!err && data && data.delay !== undefined) ? data.delay : null;
+                pending -= 1;
+                if (pending > 0) return;
+                root.delays = next;
+                root.probing = false;
+            });
+        }
     }
 
     // Probes only what has never been measured. Opening the panel should show
@@ -262,6 +297,18 @@ Singleton {
         root._run(actionProc, ["sub-del", name]);
     }
 
+    // Which core a subscription runs on. Recorded, not applied: the config for
+    // the new core is built on the next connect, so a subscription that is
+    // running is reconnected here and one that is not is left alone.
+    function setCore(name, core) {
+        root.busy = true;
+        root.lastError = "";
+        root._pendingRestart = (name === root.active && root.running) ? name : "";
+        root._run(coreProc, ["core", name, core]);
+    }
+
+    property string _pendingRestart: ""
+
     function refreshSubscription(name) {
         root.busy = true;
         root.lastError = "";
@@ -282,6 +329,9 @@ Singleton {
                 const j = root._parse(text);
                 root.running = j.running === true;
                 root.active = j.active || "";
+                root.core = j.core || "mihomo";
+                root.tunCapable = j.tun_capable !== false;
+                root.tunActive = j.tun === true;
                 root.conflict = j.conflict || "";
                 root.conflictCanStop = j.conflict_can_stop === true;
                 if (j.error) root.lastError = j.error;
@@ -305,6 +355,22 @@ Singleton {
         }
     }
 
+    // Recording the core is a settings change, and the tunnel only picks it up
+    // on the next connect — so the one that was running is brought back here.
+    property Process coreProc: Process {
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const j = root._parse(text);
+                root.busy = false;
+                root.lastError = j.error || "";
+                const restart = root._pendingRestart;
+                root._pendingRestart = "";
+                if (!j.error && restart !== "") root.start(restart);
+                else root.refresh();
+            }
+        }
+    }
+
     property Process startProc: Process {
         stdout: StdioCollector {
             onStreamFinished: {
@@ -317,6 +383,13 @@ Singleton {
                 if (!j.error && j.previous_nodes > 1 && j.nodes < j.previous_nodes / 2) {
                     root.lastError = "У «" + j.active + "» было " + j.previous_nodes
                         + " нод, провайдер отдал " + j.nodes;
+                }
+                // The other way a node list shrinks, and the one the provider
+                // has nothing to do with: this core cannot carry those nodes.
+                if (!j.error && (j.dropped || []).length > 0) {
+                    const names = j.dropped.map(d => d.name).join(", ");
+                    root.lastError = j.core + " не умеет " + j.dropped.length
+                        + " нод из этой подписки: " + names;
                 }
                 root.egress = null;
                 root.refresh();

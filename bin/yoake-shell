@@ -12,7 +12,7 @@
 # adding to it.
 
 CONFIG="$HOME/.config/quickshell/shell.qml"
-GREETER_MARK="/usr/share/yshell/greeter"
+GREETER_MARK="/usr/share/yoake/greeter"
 
 others() {
     local pid
@@ -32,7 +32,7 @@ done
 
 # A notification daemon that is not this shell has to go first.
 #
-# mako was replaced by yshell in July, but its D-Bus activation file is still
+# mako was replaced by yoake in July, but its D-Bus activation file is still
 # installed: the moment the shell is not holding org.freedesktop.Notifications
 # and anything posts a notification, systemd starts mako and it keeps the name.
 # The shell then comes up with no notifications at all -- no toasts of its own,

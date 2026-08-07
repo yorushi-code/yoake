@@ -11,7 +11,7 @@
 # be doing.
 set -euo pipefail
 
-DEST=/var/lib/yshell-greeter
+DEST=/var/lib/yoake-greeter
 OWNER=${SUDO_USER:-$(id -un)}
 HOME_DIR=$(getent passwd "$OWNER" | cut -d: -f6)
 RECORD="$HOME_DIR/.config/quickshell/.wallpaper-path"
@@ -33,7 +33,7 @@ if [ ! -r "$src" ]; then
     exit 1
 fi
 
-tmp=$(runuser -u "$OWNER" -- mktemp /tmp/yshell-greeter-wall.XXXXXX.jpg)
+tmp=$(runuser -u "$OWNER" -- mktemp /tmp/yoake-greeter-wall.XXXXXX.jpg)
 trap 'rm -f "$tmp"' EXIT
 
 # Blurred here rather than in the greeter. The snapshot only changes when this

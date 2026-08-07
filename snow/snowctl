@@ -1,0 +1,109 @@
+#!/usr/bin/env python3
+"""Small editor for the snow overlay's config.json.
+
+The overlay watches the file and reloads itself, so writing the file is the whole
+control surface - there is no IPC to keep in sync.
+"""
+
+import json
+import os
+import sys
+
+# realpath, not abspath: the usual way to call this is the `snow` symlink in
+# ~/.local/bin, and the config lives next to the real script.
+CONFIG = os.path.join(os.path.dirname(os.path.realpath(__file__)), "config.json")
+
+TYPES = ("snow", "sakura", "matrix", "rain", "leaves")
+NUMERIC = {"count": int, "speed": float, "size": float, "opacity": float}
+FLAGS = ("enabled", "sway", "spin", "onlyOverAyuGram")
+
+USAGE = f"""usage: snow [command]
+
+  <{'|'.join(TYPES)}>   switch particles
+  (no arguments)       print current settings
+
+  type <name>          same, spelled out
+  count <n>            particles on screen
+  speed <x>            fall speed multiplier, 1.0 = normal
+  size <x>             particle size multiplier
+  opacity <0..1>
+  sway on|off          sideways drift
+  spin on|off          rotation
+  only on|off          show only while AyuGram is focused
+  layer top|overlay|bottom
+  on | off | toggle    the effect itself
+"""
+
+
+def load():
+    with open(CONFIG, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save(cfg):
+    with open(CONFIG, "w", encoding="utf-8") as f:
+        json.dump(cfg, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+
+
+def as_bool(value):
+    if value in ("on", "true", "1", "yes"):
+        return True
+    if value in ("off", "false", "0", "no"):
+        return False
+    sys.exit(f"expected on/off, got {value!r}")
+
+
+def main(argv):
+    if argv and argv[0] in ("-h", "--help", "help"):
+        print(USAGE)
+        return 0
+
+    cfg = load()
+    cmd = argv[0] if argv else "show"
+    arg = argv[1] if len(argv) > 1 else None
+
+    # `snow sakura` is shorthand for `snow type sakura`.
+    if cmd in TYPES:
+        cmd, arg = "type", cmd
+
+    if cmd == "show":
+        for key in sorted(cfg):
+            print(f"{key:16} {cfg[key]}")
+        return 0
+
+    if cmd == "on":
+        cfg["enabled"] = True
+    elif cmd == "off":
+        cfg["enabled"] = False
+    elif cmd == "toggle":
+        cfg["enabled"] = not cfg.get("enabled", True)
+    elif cmd == "type":
+        if arg not in TYPES:
+            sys.exit(f"type must be one of: {', '.join(TYPES)}")
+        cfg["type"] = arg
+    elif cmd in NUMERIC:
+        if arg is None:
+            sys.exit(f"{cmd} needs a value")
+        cfg[cmd] = NUMERIC[cmd](arg)
+    elif cmd == "sway":
+        cfg["sway"] = as_bool(arg)
+    elif cmd == "spin":
+        cfg["spin"] = as_bool(arg)
+    elif cmd == "only":
+        cfg["onlyOverAyuGram"] = as_bool(arg)
+    elif cmd == "layer":
+        if arg not in ("top", "overlay", "bottom"):
+            sys.exit("layer must be top, overlay or bottom")
+        cfg["layer"] = arg
+    else:
+        sys.exit(USAGE)
+
+    save(cfg)
+    key = "onlyOverAyuGram" if cmd == "only" else (cmd if cmd in cfg else "enabled")
+    print(f"{key} -> {cfg[key]}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

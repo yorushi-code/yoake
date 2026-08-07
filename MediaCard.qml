@@ -20,7 +20,11 @@ Item {
     property real screenX: 0
     property real screenY: 0
     property bool showGlass: true
-    property real radius: 20
+    // A standalone surface floating on the wallpaper, not a card inside a
+    // panel, so it takes the panel rung rather than the card one. It was 20,
+    // which is on no rung at all and read as a third shape family sitting
+    // between the two the shell already has.
+    property real radius: Theme.radiusPanel
 
     implicitWidth: 440
     implicitHeight: 116

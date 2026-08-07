@@ -246,6 +246,6 @@ start_pending_transcode
 # -n: never prompt. A wallpaper change must not stop and ask for a password, and
 # the sudoers rule that makes this work is narrow enough to be optional -- if it
 # is missing, the desktop still changes and only the login screen lags.
-if command -v yshell-greeter-sync >/dev/null 2>&1; then
-  sudo -n /usr/local/bin/yshell-greeter-sync >/dev/null 2>&1 || true
+if command -v yoake-greeter-sync >/dev/null 2>&1; then
+  sudo -n /usr/local/bin/yoake-greeter-sync >/dev/null 2>&1 || true
 fi
