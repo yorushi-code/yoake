@@ -95,7 +95,7 @@ Item {
                     loops: Animation.Infinite
                     from: 0
                     to: Math.PI * 2
-                    duration: 1600
+                    duration: Theme.animDrift
                 }
             }
         }

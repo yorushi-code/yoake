@@ -61,7 +61,7 @@ WlSessionLock {
             // Slow drift, so a still image does not read as a frozen screen.
             scale: surface.entered ? 1.05 : 1.12
             Behavior on scale {
-                NumberAnimation { duration: 1600; easing.type: Easing.OutCubic }
+                NumberAnimation { duration: Theme.animDrift; easing.type: Easing.OutCubic }
             }
         }
 
@@ -96,7 +96,7 @@ WlSessionLock {
             spacing: 2
             opacity: surface.entered ? 1 : 0
             transform: Translate { y: surface.entered ? 0 : 26 }
-            Behavior on opacity { NumberAnimation { duration: 620; easing.type: Easing.OutCubic } }
+            Behavior on opacity { NumberAnimation { duration: Theme.animEnter; easing.type: Easing.OutCubic } }
 
             RollClock {
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -135,8 +135,8 @@ WlSessionLock {
             opacity: surface.entered ? 1 : 0
             Behavior on opacity {
                 SequentialAnimation {
-                    PauseAnimation { duration: 140 }
-                    NumberAnimation { duration: 520; easing.type: Easing.OutCubic }
+                    PauseAnimation { duration: Theme.animFast }
+                    NumberAnimation { duration: Theme.animEnter; easing.type: Easing.OutCubic }
                 }
             }
 
@@ -157,7 +157,7 @@ WlSessionLock {
                     text: (Quickshell.env("USER") || "y").charAt(0).toUpperCase()
                     color: Theme.accent
                     font.family: Theme.fontDisplayFamily
-                    font.pixelSize: 30
+                    font.pixelSize: Theme.fontHeadline
                     font.weight: Font.DemiBold
                 }
 
@@ -178,7 +178,7 @@ WlSessionLock {
                         loops: Animation.Infinite
                         from: 0
                         to: 360
-                        duration: 1500
+                        duration: Theme.animDrift
                     }
                 }
             }
@@ -205,9 +205,9 @@ WlSessionLock {
                 SequentialAnimation {
                     id: shakeAnim
                     loops: 2
-                    NumberAnimation { target: fieldHost; property: "shakeOffset"; to: -9; duration: 55 }
-                    NumberAnimation { target: fieldHost; property: "shakeOffset"; to: 9; duration: 55 }
-                    NumberAnimation { target: fieldHost; property: "shakeOffset"; to: 0; duration: 55 }
+                    NumberAnimation { target: fieldHost; property: "shakeOffset"; to: -9; duration: Theme.animTick }
+                    NumberAnimation { target: fieldHost; property: "shakeOffset"; to: 9; duration: Theme.animTick }
+                    NumberAnimation { target: fieldHost; property: "shakeOffset"; to: 0; duration: Theme.animTick }
                 }
 
                 Connections {
@@ -250,7 +250,7 @@ WlSessionLock {
                                     property: "scale"
                                     from: 0.2
                                     to: 1
-                                    duration: 180
+                                    duration: Theme.animNormal
                                     easing.type: Easing.OutBack
                                 }
                             }
@@ -329,8 +329,8 @@ WlSessionLock {
             opacity: surface.entered ? 0.45 : 0
             Behavior on opacity {
                 SequentialAnimation {
-                    PauseAnimation { duration: 420 }
-                    NumberAnimation { duration: 900; easing.type: Easing.OutCubic }
+                    PauseAnimation { duration: Theme.animSlow }
+                    NumberAnimation { duration: Theme.animArrive; easing.type: Easing.OutCubic }
                 }
             }
 
@@ -346,8 +346,8 @@ WlSessionLock {
                 SequentialAnimation on y {
                     running: parent.visible
                     loops: Animation.Infinite
-                    NumberAnimation { from: 22; to: 2; duration: 2400; easing.type: Easing.InOutQuad }
-                    PauseAnimation { duration: 500 }
+                    NumberAnimation { from: 22; to: 2; duration: Theme.animDoze; easing.type: Easing.InOutQuad }
+                    PauseAnimation { duration: Theme.animBusy }
                 }
             }
         }
@@ -368,8 +368,8 @@ WlSessionLock {
             opacity: surface.entered ? 1 : 0
             Behavior on opacity {
                 SequentialAnimation {
-                    PauseAnimation { duration: 280 }
-                    NumberAnimation { duration: 520; easing.type: Easing.OutCubic }
+                    PauseAnimation { duration: Theme.animNormal }
+                    NumberAnimation { duration: Theme.animEnter; easing.type: Easing.OutCubic }
                 }
             }
 
@@ -419,8 +419,8 @@ WlSessionLock {
             opacity: surface.entered ? 1 : 0
             Behavior on opacity {
                 SequentialAnimation {
-                    PauseAnimation { duration: 280 }
-                    NumberAnimation { duration: 520; easing.type: Easing.OutCubic }
+                    PauseAnimation { duration: Theme.animNormal }
+                    NumberAnimation { duration: Theme.animEnter; easing.type: Easing.OutCubic }
                 }
             }
 
@@ -471,7 +471,7 @@ WlSessionLock {
             font.weight: Font.Medium
             font.letterSpacing: Theme.trackCaption
             opacity: surface.entered ? 1 : 0
-            Behavior on opacity { NumberAnimation { duration: 900 } }
+            Behavior on opacity { NumberAnimation { duration: Theme.animArrive } }
         }
     }
 }

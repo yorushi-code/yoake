@@ -95,9 +95,9 @@ Item {
                     opacity: bar.atHead ? 1 : (bar.played ? 0.92 : 1)
 
                     Behavior on height {
-                        NumberAnimation { duration: bar.atHead ? 90 : 260; easing.type: Easing.OutQuad }
+                        NumberAnimation { duration: bar.atHead ? Theme.animFlick : Theme.animNormal; easing.type: Easing.OutQuad }
                     }
-                    Behavior on color { ColorAnimation { duration: 220 } }
+                    Behavior on color { ColorAnimation { duration: Theme.animNormal } }
                 }
             }
         }

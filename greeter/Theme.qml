@@ -39,9 +39,38 @@ Singleton {
     readonly property int fontBody: 12
     readonly property int fontLead: 13
     readonly property int fontTitle: 15
+    readonly property int fontHeadline: 30
 
+    // ── The shape ladder ──
+    //
+    // The same four steps the session uses, for the same reason: a family of
+    // shapes is what makes surfaces read as relatives. The greeter had none and
+    // was rounding by eye, which is how a login screen ends up looking like a
+    // near-miss of the desktop it leads to.
+    readonly property int radiusPip: 4
+    readonly property int radiusChip: 10
+    readonly property int radiusCard: 16
+    readonly property int radiusPanel: 24
+
+    function pill(height) {
+        return height / 2;
+    }
+
+    // ── Motion ──
+    //
+    // The session's vocabulary, minus the scaling. Perception does not run
+    // here and must not: a login screen that is slower at three in the morning
+    // is a login screen that looks broken to somebody who has just woken up.
+    readonly property int animFlick: 90
     readonly property int animFast: 120
     readonly property int animNormal: 220
+    readonly property int animSlow: 420
+    readonly property int animBusy: 520
+    readonly property int animTick: 55
+    readonly property int animEnter: 620
+    readonly property int animArrive: 900
+    readonly property int animDrift: 1500
+    readonly property int animDoze: 2400
 
     // Matches Theme.easeSpring: the digit overshoots a little and settles.
     readonly property var easeSpring: [0.34, 1.70, 0.60, 1.0, 1, 1]

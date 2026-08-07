@@ -42,11 +42,11 @@ ClippingRectangle {
         NumberAnimation {
             target: circle; property: "width"
             from: 0; to: root.target
-            duration: 420; easing.type: Easing.OutCubic
+            duration: Theme.animSlow; easing.type: Easing.OutCubic
         }
         SequentialAnimation {
-            NumberAnimation { target: circle; property: "opacity"; from: 0; to: root.maxOpacity; duration: 90 }
-            NumberAnimation { target: circle; property: "opacity"; to: 0; duration: 330; easing.type: Easing.InQuad }
+            NumberAnimation { target: circle; property: "opacity"; from: 0; to: root.maxOpacity; duration: Theme.animFlick }
+            NumberAnimation { target: circle; property: "opacity"; to: 0; duration: Theme.animSlow; easing.type: Easing.InQuad }
         }
     }
 

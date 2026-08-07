@@ -211,19 +211,19 @@ PanelWindow {
 
         NumberAnimation {
             target: overlay; property: "opacity"
-            from: 0; to: 1; duration: 620; easing.type: Easing.OutCubic
+            from: 0; to: 1; duration: Theme.animEnter; easing.type: Easing.OutCubic
         }
         NumberAnimation {
             target: overlay; property: "scale"
-            from: 1.24; to: 1.0; duration: 900; easing.type: Easing.OutExpo
+            from: 1.24; to: 1.0; duration: Theme.animArrive; easing.type: Easing.OutExpo
         }
         NumberAnimation {
             target: base; property: "scale"
-            from: 1.0; to: 1.09; duration: 900; easing.type: Easing.OutCubic
+            from: 1.0; to: 1.09; duration: Theme.animArrive; easing.type: Easing.OutCubic
         }
         SequentialAnimation {
-            NumberAnimation { target: flash; property: "opacity"; from: 0; to: 0.42; duration: 300; easing.type: Easing.OutQuad }
-            NumberAnimation { target: flash; property: "opacity"; to: 0; duration: 520; easing.type: Easing.InQuad }
+            NumberAnimation { target: flash; property: "opacity"; from: 0; to: 0.42; duration: Theme.animNormal; easing.type: Easing.OutQuad }
+            NumberAnimation { target: flash; property: "opacity"; to: 0; duration: Theme.animEnter; easing.type: Easing.InQuad }
         }
     }
 
@@ -256,8 +256,8 @@ PanelWindow {
             overlay.scale = 1.24;
             win.revealingVideo = false;
         }
-        NumberAnimation { target: overlay; property: "opacity"; to: 0; duration: 400; easing.type: Easing.InOutQuad }
-        NumberAnimation { target: base; property: "opacity"; to: 0; duration: 400; easing.type: Easing.InOutQuad }
+        NumberAnimation { target: overlay; property: "opacity"; to: 0; duration: Theme.animSlow; easing.type: Easing.InOutQuad }
+        NumberAnimation { target: base; property: "opacity"; to: 0; duration: Theme.animSlow; easing.type: Easing.InOutQuad }
     }
 
     Connections {

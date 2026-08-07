@@ -190,7 +190,7 @@ Item {
         offset: Qt.vector2d(0, 0)
         opacity: root.strike !== "" ? 0.55 : 0
         visible: opacity > 0
-        Behavior on opacity { NumberAnimation { duration: 150; easing.type: Easing.OutQuad } }
+        Behavior on opacity { NumberAnimation { duration: Theme.animFast; easing.type: Easing.OutQuad } }
     }
 
     // ── Sleeping ──
@@ -209,8 +209,8 @@ Item {
         SequentialAnimation on y {
             running: root.asleep
             loops: Animation.Infinite
-            NumberAnimation { from: 8; to: -6; duration: 2200; easing.type: Easing.InOutQuad }
-            PauseAnimation { duration: 400 }
+            NumberAnimation { from: 8; to: -6; duration: Theme.animDoze; easing.type: Easing.InOutQuad }
+            PauseAnimation { duration: Theme.animSlow }
         }
     }
 }

@@ -67,9 +67,9 @@ Row {
                     SequentialAnimation on opacity {
                         running: root.blink
                         loops: Animation.Infinite
-                        PauseAnimation { duration: index * 500 }
-                        NumberAnimation { to: 1.0; duration: 500; easing.type: Easing.InOutQuad }
-                        NumberAnimation { to: 0.35; duration: 500; easing.type: Easing.InOutQuad }
+                        PauseAnimation { duration: index * Theme.animBusy }
+                        NumberAnimation { to: 1.0; duration: Theme.animBusy; easing.type: Easing.InOutQuad }
+                        NumberAnimation { to: 0.35; duration: Theme.animBusy; easing.type: Easing.InOutQuad }
                     }
                 }
             }

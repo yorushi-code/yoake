@@ -32,8 +32,8 @@ Item {
         SequentialAnimation {
             id: bellRing
             RotationAnimation { target: bell; from: 0; to: 18; duration: Theme.animFlick; easing.type: Easing.OutQuad }
-            RotationAnimation { target: bell; to: -14; duration: 130; easing.type: Easing.InOutQuad }
-            RotationAnimation { target: bell; to: 8; duration: 110; easing.type: Easing.InOutQuad }
+            RotationAnimation { target: bell; to: -14; duration: Theme.animFast; easing.type: Easing.InOutQuad }
+            RotationAnimation { target: bell; to: 8; duration: Theme.animFlick; easing.type: Easing.InOutQuad }
             RotationAnimation { target: bell; to: 0; duration: Theme.animFlick; easing.type: Easing.InQuad }
         }
         Connections {

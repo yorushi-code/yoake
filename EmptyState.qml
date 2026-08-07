@@ -42,8 +42,8 @@ Column {
             SequentialAnimation on y {
                 running: root.visible
                 loops: Animation.Infinite
-                NumberAnimation { from: 10; to: -6; duration: 2400; easing.type: Easing.InOutQuad }
-                PauseAnimation { duration: 500 }
+                NumberAnimation { from: 10; to: -6; duration: Theme.animDoze; easing.type: Easing.InOutQuad }
+                PauseAnimation { duration: Theme.animBusy }
             }
         }
     }

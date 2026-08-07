@@ -249,7 +249,7 @@ Item {
                 // panel wobbled the entire time you were typing.
                 Behavior on height {
                     NumberAnimation {
-                        duration: 130
+                        duration: Theme.animFast
                         easing.type: Easing.OutCubic
                     }
                 }

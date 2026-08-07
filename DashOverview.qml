@@ -188,7 +188,7 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: Weather.glyph
                 font.family: Theme.fontIconFamily
-                font.pixelSize: 42
+                font.pixelSize: Theme.fontIconHero
                 color: Theme.accent
             }
 

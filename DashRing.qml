@@ -77,7 +77,7 @@ Item {
             text: root.primary
             color: Theme.text
             font.family: Theme.fontDisplayFamily
-            font.pixelSize: 26
+            font.pixelSize: Theme.fontDisplay
             font.weight: Font.Medium
             font.letterSpacing: Theme.trackDisplay
             font.features: ({ "tnum": 1 })

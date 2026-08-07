@@ -27,14 +27,14 @@ Singleton {
     // enough that it is over before the first chorus.
     property color accent: root.fallback
     Behavior on accent {
-        ColorAnimation { duration: 900; easing.type: Easing.InOutQuad }
+        ColorAnimation { duration: Theme.animArrive; easing.type: Easing.InOutQuad }
     }
 
     // A second colour for gradients, pulled from a different part of the
     // sleeve where there is one and derived where there isn't.
     property color accentAlt: root.fallback
     Behavior on accentAlt {
-        ColorAnimation { duration: 900; easing.type: Easing.InOutQuad }
+        ColorAnimation { duration: Theme.animArrive; easing.type: Easing.InOutQuad }
     }
 
     readonly property bool derived: root.accent !== root.fallback

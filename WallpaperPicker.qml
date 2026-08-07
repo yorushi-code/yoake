@@ -394,7 +394,7 @@ PanelWindow {
                 anchors.verticalCenter: parent.verticalCenter
                 text: "Обои"
                 color: Theme.text
-                font.pixelSize: 30
+                font.pixelSize: Theme.fontHeadline
                 font.bold: true
                 font.letterSpacing: -0.5
             }
@@ -458,8 +458,8 @@ PanelWindow {
                     SequentialAnimation on opacity {
                         running: win.searching
                         loops: Animation.Infinite
-                        NumberAnimation { to: 0; duration: 480 }
-                        NumberAnimation { to: 1; duration: 480 }
+                        NumberAnimation { to: 0; duration: Theme.animEnter }
+                        NumberAnimation { to: 1; duration: Theme.animEnter }
                     }
                 }
 
@@ -561,7 +561,7 @@ PanelWindow {
                         width: parent.width
                         text: win.previewEntry ? win.previewEntry.label : "—"
                         color: Theme.text
-                        font.pixelSize: 19
+                        font.pixelSize: Theme.fontDisplay
                         font.bold: true
                         wrapMode: Text.WordWrap
                         maximumLineCount: 2

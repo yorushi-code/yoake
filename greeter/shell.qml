@@ -212,7 +212,7 @@ ShellRoot {
             // Slow drift, so a still image does not read as a frozen screen.
             scale: win.entered ? 1.04 : 1.10
             Behavior on scale {
-                NumberAnimation { duration: 1800; easing.type: Easing.OutCubic }
+                NumberAnimation { duration: Theme.animDrift; easing.type: Easing.OutCubic }
             }
         }
 
@@ -240,7 +240,7 @@ ShellRoot {
             spacing: 2
             opacity: win.entered ? 1 : 0
             transform: Translate { y: win.entered ? 0 : 26 }
-            Behavior on opacity { NumberAnimation { duration: 620; easing.type: Easing.OutCubic } }
+            Behavior on opacity { NumberAnimation { duration: Theme.animEnter; easing.type: Easing.OutCubic } }
 
             RollClock {
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -276,8 +276,8 @@ ShellRoot {
             opacity: win.entered ? 1 : 0
             Behavior on opacity {
                 SequentialAnimation {
-                    PauseAnimation { duration: 140 }
-                    NumberAnimation { duration: 520; easing.type: Easing.OutCubic }
+                    PauseAnimation { duration: Theme.animFast }
+                    NumberAnimation { duration: Theme.animEnter; easing.type: Easing.OutCubic }
                 }
             }
 
@@ -286,7 +286,7 @@ ShellRoot {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: 72
                 height: 72
-                radius: 36
+                radius: Theme.pill(height)
                 color: Qt.alpha(Theme.text, 0.08)
                 border.width: 2
                 border.color: Qt.alpha(Theme.accent, root.busy ? 0.9 : 0.35)
@@ -297,7 +297,7 @@ ShellRoot {
                     text: (root.currentLabel || "y").charAt(0).toUpperCase()
                     color: Theme.accent
                     font.family: Theme.fontDisplayFamily
-                    font.pixelSize: 30
+                    font.pixelSize: Theme.fontHeadline
                     font.weight: Font.DemiBold
                 }
 
@@ -318,7 +318,7 @@ ShellRoot {
                         loops: Animation.Infinite
                         from: 0
                         to: 360
-                        duration: 1500
+                        duration: Theme.animDrift
                     }
                 }
 
@@ -361,9 +361,9 @@ ShellRoot {
                 SequentialAnimation {
                     id: shakeAnim
                     loops: 2
-                    NumberAnimation { target: fieldHost; property: "shakeOffset"; to: -9; duration: 55 }
-                    NumberAnimation { target: fieldHost; property: "shakeOffset"; to: 9; duration: 55 }
-                    NumberAnimation { target: fieldHost; property: "shakeOffset"; to: 0; duration: 55 }
+                    NumberAnimation { target: fieldHost; property: "shakeOffset"; to: -9; duration: Theme.animTick }
+                    NumberAnimation { target: fieldHost; property: "shakeOffset"; to: 9; duration: Theme.animTick }
+                    NumberAnimation { target: fieldHost; property: "shakeOffset"; to: 0; duration: Theme.animTick }
                 }
 
                 Connections {
@@ -404,7 +404,7 @@ ShellRoot {
                                     property: "scale"
                                     from: 0.2
                                     to: 1
-                                    duration: 180
+                                    duration: Theme.animNormal
                                     easing.type: Easing.OutBack
                                 }
                             }
@@ -489,7 +489,7 @@ ShellRoot {
             font.pixelSize: Theme.fontLabel
             font.letterSpacing: 1.6
             opacity: win.entered ? 1 : 0
-            Behavior on opacity { NumberAnimation { duration: 900 } }
+            Behavior on opacity { NumberAnimation { duration: Theme.animArrive } }
         }
 
         // ── Power ──
@@ -501,8 +501,8 @@ ShellRoot {
             opacity: win.entered ? 1 : 0
             Behavior on opacity {
                 SequentialAnimation {
-                    PauseAnimation { duration: 280 }
-                    NumberAnimation { duration: 520; easing.type: Easing.OutCubic }
+                    PauseAnimation { duration: Theme.animNormal }
+                    NumberAnimation { duration: Theme.animEnter; easing.type: Easing.OutCubic }
                 }
             }
 
@@ -519,7 +519,7 @@ ShellRoot {
                     required property var modelData
                     width: 40
                     height: 40
-                    radius: 20
+                    radius: Theme.pill(height)
                     color: btnHover.containsMouse
                         ? Qt.alpha(Theme.text, 0.14)
                         : Qt.alpha(Theme.text, 0.06)
@@ -566,8 +566,8 @@ ShellRoot {
             opacity: win.entered ? 0.5 : 0
             Behavior on opacity {
                 SequentialAnimation {
-                    PauseAnimation { duration: 420 }
-                    NumberAnimation { duration: 900; easing.type: Easing.OutCubic }
+                    PauseAnimation { duration: Theme.animSlow }
+                    NumberAnimation { duration: Theme.animArrive; easing.type: Easing.OutCubic }
                 }
             }
 
@@ -583,8 +583,8 @@ ShellRoot {
                 SequentialAnimation on y {
                     running: true
                     loops: Animation.Infinite
-                    NumberAnimation { from: 22; to: 2; duration: 2400; easing.type: Easing.InOutQuad }
-                    PauseAnimation { duration: 500 }
+                    NumberAnimation { from: 22; to: 2; duration: Theme.animDoze; easing.type: Easing.InOutQuad }
+                    PauseAnimation { duration: Theme.animBusy }
                 }
             }
         }
@@ -601,7 +601,7 @@ ShellRoot {
             font.weight: Font.Medium
             font.letterSpacing: 3
             opacity: win.entered ? 1 : 0
-            Behavior on opacity { NumberAnimation { duration: 900 } }
+            Behavior on opacity { NumberAnimation { duration: Theme.animArrive } }
         }
 
         // Visible only where greetd is not: running this file from a normal

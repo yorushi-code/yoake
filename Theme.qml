@@ -156,8 +156,16 @@ QtObject {
     readonly property int fontIconMicro: 12
     readonly property int fontIconSmall: 14
     readonly property int fontIcon: 17
+    // The same rule at the top of the scale: a glyph standing beside hero type
+    // has to be optically larger than it to read as its equal.
+    readonly property int fontIconHero: 42
 
     readonly property int fontDisplay: 22
+    // Type that is the subject of its own small area — a ring's number, an
+    // avatar's initial, the glyph an empty panel is built around. Named because
+    // the gap between display and hero was where 26, 30 and 19 were each
+    // invented separately for the same job.
+    readonly property int fontHeadline: 30
     readonly property int fontHero: 40
     // One rung above hero, and only the desktop clock stands on it. It is the
     // one piece of type in the shell meant to be read across a room rather than
@@ -275,6 +283,28 @@ QtObject {
     // the same infinite opacity pulse, and only one of them said why.
     readonly property int animBusy: Math.round(520 * motionScale)
     readonly property int animBreath: Math.round(800 * motionScale)
+
+    // Below response. Not the length of a move but the leg of an oscillation —
+    // the shake a wrong password gets, and nothing else. At flick length its
+    // three legs read as three separate movements instead of as one refusal.
+    readonly property int animTick: Math.round(55 * motionScale)
+
+    // ── Transition ──
+    //
+    // Neither the shell answering nor a thing idling: a picture changing, a
+    // lock screen arriving, a sleeve's colour taking hold. Nobody pressed
+    // anything and nothing is looping, and both existing groups were the wrong
+    // shape — at animSlow a wallpaper change is a cut, at animBreath it is a
+    // smear. Twenty-six distinct literals lived in this gap because the gap had
+    // no names in it.
+    readonly property int animEnter: Math.round(620 * motionScale)
+    readonly property int animArrive: Math.round(900 * motionScale)
+    // Slow enough that nobody watches it happen, which is the point: a still
+    // wallpaper that drifts is not a frozen screen.
+    readonly property int animDrift: Math.round(1500 * motionScale)
+    // Asleep. One motif — the bongo cat, in four files — and it is the only
+    // thing in the shell that should look slower than the room it is in.
+    readonly property int animDoze: Math.round(2400 * motionScale)
 
     // Material-3-style "emphasized" decelerate curve — everything that
     // settles into place (panel open, hover fill, list reveal) uses this

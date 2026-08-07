@@ -56,7 +56,7 @@ Rectangle {
         visible: root.iconSource === ""
         text: Glyphs.apps
         font.family: Theme.fontIconFamily
-        font.pixelSize: 20
+        font.pixelSize: Theme.fontIcon
         color: Theme.subtext0
     }
 

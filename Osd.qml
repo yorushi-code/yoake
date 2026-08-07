@@ -161,7 +161,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     text: root.icon
                     font.family: "Symbols Nerd Font"
-                    font.pixelSize: 20
+                    font.pixelSize: Theme.fontIcon
                     color: Theme.accent
 
                     // Crossing into a different icon is the clearest signal
@@ -169,8 +169,8 @@ Item {
                     // changed silently mid-fade and read as a render glitch.
                     SequentialAnimation {
                         id: glyphPop
-                        NumberAnimation { target: osdGlyph; property: "scale"; to: 1.3; duration: 100; easing.type: Easing.OutQuad }
-                        NumberAnimation { target: osdGlyph; property: "scale"; to: 1.0; duration: 190; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig }
+                        NumberAnimation { target: osdGlyph; property: "scale"; to: 1.3; duration: Theme.animFlick; easing.type: Easing.OutQuad }
+                        NumberAnimation { target: osdGlyph; property: "scale"; to: 1.0; duration: Theme.animNormal; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig }
                     }
                     onTextChanged: glyphPop.restart()
                 }

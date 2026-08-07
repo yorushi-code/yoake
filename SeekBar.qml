@@ -37,7 +37,7 @@ Item {
             // fill must track the cursor exactly.
             Behavior on width {
                 enabled: root.dragValue < 0
-                NumberAnimation { duration: 400; easing.type: Easing.OutQuad }
+                NumberAnimation { duration: Theme.animSlow; easing.type: Easing.OutQuad }
             }
         }
     }

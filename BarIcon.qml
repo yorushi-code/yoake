@@ -110,7 +110,7 @@ Item {
             id: pop
             NumberAnimation { target: icon; property: "scale"; to: 1.28; duration: Theme.animFlick; easing.type: Easing.OutQuad }
             NumberAnimation {
-                target: icon; property: "scale"; to: 1.0; duration: 160
+                target: icon; property: "scale"; to: 1.0; duration: Theme.animNormal
                 easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig
             }
         }
@@ -143,7 +143,7 @@ Item {
             anchors.centerIn: parent
             text: root.badge
             color: Theme.crust
-            font.pixelSize: 8
+            font.pixelSize: Theme.fontMicro
             font.bold: true
         }
     }
