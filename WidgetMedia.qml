@@ -9,8 +9,9 @@ import QtQuick
 MediaCard {
     id: root
 
-    // Where on screen the glass should sample the wallpaper. Set by the
-    // surface, which is the only thing that knows where the widget ended up.
-    width: 440
+    // The rail's measure, which this card is the widest member of.
+    property int railWidth: 440
+
+    width: root.railWidth
     height: 116
 }

@@ -25,14 +25,13 @@ PanelWindow {
 
     // Only what genuinely takes input. A full-output surface with no mask
     // claims the whole input region and silently eats every click on bare
-    // desktop, which is what stopped menus being dismissable. In edit mode all
-    // four widgets are grabbable; otherwise only the transport controls are,
-    // and only when there is a player.
+    // desktop, which is what stopped menus being dismissable. In edit mode the
+    // whole rail is grabbable; otherwise only the transport is, and only when
+    // there is a player — the rail is 440 wide and most of it is bare desktop
+    // with type drawn on it.
     mask: Region {
-        Region { item: DesktopWidgets.editing ? clockWidget : null }
-        Region { item: DesktopWidgets.editing ? spectrumWidget : null }
-        Region { item: DesktopWidgets.editing ? statsWidget : null }
-        Region { item: (DesktopWidgets.editing || Media.hasPlayer) ? mediaWidget : null }
+        Region { item: DesktopWidgets.editing ? railWidget : null }
+        Region { item: (!DesktopWidgets.editing && Media.hasPlayer) ? rail.cardItem : null }
     }
 
     Item {
@@ -45,51 +44,22 @@ PanelWindow {
         anchors.rightMargin: 46
         anchors.bottomMargin: 46
 
+        // Anchored at the top by default, so a card arriving under the clock
+        // lengthens the rail downward instead of sliding the time up the
+        // screen to make room for it.
         DesktopWidget {
-            id: clockWidget
-            name: "clock"
+            id: railWidget
+            name: "rail"
             screenName: surface.outputName
             defaultX: 1.0
             defaultY: 0.0
 
-            WidgetClock {}
-        }
-
-        DesktopWidget {
-            id: spectrumWidget
-            name: "spectrum"
-            screenName: surface.outputName
-            defaultX: 1.0
-            defaultY: 0.22
-
-            WidgetSpectrum {}
-        }
-
-        DesktopWidget {
-            id: statsWidget
-            name: "stats"
-            screenName: surface.outputName
-            defaultX: 1.0
-            defaultY: 0.32
-
-            WidgetStats {}
-        }
-
-        DesktopWidget {
-            id: mediaWidget
-            name: "media"
-            screenName: surface.outputName
-            defaultX: 1.0
-            defaultY: 0.44
-            visible: Media.hasPlayer || DesktopWidgets.editing
-            opacity: visible ? 1 : 0
-            Behavior on opacity { NumberAnimation { duration: Theme.animSlow } }
-
-            WidgetMedia {
+            WidgetRail {
+                id: rail
                 // The glass samples the wallpaper at its real position, and the
-                // widget can be anywhere now.
-                screenX: field.x + mediaWidget.x
-                screenY: field.y + mediaWidget.y
+                // rail can be anywhere now.
+                screenX: field.x + railWidget.x
+                screenY: field.y + railWidget.y
             }
         }
     }

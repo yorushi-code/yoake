@@ -130,20 +130,28 @@ Item {
         }
     }
 
-    // ── Toast popups: top-right, auto-dismiss, slide+fade in ──
+    // ── Toast popups: under the centre island, auto-dismiss, slide+fade in ──
+    //
+    // They fell down the right-hand edge until the desktop rail moved in
+    // underneath them: a notification landed squarely across a 112px clock, so
+    // the one surface that is always readable at a glance was hidden by the
+    // one surface that always arrives unannounced. Centre is the only free
+    // column, and it is the honest one — the centre island is already where
+    // this shell puts "what is going on", and it is what a toast is.
     PanelWindow {
         // Overlay, not the default Top: niri draws a fullscreen window above
         // the Top layer, so a panel the user just asked for would open behind
         // the video they were watching and read as a dead keystroke.
         WlrLayershell.layer: WlrLayer.Overlay
 
+        // Anchored to the top edge alone. With neither side anchored, layer
+        // shell centres the surface on that axis, so this stays centred on any
+        // output without the shell computing a position.
         anchors {
             top: true
-            right: true
         }
         margins {
             top: Theme.barHeight + Theme.barMargin * 2
-            right: Theme.barMargin
         }
         implicitWidth: 340
         implicitHeight: Math.max(1, toastColumn.height)
@@ -158,7 +166,7 @@ Item {
         Column {
             id: toastColumn
             width: parent.width
-            spacing: 8
+            spacing: Theme.spacing
 
             Repeater {
                 // ScriptModel, not the array. dismissToast() rebuilds the
@@ -191,8 +199,14 @@ Item {
                     // slight overshoot for a "tactile" pop rather than a
                     // plain slide, staggered when several land at once.
                     opacity: 0
-                    x: 40
                     scale: 0.92
+                    // Down from under the bar, now that they come from there —
+                    // through a transform rather than through `y`, because the
+                    // Column owns `y` and an animation writing it would be
+                    // overwritten by the next layout pass. `x` was safe to
+                    // animate for the same reason it is now wrong: a Column
+                    // does not set it.
+                    transform: Translate { id: drop; y: -28 }
                     // A toast can be created already leaving if it is
                     // dismissed within a frame of arriving; onLeavingChanged
                     // does not fire for a value present at construction.
@@ -203,7 +217,7 @@ Item {
                     ParallelAnimation {
                         id: entryAnim
                         SequentialAnimation {
-                            PauseAnimation { duration: Math.max(0, toastDelegate.index) * 50 }
+                            PauseAnimation { duration: Direction.stagger(toastDelegate.index) }
                             NumberAnimation {
                                 target: toastDelegate; property: "opacity"; to: 1
                                 duration: Theme.animNormal
@@ -211,15 +225,15 @@ Item {
                             }
                         }
                         SequentialAnimation {
-                            PauseAnimation { duration: Math.max(0, toastDelegate.index) * 50 }
+                            PauseAnimation { duration: Direction.stagger(toastDelegate.index) }
                             NumberAnimation {
-                                target: toastDelegate; property: "x"; to: 0
+                                target: drop; property: "y"; to: 0
                                 duration: Theme.animSlow
                                 easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig
                             }
                         }
                         SequentialAnimation {
-                            PauseAnimation { duration: Math.max(0, toastDelegate.index) * 50 }
+                            PauseAnimation { duration: Direction.stagger(toastDelegate.index) }
                             NumberAnimation {
                                 target: toastDelegate; property: "scale"; to: 1
                                 duration: Theme.animSlow
@@ -238,7 +252,7 @@ Item {
                             easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeExit
                         }
                         NumberAnimation {
-                            target: toastDelegate; property: "x"; to: 60
+                            target: drop; property: "y"; to: -40
                             duration: Theme.animExit
                             easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeExit
                         }
@@ -249,7 +263,7 @@ Item {
                         id: toastChrome
                         width: parent.width
                         height: toastContent.height + 22
-                        screenX: Screen.width - Theme.barMargin - toastColumn.width
+                        screenX: (Screen.width - toastColumn.width) / 2
                         screenY: Theme.barHeight + Theme.barMargin * 2 + toastDelegate.y
                         onCloseRequested: root.dismissToast(toastDelegate.notification)
 

@@ -62,12 +62,33 @@ Singleton {
         function reset(): void { root.resetAll(); }
     }
 
-    readonly property var names: ["clock", "spectrum", "stats", "media"]
+    readonly property var names: ["rail"]
+
+    // The four separate widgets these named are one rail now, so their saved
+    // positions describe nothing. Cleared rather than left as dead keys: a
+    // settings file that accumulates names no code reads is the same rot as a
+    // config directory nobody dares delete from.
+    readonly property var legacyNames: ["clock", "spectrum", "stats", "media"]
+
+    function _dropLegacy() {
+        for (const screen of Quickshell.screens) {
+            for (const name of root.legacyNames) {
+                Prefs.remove(root._key(name, screen.name));
+            }
+        }
+    }
+
+    Component.onCompleted: if (Prefs.loaded) root._dropLegacy()
+
+    property Connections _prefsReady: Connections {
+        target: Prefs
+        function onLoadedChanged() { if (Prefs.loaded) root._dropLegacy(); }
+    }
 
     function resetAll() {
         for (const screen of Quickshell.screens) {
             for (const name of root.names) {
-                Prefs.set(root._key(name, screen.name), null);
+                Prefs.remove(root._key(name, screen.name));
             }
         }
     }

@@ -35,6 +35,17 @@ Singleton {
         writeDelay.restart();
     }
 
+    // Deletes rather than storing null. `get` treats a stored null as a real
+    // value, so a key "cleared" by assignment shadows its own fallback for
+    // ever, and the file grows a tail of settings nothing reads.
+    function remove(key) {
+        if (!(key in root.values)) return;
+        const next = Object.assign({}, root.values);
+        delete next[key];
+        root.values = next;
+        writeDelay.restart();
+    }
+
     Timer {
         id: writeDelay
         interval: 400

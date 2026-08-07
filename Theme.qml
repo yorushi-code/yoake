@@ -159,12 +159,23 @@ QtObject {
 
     readonly property int fontDisplay: 22
     readonly property int fontHero: 40
+    // One rung above hero, and only the desktop clock stands on it. It is the
+    // one piece of type in the shell meant to be read across a room rather than
+    // across a panel, and leaving it as a literal is how 96 ended up sitting
+    // beside a scale that stopped at 40 without either of them knowing.
+    readonly property int fontClock: 112
 
     // Tracking. Small type needs opening up and large type needs closing in;
     // both are what separates set type from defaulted type.
     readonly property real trackLabel: 1.2
     readonly property real trackBody: 0
     readonly property real trackDisplay: -0.6
+    // All-caps set small under something large — the desktop date and the lock
+    // screen's. Caps have no ascenders or descenders to space them, so at label
+    // tracking they clot into a bar; this is the width that reads as a caption
+    // deliberately set under a display rather than as a line that ran out of
+    // room.
+    readonly property real trackCaption: 3.0
 
     // ── Elevation ──
     // Three levels rather than one shadow reused everywhere: the bar sits on the

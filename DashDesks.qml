@@ -24,7 +24,7 @@ Item {
         Column {
             id: column
             width: parent.width
-            spacing: 12
+            spacing: Theme.gapWide
 
             Repeater {
                 model: root.desks
@@ -38,7 +38,7 @@ Item {
                         .filter(w => w.workspace_id === card.modelData.id)
 
                     width: column.width
-                    height: 84
+                    height: 72
                     interactive: true
                     onActivated: {
                         Niri.focusWorkspace(card.modelData.idx);
@@ -64,40 +64,37 @@ Item {
                         text: card.modelData.idx
                         color: card.modelData.is_focused ? Theme.accent : Theme.subtext0
                         font.family: Theme.fontDisplayFamily
-                        font.pixelSize: 26
+                        font.pixelSize: Theme.fontDisplay
                         font.weight: Font.Medium
                         font.features: ({ "tnum": 1 })
-                    }
-
-                    Text {
-                        anchors.left: number.right
-                        anchors.leftMargin: 22
-                        anchors.verticalCenter: parent.verticalCenter
-                        visible: card.windows.length === 0
-                        text: "пусто"
-                        color: Qt.alpha(Theme.subtext0, 0.6)
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSmall
                     }
 
                     // What is actually in front on that desk. Six icons tell
                     // you a terminal is there; they do not tell you which one,
                     // and that is the thing you are looking for when you open
                     // this page at all.
+                    //
+                    // Set beside the number, not against the far edge. It was
+                    // right-aligned across the whole card, which on a desk with
+                    // one window left six hundred pixels of nothing between the
+                    // icon and its own label — two things that are the same
+                    // thing, reading as two columns of an empty table.
                     Text {
                         id: focusedTitle
-                        anchors.right: parent.right
-                        anchors.rightMargin: 18
+                        anchors.left: number.right
+                        anchors.leftMargin: Theme.gapSection
+                        anchors.right: icons.left
+                        anchors.rightMargin: Theme.gapCard
                         anchors.verticalCenter: parent.verticalCenter
-                        width: Math.max(0, parent.width - number.width - icons.width - 120)
-                        horizontalAlignment: Text.AlignRight
-                        visible: text !== ""
                         text: {
+                            if (card.windows.length === 0) return "пусто";
                             const focused = card.windows.find(w => w.is_focused);
                             const w = focused || card.windows[0];
                             return w ? (w.title || w.app_id || "") : "";
                         }
-                        color: card.modelData.is_focused ? Theme.subtext1 : Theme.subtext0
+                        color: card.windows.length === 0
+                            ? Qt.alpha(Theme.subtext0, 0.6)
+                            : (card.modelData.is_focused ? Theme.text : Theme.subtext1)
                         font.family: Theme.fontFamily
                         font.pixelSize: Theme.fontSmall
                         elide: Text.ElideRight
@@ -105,10 +102,10 @@ Item {
 
                     Row {
                         id: icons
-                        anchors.left: number.right
-                        anchors.leftMargin: 22
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.gapCard
                         anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.gapWide
+                        spacing: Theme.spacing
 
                         Repeater {
                             // Six is what fits; the count beside them carries the

@@ -469,7 +469,7 @@ WlSessionLock {
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontLabel
             font.weight: Font.Medium
-            font.letterSpacing: 3
+            font.letterSpacing: Theme.trackCaption
             opacity: surface.entered ? 1 : 0
             Behavior on opacity { NumberAnimation { duration: 900 } }
         }

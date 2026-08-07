@@ -1,74 +1,100 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 
-// Time and date, sized to its own content so it can be dragged anywhere.
+// Time and date, set to the rail's measure.
 //
 // Deliberately unadorned. Two earlier attempts at a glow both showed up as a
 // visible rectangle behind the digits: a RectangularShadow draws an actual
 // rounded box, and a blurred layer plus MultiEffect leaves a haze the size of
 // the layer's texture bounds. The digits carry enough weight on their own —
 // what they needed was not decoration but movement, so the places roll rather
-// than relabel, and the seconds roll with them at a tenth the size.
-Column {
+// than relabel.
+//
+// The seconds are gone. They were the largest continuously moving thing on the
+// desktop and the least informative thing on it, which is the exact trade
+// Direction's rule 6 exists to refuse — and the separator already pulses on the
+// second, so the beat they were there for was never theirs to carry.
+Item {
     id: root
 
-    spacing: 8
+    // Set by the rail. Everything here is right-aligned to it, because a shared
+    // edge is the only thing making these blocks read as one object.
+    property int railWidth: 440
+
+    implicitWidth: root.railWidth
+    implicitHeight: stack.height
 
     SystemClock {
         id: clock
-        precision: SystemClock.Seconds
+        // Minutes, not seconds: nothing here is drawn from the second any more,
+        // and a per-second wakeup for a display that cannot change is the kind
+        // of idle cost that stays invisible until somebody measures it.
+        precision: SystemClock.Minutes
         enabled: true
     }
 
-    Item {
-        id: timeGroup
-        width: hhmm.width + 10 + seconds.width
-        height: hhmm.height
-
-        RollClock {
-            id: hhmm
-            anchors.left: parent.left
-            hours: clock.date.getHours()
-            minutes: clock.date.getMinutes()
-            pixelSize: 96
-            weight: Font.Bold
-            ink: Theme.deskInk
-            tracking: -2
-            groupGap: 5
-            minuteInk: Theme.deskAccent
-        }
-
-        // Its own group rather than a third place on the clock: seconds move
-        // sixty times as often, and at full size that is a widget that never
-        // stops twitching. Small and set on the shared baseline, the movement
-        // reads as a pulse next to the time instead of competing with it.
-        Row {
-            id: seconds
-            anchors.left: hhmm.right
-            anchors.leftMargin: 10
-            anchors.baseline: hhmm.baseline
-            baselineOffset: s1.baselineOffset
-
-            component Tick: RollDigit {
-                pixelSize: 34
-                weight: Font.Bold
-                ink: Theme.wallpaperIsLight
-                    ? Qt.darker(Theme.subtext1, 2.2) : Theme.subtext1
-            }
-
-            Tick { id: s1; value: Math.floor(clock.date.getSeconds() / 10) }
-            Tick { value: clock.date.getSeconds() % 10 }
-        }
+    // The ground under the type, and only under the type.
+    //
+    // These are the only things in the shell drawn straight onto the picture,
+    // and no ink choice can be right for all of it: a video's brightness was
+    // measured from one extracted frame at 0.31 while the frame actually on
+    // screen was 0.82, and even a still picture is rarely uniform under the
+    // corner it happens to sit in. A scrim does not need to know. It follows
+    // the digits rather than the rail because the rail is mostly empty and a
+    // dim rectangle over bare wallpaper is a widget with a visible box around
+    // it, which is the failure the glow attempts already made twice.
+    RectangularShadow {
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.rightMargin: -10
+        anchors.topMargin: -10
+        width: Math.max(hhmm.width, dateLine.contentWidth) + 20
+        height: stack.height + 20
+        radius: Theme.radiusPanel
+        blur: 44
+        spread: 12
+        color: "#000000"
+        opacity: Theme.deskScrim
+        visible: opacity > 0
+        offset: Qt.vector2d(0, 2)
+        z: -1
     }
 
-    Text {
-        anchors.right: timeGroup.right
-        text: Lang.date(clock.date, "dddd, d MMMM").toUpperCase()
-        color: Theme.wallpaperIsLight
-            ? Qt.darker(Theme.subtext1, 2.2) : Theme.subtext1
-        font.family: Theme.fontFamily
-        font.pixelSize: Theme.fontLead
-        font.letterSpacing: 3
-        opacity: 0.85
+    Column {
+        id: stack
+        width: parent.width
+        spacing: Theme.gapTight
+
+        Item {
+            width: parent.width
+            height: hhmm.height
+
+            RollClock {
+                id: hhmm
+                anchors.right: parent.right
+                hours: clock.date.getHours()
+                minutes: clock.date.getMinutes()
+                pixelSize: Theme.fontClock
+                weight: Font.Bold
+                ink: Theme.deskInk
+                tracking: -2
+                groupGap: 5
+                minuteInk: Theme.deskAccent
+            }
+        }
+
+        Text {
+            id: dateLine
+            width: parent.width
+            horizontalAlignment: Text.AlignRight
+            text: Lang.date(clock.date, "dddd, d MMMM").toUpperCase()
+            color: Theme.wallpaperIsLight
+                ? Qt.darker(Theme.subtext1, 2.2) : Theme.subtext1
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontLead
+            font.letterSpacing: Theme.trackCaption
+            opacity: 0.85
+        }
     }
 }

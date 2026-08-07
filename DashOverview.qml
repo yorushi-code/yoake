@@ -16,46 +16,124 @@ Item {
 
     readonly property int gap: 14
 
+    // Only the calendar reads this now, and a calendar cannot change faster
+    // than a day. Minutes rather than hours so the page is not a day behind
+    // for up to an hour after midnight; seconds was a wakeup a second for a
+    // date that moves once.
     SystemClock {
         id: clock
-        precision: SystemClock.Seconds
+        precision: SystemClock.Minutes
         enabled: root.visible
     }
 
-    // ── Clock ──
+    // ── What just happened ──
+    //
+    // This slot held a third clock. The bar carries one a hundred pixels above
+    // this card and the desktop carries one at nine times the size, and a
+    // dashboard is where you look for what you do not already have — which is
+    // exactly what the notification history was, one keystroke away and never
+    // summarised anywhere. The date it also carried is on the calendar beside
+    // it, with the day already marked.
     DashCard {
-        id: timeCard
+        id: notifCard
         order: 0
         revealed: root.revealed
         anchors.top: parent.top
         anchors.left: parent.left
         width: 232
         height: 202
+        title: "Уведомления"
+        interactive: true
+        onActivated: Toggles.exclusive("notifCenter")
+
+        EmptyState {
+            anchors.centerIn: parent
+            visible: Notifs.count === 0
+            text: "Тихо"
+            catSize: 76
+        }
 
         Column {
-            anchors.centerIn: parent
+            anchors.fill: parent
+            anchors.leftMargin: 16
+            anchors.rightMargin: 16
+            anchors.topMargin: 2
+            visible: Notifs.count > 0
             spacing: Theme.gapWide
 
-            RollClock {
-                anchors.horizontalCenter: parent.horizontalCenter
-                hours: clock.date.getHours()
-                minutes: clock.date.getMinutes()
-                pixelSize: 52
-                tracking: -2
-                groupGap: 5
-            }
+            Repeater {
+                // Three, because a fourth row turns a glance into a list and
+                // the panel that is a list is one click away.
+                model: Notifs.newestFirst.slice(0, 3)
 
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: {
-                    const d = Lang.date(clock.date, "ddd, d MMMM");
-                    return d.charAt(0).toUpperCase() + d.slice(1);
+                delegate: Item {
+                    id: row
+                    required property var modelData
+                    width: parent.width
+                    height: 34
+
+                    // The same mark the toasts and the history use, so an
+                    // urgency reads the same wherever it is met.
+                    Rectangle {
+                        id: dot
+                        anchors.left: parent.left
+                        anchors.top: parent.top
+                        anchors.topMargin: 4
+                        width: 3
+                        height: 26
+                        radius: Theme.radiusPip
+                        color: Notifs.accentFor(row.modelData.urgency)
+                    }
+
+                    Column {
+                        anchors.left: dot.right
+                        anchors.right: parent.right
+                        anchors.leftMargin: Theme.gapWide
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: 1
+
+                        Text {
+                            width: parent.width
+                            // Read through a guard: these are live server
+                            // objects and the application owning one can take
+                            // it away between the model being sliced and the
+                            // delegate being drawn.
+                            text: {
+                                try { return row.modelData.summary || ""; }
+                                catch (e) { return ""; }
+                            }
+                            color: Theme.text
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.fontSmall
+                            elide: Text.ElideRight
+                        }
+
+                        Text {
+                            width: parent.width
+                            text: {
+                                try { return row.modelData.appName || ""; }
+                                catch (e) { return ""; }
+                            }
+                            color: Theme.subtext0
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.fontMicro
+                            elide: Text.ElideRight
+                        }
+                    }
                 }
-                color: Theme.subtext0
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSmall
-                font.weight: Font.Medium
             }
+        }
+
+        Text {
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.rightMargin: 16
+            anchors.bottomMargin: 12
+            visible: Notifs.count > 3
+            text: "ещё " + (Notifs.count - 3)
+            color: Theme.subtext0
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontMicro
         }
     }
 
@@ -65,7 +143,7 @@ Item {
         order: 1
         revealed: root.revealed
         anchors.top: parent.top
-        anchors.left: timeCard.right
+        anchors.left: notifCard.right
         anchors.leftMargin: root.gap
         anchors.right: weatherCard.left
         anchors.rightMargin: root.gap
@@ -192,7 +270,7 @@ Item {
         id: mediaCard
         order: 3
         revealed: root.revealed
-        anchors.top: timeCard.bottom
+        anchors.top: notifCard.bottom
         anchors.topMargin: root.gap
         anchors.left: parent.left
         anchors.right: statsCard.left

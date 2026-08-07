@@ -89,8 +89,8 @@ DesktopSurface 1.0 DesktopSurface.qml
 DesktopWidget 1.0 DesktopWidget.qml
 WidgetClock 1.0 WidgetClock.qml
 WidgetSpectrum 1.0 WidgetSpectrum.qml
-WidgetStats 1.0 WidgetStats.qml
 WidgetMedia 1.0 WidgetMedia.qml
+WidgetRail 1.0 WidgetRail.qml
 Calendar 1.0 Calendar.qml
 LockScreen 1.0 LockScreen.qml
 Launcher 1.0 Launcher.qml
@@ -111,7 +111,6 @@ RollDigit 1.0 RollDigit.qml
 RollClock 1.0 RollClock.qml
 MediaCard 1.0 MediaCard.qml
 
-StatGauge 1.0 StatGauge.qml
 Surface 1.0 Surface.qml
 Sparkline 1.0 Sparkline.qml
 singleton MediaTint 1.0 MediaTint.qml

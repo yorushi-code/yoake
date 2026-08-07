@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 
 // A widget that can be picked up and put somewhere else.
 //
@@ -46,28 +45,11 @@ Item {
         function onLoadedChanged() { if (Prefs.loaded) root._restore(); }
     }
 
-    // A soft darkening under every desktop widget.
-    //
-    // These are the only things in the shell drawn straight onto the picture,
-    // and no ink choice can be right for all of it: a video's brightness was
-    // measured from one extracted frame at 0.31 while the frame actually on
-    // screen was 0.82, and even a still picture is rarely uniform under the
-    // corner a widget happens to sit in. A scrim does not need to know -- it is
-    // how the lock screen keeps its own type readable, and it costs one blurred
-    // rectangle per widget rather than an outline per glyph.
-    RectangularShadow {
-        anchors.fill: parent
-        anchors.margins: -6
-        radius: 26
-        blur: 38
-        spread: 10
-        color: "#000000"
-        opacity: Theme.deskScrim
-        visible: opacity > 0
-        offset: Qt.vector2d(0, 2)
-        z: -1
-    }
-
+    // The scrim that used to live here belongs to the type, not to the frame.
+    // This box is the rail's bounds now — 440 wide with the clock set hard
+    // right — so darkening all of it would put a dim rectangle over a large
+    // patch of wallpaper that has nothing drawn on it. Each block that needs a
+    // ground lays its own; see WidgetClock.
     Item {
         id: holder
         anchors.fill: parent

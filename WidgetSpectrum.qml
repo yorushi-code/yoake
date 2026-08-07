@@ -12,23 +12,56 @@ import QtQuick.Effects
 Item {
     id: root
 
-    // Kept at a fixed size even when the delegates are gone, so the widget does
-    // not collapse under the drag handle the moment the music stops.
-    readonly property bool live: Cava.active && Wallpaper.desktopVisible
+    // Drawn whenever the desktop is, sounding or not.
+    //
+    // It used to fade out with the audio, which left a 64px hole between the
+    // clock and the player every time the music stopped — the rail's one
+    // connective element, absent exactly as often as it was present. The floor
+    // arc below was written to be the shape at rest and had never once been
+    // seen. Now it is the rest state: a dotted rule tying the two blocks
+    // together, that the music grows out of and settles back into.
+    //
+    // Costs nothing while silent. Cava stops publishing, so every delegate's
+    // level binding holds its last value and is never re-evaluated; what the
+    // old gate was really buying was dropping the delegates while the desktop
+    // is covered, and that half is kept.
+    readonly property bool live: Wallpaper.desktopVisible
+    readonly property bool sounding: Cava.active && root.live
 
-    readonly property int barWidth: 9
+    // Set to the rail's measure. Sized to fill it rather than to its own idea
+    // of a bar width: this band is what ties the time block to the player, and
+    // a row that stops short of both their edges ties nothing to anything.
+    property int railWidth: 440
+
     readonly property int barGap: 5
-    readonly property int span: 96
+    // Integral, so the pills never land on a half pixel and shimmer; the
+    // remainder goes into the spacing instead, where a fraction is invisible.
+    readonly property int barWidth: Math.max(2, Math.floor(
+        (root.railWidth - (Cava.barCount - 1) * root.barGap) / Cava.barCount))
+    readonly property real fillGap: Cava.barCount > 1
+        ? (root.railWidth - Cava.barCount * root.barWidth) / (Cava.barCount - 1)
+        : 0
+    // A band rather than a block: at the full 96 it competed with the clock for
+    // the eye, and the rail only has one hero.
+    readonly property int span: 64
 
-    implicitWidth: Math.max(1, Cava.barCount * root.barWidth + (Cava.barCount - 1) * root.barGap)
+    implicitWidth: root.railWidth
     implicitHeight: root.span
 
-    opacity: root.live ? 1 : 0
-    Behavior on opacity { NumberAnimation { duration: Theme.animSlow } }
+    // At rest the band pulls back rather than leaving: still there, plainly not
+    // the thing to look at.
+    opacity: root.live ? (root.sounding ? 1 : 0.5) : 0
+    Behavior on opacity {
+        NumberAnimation {
+            duration: Theme.animSlow
+            easing.type: Easing.Bezier
+            easing.bezierCurve: Theme.easeEmphasized
+        }
+    }
 
     Row {
         anchors.centerIn: parent
-        spacing: root.barGap
+        spacing: root.fillGap
 
         Repeater {
             // Zero rows, not just an invisible Row: occlusion does not stop Qt
@@ -48,7 +81,13 @@ Item {
                 // 0 at the ends, 1 in the middle.
                 readonly property real arch:
                     Math.sin(Math.PI * (bar.index + 0.5) / Cava.barCount)
-                readonly property real floorHeight: 4 + bar.arch * 9
+                // Never below the bar's own width, so a resting band is a row
+                // of round dots rather than a row of clipped slots — at 4px
+                // tall under a 10px radius the pill stops reading as a shape
+                // and starts reading as a rendering fault, which is the same
+                // complaint the arc was introduced to answer.
+                readonly property real floorHeight:
+                    Math.max(root.barWidth, 4 + bar.arch * 12)
 
                 // Hue walks along the row rather than up each bar. A vertical
                 // ramp is invisible on a bar four pixels tall; a horizontal one
