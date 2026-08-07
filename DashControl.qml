@@ -86,20 +86,23 @@ Item {
             revealed: root.revealed
             title: "Быстрые действия"
             anchors.top: parent.top
-            anchors.bottom: parent.bottom
             anchors.left: parent.left
             width: Math.round(parent.width * 0.56)
+            // Sized to the grid, not stretched to the foot of the sheet — the
+            // same rule the Apps card below already states and this one
+            // contradicted. Centring the grid in a card taller than it needs
+            // put forty-six pixels of nothing between the heading and the
+            // thing it heads, and a detached header reads as broken where a
+            // short card reads as a column that has finished.
+            height: 36 + 6 + tiles.height + 16
 
             CcTileGrid {
                 id: tiles
                 anchors.left: parent.left
                 anchors.right: parent.right
+                anchors.top: parent.top
                 anchors.margins: 16
-                // Centred in what the title leaves rather than pinned under it:
-                // the sheet is taller than three rows of tiles need, and a grid
-                // pinned to the top leaves the emptiness in one lump at the
-                // bottom where it reads as something missing.
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.topMargin: 6
                 // Three across rather than two: the sheet is more than twice
                 // the width of the panel this came from, and two columns of
                 // very wide tiles read as a list of buttons.

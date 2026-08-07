@@ -97,26 +97,86 @@ on the wallpaper — takes `radiusPanel`, not a third shape family between the t
 that exist) and a keycap hint at 6 (`radiusPip`; at chip radius a 21px hint is
 most of a pill and stops reading as a key).
 
+## Worked since, in the order it was done
+
+Measured against the running shell again, not against this document.
+
+**4 and 5 are done.** The right-hand column is one object: `WidgetRail`, one
+measure (440, the player card's own width), one right edge, one vertical
+rhythm, dragged as a whole. The gauge rings and `StatGauge` are deleted —
+`BarLoad` already reports the same numbers and only while they are worth
+reporting, with the culprit processes named in its card. The clock's seconds
+are gone; the separator was already pulsing on the second, so the beat they
+carried was never theirs. `SystemClock` on the desktop and on the overview both
+drop to minute precision, which is the same fix twice.
+
+The spectrum stopped being a widget that vanishes. It is the rail's connective
+band now, drawn at rest as a dotted arc — the floor shape the file had
+described since it was written and that nothing had ever shown, because the
+widget faded out with the audio and the arc only exists in silence.
+
+**A third clock was on screen at all times** — bar, desktop, dashboard — and the
+dashboard's is the one nothing else was standing in for. Its slot is the
+notification history, which was one keystroke away and summarised nowhere.
+
+**The toasts moved out from under the rail.** They fell down the right-hand
+edge onto a 112px clock. Centre is the only free column and it is the honest
+one: the centre island is already where this shell puts "what is going on".
+
+**1 and 6 are done.** Sixty-six literal durations, twenty-six distinct values,
+now zero. The gap they lived in had no names in it — a *transition* is neither
+the shell answering nor a thing idling, and both existing groups were the wrong
+shape for a wallpaper changing or a lock screen arriving. `animEnter`,
+`animArrive`, `animDrift`, `animDoze`, plus `animTick` for the leg of an
+oscillation. Type gained `fontHeadline` and `fontIconHero`; ten off-scale sizes
+are now zero.
+
+**The greeter has ladders.** Shape, motion and the headline rung, so its two
+radius findings are gone and its seventeen literal durations with them. Its
+motion deliberately does *not* scale with Perception: a login screen that is
+slower at three in the morning looks broken to somebody who has just woken up.
+The files are edited but **not installed** — `bin/yoake-greeter-install` needs
+root and its only real test is a logout, which must not happen unattended.
+
+**The desks page was a two-column empty table.** The window title was set
+against the far right edge, so a desk with one window showed six hundred pixels
+of nothing between the icon and its own label. Title beside the number, icons
+against the edge.
+
+**The quick-actions card contradicted its neighbour.** The Apps card below it
+says in its own comment that a centred list leaves "a hand's width of nothing
+directly under the heading"; the tile grid above it argued the opposite and
+centred. Resolved in favour of the card that was right.
+
 ## Backlog, in the order it should be worked
 
-1. **66 literal durations.** The highest-value category and no longer merely a
-   consistency issue: since `Perception` drives `motionScale`, a literal
-   duration *stands still while the whole shell speeds up and slows down around
-   it*. Every one of these is a widget that will visibly fall out of step at
-   night and under load. Mechanical to fix, verifiable by the linter.
-2. **99 off-ladder surface alphas.** Needs judgement per site, so it wants a
-   file-at-a-time pass rather than a sweep. `LockScreen.qml` (28) and
-   `WallpaperPicker.qml` (12) are half of it.
-3. **The ten private shadows and twelve gradients.** Route through `Surface`
-   or justify each in place. This is what "one surface" means concretely — more
-   than any spacing change.
-4. **The right-hand column.** Give the desktop widgets one alignment grid;
-   delete the gauge rings; decide whether the media card or the bar island owns
-   now-playing, because both cannot.
-5. **The clock's seconds.** Remove, or demote to a state the shell enters
-   deliberately.
-6. **10 off-scale font sizes**, then the greeter as its own pass — it needs the
-   ladders before it needs a repaint.
+1. **99 off-ladder surface alphas**, the last drift category with anything in
+   it. Not one problem but three wearing one name, which is why a sweep would
+   be wrong: the linter matches `Qt.alpha(Theme.x, n)` and cannot tell a *fill*
+   (0.05, 0.07, 0.12, 0.16 — the existing ladder, missed by a rung) from a
+   *veil* (0.42, 0.62, 0.86 — a scrim over content, which the ladder stops
+   short of entirely) from *ink* (0.6, 0.75, 0.8 — how much of a colour a mark
+   keeps, a third axis with no rungs at all). The fills are mechanical. The
+   veils want a ladder of their own before anything is moved onto it, and the
+   three-stop gradients in `LockScreen` and `DashOverview` are the shape it
+   should be cut to.
+2. **The four accent glows.** `BarIsland`, `BarWorkspaces`, `MediaOrb` and
+   `WidgetSpectrum` each build the same figure by hand — an accent-tinted
+   `RectangularShadow` at zero offset, spread ~1, blur chosen per object. This
+   is the part of "the ten private shadows" that survived reading: the rest are
+   depth (`Surface` owns it) or documented one-offs. A glow is not depth and
+   should not be pushed into `Surface`; it wants its own object, with blur
+   derived from the size of the thing glowing.
+3. **The bar is still a container**, three islands each a `Row`, which is
+   `Direction.md`'s own open item: rule 2 wants a composer that recomposes the
+   interval rhythm and the optical centre when the media widget appears, rather
+   than reflowing.
+4. **`Reveal` still has one caller.** `ActionMenu`, `VpnPanel`, `CcWifiPage`,
+   `CcBluetoothPage` and the notification stack each still spell their own
+   motion out, and `LockScreen`'s entrance is a hand-rolled four-beat cascade
+   written in pauses.
+5. **The greeter needs installing** once somebody is at the machine, and that
+   is the only way to find out whether any of the above reached it.
 
 Nothing above is an aesthetic preference. Every item is either a number the
 linter can check or a duplication visible in a screenshot.
