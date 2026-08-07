@@ -259,15 +259,18 @@ Item {
                 // a chip in the bar, seasick on something this big. A short
                 // lift and a fade is what a search field should do; you are
                 // already typing by the time it lands.
-                opacity: root.open ? 1 : 0
-                transform: Translate { y: root.open ? 0 : 22 }
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: root.open ? 180 : Theme.animExit
-                        easing.type: Easing.Bezier
-                        easing.bezierCurve: root.open ? Theme.easeEmphasized : Theme.easeExit
-                    }
-                }
+                shown: root.open
+                origin: Item.Top
+                // The one panel that keeps its travel: it is summoned by a key
+                // rather than opened from a widget, so it has nowhere to grow
+                // out of and the drop is what says where it came from. The 180
+                // it used to fade in was a literal the drift check could not
+                // see, hiding inside a ternary.
+                slideY: Theme.revealSlide
+                // Pure drop. Scaling as well would be the two movements rule 1
+                // forbids, and the panel is nearly a third of the screen —
+                // large things that scale read as zooming, not as arriving.
+                fromScale: 1
                 onCloseRequested: Toggles.launcherOpen = false
 
                 MouseArea {

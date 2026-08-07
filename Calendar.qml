@@ -171,24 +171,8 @@ PanelWindow {
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
             }
 
-            opacity: win.open ? 1 : 0
-            scale: win.open ? 1 : 0.9
-            transformOrigin: Item.Top
-            // See ControlCenter: open punches in, exit accelerates.
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: win.open ? Theme.animSlow : Theme.animExit
-                    easing.type: Easing.Bezier
-                    easing.bezierCurve: win.open ? Theme.easeEmphasized : Theme.easeExit
-                }
-            }
-            Behavior on scale {
-                NumberAnimation {
-                    duration: win.open ? Theme.animSlow : Theme.animExit
-                    easing.type: Easing.Bezier
-                    easing.bezierCurve: win.open ? Theme.easeSpringBig : Theme.easeExit
-                }
-            }
+            shown: win.open
+            origin: Item.Top
 
             Column {
                 anchors.fill: parent

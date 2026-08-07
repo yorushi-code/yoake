@@ -115,23 +115,8 @@ Item {
                 screenX: Math.round((Screen.width - parent.sheetWidth) / 2)
                 screenY: Theme.barHeight + Theme.barMargin * 2
 
-                opacity: root.open ? 1 : 0
-                scale: root.open ? 1 : Theme.revealScale
-                transformOrigin: Item.Top
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: root.open ? Theme.animSlow : Theme.animExit
-                        easing.type: Easing.Bezier
-                        easing.bezierCurve: root.open ? Theme.easeEmphasized : Theme.easeExit
-                    }
-                }
-                Behavior on scale {
-                    NumberAnimation {
-                        duration: root.open ? Theme.animSlow : Theme.animExit
-                        easing.type: Easing.Bezier
-                        easing.bezierCurve: root.open ? Theme.easeSpringBig : Theme.easeExit
-                    }
-                }
+                shown: root.open
+                origin: Item.Top
                 onCloseRequested: Toggles.dashboardOpen = false
 
                 MouseArea {

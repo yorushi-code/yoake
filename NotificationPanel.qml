@@ -108,24 +108,8 @@ PanelWindow {
                 : Math.min(500, header.height + historyColumn.height + 26)
             screenX: Screen.width - Theme.barMargin - width
             screenY: Theme.barHeight + Theme.barMargin * 2
-            opacity: win.open ? 1 : 0
-            scale: win.open ? 1 : 0.9
-            transformOrigin: Item.TopRight
-            // See ControlCenter: open punches in, exit accelerates.
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: win.open ? Theme.animSlow : Theme.animExit
-                    easing.type: Easing.Bezier
-                    easing.bezierCurve: win.open ? Theme.easeEmphasized : Theme.easeExit
-                }
-            }
-            Behavior on scale {
-                NumberAnimation {
-                    duration: win.open ? Theme.animSlow : Theme.animExit
-                    easing.type: Easing.Bezier
-                    easing.bezierCurve: win.open ? Theme.easeSpringBig : Theme.easeExit
-                }
-            }
+            shown: win.open
+            origin: Item.TopRight
             onCloseRequested: Toggles.notifCenterOpen = false
 
             // Swallows clicks so the backdrop doesn't treat a click on the
@@ -245,7 +229,7 @@ PanelWindow {
                             ParallelAnimation {
                                 id: histEntryAnim
                                 SequentialAnimation {
-                                    PauseAnimation { duration: Math.max(0, Math.min(histDelegate.index, 6)) * 30 }
+                                    PauseAnimation { duration: Direction.stagger(histDelegate.index) }
                                     NumberAnimation {
                                         target: histDelegate; property: "opacity"; to: 1
                                         duration: Theme.animNormal
@@ -253,7 +237,7 @@ PanelWindow {
                                     }
                                 }
                                 SequentialAnimation {
-                                    PauseAnimation { duration: Math.max(0, Math.min(histDelegate.index, 6)) * 30 }
+                                    PauseAnimation { duration: Direction.stagger(histDelegate.index) }
                                     NumberAnimation {
                                         target: histDelegate; property: "scale"; to: 1
                                         duration: Theme.animNormal

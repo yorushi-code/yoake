@@ -391,10 +391,22 @@ def drift():
             # with whoever wrote it. A trailing `0` is exempt because that is
             # the `shown ? delay : 0` idiom, an absence of animation rather than
             # a duration chosen by hand.
-            for m in re.finditer(r"\bduration:\s*(\d+)\s*(?=[};\n]|$)", line):
-                if m.group(1) == "0":
-                    continue
-                out.append((rel, n, f"duration {m.group(1)} is a literal; it will not follow the tempo"))
+            m = re.search(r"\bduration:\s*(.+)$", line)
+            if m:
+                # Every integer in the expression, not just one sitting alone
+                # after the colon. The anchored form missed
+                # `duration: open ? 180 : Theme.animExit` entirely -- a literal
+                # hiding inside a ternary, in the launcher, for as long as the
+                # check has existed. A rule that only sees the easy shape is a
+                # measurement that agrees with whoever wrote it.
+                # `0` is exempt: that is the `shown ? delay : 0` idiom, an
+                # absence of animation rather than a duration chosen by hand.
+                for num in re.finditer(r"(?<![\w.])(\d+)(?![\w.])", m.group(1)):
+                    if num.group(1) == "0":
+                        continue
+                    out.append((rel, n,
+                                f"duration {num.group(1)} is a literal; "
+                                "it will not follow the tempo"))
 
             m = re.search(r"font\.pixelSize:\s*(\d+)\s*$", line)
             if m and int(m.group(1)) not in LADDER_SIZES:

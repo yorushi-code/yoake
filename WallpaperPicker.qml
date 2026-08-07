@@ -263,7 +263,7 @@ PanelWindow {
         scale: win.open ? 1.0 : 1.06
         Behavior on scale {
             NumberAnimation {
-                duration: win.open ? 700 : Theme.animExit
+                duration: win.open ? Theme.animEnter : Theme.animExit
                 easing.type: Easing.OutExpo
             }
         }

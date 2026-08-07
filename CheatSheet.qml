@@ -421,22 +421,10 @@ Item {
                 height: Math.min(parent.height - 80, grid.height + 48)
                 screenX: (Screen.width - width) / 2
                 screenY: (Screen.height - height) / 2
-                opacity: root.open ? 1 : 0
-                scale: root.open ? 1 : 0.9
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: root.open ? Theme.animSlow : Theme.animExit
-                        easing.type: Easing.Bezier
-                        easing.bezierCurve: root.open ? Theme.easeEmphasized : Theme.easeExit
-                    }
-                }
-                Behavior on scale {
-                    NumberAnimation {
-                        duration: root.open ? Theme.animSlow : Theme.animExit
-                        easing.type: Easing.Bezier
-                        easing.bezierCurve: root.open ? Theme.easeSpringBig : Theme.easeExit
-                    }
-                }
+                shown: root.open
+                // Centred on the screen and opened by a key, so it has no
+                // corner to come out of.
+                origin: Item.Center
                 onCloseRequested: Toggles.cheatSheetOpen = false
 
                 MouseArea {
@@ -507,7 +495,7 @@ Item {
                                 ParallelAnimation {
                                     id: categoryEntryAnim
                                     SequentialAnimation {
-                                        PauseAnimation { duration: Math.min(categoryDelegate.index, 8) * 30 }
+                                        PauseAnimation { duration: Direction.stagger(categoryDelegate.index) }
                                         NumberAnimation {
                                             target: categoryDelegate; property: "opacity"; to: 1
                                             duration: Theme.animNormal
@@ -515,7 +503,7 @@ Item {
                                         }
                                     }
                                     SequentialAnimation {
-                                        PauseAnimation { duration: Math.min(categoryDelegate.index, 8) * 30 }
+                                        PauseAnimation { duration: Direction.stagger(categoryDelegate.index) }
                                         NumberAnimation {
                                             target: categoryDelegate; property: "scale"; to: 1
                                             duration: Theme.animNormal
