@@ -333,6 +333,35 @@ LADDER_ALPHAS = {
 }
 
 
+def _alpha_literals(line):
+    """The last argument of every Qt.alpha() on the line, when it is a number.
+
+    Parsed by balancing parentheses rather than by a regex, because the base
+    colour is an arbitrary expression and often contains commas of its own --
+    Qt.alpha(Qt.hsla(0, 0, 0.13, 1), 0.5) is one call with two levels, and a
+    regex reading up to "a comma" finds the wrong one.
+    """
+    out = []
+    for m in re.finditer(r"Qt\.alpha\(", line):
+        i = m.end()
+        depth = 1
+        last_comma = -1
+        while i < len(line) and depth:
+            if line[i] == "(":
+                depth += 1
+            elif line[i] == ")":
+                depth -= 1
+            elif line[i] == "," and depth == 1:
+                last_comma = i
+            i += 1
+        if depth or last_comma < 0:
+            continue
+        tail = line[last_comma + 1:i - 1].strip()
+        if re.fullmatch(r"0?\.\d+", tail):
+            out.append(tail)
+    return out
+
+
 def drift():
     """Values that belong to no rung at all.
 
@@ -412,8 +441,12 @@ def drift():
             if m and int(m.group(1)) not in LADDER_SIZES:
                 out.append((rel, n, f"font size {m.group(1)} is on no rung of the type scale"))
 
-            for m in re.finditer(r"Qt\.alpha\(\s*Theme\.\w+\s*,\s*(0?\.\d+)\s*\)", line):
-                v = m.group(1)
+            # Any Qt.alpha, not only the ones whose base is a Theme colour.
+            # The narrow form was blind to Qt.alpha(root.color, 0.22) and
+            # Qt.alpha(MediaTint.accent, 0.22) -- the same decision, made about
+            # a colour the widget was handed rather than one it looked up, and
+            # therefore exactly as likely to drift.
+            for v in _alpha_literals(line):
                 norm = f"{float(v):.2f}"
                 if norm not in LADDER_ALPHAS:
                     out.append((rel, n, f"surface alpha {v} is on no rung of the surface ladder"))

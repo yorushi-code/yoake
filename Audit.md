@@ -180,18 +180,44 @@ centred against the right edge with the content column anchored to it, so the
 column the track is read in was under three hundred wide and every video title
 wrapped. It sits in the corner behind the content now.
 
+**`Reveal` has callers.** Six panels each spelled out the same opacity-and-
+scale pair with the same two curves, drifted to 0.88, 0.90, 0.94 and
+`revealScale` — four answers to a question that has one. It lives in
+`PanelChrome` now, so it arrives with the surface rather than beside it, and a
+panel declares only which corner it grows from. The launcher keeps its drop and
+gives up its scale: it is summoned by a key, so it has no corner to grow out
+of, and travelling *and* scaling is the two movements rule 1 forbids.
+
+**The linter was agreeing with whoever wrote the code, twice.** Its duration
+rule was anchored to end-of-expression, so `duration: open ? 180 : animExit`
+was invisible — a literal hiding inside a ternary, in the launcher, for as long
+as the check had existed, plus a 700 in the wallpaper picker and two hand-
+rolled `* 30` cascades that `Direction.stagger` exists for. Its alpha rule only
+matched a `Theme.` base, so `Qt.alpha(root.color, 0.22)` and
+`Qt.alpha(MediaTint.accent, 0.32)` — the same decision about a colour the
+widget was handed rather than one it looked up — were never counted. Both are
+fixed, and both found real drift the moment they were.
+
+**The bar wore two bright halos all day.** `BarIcon`'s progress arc closes into
+a solid accent circle at 100%, and 100% battery on 100% signal is what a
+plugged-in laptop shows for most of its life — so the two least interesting
+states in the shell were also the two loudest things in it. The arc is at full
+strength while the number is worth reading and fades into its own track over
+the top of the range.
+
 ## Backlog, in the order it should be worked
 
 1. **The bar is still a container**, three islands each a `Row`, which is
    `Direction.md`'s own open item: rule 2 wants a composer that recomposes the
    interval rhythm and the optical centre when the media widget appears, rather
    than reflowing.
-2. **`Reveal` still has one caller.** `ActionMenu`, `VpnPanel`, `CcWifiPage`,
-   `CcBluetoothPage` and the notification stack each still spell their own
-   motion out, and `LockScreen`'s entrance is a hand-rolled four-beat cascade
-   written in pauses. Worth doing for the panels; `ActionMenu`'s rows are the
-   one place to be careful, since four beats on a 22px row is over-produced and
-   the menu code has already cost four silent bugs.
+2. **`MenuSurface` and `Popover` still spell their own motion out**, at 0.88
+   and 0.94. Left deliberately: `Direction` has a type for what they are —
+   a menu answering a right-click is `acknowledge`, not `narrative`, and four
+   beats on a 22px row is over-produced. What they need is the *type*, not
+   `PanelChrome`'s arrival. `LockScreen`'s entrance is also still a hand-rolled
+   four-beat cascade written in pauses, and it is the one surface here that
+   cannot be checked without risking locking an unattended machine.
 3. **The greeter needs installing** once somebody is at the machine, and that
    is the only way to find out whether any of this reached it.
 4. **The cheat sheet does not fit on a 1080p screen** and now says so. Fitting

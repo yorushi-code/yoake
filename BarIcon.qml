@@ -33,6 +33,18 @@ Item {
 
     readonly property bool hasRing: root.progress >= 0
 
+    // How much of the ring to actually draw in colour.
+    //
+    // The arc was written so the shape carries the state, and it does — but a
+    // complete sweep is a solid circle, and 100% battery and 100% signal are
+    // the two commonest readings this bar ever shows. So the two least
+    // interesting states in the shell were also the two loudest things in it:
+    // a plugged-in laptop on good wifi wore two bright accent halos all day.
+    // The arc is at full strength while the number is worth reading and fades
+    // into its own track over the top of the range, where it is not.
+    readonly property real ringPresence:
+        1 - Math.max(0, (Math.min(1, root.progress) - 0.85) / 0.15)
+
     Shape {
         id: ring
         anchors.centerIn: parent
@@ -46,7 +58,7 @@ Item {
         preferredRendererType: Shape.GeometryRenderer
 
         ShapePath {
-            strokeColor: Qt.alpha(root.color, 0.22)
+            strokeColor: Qt.alpha(root.color, Theme.fillActive)
             strokeWidth: 2
             fillColor: "transparent"
             capStyle: ShapePath.RoundCap
@@ -62,7 +74,9 @@ Item {
         }
 
         ShapePath {
-            strokeColor: root.ringColor
+            // Alpha rather than an item opacity: a ShapePath has none, and
+            // fading the whole Shape would take the track with it.
+            strokeColor: Qt.alpha(root.ringColor, root.ringPresence)
             strokeWidth: 2
             fillColor: "transparent"
             capStyle: ShapePath.RoundCap

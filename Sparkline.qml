@@ -69,8 +69,11 @@ Item {
             ctx.lineTo(x0, height);
             ctx.closePath();
             const grad = ctx.createLinearGradient(0, 0, 0, height);
-            grad.addColorStop(0, Qt.alpha(root.tint, 0.30));
-            grad.addColorStop(1, Qt.alpha(root.tint, 0.02));
+            grad.addColorStop(0, Qt.alpha(root.tint, Theme.veilThin));
+            // Nothing, rather than two per cent of something: the
+            // difference is invisible and only one of them is a value
+            // somebody chose.
+            grad.addColorStop(1, Qt.alpha(root.tint, 0));
             ctx.fillStyle = grad;
             ctx.fill();
             ctx.restore();
