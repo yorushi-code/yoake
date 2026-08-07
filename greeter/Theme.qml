@@ -56,6 +56,22 @@ Singleton {
         return height / 2;
     }
 
+    // ── The surface, veil and ink ladders ──
+    //
+    // The session's, at the same values. Only the rungs this screen actually
+    // stands on: a copy that carries rungs nothing here uses is a second source
+    // of truth waiting to disagree with the first.
+    readonly property real fillSubtle: 0.06
+    readonly property real fillMuted: 0.10
+    readonly property real fillHover: 0.14
+    readonly property real strokeSoft: 0.10
+    readonly property real strokeFirm: 0.18
+    readonly property real veilSoft: 0.45
+    readonly property real veilFirm: 0.60
+    readonly property real veilSolid: 0.88
+    readonly property real inkStrong: 0.80
+    readonly property real inkGhost: 0.28
+
     // ── Motion ──
     //
     // The session's vocabulary, minus the scaling. Perception does not run

@@ -306,7 +306,7 @@ Item {
                         font.family: Theme.fontFamily
                         font.pixelSize: Theme.fontTitle
                         selectByMouse: true
-                        selectionColor: Qt.alpha(Theme.accent, 0.4)
+                        selectionColor: Qt.alpha(Theme.accent, Theme.veilSoft)
                         clip: true
                         focus: true
                         onTextChanged: root.query = text

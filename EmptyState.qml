@@ -35,7 +35,7 @@ Column {
             anchors.right: parent.right
             anchors.top: parent.top
             text: "z"
-            color: Qt.alpha(Theme.subtext0, 0.8)
+            color: Qt.alpha(Theme.subtext0, Theme.inkStrong)
             font.family: Theme.fontFamily
             font.pixelSize: Math.max(10, root.catSize * 0.12)
 

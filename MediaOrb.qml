@@ -154,7 +154,7 @@ Item {
         preferredRendererType: Shape.CurveRenderer
 
         ShapePath {
-            strokeColor: Qt.alpha(Theme.text, 0.12)
+            strokeColor: Qt.alpha(Theme.text, Theme.fillMuted)
             strokeWidth: 2.5
             fillColor: "transparent"
 
@@ -194,7 +194,7 @@ Item {
         width: root.coverSize + root.swell * 5
         height: width
         radius: width * 0.16
-        color: Qt.alpha(Theme.crust, 0.9)
+        color: Qt.alpha(Theme.crust, Theme.veilSolid)
 
         // What is on screen whenever a player publishes no cover, which for
         // Firefox is most sites — so this is the usual case, not the edge one.
@@ -218,7 +218,7 @@ Item {
             gradient: Gradient {
                 orientation: Gradient.Vertical
                 GradientStop { position: 0.0; color: Qt.alpha(MediaTint.accent, 0.30) }
-                GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, 0.55) }
+                GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, Theme.veilFirm) }
             }
         }
 
@@ -228,7 +228,7 @@ Item {
             text: Glyphs.music
             font.family: Theme.fontIconFamily
             font.pixelSize: root.coverSize * 0.22
-            color: Qt.alpha(Theme.text, 0.5)
+            color: Qt.alpha(Theme.text, Theme.inkFaint)
         }
 
         Image {

@@ -63,8 +63,8 @@ Item {
         z: -1
         radius: Theme.radius + 6
         color: drag.active
-            ? Qt.alpha(Theme.accent, 0.22)
-            : (hover.hovered ? Qt.alpha(Theme.text, 0.12) : Qt.alpha(Theme.text, Theme.fillSubtle))
+            ? Qt.alpha(Theme.accent, Theme.tintActive)
+            : (hover.hovered ? Qt.alpha(Theme.text, Theme.fillMuted) : Qt.alpha(Theme.text, Theme.fillSubtle))
         border.width: 1
         border.color: drag.active ? Theme.accent : Qt.alpha(Theme.text, Theme.strokeFirm)
         opacity: root.editing ? 1 : 0

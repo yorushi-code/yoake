@@ -321,8 +321,16 @@ def raw_icon_lookups():
 
 # ── Rungs, named once so the drift scan and the on-ladder scan agree ──
 LADDER_RADII = {4, 10, 16, 24}
-LADDER_SIZES = {9, 10, 11, 12, 13, 15, 22, 40, 12, 14, 17}
-LADDER_ALPHAS = {"0.06", "0.10", "0.14", "0.18", "0.20"}
+LADDER_SIZES = {9, 10, 11, 12, 13, 15, 22, 30, 40, 112, 12, 14, 17, 42}
+# Three ladders, not one. The check below cannot tell them apart -- a fill, a
+# veil and an ink presence are all `Qt.alpha(Theme.x, n)` -- so it holds the
+# union and leaves which-is-which to the reader, who has the surrounding line.
+LADDER_ALPHAS = {
+    "0.06", "0.10", "0.14", "0.18", "0.20",   # fills and strokes
+    "0.16", "0.26",                           # the same, in a colour
+    "0.30", "0.45", "0.60", "0.75", "0.88",   # veils
+    "0.80", "0.28",                           # ink presence (0.60/0.45 above)
+}
 
 
 def drift():

@@ -244,7 +244,7 @@ Item {
                             text: detail.modelData.glyph
                             font.family: Theme.fontIconFamily
                             font.pixelSize: Theme.fontIconMicro
-                            color: Qt.alpha(Theme.subtext0, 0.8)
+                            color: Qt.alpha(Theme.subtext0, Theme.inkStrong)
                         }
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
@@ -310,8 +310,8 @@ Item {
             visible: bleed.status === Image.Ready
             gradient: Gradient {
                 orientation: Gradient.Horizontal
-                GradientStop { position: 0.0; color: Qt.alpha(Theme.crust, 0.62) }
-                GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, 0.86) }
+                GradientStop { position: 0.0; color: Qt.alpha(Theme.crust, Theme.veilFirm) }
+                GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, Theme.veilSolid) }
             }
         }
 

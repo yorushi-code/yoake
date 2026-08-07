@@ -19,7 +19,7 @@ Rectangle {
     radius: Theme.radius
     color: root.connected
         ? Qt.alpha(Theme.accent, 0.18)
-        : (ma.containsMouse ? Qt.alpha(Theme.text, Theme.fillMuted) : Qt.alpha(Theme.text, 0.05))
+        : (ma.containsMouse ? Qt.alpha(Theme.text, Theme.fillMuted) : Qt.alpha(Theme.text, Theme.fillSubtle))
     Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
     Text {

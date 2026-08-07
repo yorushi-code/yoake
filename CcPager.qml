@@ -75,7 +75,7 @@ Item {
                 width: 26
                 height: 26
                 radius: Theme.radiusChip
-                color: backArea.containsMouse ? Qt.alpha(Theme.text, Theme.strokeFirm) : Qt.alpha(Theme.text, 0.07)
+                color: backArea.containsMouse ? Qt.alpha(Theme.text, Theme.strokeFirm) : Qt.alpha(Theme.text, Theme.fillSubtle)
                 Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
                 Text {

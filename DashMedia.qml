@@ -215,7 +215,7 @@ Item {
                             radius: Theme.radiusChip
                             color: chip.current ? Qt.alpha(MediaTint.accent, 0.22)
                                 : (chipHit.containsMouse ? Qt.alpha(Theme.text, Theme.fillMuted)
-                                                         : Qt.alpha(Theme.text, 0.05))
+                                                         : Qt.alpha(Theme.text, Theme.fillSubtle))
                             border.width: 1
                             border.color: chip.held ? Qt.alpha(MediaTint.accent, 0.8) : "transparent"
                             Behavior on color { ColorAnimation { duration: Theme.animFast } }

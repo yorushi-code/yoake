@@ -55,7 +55,7 @@ Rectangle {
     radius: Theme.radius
     color: root.modelData.active
         ? Qt.alpha(Theme.accent, 0.14)
-        : (ma.containsMouse ? Qt.alpha(Theme.text, 0.07) : Qt.alpha(Theme.text, 0.04))
+        : (ma.containsMouse ? Qt.alpha(Theme.text, Theme.fillMuted) : Qt.alpha(Theme.text, Theme.fillSubtle))
     Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
     Column {
@@ -151,8 +151,8 @@ Rectangle {
             height: 20
             radius: Theme.radiusChip
             color: coreArea.containsMouse
-                ? Qt.alpha(Theme.accent, 0.24)
-                : Qt.alpha(Theme.text, 0.08)
+                ? Qt.alpha(Theme.accent, Theme.tintActive)
+                : Qt.alpha(Theme.text, Theme.fillSubtle)
             Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
             Text {
@@ -201,7 +201,7 @@ Rectangle {
                 height: 26
                 radius: Theme.radiusChip
                 color: buttonArea.containsMouse
-                    ? (button.modelData.act === "remove" ? Theme.red : Qt.alpha(Theme.text, 0.16))
+                    ? (button.modelData.act === "remove" ? Theme.red : Qt.alpha(Theme.text, Theme.fillHover))
                     : "transparent"
                 Behavior on color { ColorAnimation { duration: Theme.animFast } }
 

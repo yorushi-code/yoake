@@ -307,7 +307,7 @@ Item {
 
             Text {
                 text: "ПКМ — выбор сети"
-                color: Qt.alpha(Theme.subtext0, 0.75)
+                color: Qt.alpha(Theme.subtext0, Theme.inkStrong)
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontMicro
             }

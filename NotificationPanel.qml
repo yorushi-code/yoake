@@ -157,7 +157,7 @@ PanelWindow {
                     width: clearText.implicitWidth + 16
                     height: 20
                     radius: Theme.radiusChip
-                    color: clearMa.containsMouse ? Qt.alpha(Theme.red, 0.3) : Qt.alpha(Theme.text, Theme.fillSubtle)
+                    color: clearMa.containsMouse ? Qt.alpha(Theme.red, Theme.tintActive) : Qt.alpha(Theme.text, Theme.fillSubtle)
                     Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
                     Text {
@@ -182,7 +182,7 @@ PanelWindow {
                     height: 20
                     radius: Theme.radiusChip
                     color: Notifs.dnd ? Theme.accent
-                        : (dndMa.containsMouse ? Qt.alpha(Theme.text, 0.16) : Qt.alpha(Theme.text, 0.08))
+                        : (dndMa.containsMouse ? Qt.alpha(Theme.text, Theme.fillHover) : Qt.alpha(Theme.text, Theme.fillSubtle))
                     Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
                     Text {

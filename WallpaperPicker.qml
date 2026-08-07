@@ -351,9 +351,9 @@ PanelWindow {
             }
         }
         gradient: Gradient {
-            GradientStop { position: 0.0; color: Qt.alpha(Theme.crust, 0.72) }
-            GradientStop { position: 0.38; color: Qt.alpha(Theme.crust, 0.34) }
-            GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, 0.90) }
+            GradientStop { position: 0.0; color: Qt.alpha(Theme.crust, Theme.veilDense) }
+            GradientStop { position: 0.38; color: Qt.alpha(Theme.crust, Theme.veilThin) }
+            GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, Theme.veilSolid) }
         }
 
         MouseArea {
@@ -479,7 +479,7 @@ PanelWindow {
             width: 34
             height: 34
             radius: Theme.pill(height)
-            color: closeArea.containsMouse ? Theme.red : Qt.alpha(Theme.crust, 0.7)
+            color: closeArea.containsMouse ? Theme.red : Qt.alpha(Theme.crust, Theme.veilDense)
             opacity: win.open ? 1 : 0
             Behavior on color { ColorAnimation { duration: Theme.animFast } }
             Behavior on opacity { NumberAnimation { duration: Theme.animSlow } }
@@ -545,7 +545,7 @@ PanelWindow {
                 // Deliberately not frosted glass: the backing samples the
                 // *applied* wallpaper, and over a full-screen preview of a
                 // different one that mismatch is visible.
-                color: Qt.alpha(Theme.crust, 0.88)
+                color: Qt.alpha(Theme.crust, Theme.veilSolid)
                 border.width: 1
                 border.color: Qt.alpha(Theme.text, Theme.strokeSoft)
 
@@ -632,8 +632,8 @@ PanelWindow {
                         readonly property bool isApplied: win.previewEntry
                             && win.previewEntry.path === Wallpapers.currentPath
                         color: applyButton.isApplied
-                            ? Qt.alpha(Theme.text, 0.08)
-                            : (applyArea.containsMouse ? Theme.accent : Qt.alpha(Theme.accent, 0.85))
+                            ? Qt.alpha(Theme.text, Theme.fillSubtle)
+                            : (applyArea.containsMouse ? Theme.accent : Qt.alpha(Theme.accent, Theme.veilSolid))
                         Behavior on color { ColorAnimation { duration: Theme.animFast } }
                         scale: applyArea.pressed ? 0.97 : 1
                         Behavior on scale {

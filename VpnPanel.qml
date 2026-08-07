@@ -430,7 +430,7 @@ Item {
                             height: noTunLabel.implicitHeight + 16
                             radius: Theme.radius
                             visible: Mihomo.running && !Mihomo.tunCapable
-                            color: Qt.alpha(Theme.yellow, 0.16)
+                            color: Qt.alpha(Theme.yellow, Theme.tintSubtle)
 
                             Text {
                                 id: noTunLabel
@@ -451,7 +451,7 @@ Item {
                             height: conflictColumn.implicitHeight + 16
                             radius: Theme.radius
                             visible: Mihomo.conflict !== ""
-                            color: Qt.alpha(Theme.yellow, 0.16)
+                            color: Qt.alpha(Theme.yellow, Theme.tintSubtle)
 
                             Column {
                                 id: conflictColumn
@@ -537,7 +537,7 @@ Item {
                                     color: !action.modelData.on || Mihomo.busy
                                         ? Qt.alpha(Theme.text, Theme.fillSubtle)
                                         : action.modelData.accent
-                                            ? (actionArea.containsMouse ? Theme.accent : Qt.alpha(Theme.accent, 0.85))
+                                            ? (actionArea.containsMouse ? Theme.accent : Qt.alpha(Theme.accent, Theme.veilSolid))
                                             : Qt.alpha(Theme.text, actionArea.containsMouse ? 0.16 : 0.09)
                                     Behavior on color { ColorAnimation { duration: Theme.animFast } }
 

@@ -466,9 +466,9 @@ Item {
                     anchors.fill: parent
                     gradient: Gradient {
                         orientation: Gradient.Horizontal
-                        GradientStop { position: 0.0; color: Qt.alpha(Theme.mantle, 0.60) }
-                        GradientStop { position: 0.5; color: Qt.alpha(Theme.mantle, 0.42) }
-                        GradientStop { position: 1.0; color: Qt.alpha(Theme.mantle, 0.30) }
+                        GradientStop { position: 0.0; color: Qt.alpha(Theme.mantle, Theme.veilFirm) }
+                        GradientStop { position: 0.5; color: Qt.alpha(Theme.mantle, Theme.veilSoft) }
+                        GradientStop { position: 1.0; color: Qt.alpha(Theme.mantle, Theme.veilThin) }
                     }
                 }
 

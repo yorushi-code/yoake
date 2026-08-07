@@ -246,6 +246,41 @@ QtObject {
     readonly property real strokeSoft: 0.10   // an edge that only separates
     readonly property real strokeFirm: 0.18   // an edge that also lifts
 
+    // The same ladder in a colour, and it is not the same numbers.
+    //
+    // A saturated hue at ink strength is invisible: the accent at 0.06 is a
+    // rumour, where `text` at 0.06 is a card. Six files had each found this out
+    // separately and settled on 0.16, 0.22, 0.24, 0.26 and 0.30 — which is one
+    // ladder discovered five times. What has to match between an accent-
+    // selected row and an ink-hovered one is the *weight*, never the number.
+    readonly property real tintSubtle: 0.16   // selected, or a warning at rest
+    readonly property real tintActive: 0.26   // pressed, or a warning that must land
+
+    // ── The veil ladder ──
+    //
+    // Ink laid *over* content rather than under it. The rungs above stop at
+    // 0.20 because a fill is a surface you put things on; a veil is a scrim you
+    // put over things, and the two were being drawn from one handful of numbers
+    // picked per site — thirty-odd distinct values above the top fill rung, for
+    // five jobs. Every three-stop scrim in the shell is three of these.
+    readonly property real veilThin: 0.30     // you can still read what is under it
+    readonly property real veilSoft: 0.45     // present, no longer the subject
+    readonly property real veilFirm: 0.60     // legible as shape, not as detail
+    readonly property real veilDense: 0.75    // the ground wins
+    readonly property real veilSolid: 0.88    // opaque, still tinted by what is behind
+
+    // ── The ink ladder ──
+    //
+    // The three named inks say *which* grey. This says how much of it a mark
+    // keeps, which is a different question and was being answered with 0.28,
+    // 0.34, 0.35, 0.45, 0.5, 0.6, 0.65, 0.75 and 0.8 in adjacent files — a
+    // weekend in the calendar and a hint under a tooltip are the same gesture
+    // and had no way of knowing it.
+    readonly property real inkStrong: 0.80    // a step below its own ink
+    readonly property real inkSoft: 0.60      // secondary within secondary
+    readonly property real inkFaint: 0.45     // present, not for reading at speed
+    readonly property real inkGhost: 0.28     // a mark that is only there to be there
+
     // ── The spacing ladder ──
     //
     // Multiples of four, because the eye reads rhythm and not arithmetic: a

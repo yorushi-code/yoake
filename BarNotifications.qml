@@ -153,7 +153,7 @@ Item {
                             height: 26
                             radius: 1.5
                             color: item.index === 0
-                                ? Qt.alpha(Theme.accent, 0.9)
+                                ? Qt.alpha(Theme.accent, Theme.veilSolid)
                                 : Qt.alpha(Theme.text, Theme.strokeFirm)
                         }
 
@@ -230,7 +230,7 @@ Item {
 
             Text {
                 text: "ЛКМ — все уведомления · ПКМ — меню"
-                color: Qt.alpha(Theme.subtext0, 0.75)
+                color: Qt.alpha(Theme.subtext0, Theme.inkStrong)
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontMicro
             }

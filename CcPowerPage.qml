@@ -130,7 +130,7 @@ Flickable {
                     // Power off tints red on hover — the one destructive action
                     // stands apart.
                     color: actionArea.containsMouse
-                        ? (action.modelData.danger ? Theme.red : Qt.alpha(Theme.text, 0.16))
+                        ? (action.modelData.danger ? Theme.red : Qt.alpha(Theme.text, Theme.fillHover))
                         : Qt.alpha(Theme.text, Theme.fillSubtle)
                     Behavior on color { ColorAnimation { duration: Theme.animFast } }
                     scale: actionArea.pressed ? 0.95 : 1

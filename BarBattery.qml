@@ -181,9 +181,9 @@ Item {
                         width: 68
                         height: 30
                         radius: Theme.radius + 3
-                        color: chip.current ? Qt.alpha(Theme.accent, 0.9)
+                        color: chip.current ? Qt.alpha(Theme.accent, Theme.veilSolid)
                             : (chipArea.containsMouse ? Qt.alpha(Theme.text, Theme.fillHover)
-                                                      : Qt.alpha(Theme.text, 0.07))
+                                                      : Qt.alpha(Theme.text, Theme.fillSubtle))
                         Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
                         Column {

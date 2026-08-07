@@ -29,7 +29,7 @@ Rectangle {
     color: root.active && root.stateful
         ? Theme.accent
         : (body.containsMouse || chevronArea.containsMouse
-            ? Qt.alpha(Theme.text, 0.13) : Qt.alpha(Theme.text, Theme.fillSubtle))
+            ? Qt.alpha(Theme.text, Theme.fillHover) : Qt.alpha(Theme.text, Theme.fillSubtle))
     Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
     scale: body.pressed ? 0.97 : 1
@@ -84,7 +84,7 @@ Rectangle {
         anchors.bottomMargin: 10
         visible: root.detail !== ""
         text: root.detail
-        color: root.active && root.stateful ? Qt.alpha(Theme.crust, 0.75) : Theme.subtext0
+        color: root.active && root.stateful ? Qt.alpha(Theme.crust, Theme.veilDense) : Theme.subtext0
         font.pixelSize: Theme.fontLabel
         elide: Text.ElideRight
     }

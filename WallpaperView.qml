@@ -119,9 +119,9 @@ PanelWindow {
         anchors.fill: parent
         opacity: 0
         gradient: Gradient {
-            GradientStop { position: 0.0; color: Qt.alpha(Theme.accent, 0.5) }
-            GradientStop { position: 0.5; color: Qt.alpha(Theme.blue, 0.35) }
-            GradientStop { position: 1.0; color: Qt.alpha(Theme.accent, 0.5) }
+            GradientStop { position: 0.0; color: Qt.alpha(Theme.accent, Theme.veilSoft) }
+            GradientStop { position: 0.5; color: Qt.alpha(Theme.blue, Theme.veilThin) }
+            GradientStop { position: 1.0; color: Qt.alpha(Theme.accent, Theme.veilSoft) }
         }
     }
 

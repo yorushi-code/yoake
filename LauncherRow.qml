@@ -18,7 +18,7 @@ Rectangle {
 
     height: 52
     radius: Theme.radius
-    color: root.selected ? Qt.alpha(Theme.accent, 0.16)
+    color: root.selected ? Qt.alpha(Theme.accent, Theme.tintSubtle)
         : (ma.containsMouse ? Qt.alpha(Theme.text, Theme.fillSubtle) : "transparent")
     Behavior on color { ColorAnimation { duration: Theme.animFast } }
 

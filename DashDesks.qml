@@ -93,7 +93,7 @@ Item {
                             return w ? (w.title || w.app_id || "") : "";
                         }
                         color: card.windows.length === 0
-                            ? Qt.alpha(Theme.subtext0, 0.6)
+                            ? Qt.alpha(Theme.subtext0, Theme.inkSoft)
                             : (card.modelData.is_focused ? Theme.text : Theme.subtext1)
                         font.family: Theme.fontFamily
                         font.pixelSize: Theme.fontSmall

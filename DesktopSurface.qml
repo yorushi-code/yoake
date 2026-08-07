@@ -73,9 +73,9 @@ PanelWindow {
         width: hint.width + 28
         height: 32
         radius: Theme.radiusCard
-        color: Qt.alpha(Theme.crust, 0.9)
+        color: Qt.alpha(Theme.crust, Theme.veilSolid)
         border.width: 1
-        border.color: Qt.alpha(Theme.accent, 0.5)
+        border.color: Qt.alpha(Theme.accent, Theme.veilSoft)
         opacity: DesktopWidgets.editing ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }

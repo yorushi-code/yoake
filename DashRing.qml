@@ -95,7 +95,7 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             visible: root.secondary !== ""
             text: root.secondary
-            color: Qt.alpha(Theme.subtext0, 0.75)
+            color: Qt.alpha(Theme.subtext0, Theme.inkStrong)
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontMicro
             font.features: ({ "tnum": 1 })

@@ -54,7 +54,7 @@ Column {
                     text: parent.modelData
                     // Saturday and Sunday sit apart without needing a colour
                     // that fights the accent.
-                    color: parent.index >= 5 ? Qt.alpha(Theme.subtext0, 0.6) : Theme.subtext0
+                    color: parent.index >= 5 ? Qt.alpha(Theme.subtext0, Theme.inkSoft) : Theme.subtext0
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontMicro
                     font.weight: Font.Medium
@@ -97,7 +97,7 @@ Column {
                     visible: day.present
                     text: day.modelData
                     color: day.isToday ? Theme.crust
-                        : (day.weekend ? Qt.alpha(Theme.subtext1, 0.65) : Theme.subtext1)
+                        : (day.weekend ? Qt.alpha(Theme.subtext1, Theme.inkSoft) : Theme.subtext1)
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSmall
                     font.weight: day.isToday ? Font.DemiBold : Font.Normal

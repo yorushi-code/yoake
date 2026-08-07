@@ -56,7 +56,7 @@ PopupWindow {
         anchors.fill: parent
         anchors.margins: 4
         radius: Theme.radius - 2
-        color: Qt.alpha(Theme.crust, 0.94)
+        color: Qt.alpha(Theme.crust, Theme.veilSolid)
         border.color: Qt.alpha(Theme.text, Theme.strokeSoft)
         border.width: 1
 

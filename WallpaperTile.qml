@@ -112,7 +112,7 @@ Item {
             Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
             gradient: Gradient {
                 GradientStop { position: 0.0; color: "transparent" }
-                GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, 0.92) }
+                GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, Theme.veilSolid) }
             }
 
             Text {
@@ -137,7 +137,7 @@ Item {
             height: 22
             radius: Theme.radiusChip
             visible: root.modelData.video
-            color: Qt.alpha(Theme.crust, 0.8)
+            color: Qt.alpha(Theme.crust, Theme.veilDense)
 
             Text {
                 anchors.centerIn: parent

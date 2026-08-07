@@ -199,7 +199,7 @@ Item {
         anchors.top: parent.top
         anchors.rightMargin: 10
         text: "z"
-        color: Qt.alpha(Theme.subtext0, 0.8)
+        color: Qt.alpha(Theme.subtext0, Theme.inkStrong)
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontLead
         opacity: root.asleep ? 1 : 0

@@ -59,7 +59,7 @@ Rectangle {
             Text {
                 visible: root.detail !== ""
                 text: root.detail
-                color: root.active ? Qt.alpha(Theme.crust, 0.7) : Theme.subtext0
+                color: root.active ? Qt.alpha(Theme.crust, Theme.veilDense) : Theme.subtext0
                 font.pixelSize: Theme.fontLabel
                 width: Math.min(implicitWidth, 150)
                 elide: Text.ElideRight
@@ -94,7 +94,7 @@ Rectangle {
             width: 34
             height: 18
             radius: Theme.radiusChip
-            color: root.active ? Qt.alpha(Theme.crust, 0.45) : Qt.alpha(Theme.text, Theme.strokeFirm)
+            color: root.active ? Qt.alpha(Theme.crust, Theme.veilSoft) : Qt.alpha(Theme.text, Theme.strokeFirm)
             Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
             Rectangle {

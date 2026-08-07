@@ -279,7 +279,7 @@ PanelWindow {
                                 // that scales in on hover.
                                 color: dayCell.isToday
                                     ? Theme.accent
-                                    : (dayMa.containsMouse ? Qt.alpha(Theme.accent, 0.22) : "transparent")
+                                    : (dayMa.containsMouse ? Qt.alpha(Theme.accent, Theme.tintSubtle) : "transparent")
                                 border.color: Theme.accent
                                 border.width: (dayCell.isSelected && !dayCell.isToday) ? 2 : 0
                                 scale: (dayCell.isToday || dayCell.isSelected || dayMa.containsMouse) ? 1.0 : 0.6
@@ -302,7 +302,7 @@ PanelWindow {
                                 font.bold: dayCell.isToday || dayCell.isSelected
                                 color: {
                                     if (dayCell.isToday) return Theme.crust;
-                                    if (!modelData.inMonth) return Qt.alpha(Theme.subtext0, 0.45);
+                                    if (!modelData.inMonth) return Qt.alpha(Theme.subtext0, Theme.inkFaint);
                                     return index % 7 >= 5 ? Theme.subtext1 : Theme.text;
                                 }
                             }

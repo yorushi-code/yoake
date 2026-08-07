@@ -219,9 +219,9 @@ ShellRoot {
         Rectangle {
             anchors.fill: parent
             gradient: Gradient {
-                GradientStop { position: 0.0; color: Qt.alpha(Theme.crust, 0.42) }
-                GradientStop { position: 0.55; color: Qt.alpha(Theme.crust, 0.62) }
-                GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, 0.86) }
+                GradientStop { position: 0.0; color: Qt.alpha(Theme.crust, Theme.veilSoft) }
+                GradientStop { position: 0.55; color: Qt.alpha(Theme.crust, Theme.veilFirm) }
+                GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, Theme.veilSolid) }
             }
         }
 
@@ -287,7 +287,7 @@ ShellRoot {
                 width: 72
                 height: 72
                 radius: Theme.pill(height)
-                color: Qt.alpha(Theme.text, 0.08)
+                color: Qt.alpha(Theme.text, Theme.fillSubtle)
                 border.width: 2
                 border.color: Qt.alpha(Theme.accent, root.busy ? 0.9 : 0.35)
                 Behavior on border.color { ColorAnimation { duration: Theme.animNormal } }
@@ -374,11 +374,11 @@ ShellRoot {
                 Rectangle {
                     anchors.fill: parent
                     radius: height / 2
-                    color: Qt.alpha(Theme.crust, 0.55)
+                    color: Qt.alpha(Theme.crust, Theme.veilFirm)
                     border.width: 1.5
                     border.color: root.message !== ""
                         ? Theme.red
-                        : (input.activeFocus ? Qt.alpha(Theme.accent, 0.85) : Qt.alpha(Theme.text, 0.18))
+                        : (input.activeFocus ? Qt.alpha(Theme.accent, Theme.veilSolid) : Qt.alpha(Theme.text, Theme.strokeFirm))
                     Behavior on border.color { ColorAnimation { duration: Theme.animNormal } }
 
                     // Dots, drawn rather than echoed: a TextInput in password
@@ -484,7 +484,7 @@ ShellRoot {
             anchors.top: auth.bottom
             anchors.topMargin: 10
             text: root.session
-            color: Qt.alpha(Theme.subtext0, 0.8)
+            color: Qt.alpha(Theme.subtext0, Theme.inkStrong)
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontLabel
             font.letterSpacing: 1.6
@@ -576,7 +576,7 @@ ShellRoot {
                 anchors.top: parent.top
                 anchors.topMargin: 14
                 text: "z"
-                color: Qt.alpha(Theme.text, 0.7)
+                color: Qt.alpha(Theme.text, Theme.inkStrong)
                 font.family: Theme.fontFamily
                 font.pixelSize: 14
 
@@ -595,7 +595,7 @@ ShellRoot {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 26
             text: "yoake"
-            color: Qt.alpha(Theme.text, 0.28)
+            color: Qt.alpha(Theme.text, Theme.inkGhost)
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontLabel
             font.weight: Font.Medium

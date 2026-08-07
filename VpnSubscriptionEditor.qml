@@ -30,7 +30,7 @@ Column {
         radius: Theme.radius
         color: Qt.alpha(Theme.text, input.activeFocus ? 0.12 : 0.06)
         border.width: 1
-        border.color: input.activeFocus ? Qt.alpha(Theme.accent, 0.7) : "transparent"
+        border.color: input.activeFocus ? Qt.alpha(Theme.accent, Theme.veilDense) : "transparent"
         Behavior on color { ColorAnimation { duration: Theme.animFast } }
         Behavior on border.color { ColorAnimation { duration: Theme.animFast } }
 
@@ -43,7 +43,7 @@ Column {
             color: Theme.text
             font.pixelSize: Theme.fontBody
             selectByMouse: true
-            selectionColor: Qt.alpha(Theme.accent, 0.4)
+            selectionColor: Qt.alpha(Theme.accent, Theme.veilSoft)
             clip: true
 
             Text {
@@ -81,8 +81,8 @@ Column {
         radius: Theme.radius
         readonly property bool ready: nameField.text.trim() !== "" && urlField.text.trim() !== ""
         color: !submitButton.ready || root.busy
-            ? Qt.alpha(Theme.text, 0.08)
-            : (submitArea.containsMouse ? Theme.accent : Qt.alpha(Theme.accent, 0.85))
+            ? Qt.alpha(Theme.text, Theme.fillSubtle)
+            : (submitArea.containsMouse ? Theme.accent : Qt.alpha(Theme.accent, Theme.veilSolid))
         Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
         Text {

@@ -69,9 +69,9 @@ WlSessionLock {
         Rectangle {
             anchors.fill: parent
             gradient: Gradient {
-                GradientStop { position: 0.0; color: Qt.alpha(Theme.crust, 0.42) }
-                GradientStop { position: 0.55; color: Qt.alpha(Theme.crust, 0.62) }
-                GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, 0.86) }
+                GradientStop { position: 0.0; color: Qt.alpha(Theme.crust, Theme.veilSoft) }
+                GradientStop { position: 0.55; color: Qt.alpha(Theme.crust, Theme.veilFirm) }
+                GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, Theme.veilSolid) }
             }
         }
 
@@ -219,11 +219,11 @@ WlSessionLock {
                     id: field
                     anchors.fill: parent
                     radius: height / 2
-                    color: Qt.alpha(Theme.crust, 0.55)
+                    color: Qt.alpha(Theme.crust, Theme.veilFirm)
                     border.width: 1.5
                     border.color: LockState.failed
                         ? Theme.red
-                        : (input.activeFocus ? Qt.alpha(Theme.accent, 0.85) : Qt.alpha(Theme.text, Theme.strokeFirm))
+                        : (input.activeFocus ? Qt.alpha(Theme.accent, Theme.veilSolid) : Qt.alpha(Theme.text, Theme.strokeFirm))
                     Behavior on border.color { ColorAnimation { duration: Theme.animNormal } }
 
                     // Dots, drawn rather than echoed: a TextInput in password
@@ -339,7 +339,7 @@ WlSessionLock {
                 anchors.top: parent.top
                 anchors.topMargin: 12
                 text: "z"
-                color: Qt.alpha(Theme.text, 0.65)
+                color: Qt.alpha(Theme.text, Theme.inkSoft)
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontLead
 
@@ -362,7 +362,7 @@ WlSessionLock {
             width: 300
             height: 72
             radius: Theme.radiusCard
-            color: Qt.alpha(Theme.crust, 0.5)
+            color: Qt.alpha(Theme.crust, Theme.veilSoft)
             border.width: 1
             border.color: Qt.alpha(Theme.text, Theme.fillMuted)
             opacity: surface.entered ? 1 : 0
@@ -465,7 +465,7 @@ WlSessionLock {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 26
             text: "yoake"
-            color: Qt.alpha(Theme.text, 0.28)
+            color: Qt.alpha(Theme.text, Theme.inkGhost)
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontLabel
             font.weight: Font.Medium

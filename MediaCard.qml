@@ -88,9 +88,9 @@ Item {
             visible: bleed.status === Image.Ready
             gradient: Gradient {
                 orientation: Gradient.Horizontal
-                GradientStop { position: 0.0; color: Qt.alpha(Theme.crust, 0.30) }
-                GradientStop { position: 0.34; color: Qt.alpha(Theme.crust, 0.72) }
-                GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, 0.84) }
+                GradientStop { position: 0.0; color: Qt.alpha(Theme.crust, Theme.veilThin) }
+                GradientStop { position: 0.34; color: Qt.alpha(Theme.crust, Theme.veilDense) }
+                GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, Theme.veilSolid) }
             }
         }
     }
@@ -107,7 +107,7 @@ Item {
             width: parent.height
             height: width
             radius: width * 0.19
-            color: Qt.alpha(Theme.crust, 0.85)
+            color: Qt.alpha(Theme.crust, Theme.veilSolid)
 
             // Lifts with the beat. At this size that is all the reaction there
             // is room for, and it is enough to tell playing from paused across
@@ -132,7 +132,7 @@ Item {
                 gradient: Gradient {
                     orientation: Gradient.Vertical
                     GradientStop { position: 0.0; color: Qt.alpha(MediaTint.accent, 0.32) }
-                    GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, 0.5) }
+                    GradientStop { position: 1.0; color: Qt.alpha(Theme.crust, Theme.veilSoft) }
                 }
             }
 
@@ -142,7 +142,7 @@ Item {
                 text: Glyphs.music
                 font.family: Theme.fontIconFamily
                 font.pixelSize: cover.width * 0.3
-                color: Qt.alpha(Theme.text, 0.5)
+                color: Qt.alpha(Theme.text, Theme.inkFaint)
             }
 
             Image {

@@ -40,7 +40,7 @@ Item {
         anchors.fill: parent
         radius: Theme.radius - 3
         color: ma.containsMouse
-            ? (root.destructive ? Qt.alpha(Theme.red, 0.30) : Qt.alpha(Theme.accent, 0.26))
+            ? (root.destructive ? Qt.alpha(Theme.red, Theme.tintActive) : Qt.alpha(Theme.accent, Theme.tintActive))
             : "transparent"
         Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
@@ -128,7 +128,7 @@ Item {
             width: Math.min(implicitWidth, root.width - 60)
             text: root.text
             elide: Text.ElideRight
-            color: !root.enabled ? Qt.alpha(Theme.text, 0.35)
+            color: !root.enabled ? Qt.alpha(Theme.text, Theme.inkFaint)
                 : (root.destructive ? Theme.red : Theme.text)
             font.pixelSize: Theme.fontBody
         }

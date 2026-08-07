@@ -74,9 +74,9 @@ Row {
                     ? Theme.accent
                     : (modelData.is_urgent ? Theme.red
                         : (mouseArea.containsMouse ? Theme.subtext0
-                            : (wsDelegate.occupied ? Qt.alpha(Theme.text, 0.45) : "transparent")))
+                            : (wsDelegate.occupied ? Qt.alpha(Theme.text, Theme.inkFaint) : "transparent")))
                 border.width: (!modelData.is_focused && !wsDelegate.occupied) ? 1.5 : 0
-                border.color: Qt.alpha(Theme.text, 0.34)
+                border.color: Qt.alpha(Theme.text, Theme.inkGhost)
                 Behavior on color { ColorAnimation { duration: Theme.animFast } }
                 Behavior on width {
                     NumberAnimation { duration: Theme.animNormal; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpring }
