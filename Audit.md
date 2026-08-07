@@ -235,10 +235,13 @@ now, which is what `MenuSurface` has always used.
    cannot be checked without risking locking an unattended machine.
 3. **The greeter needs installing** once somebody is at the machine, and that
    is the only way to find out whether any of this reached it.
-4. **The cheat sheet does not fit on a 1080p screen** and now says so. Fitting
-   it needs either a sixth column (1920 cannot hold six at a legible measure)
-   or a smaller rung for the binding labels; the fade is the honest minimum,
-   not the answer.
+4. **The cheat sheet is one row short of fitting** on a 1080p screen, down from
+   most of a column. A rung tighter between categories recovered the rest —
+   density is the feature on a reference sheet. The last row needs the sheet to
+   stop being vertically centred and hang from the bar like every other panel
+   here, which is worth doing and is a change of character rather than a
+   number, so it is written down rather than guessed at. The fade says the
+   truth in the meantime.
 
 Nothing above is an aesthetic preference. Every item is either a number the
 linter can check or a duplication visible in a screenshot.

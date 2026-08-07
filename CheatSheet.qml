@@ -477,7 +477,14 @@ Item {
                         delegate: Column {
                         required property var modelData
                         width: 320
-                        spacing: Theme.gapSection
+                        // A rung tighter between categories than the shell uses
+                        // between sections elsewhere. This sheet's own comment
+                        // says the entire point of it is that everything is
+                        // visible at once, and on a 1080p screen it was sixty
+                        // pixels short of that -- which is eight gaps of eight.
+                        // A reference sheet is the one surface where density is
+                        // the feature.
+                        spacing: Theme.gapCard
 
                         Repeater {
                             model: modelData
@@ -568,8 +575,11 @@ Item {
                 // 1080p display the tallest column runs past the fold. It scrolls; it
                 // had no way at all of saying so.
                 ScrollFade {
+                    // No margins of its own: it fills the flickable, and the
+                    // flickable is already the one inset from the panel. The
+                    // 24 copied from there put the fade twenty-four pixels
+                    // above the edge it was describing.
                     flick: sheetFlick
-                    anchors.margins: 24
                     tint: Theme.mantle
                 }
             }

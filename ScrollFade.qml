@@ -28,11 +28,16 @@ Item {
     // real damage: it would eat the wheel event for the list it is describing.
     enabled: false
 
-    // A pixel of slack at each end, because contentY lands on fractions after a
-    // flick and an edge that flickers is worse than no edge.
-    readonly property bool moreAbove: root.flick && root.flick.contentY > 1
-    readonly property bool moreBelow: root.flick
-        && root.flick.contentY < root.flick.contentHeight - root.flick.height - 1
+    // A few pixels of slack, because contentY lands on fractions after a flick
+    // and an edge that flickers is worse than no edge — and because a list
+    // whose content is two pixels taller than its box is not a list that
+    // continues, it is a rounding error. The cheat sheet spent a version
+    // wearing a fade for exactly that.
+    readonly property bool scrollable: root.flick
+        && root.flick.contentHeight > root.flick.height + 3
+    readonly property bool moreAbove: root.scrollable && root.flick.contentY > 3
+    readonly property bool moreBelow: root.scrollable
+        && root.flick.contentY < root.flick.contentHeight - root.flick.height - 3
 
     Rectangle {
         anchors.top: parent.top
