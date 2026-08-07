@@ -148,35 +148,56 @@ says in its own comment that a centred list leaves "a hand's width of nothing
 directly under the heading"; the tile grid above it argued the opposite and
 centred. Resolved in favour of the card that was right.
 
+**The alphas are done, and they were three ladders.** Ninety-nine sites, all
+spelled `Qt.alpha(Theme.x, n)`, which is why a sweep would have been wrong. A
+*fill* sits under content and the ladder already existed — except in a colour,
+where six files had each separately discovered that the accent at 0.06 is a
+rumour and settled on 0.16/0.22/0.24/0.26/0.30, one ladder found five times. A
+*veil* sits over content and the ladder stopped at 0.20, so every scrim in the
+shell was invented per site. *Ink presence* had no rungs at all: a weekend in
+the calendar and a hint under a tooltip are the same gesture and had no way of
+knowing it. Drift is now zero in every category the linter measures.
+
+**One bloom.** `Glow` — and the reason it exists is not tidiness. Three of the
+four hand-built glows animated `spread`, which is geometry: every frame
+re-rasterises the blur. `BarIsland` measured that at 4.4 points of a core,
+fixed it and wrote it down, and `MediaOrb` was doing it on a blur-48 shadow
+regardless. Growth is a transform now, which the scene graph applies for free.
+
+**Reading the backlight is not an event.** `Brightness` had one signal for "a
+fresh reading landed" and "somebody moved it", so opening the control centre —
+which asks for a reading — slid the OSD over the panel that had just asked.
+
+**Three lists were clipping with no way of saying so.** A subscription row cut
+in half by a panel edge and a cheat sheet missing its last line read as
+rendering faults, which is the worst way for a list to be longer than its box.
+`ScrollFade`, not a scrollbar: every surface here is glass over a wallpaper and
+a rail parked on one is the single piece of chrome that cannot be made to
+belong to it.
+
+**The media page spent 180px of its width on an ornament.** The cat was
+centred against the right edge with the content column anchored to it, so the
+column the track is read in was under three hundred wide and every video title
+wrapped. It sits in the corner behind the content now.
+
 ## Backlog, in the order it should be worked
 
-1. **99 off-ladder surface alphas**, the last drift category with anything in
-   it. Not one problem but three wearing one name, which is why a sweep would
-   be wrong: the linter matches `Qt.alpha(Theme.x, n)` and cannot tell a *fill*
-   (0.05, 0.07, 0.12, 0.16 — the existing ladder, missed by a rung) from a
-   *veil* (0.42, 0.62, 0.86 — a scrim over content, which the ladder stops
-   short of entirely) from *ink* (0.6, 0.75, 0.8 — how much of a colour a mark
-   keeps, a third axis with no rungs at all). The fills are mechanical. The
-   veils want a ladder of their own before anything is moved onto it, and the
-   three-stop gradients in `LockScreen` and `DashOverview` are the shape it
-   should be cut to.
-2. **The four accent glows.** `BarIsland`, `BarWorkspaces`, `MediaOrb` and
-   `WidgetSpectrum` each build the same figure by hand — an accent-tinted
-   `RectangularShadow` at zero offset, spread ~1, blur chosen per object. This
-   is the part of "the ten private shadows" that survived reading: the rest are
-   depth (`Surface` owns it) or documented one-offs. A glow is not depth and
-   should not be pushed into `Surface`; it wants its own object, with blur
-   derived from the size of the thing glowing.
-3. **The bar is still a container**, three islands each a `Row`, which is
+1. **The bar is still a container**, three islands each a `Row`, which is
    `Direction.md`'s own open item: rule 2 wants a composer that recomposes the
    interval rhythm and the optical centre when the media widget appears, rather
    than reflowing.
-4. **`Reveal` still has one caller.** `ActionMenu`, `VpnPanel`, `CcWifiPage`,
+2. **`Reveal` still has one caller.** `ActionMenu`, `VpnPanel`, `CcWifiPage`,
    `CcBluetoothPage` and the notification stack each still spell their own
    motion out, and `LockScreen`'s entrance is a hand-rolled four-beat cascade
-   written in pauses.
-5. **The greeter needs installing** once somebody is at the machine, and that
-   is the only way to find out whether any of the above reached it.
+   written in pauses. Worth doing for the panels; `ActionMenu`'s rows are the
+   one place to be careful, since four beats on a 22px row is over-produced and
+   the menu code has already cost four silent bugs.
+3. **The greeter needs installing** once somebody is at the machine, and that
+   is the only way to find out whether any of this reached it.
+4. **The cheat sheet does not fit on a 1080p screen** and now says so. Fitting
+   it needs either a sixth column (1920 cannot hold six at a legible measure)
+   or a smaller rung for the binding labels; the fade is the honest minimum,
+   not the answer.
 
 Nothing above is an aesthetic preference. Every item is either a number the
 linter can check or a duplication visible in a screenshot.

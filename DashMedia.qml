@@ -40,22 +40,29 @@ Item {
                 coverSize: Math.min(orb.coverFor(parent.height), 168)
             }
 
+            // In the corner and behind the content, not between the orb and
+            // the type.
+            //
+            // Centred against the right edge it was a hundred and eighty pixels
+            // of the page's width spent on an ornament, and the column the
+            // track is actually read in was squeezed to under three hundred —
+            // narrow enough that every video title wrapped to two lines. It
+            // did once sit on the bottom edge and read as having fallen out of
+            // the layout; what was missing then was something for it to sit
+            // under, and the wave and the transport now run across it.
             MediaCat {
                 id: cat
                 anchors.right: parent.right
                 anchors.rightMargin: 6
-                // Sits with the block it belongs to. On the card's bottom edge
-                // it read as having fallen out of the layout instead of being
-                // part of it.
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.verticalCenterOffset: 30
+                anchors.bottom: parent.bottom
+                z: -1
+                opacity: Theme.chromeEmphasis
             }
 
             Column {
                 anchors.left: orb.right
-                anchors.right: cat.left
+                anchors.right: parent.right
                 anchors.leftMargin: 26
-                anchors.rightMargin: 14
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: Theme.spacing
 
@@ -213,11 +220,11 @@ Item {
                             width: chipRow.implicitWidth + 18
                             height: 26
                             radius: Theme.radiusChip
-                            color: chip.current ? Qt.alpha(MediaTint.accent, 0.22)
+                            color: chip.current ? Qt.alpha(MediaTint.accent, Theme.tintActive)
                                 : (chipHit.containsMouse ? Qt.alpha(Theme.text, Theme.fillMuted)
                                                          : Qt.alpha(Theme.text, Theme.fillSubtle))
                             border.width: 1
-                            border.color: chip.held ? Qt.alpha(MediaTint.accent, 0.8) : "transparent"
+                            border.color: chip.held ? Qt.alpha(MediaTint.accent, Theme.inkStrong) : "transparent"
                             Behavior on color { ColorAnimation { duration: Theme.animFast } }
                             Behavior on border.color { ColorAnimation { duration: Theme.animFast } }
 

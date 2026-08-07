@@ -716,37 +716,50 @@ Item {
                         // rows, and letting the footer take that left the node
                         // list — the thing the panel is actually for — one row
                         // tall.
-                        Flickable {
+                        // Wrapped, because a Flickable's children are its
+                        // content and scroll with it — an overlay has to be a
+                        // sibling, and inside a Column a sibling would be laid
+                        // out as another row.
+                        Item {
+                            id: subsBox
                             width: parent.width
                             height: Math.min(subsColumn.implicitHeight, 172)
-                            contentHeight: subsColumn.implicitHeight
-                            clip: true
                             visible: !root.adding
 
-                            Column {
-                                id: subsColumn
-                                width: parent.width
-                                spacing: Theme.gapTight
+                            Flickable {
+                                id: subsFlick
+                                anchors.fill: parent
+                                contentHeight: subsColumn.implicitHeight
+                                clip: true
 
-                                Repeater {
-                                    model: root.orderedSubscriptions
+                                Column {
+                                    id: subsColumn
+                                    width: parent.width
+                                    spacing: Theme.gapTight
 
-                                    delegate: VpnSubscriptionRow {
-                                        width: subsColumn.width
-                                        busy: Mihomo.busy
+                                    Repeater {
+                                        model: root.orderedSubscriptions
 
-                                        onConnectRequested: Mihomo.start(modelData.name)
-                                        onRefreshRequested: Mihomo.refreshSubscription(modelData.name)
-                                        onRemoveRequested: Mihomo.removeSubscription(modelData.name)
-                                        onCoreRequested: core => Mihomo.setCore(modelData.name, core)
+                                        delegate: VpnSubscriptionRow {
+                                            width: subsColumn.width
+                                            busy: Mihomo.busy
+
+                                            onConnectRequested: Mihomo.start(modelData.name)
+                                            onRefreshRequested: Mihomo.refreshSubscription(modelData.name)
+                                            onRemoveRequested: Mihomo.removeSubscription(modelData.name)
+                                            onCoreRequested: core => Mihomo.setCore(modelData.name, core)
+                                        }
                                     }
                                 }
                             }
+
+                            ScrollFade { flick: subsFlick }
                         }
                     }
 
                     // ── node list ──
                     Flickable {
+                        id: nodeFlick
                         anchors.top: head.bottom
                         anchors.topMargin: 14
                         anchors.bottom: foot.top
@@ -796,6 +809,9 @@ Item {
                             }
                         }
                     }
+
+                    // Anchored, not in a Column, so a plain sibling is enough.
+                    ScrollFade { flick: nodeFlick }
 
                     Text {
                         anchors.centerIn: parent

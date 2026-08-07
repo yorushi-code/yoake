@@ -473,6 +473,7 @@ Item {
                 }
 
                 Flickable {
+                    id: sheetFlick
                     anchors.fill: parent
                     anchors.margins: 24
                     contentHeight: grid.height
@@ -573,6 +574,15 @@ Item {
                         }
                         }
                     }
+                }
+
+                // The sheet is capped by the screen and the bindings are not, so on a
+                // 1080p display the tallest column runs past the fold. It scrolls; it
+                // had no way at all of saying so.
+                ScrollFade {
+                    flick: sheetFlick
+                    anchors.margins: 24
+                    tint: Theme.mantle
                 }
             }
         }
