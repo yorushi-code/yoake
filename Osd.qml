@@ -53,12 +53,17 @@ Item {
     // and neither noticed the other's changes.
     Connections {
         target: Brightness
-        function onRefreshed() { root.show("Brightness", Brightness.value); }
+        // onAnnounced, not onRefreshed: a re-read is not an event. The
+        // control centre asks for one every time it opens, and that was
+        // enough to slide this OSD over the panel that had just asked.
+        function onAnnounced() { root.show("Brightness", Brightness.value); }
     }
 
     IpcHandler {
         target: "osd"
-        function brightness() { Brightness.refresh(); }
+        // The keys change the backlight in another process, so this is the
+        // one caller that knows a reading is worth announcing.
+        function brightness() { Brightness.refresh(true); }
     }
 
     // What the label says, as opposed to what it is called. The kind is an

@@ -14,8 +14,21 @@ Singleton {
 
     // 0..1
     property real value: 0
-    // Emitted whenever a fresh reading lands, whoever caused the change.
+    // A fresh reading landed, whoever caused it. Anything showing the level
+    // follows this.
     signal refreshed()
+    // Somebody moved the level from outside any visible control, which is the
+    // only case that earns an OSD. These were one signal, so reading the
+    // backlight because a panel opened popped the OSD over the panel that had
+    // just asked -- and dragging the control centre's own slider announced a
+    // number the slider was already showing.
+    signal announced()
+
+    // Whether the reading now in flight should announce itself. The keys change
+    // the backlight in another process and then ask the shell to catch up, so
+    // "somebody moved it" is not something the reading can tell on its own --
+    // only the caller knows.
+    property bool _announce: false
 
     // brightnessctl -m prints: class,name,current,percent%,max
     Process {
@@ -29,13 +42,18 @@ Singleton {
                 if (isNaN(pct)) return;
                 root.value = pct / 100;
                 root.refreshed();
+                if (root._announce) {
+                    root._announce = false;
+                    root.announced();
+                }
             }
         }
     }
 
     Process { id: setProc }
 
-    function refresh() {
+    function refresh(announce) {
+        root._announce = announce === true;
         getProc.running = true;
     }
 

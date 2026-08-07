@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 
 // Workspace pills. Unfocused workspaces are dots and the focused one widens
@@ -44,17 +43,16 @@ Row {
             height: Theme.barHeight
             anchors.verticalCenter: parent.verticalCenter
 
-            // Accent-tinted RectangularShadow doubles as a glow, so the focused
-            // workspace reads as lit rather than just filled.
-            RectangularShadow {
+            // So the focused desk reads as lit rather than just filled.
+            Glow {
                 anchors.fill: pill
                 radius: pill.radius
-                color: modelData.is_urgent ? Theme.red : Theme.accent
-                blur: 20
-                spread: 1
-                opacity: modelData.is_focused ? 0.75 : (modelData.is_urgent ? 0.6 : 0)
-                offset: Qt.vector2d(0, 0)
-                Behavior on opacity {
+                tint: modelData.is_urgent ? Theme.red : Theme.accent
+                reach: 20
+                amount: modelData.is_focused
+                    ? Theme.veilDense
+                    : (modelData.is_urgent ? Theme.veilFirm : 0)
+                Behavior on amount {
                     NumberAnimation { duration: Theme.animNormal; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeEmphasized }
                 }
             }

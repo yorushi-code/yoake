@@ -87,17 +87,19 @@ Item {
     }
 
     // Falls back to the accent when there is no cover to take colour from.
-    RectangularShadow {
+    // The beat used to arrive as a spread from 2 to 20 on a blur-48 shadow,
+    // re-rasterised every frame; it is a transform now, which is the same
+    // growth for none of the cost.
+    Glow {
         anchors.centerIn: parent
         width: root.coverSize
         height: root.coverSize
         radius: root.coverSize * 0.16
-        visible: haloSource.status !== Image.Ready
-        color: MediaTint.accent
-        blur: 48
-        spread: 2 + root.swell * 18
-        opacity: 0.18 + root.swell * 0.40
-        offset: Qt.vector2d(0, 0)
+        tint: MediaTint.accent
+        reach: 48
+        amount: haloSource.status !== Image.Ready
+            ? 0.18 + root.swell * 0.40 : 0
+        swell: root.swell
     }
 
     // ── Spectrum ──

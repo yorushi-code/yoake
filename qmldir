@@ -112,6 +112,7 @@ RollClock 1.0 RollClock.qml
 MediaCard 1.0 MediaCard.qml
 
 Surface 1.0 Surface.qml
+Glow 1.0 Glow.qml
 Sparkline 1.0 Sparkline.qml
 singleton MediaTint 1.0 MediaTint.qml
 DashControl 1.0 DashControl.qml

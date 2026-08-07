@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 
 // Audio spectrum, mirrored around the vertical centre so the shape reads as a
 // waveform rather than a bar chart.
@@ -100,19 +99,17 @@ Item {
                 width: root.barWidth
                 height: root.span
 
-                // Glow scales with the band's own level, so loud bands bloom and
-                // quiet ones stay clean. Gated on being visible at all: below
-                // this the glow is under 0.17 opacity and indistinguishable from
-                // nothing, but all 28 were still drawn every frame.
-                RectangularShadow {
+                // Scales with the band's own level, so loud bands bloom and
+                // quiet ones stay clean.
+                Glow {
                     anchors.fill: barRect
                     radius: barRect.radius
-                    visible: bar.level > 0.25
-                    color: bar.tint
-                    blur: 20
-                    spread: 1
-                    opacity: bar.level * 0.75
-                    offset: Qt.vector2d(0, 0)
+                    tint: bar.tint
+                    reach: 20
+                    // Gated by Glow's own floor: below it the bloom is under
+                    // two per cent and indistinguishable from nothing, but all
+                    // twenty-eight were still being drawn every frame.
+                    amount: bar.level > 0.25 ? bar.level * Theme.veilDense : 0
                 }
 
                 Rectangle {

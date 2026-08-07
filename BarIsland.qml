@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell.Widgets
 
 // One of the bar's floating glass islands.
@@ -40,27 +39,23 @@ Item {
     // Always-on accent glow marks the clock as the bar's focal point, and
     // pulses with the music: the three lowest cava bands (bass) drive its
     // intensity and spread, so the island visibly breathes to the beat.
-    RectangularShadow {
+    // The measurement that produced Glow's fixed spread was taken here: 4.4
+    // points of a core for one island pulsing on geometry instead of opacity.
+    //
+    // No Behaviors. Two 90ms animations restarting on every cava frame never
+    // finished, and each restart re-rendered the blur. Cava.bass is already
+    // damped on its falling edge.
+    Glow {
         anchors.fill: glass
         radius: glass.radius
-        visible: root.pulseWithAudio
-        color: Theme.accent
-        blur: 28
-        // Fixed. Spread is geometry, and changing it re-rasterises a blur-28
-        // shadow -- thirty times a second, in the always-visible bar. Measured
-        // at 4.4 points of a core against the same glow pulsing on opacity
-        // alone, which the scene graph changes for free and which carries the
-        // beat just as visibly.
-        spread: 1
+        reach: 28
         // Scaled by hierarchy: this glow is decoration, and decoration is the
         // first thing that should step back when someone has been sitting in
         // one window for a while. It stays a beat -- the bass still drives it
         // -- but a quieter one.
-        opacity: Math.min(0.85, 0.18 + root.bass * 0.62) * Theme.chromeEmphasis
-        offset: Qt.vector2d(0, 0)
-        // No Behaviors. Two 90ms animations restarting on every cava frame
-        // never finished, and each restart re-rendered a blur-28 shadow.
-        // Cava.bass is already damped on its falling edge.
+        amount: root.pulseWithAudio
+            ? Math.min(0.85, 0.18 + root.bass * 0.62) * Theme.chromeEmphasis
+            : 0
     }
 
     // The same object the panels and the cards are made of. It also puts the
