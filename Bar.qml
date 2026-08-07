@@ -137,16 +137,25 @@ PanelWindow {
         // takes no clicks, so the widgets keep their own.
         HoverHandler {
             id: dashHover
-            onHoveredChanged: hovered ? dashOpen.restart() : dashOpen.stop()
+            onHoveredChanged: {
+                // The peek watches both surfaces, so the island reports where
+                // the pointer is rather than deciding on its own when to close.
+                Toggles.dashPointerOnBar = hovered;
+                if (hovered) dashOpen.restart();
+                else dashOpen.stop();
+            }
         }
 
         Timer {
             id: dashOpen
             // Long enough that crossing the bar on the way somewhere else does
             // not summon it.
-            interval: 420
+            interval: Theme.animSlow
+            // A peek, not an open: it asks for no keyboard and it leaves with
+            // the pointer. Pointing at something is not the same as asking for
+            // it, and this used to treat them as the same.
             onTriggered: if (dashHover.hovered && !Menus.anyOpen) {
-                Toggles.exclusive("dashboard");
+                Toggles.dashPeek();
             }
         }
     }

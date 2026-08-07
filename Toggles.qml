@@ -66,6 +66,78 @@ QtObject {
         root[name + "Open"] = wanted;
     }
 
+    // ── The dashboard peek ──
+    //
+    // Pointing at the bar's centre island for 420ms opened the full sheet and
+    // took the keyboard exclusively with it. So brushing past the clock on the
+    // way to the tray stole the keyboard from whatever was being typed into,
+    // and left a sheet that then had to be dismissed by hand — a gesture
+    // nobody performed on purpose, with two consequences that both had to be
+    // undone.
+    //
+    // A peek is the same sheet without either commitment. It asks for the
+    // keyboard on demand rather than exclusively, so it takes nothing until it
+    // is clicked, and it leaves when the pointer does.
+    property bool dashboardPeek: false
+
+    // Where the pointer is, as far as the peek is concerned. Two flags because
+    // there are two surfaces in two windows: the island that opens it and the
+    // sheet it opens, and neither can see the other's hover.
+    //
+    // One pointer, so one flag each rather than a count. On two monitors two
+    // bars write the same flag and the enter and leave are not ordered across
+    // windows, so crossing from one bar to the other can close a peek a beat
+    // early. That is the whole cost, and a reference count would leak the
+    // first time a surface unmapped while hovered.
+    property bool dashPointerOnBar: false
+    property bool dashPointerOnSheet: false
+
+    function dashPeek() {
+        if (root.dashboardOpen) return;
+        root.dashboardPeek = true;
+        root.exclusive("dashboard");
+    }
+
+    // Any deliberate input promotes it: you meant it after all, and from here
+    // it behaves like a dashboard somebody asked for.
+    function dashCommit() {
+        root.dashboardPeek = false;
+    }
+
+    onDashboardOpenChanged: {
+        if (root.dashboardOpen) return;
+        root.dashboardPeek = false;
+        // The sheet's window is about to unmap, and a hover flag left standing
+        // on a surface that no longer exists would keep the *next* peek from
+        // ever closing itself.
+        root.dashPointerOnSheet = false;
+    }
+
+    onDashPointerOnBarChanged: root._peekTick()
+    onDashPointerOnSheetChanged: root._peekTick()
+
+    function _peekTick() {
+        if (root.dashPointerOnBar || root.dashPointerOnSheet) {
+            peekOut.stop();
+        } else if (root.dashboardPeek) {
+            peekOut.restart();
+        }
+    }
+
+    property Timer _peekOut: Timer {
+        id: peekOut
+        // Long enough to cross the gap between the island and the sheet, which
+        // is only the bar's own margin, and short enough that a sheet nobody is
+        // pointing at does not sit there.
+        interval: Theme.animNormal
+        onTriggered: {
+            if (root.dashboardPeek && !root.dashPointerOnBar
+                    && !root.dashPointerOnSheet) {
+                root.dashboardOpen = false;
+            }
+        }
+    }
+
     property IpcHandler handler: IpcHandler {
         target: "toggles"
 

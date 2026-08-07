@@ -15,7 +15,10 @@ import QtQuick
 // that doesn't line up with what's behind it.
 Item {
     id: root
-    default property alias content: inner.children
+    // `data`, not `children`: a panel's content is not always an Item — a
+    // HoverHandler or a Timer belongs to the sheet as much as a Rectangle
+    // does, and `children` rejects both. MenuSurface has always used data.
+    default property alias content: inner.data
     property real screenX: 0
     property real screenY: 0
 

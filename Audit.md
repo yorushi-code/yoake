@@ -205,6 +205,21 @@ states in the shell were also the two loudest things in it. The arc is at full
 strength while the number is worth reading and fades into its own track over
 the top of the range.
 
+**Pointing at something is not the same as asking for it.** Resting on the bar's
+centre island for 420ms opened the full dashboard *and* took the keyboard
+exclusively — so brushing past the clock on the way to the tray stole the
+keyboard from whatever was being typed into and left a sheet that had to be
+dismissed by hand. Two consequences nobody asked for, from a gesture nobody
+performed on purpose. It is a **peek** now: `OnDemand` keyboard focus instead of
+`Exclusive`, so it takes nothing until it is clicked, and it leaves when the
+pointer leaves both the island and the sheet. Clicking or typing promotes it to
+a dashboard somebody asked for. Verified by reading, not by pointer — driving
+the pointer on this machine is not safe (see the input-automation note).
+
+`PanelChrome`'s default property was `inner.children`, which rejects anything
+that is not an Item — the HoverHandler above would not load. It is `inner.data`
+now, which is what `MenuSurface` has always used.
+
 ## Backlog, in the order it should be worked
 
 1. **The bar is still a container**, three islands each a `Row`, which is

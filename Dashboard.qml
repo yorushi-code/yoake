@@ -52,9 +52,16 @@ Item {
         // See Launcher: bound to the toggle, because `open` waits a frame for
         // `armed` and a surface mapped asking for no keyboard never gets one.
         focusable: Toggles.dashboardOpen
-        WlrLayershell.keyboardFocus: Toggles.dashboardOpen
-            ? WlrKeyboardFocus.Exclusive
-            : WlrKeyboardFocus.None
+        // Exclusive when it was asked for, on demand when it was only pointed
+        // at. A peek that seized the keyboard was the whole problem: a surface
+        // mapped asking for no keyboard is never offered one afterwards, so
+        // the choice has to be made here rather than by flipping `focusable`
+        // once the peek is clicked.
+        WlrLayershell.keyboardFocus: !Toggles.dashboardOpen
+            ? WlrKeyboardFocus.None
+            : (Toggles.dashboardPeek
+                ? WlrKeyboardFocus.OnDemand
+                : WlrKeyboardFocus.Exclusive)
 
         Timer {
             id: hideDelay
@@ -86,6 +93,9 @@ Item {
             focus: root.open
 
             Keys.onPressed: event => {
+                // Typing into it is asking for it, for the same reason a click
+                // is.
+                Toggles.dashCommit();
                 if (event.key === Qt.Key_Escape) {
                     Toggles.dashboardOpen = false;
                     event.accepted = true;
@@ -119,9 +129,20 @@ Item {
                 origin: Item.Top
                 onCloseRequested: Toggles.dashboardOpen = false
 
+                // Reports the pointer to the peek, which watches this surface
+                // and the bar island together — neither window can see the
+                // other's hover, so each says where the pointer is and the
+                // decision is made in one place.
+                HoverHandler {
+                    onHoveredChanged: Toggles.dashPointerOnSheet = hovered
+                }
+
                 MouseArea {
                     anchors.fill: parent
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    // Clicking it is asking for it. From here it stays until
+                    // it is dismissed, like a dashboard opened by the key.
+                    onPressed: Toggles.dashCommit()
                 }
 
                 // ── Tabs ──
