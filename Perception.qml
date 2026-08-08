@@ -128,6 +128,13 @@ Singleton {
     // decision at all. It is the budget talking -- see PerformanceContract.md
     // -- so it is a veto applied to the axis, not a term inside it. Optical
     // stays what it says it is: how soft the light should be.
+    //
+    // There is now a second veto, and it is not this file's opinion either.
+    // Frosted glass is a *material*, and which material the shell is made of is
+    // taste, not perception -- so it is the user's switch, and this file only
+    // says whether the machine can currently afford the one they picked.
+    // Read once and written back explicitly rather than bound, because a
+    // binding onto Prefs plus a write-back handler is a loop.
     readonly property real optical: root._ax(
         0.15 + root._daylight * 0.80 - (Context.capturing ? 0.15 : 0), root._forceOptical)
 
@@ -188,9 +195,23 @@ Singleton {
         Binding { target: Theme; property: "densityScale"; value: root._lerp(0.75, 1.35, root.spatial) },
         Binding { target: Theme; property: "motionScale"; value: root._lerp(0.55, 1.60, root.temporal) },
         Binding { target: Theme; property: "inkScale"; value: root._lerp(0.72, 1.00, root.optical) },
-        Binding { target: Theme; property: "frost"; value: root._affordable },
+        Binding { target: Theme; property: "frost"; value: root._affordable && root.frostWanted },
         Binding { target: Theme; property: "emphasis"; value: root._lerp(0.70, 1.15, root.hierarchy) }
     ]
+
+    // Taste, not perception: whether the shell is made of glass at all.
+    property bool frostWanted: true
+
+    Component.onCompleted: if (Prefs.loaded) root.frostWanted = Prefs.get("look.frost", true)
+
+    property Connections _prefsReady: Connections {
+        target: Prefs
+        function onLoadedChanged() {
+            if (Prefs.loaded) root.frostWanted = Prefs.get("look.frost", true);
+        }
+    }
+
+    onFrostWantedChanged: if (Prefs.loaded) Prefs.set("look.frost", root.frostWanted)
 
     SystemClock {
         id: clock
@@ -227,6 +248,13 @@ Singleton {
             default: return "axis must be spatial|temporal|optical|hierarchy";
             }
             return axis + " forced to " + v.toFixed(2) + " (qs ipc call perception auto to release)";
+        }
+
+        // The material switch, so the two looks can be put side by side
+        // rather than argued about.
+        function frost(): string {
+            root.frostWanted = !root.frostWanted;
+            return root.frostWanted ? "frosted" : "flat";
         }
 
         function auto(): string {

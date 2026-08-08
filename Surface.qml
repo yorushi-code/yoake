@@ -35,8 +35,37 @@ Item {
     // denser frost than the bar, which only has to keep glyphs legible.
     property real tintOpacity: 0.52
     property bool stroke: true
+
     // The fill under a non-glass surface, and the tint over a glass one.
-    property color fill: Qt.alpha(Theme.text, Theme.fillSubtle)
+    //
+    // This was one value for both jobs, and its default -- six per cent ink --
+    // is right for a card sitting on a panel and is not a surface at all for a
+    // panel sitting on a wallpaper. So turning the frost off did not give a
+    // plainly-coloured shell, it gave a transparent one: the dashboard was
+    // legible only because of the blur behind it, and there is nothing under
+    // the blur holding it up.
+    //
+    // That matters beyond taste, because `Theme.frost` is a switch Perception
+    // throws by itself when the machine is short of frames -- so the one moment
+    // the shell most needs to be readable was the moment it dissolved. Nobody
+    // saw it because nobody had run the shell with the frost off.
+    //
+    // A raised surface therefore has a ground of its own, and the ground is
+    // *opaque*. Not a high veil rung: at 0.88 a panel laid over a terminal
+    // still shows the terminal, which is the one thing a painted surface exists
+    // to stop, and the result is glass without the blur — the worse half of
+    // both materials.
+    //
+    // What keeps an opaque panel from reading as a foreign strip laid on the
+    // desktop is that `crust` is derived from the wallpaper's own palette. The
+    // belonging comes from the colour, not from being able to see through it.
+    // That is the whole argument for this mode: transparency is one way to look
+    // like part of the picture and it is the expensive one.
+    //
+    // A flat surface keeps the tint: it is sitting on something already.
+    property color fill: root._raised
+        ? Theme.crust
+        : Qt.alpha(Theme.text, Theme.fillSubtle)
 
     // Where on screen the glass should sample from. Only the surface's owner
     // knows where it ended up.

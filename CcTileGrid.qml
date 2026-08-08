@@ -131,6 +131,21 @@ Grid {
         onToggled: Recorder.toggle()
     }
 
+    // Which material the shell is made of, next to the picture it is made to
+    // sit on. Frosted glass is a tint over the wallpaper, so it is beautiful on
+    // exactly the wallpapers it happens to suit and needs a hairline and a lit
+    // edge to survive the rest; flat is the same palette laid down opaquely and
+    // costs no blur at all. That is taste, and taste belongs to whoever is
+    // looking -- so it is a switch rather than a decision made in Theme.qml.
+    CcTile {
+        width: root.cellWidth
+        glyph: Glyphs.palette
+        label: "Стекло"
+        detail: Perception.frostWanted ? "матовое" : "плоское"
+        active: Perception.frostWanted
+        onToggled: Perception.frostWanted = !Perception.frostWanted
+    }
+
     CcTile {
         width: root.cellWidth
         glyph: Glyphs.monitor
