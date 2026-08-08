@@ -95,7 +95,21 @@ WlSessionLock {
             anchors.topMargin: parent.height * 0.24
             spacing: 2
             opacity: surface.entered ? 1 : 0
-            transform: Translate { y: surface.entered ? 0 : 26 }
+            transform: Translate {
+                y: surface.entered ? 0 : 26
+                // The rise never played. `transform` carried a value that
+                // flipped on one frame while the opacity beside it faded over
+                // six hundred milliseconds, so the block appeared already in
+                // place and simply became visible -- Direction's rule 4 exactly
+                // inverted: it arrived and then did not start moving.
+                //
+                // Same duration and curve as the fade beside it, deliberately:
+                // these are one element, and two curves on one element is two
+                // events where there is one.
+                Behavior on y {
+                    NumberAnimation { duration: Theme.animEnter; easing.type: Easing.OutCubic }
+                }
+            }
             Behavior on opacity { NumberAnimation { duration: Theme.animEnter; easing.type: Easing.OutCubic } }
 
             RollClock {
