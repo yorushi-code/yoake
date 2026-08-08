@@ -158,6 +158,28 @@ Singleton {
         return batterySteps[Math.max(0, Math.min(last, Math.round(fraction * last)))];
     }
 
+    // ── Added for the panels that let you change things ──
+    //
+    // Every name below belongs to a control rather than to a readout, which is
+    // most of what this pass is about. Declared here in one block so no track
+    // has to reach into this file while the others are working in theirs.
+    readonly property string equalizer: "graphic_eq"
+    readonly property string tuneVertical: "tune"
+    readonly property string swap: "swap_horiz"
+    readonly property string recordDot: "fiber_manual_record"
+    readonly property string stream: "graphic_eq"
+    readonly property string outputs: "speaker"
+    readonly property string inputs: "mic"
+    readonly property string scan: "wifi_find"
+    readonly property string forget: "link_off"
+    readonly property string paired: "link"
+    readonly property string batterySaver: "battery_saver"
+    readonly property string performance: "bolt"
+    readonly property string balanced: "balance"
+    readonly property string nightLight: "nightlight"
+    readonly property string preset: "bookmark"
+    readonly property string presetSaved: "bookmark_added"
+
     // -1 means "no link" rather than 0%, which is a real signal level.
     function wifiFor(percent) {
         if (percent < 0) return wifiOff;

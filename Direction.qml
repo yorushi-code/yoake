@@ -65,6 +65,29 @@ QtObject {
         return Math.min(Math.max(0, index), 9) * Math.round(root.tempo * 0.155);
     }
 
+    // ── Rule 8: a change across a row travels along it ──
+    //
+    // A stagger is a cascade of arrivals; this is something else. When ten
+    // things that already exist all take a new value at once -- ten equaliser
+    // bands on a preset, a device list on a new default, a grid of tiles on a
+    // new profile -- doing it on one frame is a jump cut. The row is one object
+    // and the change should cross it like a wave crossing a rope.
+    //
+    // Written as a fraction of the whole crossing rather than per item, because
+    // the crossing has to take the same time whether the row is four long or
+    // sixteen: what the eye follows is the light travelling, and a light that
+    // takes four times as long on a longer row reads as the shell hesitating.
+    //
+    // The measured reference is 43 ms a band over ten bands, which is a hair
+    // under two tempos for the whole sweep.
+    readonly property int crossing: Math.round(root.tempo * 1.95)
+
+    function sweep(index, count) {
+        if (count <= 1) return 0;
+        const at = Math.max(0, Math.min(count - 1, index));
+        return Math.round(root.crossing * (at / (count - 1)));
+    }
+
     // ── Surface types, which used to be written here as exemptions ──
     //
     // Two of the montage rules are wrong applied to everything, and both would

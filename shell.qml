@@ -90,6 +90,36 @@ ShellRoot {
         Dashboard {}
     }
 
+    // ── Sheets ──
+    //
+    // One per chip in the bar. Wired here in the foundation wave, against files
+    // that were still empty at the time, so that the eleven tracks building
+    // them could run at once without any of them editing this file.
+    LazyPanel {
+        shown: Toggles.audioPanelOpen
+        AudioPanel {}
+    }
+    LazyPanel {
+        shown: Toggles.mediaPanelOpen
+        MediaPanel {}
+    }
+    LazyPanel {
+        shown: Toggles.netPanelOpen
+        NetworkPanel {}
+    }
+    LazyPanel {
+        shown: Toggles.btPanelOpen
+        BluetoothPanel {}
+    }
+    LazyPanel {
+        shown: Toggles.powerPanelOpen
+        PowerPanel {}
+    }
+    LazyPanel {
+        shown: Toggles.weatherPanelOpen
+        WeatherPanel {}
+    }
+
     // A menu or panel left up after the user has moved to a window reads as
     // the shell being stuck. Popups hold no focus of their own under niri, so
     // the compositor's own focus events are the only reliable signal.

@@ -123,3 +123,39 @@ DashControl 1.0 DashControl.qml
 EmptyState 1.0 EmptyState.qml
 singleton Idle 1.0 Idle.qml
 singleton Lang 1.0 Lang.qml
+
+# ── Rework: the design system, registered once so no track has to touch this file ──
+singleton Audio 1.0 Audio.qml
+singleton Eq 1.0 Eq.qml
+singleton Net 1.0 Net.qml
+singleton Bluetooth 1.0 Bluetooth.qml
+singleton Layout 1.0 Layout.qml
+singleton Sfx 1.0 Sfx.qml
+Chip 1.0 Chip.qml
+Sheet 1.0 Sheet.qml
+SheetHeader 1.0 SheetHeader.qml
+Segmented 1.0 Segmented.qml
+LevelTile 1.0 LevelTile.qml
+Liquid 1.0 Liquid.qml
+HSlider 1.0 HSlider.qml
+VSlider 1.0 VSlider.qml
+DeviceRow 1.0 DeviceRow.qml
+Marquee 1.0 Marquee.qml
+Vinyl 1.0 Vinyl.qml
+Meter 1.0 Meter.qml
+KeyValue 1.0 KeyValue.qml
+EmptyRow 1.0 EmptyRow.qml
+Bloom 1.0 Bloom.qml
+Trail 1.0 Trail.qml
+AudioPanel 1.0 AudioPanel.qml
+MediaPanel 1.0 MediaPanel.qml
+Equalizer 1.0 Equalizer.qml
+NetworkPanel 1.0 NetworkPanel.qml
+BluetoothPanel 1.0 BluetoothPanel.qml
+PowerPanel 1.0 PowerPanel.qml
+WeatherPanel 1.0 WeatherPanel.qml
+BarStrip 1.0 BarStrip.qml
+BarBluetooth 1.0 BarBluetooth.qml
+BarLayout 1.0 BarLayout.qml
+BarWeather 1.0 BarWeather.qml
+SfxCatalog 1.0 SfxCatalog.qml

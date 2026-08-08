@@ -1,0 +1,179 @@
+import QtQuick
+
+// One real thing in a list of real things: a sink, a network, a paired device.
+//
+// Four states, and all four are drawn, which is the difference between a list
+// and a list you can use. Resting shows what it is. Hovered says it can be
+// clicked. Active is a solid domain ground with dark ink and *no control of its
+// own*, because the thing that is active is controlled by the panel's header.
+// Muted or unavailable keeps its control but drains the colour out of it, so
+// the row still reads as present and plainly not doing anything.
+//
+// The subtitle is the technical name -- a node id, a MAC, an interface. Nobody
+// needs it most days and everybody needs it the day something has two of the
+// same name.
+Rectangle {
+    id: root
+
+    property string glyph: ""
+    property string name: ""
+    property string subtitle: ""
+    property string tone: "audio"
+    property bool active: false
+    property bool muted: false
+    // Set false for the active row: its value belongs to the header.
+    property bool hasControl: true
+    property real value: 0
+    property string trailing: ""
+
+    signal activated()
+    signal toggledMute()
+    signal moved(real value)
+    signal committed(real value)
+    signal rightClicked()
+
+    implicitWidth: 200
+    implicitHeight: body.implicitHeight + Theme.rowPad * 2 - (root.hasControl ? 0 : Theme.gapTight)
+    radius: Theme.radiusRow
+
+    color: root.active
+        ? Theme.tone(root.tone)
+        : (hit.containsMouse ? Qt.alpha(Theme.text, Theme.fillHover)
+                             : Qt.alpha(Theme.text, Theme.fillSubtle))
+    Behavior on color { ColorAnimation { duration: Theme.animNormal } }
+
+    readonly property color ink: root.active ? Theme.onTone(root.tone) : Theme.text
+    readonly property color subInk: root.active
+        ? Qt.alpha(Theme.onTone(root.tone), Theme.inkSoft)
+        : Theme.subtext0
+
+    Column {
+        id: body
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.leftMargin: Theme.rowPad
+        anchors.rightMargin: Theme.rowPad
+        spacing: Theme.spacing
+
+        Row {
+            width: parent.width
+            spacing: Theme.gapWide
+
+            MaterialSymbol {
+                anchors.verticalCenter: parent.verticalCenter
+                visible: root.glyph !== ""
+                icon: root.glyph
+                size: Theme.fontIcon
+                fill: root.active ? 1 : 0
+                color: root.ink
+            }
+
+            Column {
+                width: parent.width - (root.glyph !== "" ? Theme.fontIcon + Theme.gapWide : 0)
+                    - (trailingText.visible ? trailingText.width + Theme.gapWide : 0)
+                spacing: 1
+
+                Text {
+                    width: parent.width
+                    text: root.name
+                    color: root.ink
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontBody
+                    font.weight: root.active ? Font.DemiBold : Font.Medium
+                    elide: Text.ElideRight
+                }
+
+                Text {
+                    width: parent.width
+                    visible: root.subtitle !== ""
+                    text: root.subtitle
+                    color: root.subInk
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontMicro
+                    elide: Text.ElideRight
+                }
+            }
+
+            Text {
+                id: trailingText
+                anchors.verticalCenter: parent.verticalCenter
+                visible: root.trailing !== ""
+                text: root.trailing
+                color: root.subInk
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontLabel
+                font.features: ({ "tnum": 1 })
+            }
+        }
+
+        Row {
+            width: parent.width
+            visible: root.hasControl && !root.active
+            spacing: Theme.gapWide
+
+            Rectangle {
+                id: muteButton
+                anchors.verticalCenter: parent.verticalCenter
+                width: 24
+                height: 24
+                radius: Theme.pill(height)
+                color: muteHit.containsMouse
+                    ? Qt.alpha(Theme.text, Theme.fillHover)
+                    : Qt.alpha(Theme.text, Theme.fillMuted)
+                Behavior on color { ColorAnimation { duration: Theme.animFast } }
+
+                MaterialSymbol {
+                    anchors.centerIn: parent
+                    icon: root.muted ? Glyphs.volumeMute : Glyphs.volumeHigh
+                    size: Theme.fontIconMicro
+                    fill: 1
+                    color: root.muted ? Theme.subtext0 : Theme.text
+                }
+
+                MouseArea {
+                    id: muteHit
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.toggledMute()
+                }
+            }
+
+            HSlider {
+                anchors.verticalCenter: parent.verticalCenter
+                width: parent.width - muteButton.width - valueText.width - Theme.gapWide * 2
+                value: root.value
+                muted: root.muted
+                tint: Theme.tone(root.tone)
+                onMoved: v => root.moved(v)
+                onCommitted: v => root.committed(v)
+            }
+
+            Text {
+                id: valueText
+                anchors.verticalCenter: parent.verticalCenter
+                text: Math.round(root.value * 100) + "%"
+                color: Theme.subtext0
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontLabel
+                font.features: ({ "tnum": 1 })
+            }
+        }
+    }
+
+    // Under the controls, so the slider and the mute button take their own
+    // clicks and only the rest of the row selects it.
+    MouseArea {
+        id: hit
+        anchors.fill: parent
+        z: -1
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: mouse => {
+            if (mouse.button === Qt.RightButton) root.rightClicked();
+            else root.activated();
+        }
+    }
+}

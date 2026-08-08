@@ -21,12 +21,29 @@ QtObject {
     property int dashPage: 0
     property bool launcherOpen: false
 
+    // ── Sheets ──
+    //
+    // One flag per chip in the bar, because a sheet belongs to the chip that
+    // opened it and only ever one of them is up. Declared here in the
+    // foundation so that eleven tracks could be written at the same time
+    // without any of them editing this file.
+    property bool audioPanelOpen: false
+    property bool mediaPanelOpen: false
+    property bool netPanelOpen: false
+    property bool btPanelOpen: false
+    property bool powerPanelOpen: false
+    property bool weatherPanelOpen: false
+
     // Panels are dismissed by the same gestures as menus (desktop click,
     // Escape, focus moving to a window), so the desktop catcher needs one
     // question answered rather than a growing list of them.
     readonly property bool anyOpen: root.notifCenterOpen
         || root.cheatSheetOpen || root.calendarOpen || root.wallpaperPickerOpen
-        || root.vpnPanelOpen || root.launcherOpen
+        || root.vpnPanelOpen || root.launcherOpen || root.anySheetOpen
+
+    readonly property bool anySheetOpen: root.audioPanelOpen || root.mediaPanelOpen
+        || root.netPanelOpen || root.btPanelOpen || root.powerPanelOpen
+        || root.weatherPanelOpen
 
     // Panels that take keyboard focus for themselves. niri reports a window
     // focus change when they open, and closing on that signal means a panel
@@ -48,6 +65,44 @@ QtObject {
         root.vpnPanelOpen = false;
         root.dashboardOpen = false;
         root.launcherOpen = false;
+        root.closeSheets();
+    }
+
+    // A sheet replaces whichever sheet was up: they all hang off the same strip
+    // and two of them open at once would overlap.
+    function sheet(name) {
+        root.closeSheets();
+        if (name === "audio") root.audioPanelOpen = true;
+        else if (name === "media") root.mediaPanelOpen = true;
+        else if (name === "net") root.netPanelOpen = true;
+        else if (name === "bt") root.btPanelOpen = true;
+        else if (name === "power") root.powerPanelOpen = true;
+        else if (name === "weather") root.weatherPanelOpen = true;
+    }
+
+    function toggleSheet(name) {
+        const was = root.sheetOpen(name);
+        root.closeSheets();
+        if (!was) root.sheet(name);
+    }
+
+    function sheetOpen(name) {
+        if (name === "audio") return root.audioPanelOpen;
+        if (name === "media") return root.mediaPanelOpen;
+        if (name === "net") return root.netPanelOpen;
+        if (name === "bt") return root.btPanelOpen;
+        if (name === "power") return root.powerPanelOpen;
+        if (name === "weather") return root.weatherPanelOpen;
+        return false;
+    }
+
+    function closeSheets() {
+        root.audioPanelOpen = false;
+        root.mediaPanelOpen = false;
+        root.netPanelOpen = false;
+        root.btPanelOpen = false;
+        root.powerPanelOpen = false;
+        root.weatherPanelOpen = false;
     }
 
     readonly property var dashPages: ["overview", "media", "system", "control", "desks"]

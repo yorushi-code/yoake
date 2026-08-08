@@ -87,6 +87,51 @@ QtObject {
 
     readonly property color accent: mauve
 
+    // ── The domain ladder ──
+    //
+    // A colour that says *what kind of thing this is*, not how important it is.
+    //
+    // The shell had one accent and spent it on everything, so the bar was a row
+    // of identically-coloured marks and the only way to tell the network from
+    // the battery was to read the glyph. A fixed hue per domain means the eye
+    // sorts them before it reads them -- and it means a chip in the bar and the
+    // panel it opens are visibly the same subject.
+    //
+    // Fixed rather than derived from the wallpaper, deliberately. These are a
+    // vocabulary: "green means network" has to survive a change of picture, or
+    // it is not a vocabulary. The wallpaper's palette owns the surfaces the
+    // chips sit on, which is where belonging comes from.
+    //
+    // Saturated and light, with dark ink over them. A pale tint with light ink
+    // is what every other shell does and it is why their status bars are grey:
+    // at chip size, a colour has to be the *ground* to register at all.
+    readonly property var domainHue: ({
+        "net": 0.417,      // mint
+        "bt": 0.958,       // dusty rose
+        "audio": 0.083,    // orange
+        "power": 0.208,    // yellow-green
+        "alert": 0.014,    // red
+        "vpn": 0.778       // violet
+    })
+
+    // The chip's ground. "media" borrows the accent, which is derived from the
+    // album art, because the one domain whose colour genuinely belongs to its
+    // content is the one playing it. Anything unknown is neutral, so a caller
+    // that invents a domain gets a plain chip rather than a wrong colour.
+    function tone(domain) {
+        if (domain === "media") return accent;
+        if (!domainHue.hasOwnProperty(domain)) return Qt.alpha(text, fillHover);
+        return Qt.hsla(domainHue[domain], 0.42, 0.66, 1);
+    }
+
+    // The ink over it. Same hue, so the mark reads as one object rather than as
+    // black text on a coloured sticker.
+    function onTone(domain) {
+        if (domain === "media") return crust;
+        if (!domainHue.hasOwnProperty(domain)) return text;
+        return Qt.hsla(domainHue[domain], 0.60, 0.16, 1);
+    }
+
     // ── Drawing straight onto the wallpaper ──
     // Panels sit on their own frosted glass and can use `text` safely. The
     // desktop widgets have nothing behind them but the picture, and the accent
@@ -133,12 +178,21 @@ QtObject {
     // be a literal: 12 and 11 appeared 78 times between them, 9/13/14/15/17/19
     // once or twice each, which is what a scale looks like when there isn't one.
     //
-    // Inter is the interface face and Inter Display the optical size cut for
-    // anything large — Display's tighter spacing and smaller apertures are what
-    // stop a 132px clock reading as a blown-up body font. JetBrains Mono is kept
-    // for genuinely tabular material.
-    readonly property string fontFamily: "Inter"
-    readonly property string fontDisplayFamily: "Inter Display"
+    // One monospaced face for the whole shell, where there used to be a
+    // proportional one with mono kept aside "for genuinely tabular material".
+    //
+    // Almost everything here turns out to be tabular material. A device list, a
+    // volume, a bitrate, a node id, a clock, an SSID, a temperature: these are
+    // data, and data set proportionally does not line up into columns, so a
+    // panel full of it reads as a heap of words of assorted widths. The moment
+    // the shell started listing real things -- sinks, streams, networks, paired
+    // devices -- the face that could not make a column became the wrong face.
+    //
+    // It also does something the type scale alone cannot: a monospaced grid is
+    // *visible*, and a visible grid is most of what makes an interface read as
+    // built rather than arranged.
+    readonly property string fontFamily: "JetBrains Mono"
+    readonly property string fontDisplayFamily: "JetBrains Mono"
     readonly property string fontMonoFamily: "JetBrains Mono"
     // Material Symbols Rounded, variable. Rounded rather than Outlined
     // because Inter is a humanist face with open, rounded terminals, and
@@ -231,8 +285,23 @@ QtObject {
     // cannot share a radius and still look equally rounded.
     readonly property int radiusPip: 4       // marks, bars, ticks
     readonly property int radiusChip: 10     // chips, rows, small controls
+    readonly property int radiusRow: 14      // a row in a list of real things
     readonly property int radiusCard: 16     // cards inside a panel
+    readonly property int radiusSheet: 20    // a panel opened from a bar chip
     readonly property int radiusPanel: 24    // panels and sheets themselves
+
+    // ── Chip metrics ──
+    //
+    // The bar is a row of these now, so their height, padding and gap are one
+    // decision rather than eight. A chip is small enough that a pixel of
+    // padding is a fifth of its air.
+    readonly property int chipHeight: 22
+    readonly property int chipPadH: 9
+    readonly property int chipGap: 6
+    // Inside a sheet. Generous on purpose: these panels list real things with
+    // real names, and a dense list of long strings is unreadable.
+    readonly property int sheetPad: 18
+    readonly property int rowPad: 14
 
     // A pill for anything whose height is its identity -- a chip, a toggle,
     // a badge. Written as a function so the call site cannot drift from the
@@ -301,10 +370,21 @@ QtObject {
     readonly property int gapWide: Math.round(12 * densityScale)
     readonly property int gapCard: Math.round(16 * densityScale)
     readonly property int gapSection: Math.round(24 * densityScale)
-    // Islands need more presence than a hairline strip — at 28 the frosted
-    // glass and its glow had no room to read as an actual surface.
-    readonly property int barHeight: 34
-    readonly property int barMargin: 8
+    // One strip, not three islands.
+    //
+    // Islands gave air and took away the grid: the space between them was not
+    // *between* anything, it was three separate objects with holes punched
+    // around them, and nothing in the bar had a place so much as a neighbour.
+    // A single strip is a row with slots in it, which is what lets a chip be
+    // found by position rather than by reading every glyph.
+    //
+    // 36 rather than 34 because the centre is two lines now -- the time and the
+    // date under it -- and 34 left the second line touching the edge.
+    readonly property int barHeight: 36
+    // Small: the strip is nearly the width of the screen, so a wide margin
+    // reads as a mistake in the layout rather than as air.
+    readonly property int barMargin: 5
+    readonly property int radiusStrip: 14
 
     // Faster than a response: the pop of an icon under a click, the shake of
     // the bell. These are not the shell answering, they are the shell
