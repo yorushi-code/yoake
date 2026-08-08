@@ -108,6 +108,12 @@ MenuSurface {
                 // Staggered reveal, capped so a long device list doesn't
                 // cascade slowly on open. The cap lives in Direction.stagger so
                 // every cascade in the shell has the same rhythm.
+                //
+                // It fades and travels, like the launcher's rows: a list that
+                // only fades in arrives everywhere at once and the stagger is
+                // the only thing saying otherwise. Six pixels is enough — a
+                // menu is read in one glance and anything further turns the
+                // cascade into a wait.
                 opacity: 0
                 Component.onCompleted: entry.start()
                 SequentialAnimation {
@@ -117,10 +123,17 @@ MenuSurface {
                     // animation resolves to the enclosing Item's parent — the
                     // Column — so this animated the wrong object's opacity and
                     // left every row sitting invisible at 0.
-                    NumberAnimation {
-                        target: entryRow; property: "opacity"; to: 1
-                        duration: Theme.animFast
-                        easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeEmphasized
+                    ParallelAnimation {
+                        NumberAnimation {
+                            target: entryRow; property: "opacity"; to: 1
+                            duration: Theme.animFast
+                            easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeEmphasized
+                        }
+                        NumberAnimation {
+                            target: entryRow; property: "x"; from: -6; to: 0
+                            duration: Theme.animNormal
+                            easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig
+                        }
                     }
                 }
 

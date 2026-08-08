@@ -174,12 +174,16 @@ Item {
                                     anchors.centerIn: parent
                                     spacing: Theme.gapWide
 
-                                    Text {
+                                    MaterialSymbol {
                                         id: tabGlyph
                                         anchors.verticalCenter: parent.verticalCenter
-                                        text: tab.modelData.glyph
-                                        font.family: Theme.fontIconFamily
-                                        font.pixelSize: Theme.fontIconSmall
+                                        icon: tab.modelData.glyph
+                                        size: Theme.fontIconSmall
+                                        // The tab you are on is the filled one.
+                                        // Same drawing, different state, which
+                                        // is the axis doing the job a second
+                                        // picture used to do badly.
+                                        fill: tab.current ? 1 : 0
                                         color: tab.current ? Theme.accent
                                             : (tabArea.containsMouse ? Theme.text : Theme.subtext0)
                                         Behavior on color { ColorAnimation { duration: Theme.animFast } }
@@ -218,13 +222,20 @@ Item {
                     // under a word was the last element still speaking its own
                     // language. It sits behind the label, so the sliding that
                     // made the underline worth having is unchanged.
-                    Rectangle {
+                    // The same marker the workspaces and the launcher use, so
+                    // the deformation is not a per-widget decision either. It
+                    // already slid; what it did not do was behave like it had
+                    // any mass, and the tab bar is the widest thing in the
+                    // shell for a marker to cross.
+                    Traveller {
                         id: indicator
-                        anchors.verticalCenter: parent.verticalCenter
-                        height: 38
-                        radius: Theme.pill(height)
-                        color: Qt.alpha(Theme.text, Theme.fillHover)
                         z: -1
+                        active: indicator.target !== null
+                        slotY: Math.round((tabBar.height - indicator.slotHeight) / 2)
+                        slotHeight: 38
+                        // Crossing the whole bar is the long journey here, and
+                        // it is what "Обзор" to "Столы" actually is.
+                        span: tabRow.width
 
                         // Found by the delegate's own index rather than by
                         // position in children: a Repeater is itself a child of
@@ -238,22 +249,13 @@ Item {
                             }
                             return null;
                         }
-                        width: indicator.target ? indicator.target.width : 0
-                        x: indicator.target ? tabRow.x + indicator.target.x : 0
+                        slotWidth: indicator.target ? indicator.target.width : 0
+                        slotX: indicator.target ? tabRow.x + indicator.target.x : 0
 
-                        Behavior on x {
-                            NumberAnimation {
-                                duration: Theme.animNormal
-                                easing.type: Easing.Bezier
-                                easing.bezierCurve: Theme.easeEmphasized
-                            }
-                        }
-                        Behavior on width {
-                            NumberAnimation {
-                                duration: Theme.animNormal
-                                easing.type: Easing.Bezier
-                                easing.bezierCurve: Theme.easeEmphasized
-                            }
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: Theme.pill(height)
+                            color: Qt.alpha(Theme.text, Theme.fillHover)
                         }
                     }
 
