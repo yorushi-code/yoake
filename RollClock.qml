@@ -22,8 +22,21 @@ Row {
     // The gap between hours and minutes; the separator sits inside it.
     property real groupGap: 6
     property bool showSeparator: true
-    // Pulses on the second. Off where there is no room for it to read.
-    property bool blink: true
+    // Pulses on the second. Off everywhere, and off by default.
+    //
+    // It was on, on the desktop clock, forever. Measured: two three-pixel dots
+    // breathing cost twenty points of a core -- not because of the dots, but
+    // because *any* running animation holds its window's render loop at the
+    // refresh rate, and the widget window is the size of the screen. Switching
+    // it off with the sleeping cat's floating "z" took the shell from 48% of a
+    // core to 27% with nothing playing and nothing on screen moving.
+    //
+    // That is the line this shell draws: continuous motion is for something
+    // that is *happening* -- cava has music behind it, the load ring has load
+    // -- and a colon pulsing at three in the morning for nobody is the whole
+    // cost with none of the reason. The digits roll once a minute, which is the
+    // life this clock actually has.
+    property bool blink: false
     // How present the colon is between pulses -- and, with `blink` off, all the
     // time. A hero clock wants it faint enough that the digits lead; a 15px bar
     // clock wants it as legible as they are, or the time reads as two numbers.

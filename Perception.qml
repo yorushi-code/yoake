@@ -179,6 +179,32 @@ Singleton {
         return a + (b - a) * t;
     }
 
+    // How finely a decision is published.
+    //
+    // This is the most expensive line in the shell, and it was not here.
+    //
+    // The axes below are continuous and they never stop moving: a two-second
+    // tick nudged `hierarchy` by 0.02 and `spatial` by 0.002, forever. Every
+    // one of those nudges started a 1400ms Behavior in Theme on a token that
+    // every size, gap, alpha and duration in the shell is derived from -- so
+    // the whole design system was interpolating for 1.4 seconds out of every 2,
+    // across every window, awake or not, visible or not. Measured on an idle
+    // desktop with nothing playing: the shell never stopped rendering.
+    //
+    // Nothing in that was visible. `emphasis` moving from 0.999 to 1.009 scales
+    // a glow by one part in a hundred. So the value is published on a grid
+    // coarse enough that crossing a line means something -- a step is about
+    // half a pixel of gap, four milliseconds of duration -- and the drift
+    // between lines costs nothing at all.
+    //
+    // Quantising is a decision about what to say, not about how to show it, so
+    // it belongs on this side of the line. The smoothing stays in Theme.
+    readonly property real _grain: 0.04
+
+    function _step(v) {
+        return Math.round(v / root._grain) * root._grain;
+    }
+
     // ── Driving Theme ──
     //
     // Written to Theme rather than read from it, so Theme keeps depending on
@@ -192,11 +218,11 @@ Singleton {
     // -- deciding and presenting are different, and a Behavior here would be
     // exactly the output-side memory Invariant 2 forbids.
     property list<Binding> _drive: [
-        Binding { target: Theme; property: "densityScale"; value: root._lerp(0.75, 1.35, root.spatial) },
-        Binding { target: Theme; property: "motionScale"; value: root._lerp(0.55, 1.60, root.temporal) },
-        Binding { target: Theme; property: "inkScale"; value: root._lerp(0.72, 1.00, root.optical) },
+        Binding { target: Theme; property: "densityScale"; value: root._step(root._lerp(0.75, 1.35, root.spatial)) },
+        Binding { target: Theme; property: "motionScale"; value: root._step(root._lerp(0.55, 1.60, root.temporal)) },
+        Binding { target: Theme; property: "inkScale"; value: root._step(root._lerp(0.72, 1.00, root.optical)) },
         Binding { target: Theme; property: "frost"; value: root._affordable && root.frostWanted },
-        Binding { target: Theme; property: "emphasis"; value: root._lerp(0.70, 1.15, root.hierarchy) }
+        Binding { target: Theme; property: "emphasis"; value: root._step(root._lerp(0.70, 1.15, root.hierarchy)) }
     ]
 
     // Taste, not perception: whether the shell is made of glass at all.

@@ -78,10 +78,6 @@ Row {
             weight: Font.DemiBold
             ink: Theme.text
             groupGap: 2
-            // No pulse in the bar. A colon breathing in the corner of the eye
-            // for eight hours is the sort of thing people quietly turn off, and
-            // the digits already say the shell is alive once a minute.
-            blink: false
             separatorRest: Theme.inkStrong
         }
 

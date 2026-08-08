@@ -195,6 +195,7 @@ Item {
 
     // ── Sleeping ──
     Text {
+        id: sleepZ
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.rightMargin: 10
@@ -206,11 +207,33 @@ Item {
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: Theme.animSlow } }
 
-        SequentialAnimation on y {
+        // One breath at a time, with the animation stopped in between.
+        //
+        // It used to loop forever with a PauseAnimation for the gap, and a
+        // pause is not a stop: the animation is still running, so the window's
+        // render loop keeps producing frames at the refresh rate for a "z" that
+        // is not moving. On a widget layer the size of the screen that is the
+        // difference between a sleeping cat and a fifth of a core. Restarted by
+        // a Timer, which costs one wakeup every few seconds.
+        //
+        // It also reads better. A z that floats up every so often is a cat
+        // breathing; one that floats continuously is a loop.
+        SequentialAnimation {
+            id: snore
+            NumberAnimation {
+                target: sleepZ; property: "y"
+                from: 8; to: -6
+                duration: Theme.animDoze
+                easing.type: Easing.InOutQuad
+            }
+        }
+
+        Timer {
+            interval: Theme.animDoze + Theme.animArrive
+            repeat: true
             running: root.asleep
-            loops: Animation.Infinite
-            NumberAnimation { from: 8; to: -6; duration: Theme.animDoze; easing.type: Easing.InOutQuad }
-            PauseAnimation { duration: Theme.animSlow }
+            triggeredOnStart: true
+            onTriggered: snore.restart()
         }
     }
 }

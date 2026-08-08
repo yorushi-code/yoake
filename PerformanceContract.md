@@ -104,6 +104,36 @@ Discontinuities require an explicit architectural reason, stated at the site.
 
 The shell is held under 20% of one core on the desktop.
 
+It was not. Measured on an idle desktop with nothing playing and nothing on
+screen moving, it sat at **48%**, and had done since the semantic layer was
+written. Two causes, and both are worth naming because neither is visible in
+the code that causes them:
+
+**A continuous value published continuously.** `Perception`'s axes never settle
+— a two-second tick nudged `hierarchy` by 0.02 and `spatial` by 0.002, forever
+— and each nudge started a 1400ms `Behavior` in `Theme` on a token that every
+size, gap, alpha and duration in the shell derives from. The whole design
+system was therefore interpolating for 1.4 seconds out of every 2, in every
+window, whether or not anyone could see it, and none of it was visible:
+`emphasis` moving from 0.999 to 1.009 scales a glow by one part in a hundred.
+The values are now published on a grid coarse enough that crossing a line means
+something — about half a pixel of gap, four milliseconds of duration — and the
+drift between lines costs nothing. **48% → 32%.**
+
+**A pause is not a stop.** Two decorative animations ran forever: the desktop
+clock's breathing colon and the sleeping cat's floating "z", the latter looping
+with a `PauseAnimation` for its gap. A paused animation is still a running one,
+so the render loop kept producing frames at the refresh rate for a "z" that was
+not moving — and the widget layer is the size of the screen, so the cost has
+nothing to do with how small the animated thing is. **Any** permanently running
+animation on a full-output surface costs about a fifth of a core. **32% → 17%.**
+
+The rule that follows: continuous motion is for something that is *happening*.
+`cava` has music behind it and the load ring has load; a colon pulsing at three
+in the morning for nobody is the whole cost with none of the reason. Decoration
+that wants to repeat gets a `Timer` that restarts it, so the animation is
+genuinely stopped in between.
+
     ~/.claude/jobs/*/tmp/wallbench.sh <wallpaper> [wallpaper...]
 
 Measure with two interleaved passes and a long settle, never one sample: setting
