@@ -38,27 +38,46 @@ Item {
             summary: notification.summary || "",
             body: notification.body || "",
             urgency: notification.urgency,
-            leaving: false
+            leaving: false,
+            // Carried on the entry so the card can show the time it has left.
+            // A toast that disappears on a schedule nobody can see reads as the
+            // shell losing it, and the one question anyone actually has while
+            // reading one is how long they have.
+            timeout: root.timeoutFor(notification)
         };
         // Nothing to show and nothing to say — an application sending an empty
         // notification should not leave a blank card on screen.
         if (entry.summary === "" && entry.body === "") return;
 
-        activeToasts = [...activeToasts, entry];
         const timer = toastTimerComponent.createObject(root, {
-            notification, interval: root.timeoutFor(notification)
+            notification, interval: entry.timeout
         });
+        // Handed to the card so hovering can hold it. Stopping only the drawn
+        // countdown while the real one ran underneath would make the card lie
+        // about its own life and then vanish under the cursor mid-sentence.
+        entry.timer = timer;
+        activeToasts = [...activeToasts, entry];
         timer.start();
     }
 
     // Two steps: flag it so the delegate can play its exit, then drop it once
     // the animation has had time to run.
+    //
+    // Copied rather than rebuilt field by field: a literal here silently drops
+    // whatever was added to the entry since it was written, and the field it
+    // would drop is always the newest one, so the bug arrives with the feature.
     function dismissToast(notification) {
-        root.activeToasts = root.activeToasts.map(t =>
-            t.notification === notification
-                ? { id: t.id, notification: t.notification, summary: t.summary,
-                    body: t.body, urgency: t.urgency, leaving: true }
-                : t);
+        root.activeToasts = root.activeToasts.map(t => {
+            if (t.notification !== notification) return t;
+            // The countdown only destroyed itself when it fired. Every toast
+            // dismissed by hand -- which is most of them -- left a stopped
+            // Timer parented to this object for the life of the session.
+            if (t.timer) {
+                t.timer.stop();
+                t.timer.destroy();
+            }
+            return Object.assign({}, t, { leaving: true, timer: null });
+        });
         const reaper = toastReaperComponent.createObject(root, { notification });
         reaper.start();
     }
@@ -67,10 +86,9 @@ Item {
         id: toastTimerComponent
         Timer {
             property var notification
-            onTriggered: {
-                root.dismissToast(notification);
-                destroy();
-            }
+            // No destroy() here: dismissToast owns the countdown's lifetime now,
+            // and it is reached on this path too.
+            onTriggered: root.dismissToast(notification)
         }
     }
 
@@ -168,6 +186,11 @@ Item {
             width: parent.width
             spacing: Theme.spacing
 
+            // The stack closes ranks rather than snapping shut. Without it,
+            // dismissing the top toast teleports every one below it up by a
+            // card's height, which reads as the whole stack flickering.
+            move: MotionMove {}
+
             Repeater {
                 // ScriptModel, not the array. dismissToast() rebuilds the
                 // array, and a Repeater bound to one destroys every delegate
@@ -194,6 +217,80 @@ Item {
                     width: toastColumn.width
                     height: toastChrome.height
 
+                    // ── Time left, and swiping it away ──
+
+                    // 1 when it arrives, 0 when it is due to go. Drawn by the
+                    // urgency stripe, which is the one part of the card that
+                    // already stands for this notification and nothing else —
+                    // a second bar underneath would be a new element saying
+                    // something the card can already say.
+                    property real life: 1
+                    NumberAnimation {
+                        id: drain
+                        target: toastDelegate
+                        property: "life"
+                        from: 1
+                        to: 0
+                        // Linear on purpose. This is the only thing in the
+                        // shell that is a clock rather than a movement, and an
+                        // eased clock is a lie about how much time is left.
+                        duration: toastDelegate.modelData.timeout
+                    }
+
+                    // Reading takes as long as it takes. Hovering stops the
+                    // clock, and leaving gives the notification its full life
+                    // back rather than the remainder — a card you have just
+                    // finished reading and moved away from is the one you are
+                    // least likely to want two hundred milliseconds of.
+                    property bool held: false
+                    onHeldChanged: {
+                        if (toastDelegate.held) {
+                            drain.stop();
+                            toastDelegate.life = 1;
+                            if (toastDelegate.lifeTimer) toastDelegate.lifeTimer.stop();
+                        } else if (!toastDelegate.leaving) {
+                            drain.restart();
+                            if (toastDelegate.lifeTimer) toastDelegate.lifeTimer.restart();
+                        }
+                    }
+                    readonly property var lifeTimer: modelData.timer
+
+                    // Thrown off the edge rather than dismissed in place. The
+                    // exit animation below plays the other way — up, the way it
+                    // came — and running both would be two departures.
+                    property bool thrown: false
+                    readonly property real swipe: Math.abs(toastDelegate.x) / toastDelegate.width
+                    // Far enough that it cannot be reached by the wobble of a
+                    // click, near enough that the gesture never feels like work.
+                    readonly property real swipeCommit: 0.28
+
+                    // Fixed at the moment of release. Left as a live expression
+                    // on the animation's own `to`, it would keep re-reading the
+                    // position it is currently animating.
+                    property real throwTo: 0
+
+                    ParallelAnimation {
+                        id: throwOff
+                        NumberAnimation {
+                            target: toastDelegate; property: "x"
+                            to: toastDelegate.throwTo
+                            duration: Theme.animExit
+                            easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeExit
+                        }
+                        NumberAnimation {
+                            target: toastChrome; property: "opacity"; to: 0
+                            duration: Theme.animExit
+                        }
+                        onFinished: root.dismissToast(toastDelegate.notification)
+                    }
+
+                    NumberAnimation {
+                        id: settle
+                        target: toastDelegate; property: "x"; to: 0
+                        duration: Theme.animNormal
+                        easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig
+                    }
+
                     // Animates in on creation (Repeater delegates start
                     // already-parented, so this fires once on entry) with a
                     // slight overshoot for a "tactile" pop rather than a
@@ -211,8 +308,12 @@ Item {
                     // dismissed within a frame of arriving; onLeavingChanged
                     // does not fire for a value present at construction.
                     Component.onCompleted: {
-                        if (toastDelegate.leaving) exitAnim.start();
-                        else entryAnim.start();
+                        if (toastDelegate.leaving) {
+                            exitAnim.start();
+                        } else {
+                            entryAnim.start();
+                            drain.start();
+                        }
                     }
                     ParallelAnimation {
                         id: entryAnim
@@ -257,7 +358,11 @@ Item {
                             easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeExit
                         }
                     }
-                    onLeavingChanged: if (leaving) exitAnim.start()
+                    onLeavingChanged: {
+                        if (!toastDelegate.leaving) return;
+                        drain.stop();
+                        if (!toastDelegate.thrown) exitAnim.start();
+                    }
 
                     PanelChrome {
                         id: toastChrome
@@ -267,25 +372,79 @@ Item {
                         screenY: Theme.barHeight + Theme.barMargin * 2 + toastDelegate.y
                         onCloseRequested: root.dismissToast(toastDelegate.notification)
 
+                        // Fades as it is swiped, so the card is visibly on its
+                        // way out before the gesture commits. Applied here
+                        // rather than on the delegate, whose own opacity is
+                        // driven by the entry and exit animations — a binding
+                        // and an animation on one property is a binding that
+                        // survives until the first frame of the animation.
+                        opacity: 1 - Math.min(1, toastDelegate.swipe * 1.4)
+
                         // Urgency stripe: the only always-visible cue telling a
-                        // critical alert apart from a routine one.
+                        // critical alert apart from a routine one, and now also
+                        // the clock. It drains from the bottom, so what is left
+                        // is what is left.
                         Rectangle {
+                            id: stripeTrack
                             anchors.left: parent.left
                             anchors.top: parent.top
                             anchors.bottom: parent.bottom
                             anchors.margins: 10
                             width: 3
-                            radius: 1.5
-                            color: Notifs.accentFor(toastDelegate.urgency)
+                            radius: width / 2
+                            color: Qt.alpha(Notifs.accentFor(toastDelegate.urgency), Theme.fillActive)
+
+                            Rectangle {
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.top: parent.top
+                                height: parent.height * toastDelegate.life
+                                radius: parent.radius
+                                color: Notifs.accentFor(toastDelegate.urgency)
+                            }
                         }
 
-                        // Clicking the body dismisses, matching every other
-                        // notification daemon; sits below the content so the
-                        // action buttons still get their clicks.
+                        // Click dismisses, drag throws. Both live on one hit
+                        // area: a separate DragHandler would have to agree with
+                        // this one about what counts as a click, and the two
+                        // definitions drift.
                         MouseArea {
+                            id: toastGrab
                             anchors.fill: parent
                             acceptedButtons: Qt.LeftButton | Qt.RightButton
-                            onClicked: root.dismissToast(toastDelegate.notification)
+                            hoverEnabled: true
+                            cursorShape: drag.active ? Qt.ClosedHandCursor : Qt.ArrowCursor
+                            drag.target: toastDelegate
+                            drag.axis: Drag.XAxis
+                            drag.threshold: 6
+                            // The Column owns `y`; a horizontal drag is the only
+                            // one that can be given to the layout's own item
+                            // without the next layout pass undoing it.
+                            drag.minimumX: -toastDelegate.width
+                            drag.maximumX: toastDelegate.width
+
+                            onEntered: toastDelegate.held = true
+                            onExited: toastDelegate.held = false
+
+                            onPressed: {
+                                settle.stop();
+                                toastDelegate.held = true;
+                            }
+
+                            onReleased: {
+                                if (toastDelegate.swipe >= toastDelegate.swipeCommit) {
+                                    toastDelegate.thrown = true;
+                                    toastDelegate.throwTo = (toastDelegate.x >= 0 ? 1 : -1) * toastDelegate.width * 1.2;
+                                    throwOff.restart();
+                                } else if (toastDelegate.x !== 0) {
+                                    settle.restart();
+                                } else {
+                                    // Never moved: an ordinary click, which
+                                    // dismisses, as every other notification
+                                    // daemon does.
+                                    root.dismissToast(toastDelegate.notification);
+                                }
+                            }
                         }
 
                         Row {

@@ -114,8 +114,13 @@ Item {
                 width: root.cellWidth
                 height: root.height
 
-                readonly property bool focused: cell.modelData.is_focused
-                readonly property bool urgent: cell.modelData.is_urgent
+                // Compared rather than assigned: niri leaves these out of the
+                // object entirely rather than sending false, and `undefined`
+                // assigned to a bool property is a warning per workspace per
+                // event -- which the old code never saw only because it used
+                // them inside ternaries, where undefined is merely falsy.
+                readonly property bool focused: cell.modelData.is_focused === true
+                readonly property bool urgent: cell.modelData.is_urgent === true
                 readonly property bool occupied: Niri.windowCountOn(cell.modelData.id) > 0
 
                 // RestoreNone, deliberately. The default restores the previous

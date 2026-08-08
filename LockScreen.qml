@@ -349,6 +349,7 @@ WlSessionLock {
             }
 
             Text {
+                id: snore
                 anchors.right: parent.right
                 anchors.top: parent.top
                 anchors.topMargin: 12
@@ -358,7 +359,10 @@ WlSessionLock {
                 font.pixelSize: Theme.fontLead
 
                 SequentialAnimation on y {
-                    running: parent.visible
+                    // By id, not by `parent`: an animation is not a visual item
+                    // and has none, so this read `undefined` and the cat has
+                    // never once snored.
+                    running: snore.visible
                     loops: Animation.Infinite
                     NumberAnimation { from: 22; to: 2; duration: Theme.animDoze; easing.type: Easing.InOutQuad }
                     PauseAnimation { duration: Theme.animBusy }

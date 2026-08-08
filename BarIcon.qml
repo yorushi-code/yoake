@@ -45,8 +45,13 @@ Item {
     // a plugged-in laptop on good wifi wore two bright accent halos all day.
     // The arc is at full strength while the number is worth reading and fades
     // into its own track over the top of the range, where it is not.
+    //
+    // Clamped at both ends. At exactly full the division lands a hair over one
+    // in binary, so this came out as -2.2e-16 -- a negative alpha, which QColor
+    // rejects and complains about once per frame, and a full battery on good
+    // wifi is the state this laptop is in most of the day.
     readonly property real ringPresence:
-        1 - Math.max(0, (Math.min(1, root.progress) - 0.85) / 0.15)
+        Math.max(0, 1 - Math.max(0, (Math.min(1, root.progress) - 0.85) / 0.15))
 
     Shape {
         id: ring
