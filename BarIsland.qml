@@ -28,6 +28,23 @@ Item {
     // itself.
     property bool pulseWithAudio: false
 
+    // Where this island falls in the bar's arrival. The bar simply existed at
+    // startup: the one surface that is on screen before anything else, and the
+    // only one that never said hello. The order is left, right, centre, so the
+    // accent lands last -- rule 3, and also the build anyone would choose: you
+    // are told where you are, then how the machine is, and last what is going
+    // on, which is the thing carrying the light.
+    property int arrivalIndex: 0
+
+    // A frame, so `shown` has a false to animate away from. Bound straight to
+    // true the entrance has nothing to play and the island is simply there.
+    property bool arrived: false
+    property Timer _armTick: Timer {
+        interval: 16
+        running: true
+        onTriggered: root.arrived = true
+    }
+
     height: Theme.barHeight
     // Driven by the content's natural size. `inner` must therefore never be
     // anchored to this item's width, or the two define each other and Qt
@@ -45,48 +62,70 @@ Item {
     // No Behaviors. Two 90ms animations restarting on every cava frame never
     // finished, and each restart re-rendered the blur. Cava.bass is already
     // damped on its falling edge.
-    Glow {
-        anchors.fill: glass
-        radius: glass.radius
-        reach: 28
-        // Scaled by hierarchy: this glow is decoration, and decoration is the
-        // first thing that should step back when someone has been sitting in
-        // one window for a while. It stays a beat -- the bass still drives it
-        // -- but a quieter one.
-        amount: root.pulseWithAudio
-            ? Math.min(0.85, 0.18 + root.bass * 0.62) * Theme.chromeEmphasis
-            : 0
-    }
-
-    // The same object the panels and the cards are made of. It also puts the
-    // bar on its own rung of the elevation ladder, which Theme has described
-    // since the ladder was written and nothing had ever used: the bar was
-    // casting a panel-sized shadow, so it sat as far off the desktop as the
-    // sheets that open above it.
-    Surface {
-        id: glass
+    // The four beats, played by the thing that owns them rather than spelled
+    // out here. Direction.md has had "Reveal had no callers at all" in its
+    // not-done list since it was written, and every surface that hand-rolls the
+    // same opacity-and-scale pair is how the shell drifted into six versions of
+    // one entrance in the first place.
+    //
+    // No slide. The window is exactly as tall as the island, so anything moved
+    // vertically is cropped by the layer surface rather than travelling; the
+    // space beat is the scale, which grows inward and cannot be clipped.
+    Reveal {
+        id: entrance
         anchors.fill: parent
-        radius: Theme.pill(height)
-        elevation: "bar"
-        screenX: Theme.barMargin + root.x
-        screenY: Theme.barMargin
-    }
+        shown: root.arrived
+        delay: Direction.stagger(root.arrivalIndex)
+        fromScale: 0.86
+        slideY: 0
 
-    // Behind the content, so widgets inside keep their own right-click
-    // handlers and only bare glass falls through to the shell menu.
-    MouseArea {
-        anchors.fill: parent
-        acceptedButtons: Qt.RightButton
-        enabled: root.menuModel.length > 0
-        onClicked: Menus.toggle(root.menuId)
-    }
+        Glow {
+            anchors.fill: glass
+            radius: glass.radius
+            reach: 28
+            // Scaled by hierarchy: this glow is decoration, and decoration is
+            // the first thing that should step back when someone has been
+            // sitting in one window for a while. It stays a beat -- the bass
+            // still drives it -- but a quieter one.
+            //
+            // And by the accent beat, which is what makes it the third event of
+            // the arrival rather than a light that is simply on before the
+            // island it belongs to has finished appearing.
+            amount: (root.pulseWithAudio
+                ? Math.min(0.85, 0.18 + root.bass * 0.62) * Theme.chromeEmphasis
+                : 0) * entrance.accentProgress
+        }
 
-    Item {
-        id: inner
-        x: root.padding
-        anchors.verticalCenter: parent.verticalCenter
-        width: childrenRect.width
-        height: parent.height
+        // The same object the panels and the cards are made of. It also puts
+        // the bar on its own rung of the elevation ladder, which Theme has
+        // described since the ladder was written and nothing had ever used: the
+        // bar was casting a panel-sized shadow, so it sat as far off the
+        // desktop as the sheets that open above it.
+        Surface {
+            id: glass
+            anchors.fill: parent
+            radius: Theme.pill(height)
+            elevation: "bar"
+            screenX: Theme.barMargin + root.x
+            screenY: Theme.barMargin
+        }
+
+        // Behind the content, so widgets inside keep their own right-click
+        // handlers and only bare glass falls through to the shell menu.
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.RightButton
+            enabled: root.menuModel.length > 0
+            onClicked: Menus.toggle(root.menuId)
+        }
+
+        Item {
+            id: inner
+            x: root.padding
+            anchors.verticalCenter: parent.verticalCenter
+            width: childrenRect.width
+            height: parent.height
+        }
     }
 
     ActionMenu {

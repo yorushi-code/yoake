@@ -319,6 +319,40 @@ def raw_icon_lookups():
     return out
 
 
+# A glyph in the private use area. Nothing about the character says what it is,
+# grep cannot find it, and a reviewer sees four hex digits.
+PUA_ESCAPE = re.compile(r"\\u\{?[eEfF][0-9a-fA-F]{3}")
+
+
+def nerd_font():
+    """Nerd Font, by name or by codepoint.
+
+    Nerd Font is a bitmap-era idea wearing a font: one fixed picture per state,
+    so "wifi on" and "wifi off" are unrelated shapes and moving between them is
+    a substitution the eye reads as a swap. Material Symbols is one drawing per
+    idea with FILL, wght, GRAD and opsz as axes, which is what makes a state
+    animatable at all.
+
+    Both spellings are banned because both are how it comes back: a family
+    string pasted from an old widget, or a codepoint pasted from a cheat sheet.
+    The second is the one that would survive review -- a private-use escape
+    renders as *something*, and something is hard to argue with in a
+    screenshot.
+    """
+    out = []
+    for path in sorted(list(ROOT.glob("*.qml")) + list((ROOT / "greeter").glob("*.qml"))):
+        for n, line in enumerate(path.read_text().splitlines(), 1):
+            if "Symbols Nerd Font" in line or "NerdFont" in line:
+                out.append((path.name, n, "Nerd Font family; icons are Material Symbols"))
+                continue
+            if line.lstrip().startswith("//"):
+                continue
+            if PUA_ESCAPE.search(line):
+                out.append((path.name, n,
+                            "private-use codepoint; name the icon in Glyphs instead"))
+    return out
+
+
 # ── Rungs, named once so the drift scan and the on-ladder scan agree ──
 LADDER_RADII = {4, 10, 16, 24}
 LADDER_SIZES = {9, 10, 11, 12, 13, 15, 22, 30, 40, 112, 12, 14, 17, 42}
@@ -469,6 +503,7 @@ def main():
     findings.extend(unregistered())
     findings.extend(missing_imports())
     findings.extend(raw_icon_lookups())
+    findings.extend(nerd_font())
     findings.extend(off_ladder())
 
     for name, line, what in findings:

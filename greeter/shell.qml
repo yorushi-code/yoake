@@ -522,10 +522,12 @@ ShellRoot {
 
             Repeater {
                 model: [
-                    // Nerd Font: power, restart, sleep.
-                    { glyph: "\u{F0425}", args: ["systemctl", "poweroff"] },
-                    { glyph: "\u{F0709}", args: ["systemctl", "reboot"] },
-                    { glyph: "\u{F04B2}", args: ["systemctl", "suspend"] }
+                    // Material Symbols ligatures: the name in the source is
+                    // what the font looks up, so there is nothing here to
+                    // decode and nothing that greps as four hex digits.
+                    { glyph: "power_settings_new", args: ["systemctl", "poweroff"] },
+                    { glyph: "restart_alt", args: ["systemctl", "reboot"] },
+                    { glyph: "bedtime", args: ["systemctl", "suspend"] }
                 ]
 
                 delegate: Rectangle {
@@ -546,6 +548,13 @@ ShellRoot {
                         text: btn.modelData.glyph
                         font.family: Theme.fontIconFamily
                         font.pixelSize: 15
+                        // The font redraws its strokes for the size it is set
+                        // at, and the axis only exists from 20 up -- left at
+                        // the default a 15px glyph is drawn with a 24px stroke
+                        // weight, which is the thin, undersized look that made
+                        // the old icons read as clip art. Filled, because these
+                        // are buttons rather than readings.
+                        font.variableAxes: ({ "FILL": 1, "opsz": 20, "wght": 400 })
                         color: Theme.subtext1
                     }
 

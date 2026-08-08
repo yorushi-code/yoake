@@ -94,6 +94,7 @@ PanelWindow {
         anchors.verticalCenter: parent.verticalCenter
         barWindow: bar
         islandName: "left"
+        arrivalIndex: 0
 
         BarWorkspaces {
             anchors.verticalCenter: parent.verticalCenter
@@ -107,6 +108,7 @@ PanelWindow {
         anchors.verticalCenter: parent.verticalCenter
         barWindow: bar
         islandName: "centre"
+        arrivalIndex: 2
 
         pulseWithAudio: true
 
@@ -185,6 +187,7 @@ PanelWindow {
         anchors.verticalCenter: parent.verticalCenter
         barWindow: bar
         islandName: "right"
+        arrivalIndex: 1
 
         Row {
             anchors.verticalCenter: parent.verticalCenter

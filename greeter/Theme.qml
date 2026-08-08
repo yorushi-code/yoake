@@ -32,7 +32,10 @@ Singleton {
 
     readonly property string fontFamily: "Inter"
     readonly property string fontDisplayFamily: "Inter Display"
-    readonly property string fontIconFamily: "Symbols Nerd Font"
+    // Installed to /usr/share/fonts/yoake by bin/yoake-greeter-install: the
+    // shell's own copy lives under a home directory the greeter account cannot
+    // read, and a missing icon font here draws the icon's *name*, not a box.
+    readonly property string fontIconFamily: "Material Symbols Rounded"
 
     readonly property int fontLabel: 10
     readonly property int fontSmall: 11

@@ -57,6 +57,17 @@ which is rule 1 reintroduced through the back door.
 
 **6. Only what is in focus may move.** Everything else holds still.
 
+**7. A change with a before and an after is a journey, not a cross-fade.** If
+one thing stops being selected and another starts, the honest drawing is one
+object travelling between them — not two objects changing in opposite
+directions on the same frame. A cross-fade says the state changed without
+saying from what, so the eye has nothing to follow and the change reads as a
+repaint. This is the rule the whole shell was breaking: the workspace pill
+widened while the one you came from gave up its width, and the launcher row lit
+its own fill while another put one out. `Traveller.qml` is the object; the
+deformation along its direction of travel is not decoration but the cheapest
+possible statement that it *went* there rather than being redrawn there.
+
 ## Surface types
 
 Two of the rules above are wrong applied to everything. That was written here
@@ -105,19 +116,29 @@ Implemented:
   four.
 - `DashCard.qml` is the first real consumer. Every dashboard card now assembles
   instead of appearing, and its eyebrow is bound to the accent beat.
+- `BarIsland.qml` is the second, and the one that matters most: the bar is the
+  surface that is on screen before anything else and was the only one that
+  never said hello. Left, then right, then centre, so the accent lands last —
+  which is rule 3 and also the build anyone would choose. No slide: the layer
+  surface is exactly as tall as the island, so anything moved vertically is
+  cropped rather than travelling, and the space beat is the scale.
+- `Traveller.qml` and rule 7. Consumers: the workspace pill, which travels
+  between fixed cells rather than being redrawn wide somewhere else, and the
+  launcher's selection.
+- the bar is a composer rather than a container. The clock is what is centred
+  and the island grows around it, so starting music opens room to the clock's
+  left instead of sliding the clock right by half a player's width. Written
+  without a `Behavior` on purpose: the island's `x` and the clock's position
+  inside it come from one layout pass, so they move on the same frame and the
+  clock is exactly still while the island widens under it.
 
 Not done:
 
-- **`Reveal` had no callers at all** before this. It was registered, documented
-  as the thing that stops motion drifting, and used by nobody, while the panels
-  each still hand-rolled their own `Behavior` pairs — the same failure as
-  `partOfDay` computed and never read. `DashCard` is one consumer. `ActionMenu`,
-  `VpnPanel`, `CcWifiPage`, `CcBluetoothPage` and the notification stack still
-  spell their own motion out.
+- **`Reveal` had one caller** and now has two. `ActionMenu`, `VpnPanel`,
+  `CcWifiPage`, `CcBluetoothPage` and the notification stack still spell their
+  own motion out.
 - the **rest** beat is defined and nothing enforces it. Rule 5 is currently an
   intention.
-- the bar is still a container — three islands, each a `Row`. Rule 2 wants a
-  composer: when the media widget appears the interval rhythm and the optical
-  centre should recompose, not just reflow. That is a layer above this one, and
-  it is the same work as the bar constructor from the very start of all this,
-  approached from the other side.
+- rule 7 has two consumers and at least two more places that want it: the
+  control centre's pager, where a page slides in and the main view drifts, and
+  the dashboard's own navigation.

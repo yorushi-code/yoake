@@ -17,6 +17,23 @@ install -d -m 0755 "$DEST"
 install -m 0644 "$SRC/greeter/shell.qml" "$SRC/greeter/Theme.qml" "$SRC/greeter/qmldir" "$DEST/"
 install -m 0644 "$SRC/RollDigit.qml" "$SRC/RollClock.qml" "$DEST/"
 
+# The icon font, system-wide.
+#
+# The shell's icons are Material Symbols ligatures -- the icon is named in the
+# source and the font looks the name up -- and the font is installed under the
+# user's home, which the greeter account cannot read. A missing font here does
+# not draw a box, it draws the word "power_settings_new", so this is checked
+# rather than attempted.
+SYMBOLS=$(find "$SRC/.." /home/*/.local/share/fonts /usr/share/fonts \
+    -maxdepth 3 -name 'MaterialSymbolsRounded*.ttf' -print -quit 2>/dev/null || true)
+if [ -z "$SYMBOLS" ]; then
+    echo "MaterialSymbolsRounded.ttf not found; the greeter would render icon names as text" >&2
+    exit 1
+fi
+install -d -m 0755 /usr/share/fonts/yoake
+install -m 0644 "$SYMBOLS" /usr/share/fonts/yoake/MaterialSymbolsRounded.ttf
+fc-cache -f /usr/share/fonts/yoake >/dev/null
+
 # The greeter account cannot read the shell's config directory, so the one
 # sprite it uses goes where its own assets live.
 install -d -m 0755 /var/lib/yoake-greeter
