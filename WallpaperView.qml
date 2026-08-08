@@ -77,38 +77,85 @@ PanelWindow {
         onSourceChanged: if (shouldPlay) play()
     }
 
-    VideoOutput {
-        id: videoOut
-        anchors.fill: parent
-        fillMode: VideoOutput.PreserveAspectCrop
-        visible: Wallpaper.isVideo
+    // ── Parallax ──
+    //
+    // The desktop is one picture and each workspace is a different part of it.
+    // Switching desk moves the wallpaper by a few pixels, which is the oldest
+    // trick there is for making a set of workspaces feel like places rather
+    // than like a list -- you are not being shown another screen, you have gone
+    // somewhere.
+    //
+    // The whole travel is one transform on three items the scene graph is
+    // already drawing, so it costs a compositor pass that was happening anyway.
+    // The overscale is exactly the travel: without it, sliding the picture
+    // would uncover the edge it was cropped to.
+    readonly property real parallaxSpan: 18
+    readonly property var _desks: Niri.workspacesFor(win.modelData.name)
+    // Where the focused desk sits in the list, 0 to 1. Half when there is
+    // nothing to place it against, which is also where a single desk belongs.
+    readonly property real _deskPhase: {
+        const n = win._desks.length;
+        if (n <= 1) return 0.5;
+        for (let i = 0; i < n; i++) {
+            if (win._desks[i].is_focused) return i / (n - 1);
+        }
+        return 0.5;
     }
+    readonly property real parallaxY: (0.5 - win._deskPhase) * 2 * win.parallaxSpan
 
-    // Decode at output resolution (see FrostedBackground): the native
-    // wallpapers are 7680x4320 and two full-size copies here alone were
-    // ~260 MB.
-    Image {
-        id: base
+    Item {
+        id: field
         anchors.fill: parent
-        fillMode: Image.PreserveAspectCrop
-        sourceSize.width: Screen.width
-        sourceSize.height: Screen.height
-        cache: false
-        asynchronous: true
-        transformOrigin: Item.Center
-        Component.onCompleted: source = Wallpaper.isVideo ? Wallpaper.stillPath : Wallpaper.path
-    }
+        scale: 1 + (win.parallaxSpan * 2) / Math.max(1, win.height)
 
-    Image {
-        id: overlay
-        anchors.fill: parent
-        fillMode: Image.PreserveAspectCrop
-        sourceSize.width: Screen.width
-        sourceSize.height: Screen.height
-        cache: false
-        asynchronous: true
-        opacity: 0
-        transformOrigin: Item.Center
+        transform: Translate {
+            y: win.parallaxY
+            Behavior on y {
+                // Not while nobody can see it. A fullscreen window over the
+                // desktop hides the travel but not its cost, and a workspace
+                // switch is precisely when there is usually one.
+                enabled: !win.occluded
+                NumberAnimation {
+                    duration: Theme.animEnter
+                    easing.type: Easing.Bezier
+                    easing.bezierCurve: Theme.easeEmphasized
+                }
+            }
+        }
+
+        VideoOutput {
+            id: videoOut
+            anchors.fill: parent
+            fillMode: VideoOutput.PreserveAspectCrop
+            visible: Wallpaper.isVideo
+        }
+
+        // Decode at output resolution (see FrostedBackground): the native
+        // wallpapers are 7680x4320 and two full-size copies here alone were
+        // ~260 MB.
+        Image {
+            id: base
+            anchors.fill: parent
+            fillMode: Image.PreserveAspectCrop
+            sourceSize.width: Screen.width
+            sourceSize.height: Screen.height
+            cache: false
+            asynchronous: true
+            transformOrigin: Item.Center
+            Component.onCompleted: source = Wallpaper.isVideo ? Wallpaper.stillPath : Wallpaper.path
+        }
+
+        Image {
+            id: overlay
+            anchors.fill: parent
+            fillMode: Image.PreserveAspectCrop
+            sourceSize.width: Screen.width
+            sourceSize.height: Screen.height
+            cache: false
+            asynchronous: true
+            opacity: 0
+            transformOrigin: Item.Center
+        }
     }
 
     // Accent burst flashed across the whole screen at the peak of the punch —
