@@ -104,24 +104,42 @@ PanelWindow {
     // ── Centre island: now-playing + clock ──
     BarIsland {
         id: centerIsland
-        anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         barWindow: bar
         islandName: "centre"
 
         pulseWithAudio: true
 
-        // No Behavior on width here. Animating the island's own width relayouts
-        // every widget inside it on each frame of the animation, and its width
-        // is driven by the mini spectrum, which already animates its own. The
-        // island follows for free and nothing has to be laid out twice.
+        // Composed, not centred. This is Direction's open item — the bar was a
+        // container, and a container reflows.
+        //
+        // Centring the island as a whole put its *midpoint* on the bar's, so
+        // the clock slid right by half the player's width every time music
+        // started and back again when it stopped. A clock is read by position
+        // before it is read at all: it is the one thing on this bar that must
+        // never move, and it was the only thing that did.
+        //
+        // So the clock is what is centred, and the island grows around it. The
+        // player opens the room to its left; nothing that was already on screen
+        // is shoved aside, which is rule 2 with the arithmetic written out.
+        //
+        // Deliberately without a Behavior. `x` and the clock's own position
+        // inside the row are recomputed from the same layout pass, so they move
+        // on the same frame and the clock stays exactly still while the island
+        // widens under it. Animating this instead would make the clock wobble
+        // by the difference between two curves. What animates is the player's
+        // width, which BarMedia already owns — the space opens at the player's
+        // tempo and the title becomes legible inside it.
+        x: Math.round(bar.width / 2 - centerIsland.padding
+                      - centreRow.x - barClock.x - barClock.width / 2)
 
         Row {
+            id: centreRow
             anchors.verticalCenter: parent.verticalCenter
             spacing: Theme.gapWide
 
             BarMedia { barWindow: bar }
-            BarClock { barWindow: bar }
+            BarClock { id: barClock; barWindow: bar }
         }
 
         // Pointing at the centre island opens the dashboard. It is the one
