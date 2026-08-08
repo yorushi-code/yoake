@@ -1,6 +1,8 @@
-# Generated per-wallpaper by set-wallpaper.sh — machine state, not config.
+# Machine state, not config: written per wallpaper by set-wallpaper.sh,
+# and debug logs that a config directory has no business carrying.
 generated-colors.json
-.wallpaper-path
 palette-override.json
-__pycache__/
+.wallpaper-path
+*.log
 *.pyc
+__pycache__/
