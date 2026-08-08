@@ -29,7 +29,7 @@ Item {
             Text {
                 anchors.verticalCenter: parent.verticalCenter
                 text: root.glyph
-                font.family: "Symbols Nerd Font"
+                font.family: Theme.fontIconFamily
                 font.pixelSize: Theme.fontIconMicro
                 color: root.levelColor
                 Behavior on color { ColorAnimation { duration: Theme.animNormal } }

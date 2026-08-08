@@ -57,7 +57,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             visible: Recorder.micEnabled
             text: Glyphs.microphone
-            font.family: "Symbols Nerd Font"
+            font.family: Theme.fontIconFamily
             font.pixelSize: Theme.fontIconMicro
             color: Theme.red
         }

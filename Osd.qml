@@ -165,7 +165,7 @@ Item {
                     id: osdGlyph
                     anchors.verticalCenter: parent.verticalCenter
                     text: root.icon
-                    font.family: "Symbols Nerd Font"
+                    font.family: Theme.fontIconFamily
                     font.pixelSize: Theme.fontIcon
                     color: Theme.accent
 

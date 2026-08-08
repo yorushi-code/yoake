@@ -41,11 +41,11 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.gapWide
 
-        Text {
+        MaterialSymbol {
             anchors.verticalCenter: parent.verticalCenter
-            text: root.glyph
-            font.family: "Symbols Nerd Font"
-            font.pixelSize: Theme.fontIconSmall
+            icon: root.glyph
+            size: Theme.fontIconSmall
+            fill: root.active ? 1 : 0
             color: root.contentColor
         }
         Column {
@@ -77,7 +77,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             visible: root.expandable
             text: Glyphs.chevronDown
-            font.family: "Symbols Nerd Font"
+            font.family: Theme.fontIconFamily
             font.pixelSize: Theme.fontIconMicro
             rotation: root.expanded ? 180 : 0
             Behavior on rotation {

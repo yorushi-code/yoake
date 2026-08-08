@@ -2,144 +2,160 @@ pragma Singleton
 import QtQuick
 import Quickshell
 
-// Every Nerd Font icon the shell draws, as escape sequences instead of literal
-// characters.
+// Every icon the shell draws, as a Material Symbols name.
 //
-// The glyphs live in the Private Use Area, and plenty of tooling between an
-// editor and this file (and the odd terminal) silently mangles or drops those
-// codepoints — a lost icon shows up as an invisible bug, since the Text just
-// renders nothing. `\u{...}` survives every text pipeline intact, and having
-// one table also means a widget references `Glyphs.wifi3` rather than an
-// opaque box nobody can grep for.
+// It used to be Nerd Font, written as `\u{F05A9}` escapes because the glyphs
+// live in the Private Use Area and half the tooling between an editor and this
+// file silently mangles those codepoints — a lost icon is an invisible bug,
+// since the Text simply renders nothing. That whole problem is gone: Material
+// Symbols ships ligatures, so the icon's own name *is* the text, and
+// `Glyphs.wifi` is now the string "wifi".
 //
-// Names mirror the upstream nf-md-* names so they can be looked up directly in
-// the Nerd Fonts cheat sheet.
+// Which means this file is no longer a decoder ring. It is kept anyway, and
+// for a better reason than it had: it is the shell's vocabulary. A widget asks
+// for `Glyphs.batteryAlert`, not for whichever of `battery_alert`,
+// `battery_1_bar` and `battery_error` somebody reached for that day, and the
+// same state gets the same picture in the bar, the dashboard and a menu.
+//
+// Names on the left are the shell's; names on the right are upstream's, and
+// every one of them was checked against the font's own codepoint table rather
+// than remembered.
 Singleton {
     // Network
-    readonly property string wifi: "\u{F05A9}"
-    readonly property string wifiOff: "\u{F05AA}"
-    readonly property string wifi1: "\u{F091F}"
-    readonly property string wifi2: "\u{F0922}"
-    readonly property string wifi3: "\u{F0925}"
-    readonly property string wifi4: "\u{F0928}"
-    readonly property string wifiNone: "\u{F092F}"
-    readonly property string ethernet: "\u{F0200}"
-    readonly property string vpn: "\u{F0582}"
-    readonly property string earth: "\u{F01E7}"
+    readonly property string wifi: "wifi"
+    readonly property string wifiOff: "wifi_off"
+    readonly property string wifi1: "network_wifi_1_bar"
+    readonly property string wifi2: "network_wifi_2_bar"
+    readonly property string wifi3: "network_wifi_3_bar"
+    readonly property string wifi4: "network_wifi"
+    readonly property string wifiNone: "signal_wifi_0_bar"
+    readonly property string ethernet: "lan"
+    readonly property string vpn: "vpn_lock"
+    readonly property string earth: "public"
 
     // Audio
-    readonly property string volumeHigh: "\u{F057E}"
-    readonly property string volumeMedium: "\u{F0580}"
-    readonly property string volumeLow: "\u{F057F}"
-    readonly property string volumeOff: "\u{F0581}"
-    readonly property string volumeMute: "\u{F075F}"
-    readonly property string microphone: "\u{F036C}"
-    readonly property string microphoneOff: "\u{F036D}"
-    readonly property string headphones: "\u{F02CB}"
-    readonly property string speaker: "\u{F04C3}"
-    readonly property string speakerMultiple: "\u{F0D38}"
+    readonly property string volumeHigh: "volume_up"
+    readonly property string volumeMedium: "volume_down"
+    readonly property string volumeLow: "volume_mute"
+    readonly property string volumeOff: "volume_mute"  // level zero, still audible; `volumeMute` is the crossed speaker
+    readonly property string volumeMute: "volume_off"
+    readonly property string microphone: "mic"
+    readonly property string microphoneOff: "mic_off"
+    readonly property string headphones: "headphones"
+    readonly property string speaker: "speaker"
+    readonly property string speakerMultiple: "speaker_group"
 
-    // Battery — indexed lookup lives in batteryFor() below.
-    readonly property string battery: "\u{F0079}"
-    readonly property string batteryCharging: "\u{F0084}"
-    readonly property string batteryAlert: "\u{F0083}"
-    readonly property var batterySteps: [
-        "\u{F007A}", "\u{F007B}", "\u{F007C}", "\u{F007D}", "\u{F007E}",
-        "\u{F007F}", "\u{F0080}", "\u{F0081}", "\u{F0082}", "\u{F0079}"
-    ]
+    // Battery
+    readonly property string battery: "battery_android_full"
+    readonly property string batteryCharging: "battery_android_bolt"
+    readonly property string batteryAlert: "battery_android_alert"
 
     // Notifications
-    readonly property string bell: "\u{F009A}"
-    readonly property string bellOff: "\u{F009B}"
-    readonly property string bellBadge: "\u{F116B}"
+    readonly property string bell: "notifications"
+    readonly property string bellOff: "notifications_off"
+    readonly property string bellBadge: "notifications_active"
 
-    // Chrome / controls
-    readonly property string check: "\u{F012C}"
-    readonly property string close: "\u{F0156}"
-    readonly property string chevronDown: "\u{F0140}"
-    readonly property string chevronUp: "\u{F0143}"
-    readonly property string download: "\u{F0045}"
-    readonly property string upload: "\u{F0552}"
-    readonly property string chevronLeft: "\u{F0141}"
-    readonly property string chevronRight: "\u{F0142}"
-    readonly property string dot: "\u{F09DF}"
-    readonly property string plus: "\u{F0415}"
-    readonly property string minus: "\u{F0374}"
-    readonly property string refresh: "\u{F0450}"
-    readonly property string copy: "\u{F018F}"
-    readonly property string openExternal: "\u{F03CC}"
-    readonly property string cog: "\u{F0493}"
-    readonly property string tune: "\u{F062E}"
+    // Interface
+    readonly property string check: "check"
+    readonly property string close: "close"
+    readonly property string chevronDown: "keyboard_arrow_down"
+    readonly property string chevronUp: "keyboard_arrow_up"
+    readonly property string chevronLeft: "keyboard_arrow_left"
+    readonly property string chevronRight: "keyboard_arrow_right"
+    readonly property string download: "download"
+    readonly property string upload: "upload"
+    readonly property string dot: "circle"  // outline at FILL 0 and a solid dot at FILL 1
+    readonly property string plus: "add"
+    readonly property string minus: "remove"
+    readonly property string refresh: "refresh"
+    readonly property string copy: "content_copy"
+    readonly property string openExternal: "open_in_new"
+    readonly property string cog: "settings"
+    readonly property string tune: "tune"
 
-    // Session / power
-    readonly property string power: "\u{F0425}"
-    readonly property string restart: "\u{F0709}"
-    readonly property string sleep: "\u{F04B2}"
-    readonly property string coffee: "\u{F0176}"
-    readonly property string lock: "\u{F033E}"
-    readonly property string speedometer: "\u{F04C5}"
-    readonly property string leaf: "\u{F032A}"
-    readonly property string flash: "\u{F0241}"
+    // Session
+    readonly property string power: "power_settings_new"
+    readonly property string restart: "restart_alt"
+    readonly property string sleep: "bedtime"
+    readonly property string coffee: "coffee"
+    readonly property string lock: "lock"
+
+    // Power profiles
+    readonly property string speedometer: "speed"
+    readonly property string leaf: "eco"
+    readonly property string flash: "bolt"
 
     // Media
-    readonly property string play: "\u{F040A}"
-    readonly property string pause: "\u{F03E4}"
-    readonly property string skipNext: "\u{F04AD}"
-    readonly property string skipPrevious: "\u{F04AE}"
-    readonly property string music: "\u{F075A}"
-    readonly property string playlist: "\u{F0CB8}"
-    readonly property string shuffle: "\u{F049D}"
-    readonly property string shuffleOff: "\u{F049E}"
-    readonly property string repeatAll: "\u{F0456}"
-    readonly property string repeatOne: "\u{F0458}"
-    readonly property string repeatOff: "\u{F0457}"
+    readonly property string play: "play_arrow"
+    readonly property string pause: "pause"
+    readonly property string skipNext: "skip_next"
+    readonly property string skipPrevious: "skip_previous"
+    readonly property string music: "music_note"
+    readonly property string playlist: "queue_music"
+    readonly property string shuffle: "shuffle_on"  // upstream ships the on-state as its own glyph rather than
+    readonly property string shuffleOff: "shuffle"  // as a fill, so these two are a genuine pair
+    readonly property string repeatAll: "repeat_on"
+    readonly property string repeatOne: "repeat_one_on"
+    readonly property string repeatOff: "repeat"
 
-    // System stats
-    readonly property string cpu: "\u{F0EE0}"
-    readonly property string memory: "\u{F035B}"
-    readonly property string thermometer: "\u{F050F}"
-    readonly property string disk: "\u{F02CA}"
-    readonly property string brightness: "\u{F00DF}"
+    // Machine
+    readonly property string cpu: "memory"  // upstream's `memory` is the processor die, not the RAM
+    readonly property string memory: "memory_alt"  // and `memory_alt` is the RAM stick
+    readonly property string thermometer: "thermostat"
+    readonly property string disk: "hard_drive"
+    readonly property string brightness: "brightness_6"
 
-    // Weather — nf-md-weather-*
-    readonly property string weatherSunny: "\u{F0599}"
-    readonly property string weatherNight: "\u{F0594}"
-    readonly property string weatherPartly: "\u{F0595}"
-    readonly property string weatherNightPartly: "\u{F0F31}"
-    readonly property string weatherCloudy: "\u{F0590}"
-    readonly property string weatherFog: "\u{F0591}"
-    readonly property string weatherRain: "\u{F0597}"
-    readonly property string weatherPour: "\u{F0596}"
-    readonly property string weatherSnow: "\u{F0598}"
-    readonly property string weatherStorm: "\u{F067E}"
-    readonly property string wind: "\u{F059D}"
-    readonly property string humidity: "\u{F058E}"
+    // Weather
+    readonly property string weatherSunny: "clear_day"
+    readonly property string weatherNight: "clear_night"
+    readonly property string weatherPartly: "partly_cloudy_day"
+    readonly property string weatherNightPartly: "partly_cloudy_night"
+    readonly property string weatherCloudy: "cloud"
+    readonly property string weatherFog: "foggy"
+    readonly property string weatherRain: "rainy"
+    readonly property string weatherPour: "rainy_heavy"
+    readonly property string weatherSnow: "weather_snowy"
+    readonly property string weatherStorm: "thunderstorm"
+    readonly property string wind: "air"
+    readonly property string humidity: "humidity_percentage"
 
-    // Apps / misc
-    readonly property string bluetooth: "\u{F00AF}"
-    readonly property string bluetoothOff: "\u{F00B2}"
-    readonly property string image: "\u{F02E9}"
-    readonly property string palette: "\u{F03D8}"
-    readonly property string keyboard: "\u{F030C}"
-    readonly property string apps: "\u{F003B}"
-    readonly property string monitor: "\u{F0379}"
-    readonly property string folder: "\u{F024B}"
-    readonly property string magnify: "\u{F0349}"
-    readonly property string terminal: "\u{F018D}"
-    readonly property string web: "\u{F059F}"
-    readonly property string calendar: "\u{F00F6}"
-    readonly property string record: "\u{F044A}"
-    readonly property string stop: "\u{F04DB}"
-    readonly property string video: "\u{F0567}"
+    // Bluetooth
+    readonly property string bluetooth: "bluetooth"
+    readonly property string bluetoothOff: "bluetooth_disabled"
 
-    // Rounds to the nearest 10% bucket the icon set provides. The step for a
-    // given bucket is at index-1 (the array starts at battery_10, not at
-    // empty), so 50% picks battery_50 rather than battery_60; clamping keeps
-    // 0% and 100% on the end entries instead of falling off the array.
+    // Everything else
+    readonly property string image: "image"
+    readonly property string palette: "palette"
+    readonly property string keyboard: "keyboard"
+    readonly property string apps: "apps"
+    readonly property string monitor: "monitor"
+    readonly property string folder: "folder"
+    readonly property string magnify: "search"
+    readonly property string terminal: "terminal"
+    readonly property string web: "language"
+    readonly property string calendar: "calendar_month"
+    readonly property string record: "radio_button_checked"
+    readonly property string stop: "stop"
+    readonly property string video: "videocam"
+
+    // Eight steps, not ten. The old Nerd Font set had one glyph per 10% and
+    // this one has one per bar, which is what the hardware draws and what the
+    // eye counts -- a battery that distinguishes 70% from 80% by a difference
+    // nobody can see was precision the picture never had.
+    //
+    // Horizontal, deliberately: `battery_*_bar` is the upright cell and
+    // `battery_android_*` is the flat one, and a flat battery in a horizontal
+    // bar of flat icons is the one that belongs there.
+    readonly property var batterySteps: [
+        "battery_android_0", "battery_android_1", "battery_android_2",
+        "battery_android_3", "battery_android_4", "battery_android_5",
+        "battery_android_6", "battery_android_full"
+    ]
+
     function batteryFor(fraction, charging) {
         if (charging) return batteryCharging;
-        const idx = Math.max(0, Math.min(9, Math.round(fraction * 10) - 1));
-        return batterySteps[idx];
+        const last = batterySteps.length - 1;
+        return batterySteps[Math.max(0, Math.min(last, Math.round(fraction * last)))];
     }
 
     // -1 means "no link" rather than 0%, which is a real signal level.

@@ -43,7 +43,7 @@ ClippingRectangle {
         // to leave a blank square with no indication anything was wrong.
         visible: art.status === Image.Null || art.status === Image.Error
         text: Glyphs.music
-        font.family: "Symbols Nerd Font"
+        font.family: Theme.fontIconFamily
         font.pixelSize: root.glyphSize
         color: Theme.subtext0
     }

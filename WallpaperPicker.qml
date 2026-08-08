@@ -428,7 +428,7 @@ PanelWindow {
                     anchors.leftMargin: 13
                     anchors.verticalCenter: parent.verticalCenter
                     text: Glyphs.magnify
-                    font.family: "Symbols Nerd Font"
+                    font.family: Theme.fontIconFamily
                     font.pixelSize: Theme.fontIconMicro
                     color: win.searching ? Theme.accent : Theme.subtext0
                     Behavior on color { ColorAnimation { duration: Theme.animFast } }
@@ -491,7 +491,7 @@ PanelWindow {
             Text {
                 anchors.centerIn: parent
                 text: Glyphs.close
-                font.family: "Symbols Nerd Font"
+                font.family: Theme.fontIconFamily
                 font.pixelSize: Theme.fontIconSmall
                 color: Theme.text
             }

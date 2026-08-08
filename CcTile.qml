@@ -47,15 +47,21 @@ Rectangle {
         onClicked: root.toggled()
     }
 
-    Text {
-        id: icon
+    // The icon fills when the tile is on.
+    //
+    // The tile already said so twice -- an accent ground and a dark label --
+    // and the icon said it not at all, because a Nerd Font has no way to. It is
+    // the same shape solidifying now rather than a second picture appearing,
+    // which is the difference between a state and a swap.
+    MaterialSymbol {
+        id: mark
         anchors.left: parent.left
         anchors.leftMargin: 14
         anchors.top: parent.top
         anchors.topMargin: 12
-        text: root.glyph
-        font.family: "Symbols Nerd Font"
-        font.pixelSize: Theme.fontIcon
+        icon: root.glyph
+        size: Theme.fontIcon
+        fill: root.active && root.stateful ? 1 : 0
         color: root.contentColor
         Behavior on color { ColorAnimation { duration: Theme.animFast } }
     }
@@ -65,7 +71,7 @@ Rectangle {
         anchors.leftMargin: 14
         anchors.right: parent.right
         anchors.rightMargin: 12
-        anchors.top: icon.bottom
+        anchors.top: mark.bottom
         anchors.topMargin: 5
         text: root.label
         color: root.contentColor
@@ -104,11 +110,10 @@ Rectangle {
             ? Qt.alpha(root.contentColor, 0.18) : "transparent"
         Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
-        Text {
+        MaterialSymbol {
             anchors.centerIn: parent
-            text: Glyphs.chevronRight
-            font.family: "Symbols Nerd Font"
-            font.pixelSize: Theme.fontIconMicro
+            icon: Glyphs.chevronRight
+            size: Theme.fontIconSmall
             color: root.active && root.stateful ? Theme.crust : Theme.subtext1
         }
 

@@ -252,7 +252,7 @@ Item {
                                 Text {
                                     anchors.centerIn: parent
                                     text: Glyphs.vpn
-                                    font.family: "Symbols Nerd Font"
+                                    font.family: Theme.fontIconFamily
                                     font.pixelSize: Theme.fontIconSmall
                                     color: Mihomo.running ? Theme.accent : Theme.subtext0
                                     Behavior on color { ColorAnimation { duration: Theme.animNormal } }
@@ -328,7 +328,7 @@ Item {
                                     Text {
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: rate.modelData.glyph
-                                        font.family: "Symbols Nerd Font"
+                                        font.family: Theme.fontIconFamily
                                         font.pixelSize: Theme.fontIconMicro
                                         color: Theme.accent
                                     }
@@ -364,7 +364,7 @@ Item {
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: Glyphs.earth
-                                    font.family: "Symbols Nerd Font"
+                                    font.family: Theme.fontIconFamily
                                     font.pixelSize: Theme.fontIconMicro
                                     color: Mihomo.leaking ? Theme.red : Theme.accent
                                     opacity: Mihomo.checking ? 0.5 : 1

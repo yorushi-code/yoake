@@ -38,7 +38,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         width: 16
         text: root.current ? Glyphs.check : ""
-        font.family: "Symbols Nerd Font"
+        font.family: Theme.fontIconFamily
         font.pixelSize: Theme.fontIconMicro
         color: Theme.accent
     }

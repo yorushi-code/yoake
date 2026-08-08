@@ -75,7 +75,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             visible: root.micMuted
             text: Glyphs.microphoneOff
-            font.family: "Symbols Nerd Font"
+            font.family: Theme.fontIconFamily
             font.pixelSize: Theme.fontIconMicro
             color: Theme.red
         }

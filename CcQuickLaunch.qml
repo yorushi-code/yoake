@@ -92,7 +92,7 @@ Flow {
                         anchors.centerIn: parent
                         visible: !appIcon.visible
                         text: Glyphs.apps
-                        font.family: "Symbols Nerd Font"
+                        font.family: Theme.fontIconFamily
                         font.pixelSize: Theme.fontIconMicro
                         color: Theme.subtext1
                     }

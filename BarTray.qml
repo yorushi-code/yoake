@@ -68,7 +68,7 @@ Row {
                 anchors.centerIn: parent
                 visible: !icon.visible
                 text: Glyphs.apps
-                font.family: "Symbols Nerd Font"
+                font.family: Theme.fontIconFamily
                 font.pixelSize: Theme.fontIconSmall
                 color: trayMa.containsMouse ? Theme.accent : Theme.subtext1
                 scale: icon.scale

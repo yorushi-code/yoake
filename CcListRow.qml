@@ -29,7 +29,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         width: 15
         text: root.connected ? Glyphs.check : root.glyph
-        font.family: "Symbols Nerd Font"
+        font.family: Theme.fontIconFamily
         font.pixelSize: Theme.fontIconMicro
         color: root.connected ? Theme.accent : Theme.subtext0
     }

@@ -140,7 +140,10 @@ QtObject {
     readonly property string fontFamily: "Inter"
     readonly property string fontDisplayFamily: "Inter Display"
     readonly property string fontMonoFamily: "JetBrains Mono"
-    readonly property string fontIconFamily: "Symbols Nerd Font"
+    // Material Symbols Rounded, variable. Rounded rather than Outlined
+    // because Inter is a humanist face with open, rounded terminals, and
+    // Outlined's square cuts read as a second designer having a go.
+    readonly property string fontIconFamily: "Material Symbols Rounded"
 
     readonly property int fontMicro: 9
     readonly property int fontLabel: 10
@@ -148,17 +151,22 @@ QtObject {
     readonly property int fontBody: 12
     readonly property int fontLead: 13
     readonly property int fontTitle: 15
-    // Glyphs sit a rung or two above the text they stand beside: a 12px icon
-    // next to 12px type reads as smaller than it is, because a letter fills
-    // its box and a symbol does not. Found by counting -- every icon in the
-    // tree had already been hand-set to 14 or 17 for exactly this reason, and
-    // naming it is the difference between a convention and a coincidence.
+    // Glyphs used to sit a rung or two *above* the text beside them, because a
+    // Nerd Font symbol does not fill its em box and a letter nearly does. That
+    // reasoning was correct and it is now obsolete: Material Symbols is drawn
+    // on a grid where the glyph *is* the box, so an icon set to the same pixel
+    // size as its label already reads a shade larger than it. Keeping the old
+    // rungs made every icon in the bar about a fifth too big on the first
+    // build, which is what a ladder inherited across a change of material
+    // looks like.
+    //
+    // So the ladder is now roughly the type scale itself, one step up.
     readonly property int fontIconMicro: 12
-    readonly property int fontIconSmall: 14
-    readonly property int fontIcon: 17
-    // The same rule at the top of the scale: a glyph standing beside hero type
-    // has to be optically larger than it to read as its equal.
-    readonly property int fontIconHero: 42
+    readonly property int fontIconSmall: 13
+    readonly property int fontIcon: 16
+    // Display size, for a glyph that is the subject of its own area rather than
+    // a label's companion — the weather card, an empty state.
+    readonly property int fontIconHero: 36
 
     readonly property int fontDisplay: 22
     // Type that is the subject of its own small area — a ring's number, an

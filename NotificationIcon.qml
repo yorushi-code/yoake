@@ -55,7 +55,7 @@ ClippingRectangle {
         // resolve would otherwise leave a blank tile.
         visible: img.status !== Image.Ready
         text: Glyphs.bell
-        font.family: "Symbols Nerd Font"
+        font.family: Theme.fontIconFamily
         font.pixelSize: Math.round(root.size * 0.5)
         color: root.accent
     }

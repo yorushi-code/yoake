@@ -81,7 +81,7 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     text: Glyphs.chevronLeft
-                    font.family: "Symbols Nerd Font"
+                    font.family: Theme.fontIconFamily
                     font.pixelSize: Theme.fontIconMicro
                     color: Theme.text
                 }

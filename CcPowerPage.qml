@@ -145,7 +145,7 @@ Flickable {
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
                             text: action.modelData.glyph
-                            font.family: "Symbols Nerd Font"
+                            font.family: Theme.fontIconFamily
                             font.pixelSize: Theme.fontIconSmall
                             color: Theme.text
                         }

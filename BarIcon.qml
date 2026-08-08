@@ -9,9 +9,10 @@ import QtQuick.Shapes
 // so the shape carries the state and the number becomes confirmation rather
 // than the only information.
 //
-// Still Nerd Font, deliberately: a coloured SVG set would look pasted on next
-// to the rest of the shell, and the glyphs already match the menus and the
-// control centre.
+// Material Symbols, and the ring and the fill say different things: the ring
+// is *how much*, the fill is *whether*. A battery at 80% wants an arc; a
+// bluetooth radio that is on wants a solid glyph. Nerd Font could express
+// neither without a second picture.
 Item {
     id: root
 
@@ -23,7 +24,9 @@ Item {
     // Empty for none. Kept short — this is 13px tall.
     property string badge: ""
     property color badgeColor: Theme.red
-    property int glyphSize: 13
+    property int glyphSize: Theme.fontIconSmall
+    // 0 outline, 1 solid. For state the ring cannot carry.
+    property real fill: 0
 
     property bool hovered: false
     property bool pressed: false
@@ -102,14 +105,13 @@ Item {
         }
     }
 
-    Text {
-        id: icon
+    MaterialSymbol {
+        id: mark
         anchors.centerIn: parent
-        text: root.glyph
-        font.family: "Symbols Nerd Font"
-        // Inside a ring the glyph has to give up a couple of pixels or the two
-        // touch.
-        font.pixelSize: root.hasRing ? root.glyphSize - 2 : root.glyphSize
+        icon: root.glyph
+        // Inside a ring the glyph has to give up a rung or the two touch.
+        size: root.hasRing ? Theme.fontIconMicro : root.glyphSize
+        fill: root.fill
         color: root.color
         Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
@@ -119,12 +121,14 @@ Item {
         }
 
         // A short kick whenever the glyph itself changes, so crossing a
-        // threshold registers as a change rather than a silent swap.
+        // threshold registers as a change rather than a silent swap. Still
+        // needed alongside the fill: a battery stepping from four bars to three
+        // is a different glyph, not a different fill.
         SequentialAnimation {
             id: pop
-            NumberAnimation { target: icon; property: "scale"; to: 1.28; duration: Theme.animFlick; easing.type: Easing.OutQuad }
+            NumberAnimation { target: mark; property: "scale"; to: 1.28; duration: Theme.animFlick; easing.type: Easing.OutQuad }
             NumberAnimation {
-                target: icon; property: "scale"; to: 1.0; duration: Theme.animNormal
+                target: mark; property: "scale"; to: 1.0; duration: Theme.animNormal
                 easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig
             }
         }

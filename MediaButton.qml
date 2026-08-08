@@ -29,11 +29,14 @@ Rectangle {
         NumberAnimation { duration: Theme.animFast; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpring }
     }
 
-    Text {
+    // Solid, not outlined. A transport control is a button rather than a
+    // status, and an outlined play arrow at fourteen pixels is a hairline
+    // triangle nobody can hit with their eye.
+    MaterialSymbol {
         anchors.centerIn: parent
-        text: root.glyph
-        font.family: "Symbols Nerd Font"
-        font.pixelSize: root.size * 0.5
+        icon: root.glyph
+        size: root.size * 0.5
+        fill: 1
         color: root.accented ? Theme.crust : Theme.text
     }
 
