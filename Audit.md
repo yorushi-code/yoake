@@ -135,8 +135,8 @@ are now zero.
 radius findings are gone and its seventeen literal durations with them. Its
 motion deliberately does *not* scale with Perception: a login screen that is
 slower at three in the morning looks broken to somebody who has just woken up.
-The files are edited but **not installed** — `bin/yoake-greeter-install` needs
-root and its only real test is a logout, which must not happen unattended.
+The files are edited, and since the session after this one they are **also
+installed** — see below.
 
 **The desks page was a two-column empty table.** The window title was set
 against the far right edge, so a desk with one window showed six hundred pixels
@@ -222,19 +222,38 @@ now, which is what `MenuSurface` has always used.
 
 ## Backlog, in the order it should be worked
 
-1. **The bar is still a container**, three islands each a `Row`, which is
-   `Direction.md`'s own open item: rule 2 wants a composer that recomposes the
-   interval rhythm and the optical centre when the media widget appears, rather
-   than reflowing.
+1. ~~The bar is still a container~~ — **done.** The clock is what is centred
+   now and the island grows around it, so the player opens room to its left and
+   nothing already on screen is shoved aside. What was wrong was worse than a
+   reflow: the island centred its own midpoint, so the clock slid right by half
+   the player's width whenever music started. A clock is read by position
+   before it is read at all.
 2. **`MenuSurface` and `Popover` still spell their own motion out**, at 0.88
    and 0.94. Left deliberately: `Direction` has a type for what they are —
    a menu answering a right-click is `acknowledge`, not `narrative`, and four
    beats on a 22px row is over-produced. What they need is the *type*, not
-   `PanelChrome`'s arrival. `LockScreen`'s entrance is also still a hand-rolled
-   four-beat cascade written in pauses, and it is the one surface here that
-   cannot be checked without risking locking an unattended machine.
-3. **The greeter needs installing** once somebody is at the machine, and that
-   is the only way to find out whether any of this reached it.
+   `PanelChrome`'s arrival, and `Reveal` cannot give them one: its durations are
+   fixed per beat, so `acknowledge` today means a menu that arrives at
+   `animSlow` instead of `animNormal` — slower, which is the wrong direction.
+   The type would have to reach the durations as well as the offsets.
+
+   `LockScreen`'s pause cascade is left too, and on purpose. `Direction.stagger`
+   is cut for lists: at tempo 220 it gives 34/68/102ms, and this is a whole
+   screen arriving rather than a row of a menu. What Direction actually asks —
+   that offsets stretch with the tempo — the `Theme.anim*` rungs already satisfy,
+   because every one of them is multiplied by `motionScale`.
+
+   What *was* wrong there was not the cascade: the hero's `Translate` had no
+   `Behavior`, so the 26px rise flipped in one frame while the opacity beside it
+   faded over six hundred milliseconds. The block arrived and then did not start
+   moving. Verified by locking, with the user present.
+3. ~~The greeter needs installing~~ — **done**, and it was hiding a live
+   defect rather than only a stale copy. `set-wallpaper.sh` calls
+   `yoake-greeter-sync`; only `yshell-greeter-sync` was installed, and the call
+   sits behind `command -v`, so it silently did nothing. The login screen had
+   been wearing the wallpaper and palette of the day of the rename ever since.
+   The old install is left in place as the rollback path until a logout has
+   confirmed the new one.
 4. **The cheat sheet is one row short of fitting** on a 1080p screen, down from
    most of a column. A rung tighter between categories recovered the rest —
    density is the feature on a reference sheet. The last row needs the sheet to
