@@ -24,6 +24,10 @@ Row {
     property bool showSeparator: true
     // Pulses on the second. Off where there is no room for it to read.
     property bool blink: true
+    // How present the colon is between pulses -- and, with `blink` off, all the
+    // time. A hero clock wants it faint enough that the digits lead; a 15px bar
+    // clock wants it as legible as they are, or the time reads as two numbers.
+    property real separatorRest: Theme.inkFaint
 
     spacing: 0
 
@@ -62,14 +66,14 @@ Row {
                     color: root.ink
                     // The two dots breathe out of phase, which reads as a pulse
                     // rather than as a colon flashing on and off.
-                    opacity: 0.35
+                    opacity: root.separatorRest
 
                     SequentialAnimation on opacity {
                         running: root.blink
                         loops: Animation.Infinite
                         PauseAnimation { duration: index * Theme.animBusy }
                         NumberAnimation { to: 1.0; duration: Theme.animBusy; easing.type: Easing.InOutQuad }
-                        NumberAnimation { to: 0.35; duration: Theme.animBusy; easing.type: Easing.InOutQuad }
+                        NumberAnimation { to: root.separatorRest; duration: Theme.animBusy; easing.type: Easing.InOutQuad }
                     }
                 }
             }

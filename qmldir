@@ -109,6 +109,7 @@ MediaCat 1.0 MediaCat.qml
 SeekWave 1.0 SeekWave.qml
 RollDigit 1.0 RollDigit.qml
 RollClock 1.0 RollClock.qml
+RollNumber 1.0 RollNumber.qml
 MediaCard 1.0 MediaCard.qml
 
 Surface 1.0 Surface.qml

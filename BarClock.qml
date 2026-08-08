@@ -55,17 +55,34 @@ Row {
         width: timeLabel.width
         height: Theme.barHeight
 
-        Text {
+        // Rolling digits, not a label that updates.
+        //
+        // The lock screen and the desktop clock have rolled since RollDigit was
+        // written; the bar -- the clock anyone actually reads, sixty times an
+        // hour, all day -- was still a Text being reassigned. It is the highest
+        // frequency piece of motion this shell can own, it costs one
+        // translation on a column of ten glyphs laid out once, and it is the
+        // difference between a shell that displays the time and one that keeps
+        // it.
+        //
+        // Tabular figures are still what makes it safe: the island's optical
+        // centre is composed against this widget's width, so a clock that
+        // changed width at 09:59 would shove the whole bar.
+        RollClock {
             id: timeLabel
             anchors.centerIn: parent
-            text: Qt.formatDateTime(clock.date, "HH:mm")
-            color: Theme.text
-            font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontLead
-            font.weight: Font.DemiBold
-            // Proportional digits make the clock breathe in and out as the
-            // minute changes, and every widget to its left shifts with it.
-            font.features: ({ "tnum": 1 })
+            hours: clock.date.getHours()
+            minutes: clock.date.getMinutes()
+            pixelSize: Theme.fontLead
+            family: Theme.fontFamily
+            weight: Font.DemiBold
+            ink: Theme.text
+            groupGap: 2
+            // No pulse in the bar. A colon breathing in the corner of the eye
+            // for eight hours is the sort of thing people quietly turn off, and
+            // the digits already say the shell is alive once a minute.
+            blink: false
+            separatorRest: Theme.inkStrong
         }
 
         MouseArea {
