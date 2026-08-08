@@ -286,11 +286,11 @@ def off_ladder():
                 continue
             m = re.search(r"font\.pixelSize:\s*(\d+)\s*$", line)
             if m and m.group(1) in sizes:
-                out.append((rel, n, f"font size {m.group(1)} has a rung in Theme"))
+                out.append((path.name, n, f"font size {m.group(1)} has a rung in Theme"))
                 continue
             m = re.search(r"\bradius:\s*(\d+)\s*$", line)
             if m and m.group(1) in radii:
-                out.append((rel, n, f"radius {m.group(1)} has a rung in Theme"))
+                out.append((path.name, n, f"radius {m.group(1)} has a rung in Theme"))
                 continue
             m = re.search(r"Qt\.alpha\(Theme\.text,\s*(0\.\d+)\)", line)
             if m and m.group(1) in ("0.06", "0.10", "0.14", "0.18", "0.20"):
@@ -408,7 +408,7 @@ def drift():
             m = re.search(r"\bradius:\s*(\d+)\s*$", line)
             if (m and n not in shadow_lines
                     and int(m.group(1)) >= 4 and int(m.group(1)) not in LADDER_RADII):
-                out.append((rel, n, f"radius {m.group(1)} is on no rung of the shape ladder"))
+                out.append((path.name, n, f"radius {m.group(1)} is on no rung of the shape ladder"))
 
             # Every duration in the shell should now be a Theme rung, because
             # the rungs are the only ones that scale with Perception's tempo. A
@@ -439,7 +439,7 @@ def drift():
 
             m = re.search(r"font\.pixelSize:\s*(\d+)\s*$", line)
             if m and int(m.group(1)) not in LADDER_SIZES:
-                out.append((rel, n, f"font size {m.group(1)} is on no rung of the type scale"))
+                out.append((path.name, n, f"font size {m.group(1)} is on no rung of the type scale"))
 
             # Any Qt.alpha, not only the ones whose base is a Theme colour.
             # The narrow form was blind to Qt.alpha(root.color, 0.22) and
@@ -449,7 +449,7 @@ def drift():
             for v in _alpha_literals(line):
                 norm = f"{float(v):.2f}"
                 if norm not in LADDER_ALPHAS:
-                    out.append((rel, n, f"surface alpha {v} is on no rung of the surface ladder"))
+                    out.append((path.name, n, f"surface alpha {v} is on no rung of the surface ladder"))
     return out
 
 

@@ -200,14 +200,23 @@ Singleton {
     ]
 
     // Taste, not perception: whether the shell is made of glass at all.
-    property bool frostWanted: true
+    //
+    // Off by default. Frost was the shell's material because it is the material
+    // a screenshot flatters, and a screenshot is not where anyone spends the
+    // day: over a terminal it reads as smudged, over a bright frame it stops
+    // separating the shell from the desktop at all, and it is the one effect
+    // here expensive enough that the machine takes it away by itself under
+    // load. Painted surfaces mixed from the wallpaper's own palette belong to
+    // the picture by colour rather than by transparency, which is the cheap way
+    // to do the same job and the one that holds at every brightness.
+    property bool frostWanted: false
 
-    Component.onCompleted: if (Prefs.loaded) root.frostWanted = Prefs.get("look.frost", true)
+    Component.onCompleted: if (Prefs.loaded) root.frostWanted = Prefs.get("look.frost", false)
 
     property Connections _prefsReady: Connections {
         target: Prefs
         function onLoadedChanged() {
-            if (Prefs.loaded) root.frostWanted = Prefs.get("look.frost", true);
+            if (Prefs.loaded) root.frostWanted = Prefs.get("look.frost", false);
         }
     }
 

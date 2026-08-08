@@ -106,12 +106,19 @@ Item {
         color: root.fill
     }
 
-    // The light falls from above, on every surface, at the same angle. This is
-    // the single detail that does most of the work: without it a rounded fill
-    // is a shape, and with it the same shape is an object with a lit edge.
+    // The light falls from above, on every surface, at the same angle -- on
+    // every *glass* surface. Without the blur underneath it there is nothing
+    // for the light to be catching on, and a wash laid over a painted fill is
+    // not a highlight, it is a lighter patch: the gradient's far end shows as a
+    // visible band across the middle of every island, because eight bits of
+    // white fading to nothing over 34 pixels cannot help doing that.
+    //
+    // The flat material draws its edge with the stroke below instead, which is
+    // what a painted surface has always used and does not depend on there being
+    // a light source the shell cannot actually simulate.
     ClippingRectangle {
         anchors.fill: parent
-        visible: root.specular
+        visible: root.specular && root._frosted
         radius: root.radius
         color: "transparent"
 
@@ -121,7 +128,7 @@ Item {
             anchors.right: parent.right
             height: parent.height * 0.55
             gradient: Gradient {
-                GradientStop { position: 0.0; color: Qt.alpha("white", root._frosted ? 0.13 : 0.07) }
+                GradientStop { position: 0.0; color: Qt.alpha("white", 0.13) }
                 GradientStop { position: 1.0; color: "transparent" }
             }
         }

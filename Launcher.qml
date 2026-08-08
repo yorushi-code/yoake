@@ -99,12 +99,41 @@ Item {
         return out.slice(0, 40);
     }
 
+    // Whether a row appearing right now is part of an arrival or is simply
+    // scrolling into view.
+    //
+    // A delegate cannot tell the difference by itself, which is why every list
+    // that animates on `Component.onCompleted` replays its entrance forever as
+    // you scroll. The window is opened deliberately -- on the open and on a new
+    // query, the only two moments when the whole list really is new -- and shut
+    // by the time anything could have been scrolled to.
+    property bool cascading: false
+    property Timer _cascadeWindow: Timer {
+        id: cascadeWindow
+        interval: Direction.rest
+        onTriggered: root.cascading = false
+    }
+
+    function restage() {
+        root.cascading = true;
+        cascadeWindow.restart();
+    }
+
+    // Set for as long as it takes the panel to leave. The row you chose gets to
+    // acknowledge the choice: without it the window simply stops existing, and
+    // a launcher that vanishes has not told you it did anything.
+    property bool committing: false
+
     function launch(index) {
         const hit = root.results[index];
         if (!hit) return;
         const next = Object.assign({}, root.usage);
         next[hit.entry.id] = (next[hit.entry.id] || 0) + 1;
         Prefs.set("launcher.usage", next);
+        // Before the close, not after: the process start is the slow part of
+        // this function and holding the flash behind it would put the
+        // acknowledgement after the thing it acknowledges.
+        root.committing = true;
         hit.entry.execute();
         Toggles.launcherOpen = false;
     }
@@ -112,12 +141,32 @@ Item {
     function move(delta) {
         if (root.results.length === 0) return;
         root.selected = Math.max(0, Math.min(root.results.length - 1, root.selected + delta));
-        list.positionViewAtIndex(root.selected, ListView.Contain);
+        root.reveal(root.selected);
+    }
+
+    // Scrolls the selection into view, as a movement rather than a jump.
+    //
+    // This was `positionViewAtIndex`, which is instant, and that is the whole
+    // reason the selection could not be drawn once and moved: the marker would
+    // glide a row down in content coordinates while the content itself
+    // teleported a row up, and the two together read as the highlight lagging.
+    // They are one movement and have to travel at one speed.
+    function reveal(index) {
+        const top = index * chrome.rowHeight;
+        const bottom = top + chrome.rowHeight;
+        let want = list.contentY;
+        if (top < want) want = top;
+        else if (bottom > want + list.height) want = bottom - list.height;
+        want = Math.max(0, Math.min(want, Math.max(0, list.contentHeight - list.height)));
+        if (Math.abs(want - list.contentY) < 1) return;
+        scroll.to = want;
+        scroll.restart();
     }
 
     onQueryChanged: {
         root.selected = 0;
         list.positionViewAtBeginning();
+        root.restage();
     }
 
     PanelWindow {
@@ -153,6 +202,8 @@ Item {
             win.mapped = true;
             root.query = "";
             root.selected = 0;
+            root.committing = false;
+            root.restage();
             input.text = "";
             input.forceActiveFocus();
             // Again once the surface is actually up. Focus asked for before the
@@ -286,14 +337,17 @@ Item {
                     anchors.right: parent.right
                     height: 62
 
-                    Text {
+                    MaterialSymbol {
                         id: searchIcon
                         anchors.left: parent.left
                         anchors.leftMargin: 22
                         anchors.verticalCenter: parent.verticalCenter
-                        text: Glyphs.magnify
-                        font.family: Theme.fontIconFamily
-                        font.pixelSize: Theme.fontIcon
+                        icon: Glyphs.magnify
+                        size: Theme.fontIcon
+                        // Fills as soon as there is a query, which is the axis
+                        // doing what it is for: the same glyph, in a different
+                        // state, rather than a second picture.
+                        fill: root.query === "" ? 0 : 1
                         color: root.query === "" ? Theme.subtext0 : Theme.accent
                         Behavior on color { ColorAnimation { duration: Theme.animFast } }
                     }
@@ -391,12 +445,72 @@ Item {
                     clip: true
                     model: root.results
                     currentIndex: root.selected
-                    // The highlight is drawn per delegate instead: a moving
-                    // highlight rectangle lags the selection by its animation
-                    // whenever the list scrolls under it.
                     boundsBehavior: Flickable.StopAtBounds
 
+                    // The one thing that is scrolled rather than jumped. See
+                    // root.reveal(): a marker that travels and a viewport that
+                    // teleports are the two halves of the bug that made a
+                    // moving highlight unusable here in the first place.
+                    NumberAnimation {
+                        id: scroll
+                        target: list
+                        property: "contentY"
+                        duration: Theme.animNormal
+                        easing.type: Easing.Bezier
+                        easing.bezierCurve: Theme.easeEmphasized
+                    }
+
+                    // Declared inside the view on purpose: a Flickable puts its
+                    // visual children in the content item, so this shares the
+                    // delegates' coordinate space and scrolls with them for
+                    // free. Behind them, so the marker is a surface the row
+                    // sits on rather than a pane over it.
+                    Traveller {
+                        id: marker
+                        z: -1
+                        active: root.results.length > 0
+                        slotX: 0
+                        slotY: root.selected * chrome.rowHeight
+                        slotWidth: list.width
+                        slotHeight: chrome.rowHeight
+                        // A page of arrow keys is the longest journey worth
+                        // deforming for; beyond that it is a jump, and a jump
+                        // that stretches reads as elastic rather than as mass.
+                        span: chrome.rowHeight * 4
+
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: Theme.radiusChip
+                            color: Qt.alpha(Theme.accent, Theme.tintSubtle)
+                            // The commit. Brief and bright, and it plays while
+                            // the panel is already on its way out, so the two
+                            // are one event rather than a flash followed by a
+                            // close.
+                            Rectangle {
+                                anchors.fill: parent
+                                radius: parent.radius
+                                color: Theme.accent
+                                opacity: root.committing ? Theme.tintActive : 0
+                                Behavior on opacity { NumberAnimation { duration: Theme.animFlick } }
+                            }
+                        }
+
+                        // Travels with the fill rather than being drawn by the
+                        // selected row, so the rail is the same object all the
+                        // way down the list.
+                        Rectangle {
+                            anchors.left: parent.left
+                            anchors.leftMargin: 4
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 3
+                            height: 24
+                            radius: width / 2
+                            color: Theme.accent
+                        }
+                    }
+
                     delegate: LauncherRow {
+                        id: row
                         required property var modelData
                         required property int index
 
@@ -405,6 +519,35 @@ Item {
                         selected: index === root.selected
                         onActivated: root.launch(index)
                         onHovered: root.selected = index
+
+                        // Rows arrive one after another, from the left, but
+                        // only when the list itself is new -- see
+                        // root.cascading. A delegate built because you scrolled
+                        // is not an arrival and must not be staged as one.
+                        opacity: 0
+                        Component.onCompleted: {
+                            if (root.cascading) intro.restart();
+                            else row.opacity = 1;
+                        }
+
+                        SequentialAnimation {
+                            id: intro
+                            PauseAnimation { duration: Direction.stagger(row.index) }
+                            ParallelAnimation {
+                                NumberAnimation {
+                                    target: row; property: "opacity"; to: 1
+                                    duration: Theme.animNormal
+                                    easing.type: Easing.Bezier
+                                    easing.bezierCurve: Theme.easeEmphasized
+                                }
+                                NumberAnimation {
+                                    target: row; property: "x"; from: -22; to: 0
+                                    duration: Theme.animSlow
+                                    easing.type: Easing.Bezier
+                                    easing.bezierCurve: Theme.easeSpringBig
+                                }
+                            }
+                        }
                     }
                 }
 
