@@ -44,9 +44,7 @@ Item {
         // travelled to does.
         label: root.wireless ? root.deviceName : ""
         labelCap: 118
-        // The audio panel already lists every output and names them, which
-        // is the question this chip raises. BluetoothPanel will take it over.
-        onClicked: Toggles.toggleSheet("audio")
+        onClicked: Toggles.toggleSheet("bt")
     }
 
     Tooltip {
