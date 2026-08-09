@@ -46,43 +46,39 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.gapTight
 
-        BarIcon {
-            id: glyph
+        // The ring is gone: `battery_android_*` steps once per bar, which is
+        // what the hardware draws and what the eye counts, so the ring was the
+        // same number said twice.
+        //
+        // The low-battery pulse is gone too, and that one was not taste. It
+        // looped forever, and a permanently running animation holds its
+        // window's render loop at the refresh rate for as long as it runs --
+        // measured at a fifth of a core. A battery that is nearly flat says so
+        // by turning red, which costs nothing and is not easier to miss.
+        Chip {
+            id: batteryChip
             anchors.verticalCenter: parent.verticalCenter
+            tone: "power"
+            alert: root.low
             glyph: root.low ? Glyphs.batteryAlert : Glyphs.batteryFor(root.fraction, root.charging)
-            color: root.low ? Theme.red : (root.charging ? Theme.green : Theme.accent)
-            // The ring is the charge: at a glance the shape says how full it is
-            // without reading the number beside it.
-            progress: root.fraction
-            ringColor: root.low ? Theme.red : (root.charging ? Theme.green : Theme.accent)
-            hovered: ma.containsMouse
-
-            SequentialAnimation on opacity {
-                running: root.low
-                loops: Animation.Infinite
-                NumberAnimation { to: 0.35; duration: Theme.animBreath; easing.type: Easing.InOutQuad }
-                NumberAnimation { to: 1.0; duration: Theme.animBreath; easing.type: Easing.InOutQuad }
+            value: Math.round(root.fraction * 100) + "%"
+            onClicked: {
+                Power.refresh();
+                Toggles.toggleSheet("power");
             }
-        }
-
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            color: root.low ? Theme.red : (root.charging ? Theme.green : Theme.text)
-            font.pixelSize: Theme.fontSmall
-            text: Math.round(root.fraction * 100) + "%"
+            onRightClicked: {
+                Power.refresh();
+                Menus.toggle(root.menuId);
+            }
         }
     }
 
     MouseArea {
         id: ma
         anchors.fill: parent
+        z: -1
         hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        acceptedButtons: Qt.LeftButton | Qt.RightButton
-        onClicked: {
-            Power.refresh();
-            Menus.toggle(root.menuId);
-        }
+        acceptedButtons: Qt.NoButton
     }
 
     ActionMenu {

@@ -87,133 +87,88 @@ PanelWindow {
         }
     }
 
-    // ── Left island: workspaces ──
-    BarIsland {
-        id: leftIsland
-        anchors.left: parent.left
-        anchors.verticalCenter: parent.verticalCenter
-        barWindow: bar
-        islandName: "left"
-        arrivalIndex: 0
 
-        BarWorkspaces {
-            anchors.verticalCenter: parent.verticalCenter
-            output: bar.barScreen.name
-        }
-    }
+    // ── One strip ──
+    //
+    // Three islands became one surface. The air between them was the argument
+    // for them and the grid was what it cost: two islands have a gap, and a gap
+    // is only a boundary to someone who already knows one is meant to be there.
+    // A strip has slots, and a chip in a slot is found by position.
+    //
+    // The zones are lists rather than named children so the order in this file
+    // is the order on screen, which is the only property of a bar layout anyone
+    // ever needs to check.
+    BarStrip {
+        id: strip
+        anchors.fill: parent
+        // The clock is what sits on the bar's midpoint, and the centre zone
+        // composes itself around it. Everything else in the centre opens room
+        // to one side or the other of a clock that never moves.
+        centreAnchorX: barClock.x + barClock.anchorX
 
-    // ── Centre island: now-playing + clock ──
-    BarIsland {
-        id: centerIsland
-        anchors.verticalCenter: parent.verticalCenter
-        barWindow: bar
-        islandName: "centre"
-        arrivalIndex: 2
-
-        pulseWithAudio: true
-
-        // Composed, not centred. This is Direction's open item — the bar was a
-        // container, and a container reflows.
-        //
-        // Centring the island as a whole put its *midpoint* on the bar's, so
-        // the clock slid right by half the player's width every time music
-        // started and back again when it stopped. A clock is read by position
-        // before it is read at all: it is the one thing on this bar that must
-        // never move, and it was the only thing that did.
-        //
-        // So the clock is what is centred, and the island grows around it. The
-        // player opens the room to its left; nothing that was already on screen
-        // is shoved aside, which is rule 2 with the arithmetic written out.
-        //
-        // Deliberately without a Behavior. `x` and the clock's own position
-        // inside the row are recomputed from the same layout pass, so they move
-        // on the same frame and the clock stays exactly still while the island
-        // widens under it. Animating this instead would make the clock wobble
-        // by the difference between two curves. What animates is the player's
-        // width, which BarMedia already owns — the space opens at the player's
-        // tempo and the title becomes legible inside it.
-        x: Math.round(bar.width / 2 - centerIsland.padding
-                      - centreRow.x - barClock.x - barClock.width / 2)
-
-        Row {
-            id: centreRow
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: Theme.gapWide
-
-            BarMedia { barWindow: bar }
-            BarClock { id: barClock; barWindow: bar }
-        }
-
-        // Pointing at the centre island opens the dashboard. It is the one
-        // island that is already about "what is going on" rather than about a
-        // single control, so it is where the summary of everything belongs --
-        // and reaching it should not require remembering a key.
-        //
-        // A HoverHandler, not a MouseArea under the widgets. Underneath, it
-        // only saw the pointer in the gaps between the clock and the media
-        // widget -- pointing at the island's actual contents did nothing, and
-        // finding the strip that worked was the whole complaint. A
-        // HoverHandler sees the pointer whatever is drawn above it, and it
-        // takes no clicks, so the widgets keep their own.
-        HoverHandler {
-            id: dashHover
-            onHoveredChanged: {
-                // The peek watches both surfaces, so the island reports where
-                // the pointer is rather than deciding on its own when to close.
-                Toggles.dashPointerOnBar = hovered;
-                if (hovered) dashOpen.restart();
-                else dashOpen.stop();
+        leftItems: [
+            BarMedia { barWindow: bar },
+            BarStrip.Divider {},
+            BarWorkspaces {
+                anchors.verticalCenter: parent ? parent.verticalCenter : undefined
+                output: bar.barScreen.name
             }
-        }
+        ]
 
-        Timer {
-            id: dashOpen
-            // Long enough that crossing the bar on the way somewhere else does
-            // not summon it.
-            interval: Theme.animSlow
-            // A peek, not an open: it asks for no keyboard and it leaves with
-            // the pointer. Pointing at something is not the same as asking for
-            // it, and this used to treat them as the same.
-            onTriggered: if (dashHover.hovered && !Menus.anyOpen) {
-                Toggles.dashPeek();
-            }
-        }
-    }
-
-    // ── Right island: tray + status ──
-    BarIsland {
-        id: rightIsland
-        anchors.right: parent.right
-        anchors.verticalCenter: parent.verticalCenter
-        barWindow: bar
-        islandName: "right"
-        arrivalIndex: 1
-
-        Row {
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: 12
-
+        centreItems: [
+            BarClock { id: barClock; barWindow: bar },
             BarRecorder {
                 barWindow: bar
                 // Without this the capture script falls back to the first
                 // output it finds, which is only right by luck on one monitor.
                 Component.onCompleted: Recorder.output = bar.barScreen.name
-            }
+            },
+            BarWeather {}
+        ]
+
+        rightItems: [
+            BarTray { barWindow: bar },
+            BarLayout {},
+            BarStrip.Divider {},
+            BarLoad { barWindow: bar },
+            BarVpn { barWindow: bar },
+            BarNetwork { barWindow: bar },
+            BarBluetooth {},
+            BarAudio { barWindow: bar },
+            BarBattery { barWindow: bar },
             BarNotifications { barWindow: bar }
-            BarTray { barWindow: bar }
+        ]
+    }
 
-            Rectangle {
-                width: 1
-                height: 12
-                anchors.verticalCenter: parent.verticalCenter
-                color: Qt.alpha(Theme.text, Theme.strokeFirm)
-            }
+    // Pointing at the centre of the strip opens the dashboard. It is the part
+    // of the bar that is already about "what is going on" rather than about a
+    // single control, so it is where the summary of everything belongs -- and
+    // reaching it should not require remembering a key.
+    //
+    // A HoverHandler on the zone, not a MouseArea under the widgets: underneath
+    // it only saw the pointer in the gaps between the clock and its
+    // neighbours, so pointing at the island's actual contents did nothing.
+    HoverHandler {
+        id: dashHover
+        parent: strip.centreArea
+        onHoveredChanged: {
+            // The peek watches both surfaces, so the strip reports where the
+            // pointer is rather than deciding on its own when to close.
+            Toggles.dashPointerOnBar = hovered;
+            if (hovered) dashOpen.restart();
+            else dashOpen.stop();
+        }
+    }
 
-            BarLoad { barWindow: bar }
-            BarVpn { barWindow: bar }
-            BarNetwork { barWindow: bar }
-            BarAudio { barWindow: bar }
-            BarBattery { barWindow: bar }
+    Timer {
+        id: dashOpen
+        // Long enough that crossing the bar on the way somewhere else does not
+        // summon it.
+        interval: Theme.animSlow
+        // A peek, not an open: it asks for no keyboard and it leaves with the
+        // pointer. Pointing at something is not the same as asking for it.
+        onTriggered: if (dashHover.hovered && !Menus.anyOpen) {
+            Toggles.dashPeek();
         }
     }
 }

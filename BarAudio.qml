@@ -48,56 +48,52 @@ Item {
         id: audioRow
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
-        spacing: Theme.gapTight
+        spacing: Theme.chipGap
 
-        BarIcon {
+        // A live value, so it gets its domain's colour. The ring is gone with
+        // it: the glyph already steps through five levels, and drawing the same
+        // number twice was the loudest thing in the bar for the state the
+        // machine is in most of the day.
+        Chip {
+            id: volumeChip
             anchors.verticalCenter: parent.verticalCenter
+            tone: "audio"
             glyph: Glyphs.volumeFor(root.volume, root.muted)
-            color: root.muted ? Theme.subtext0 : Theme.accent
-            // No ring while muted: a level readout under a muted icon is a
-            // contradiction, and the ring is the loudest part of the widget.
-            progress: root.muted ? -1 : root.volume
-            hovered: ma.containsMouse
+            value: root.muted ? "—" : Math.round(root.volume * 100) + "%"
+            live: !root.muted
+            onClicked: Toggles.toggleSheet("audio")
+            onRightClicked: Menus.toggle(root.menuId)
+            onScrolled: delta => {
+                if (!root.sink || !root.sink.audio) return;
+                const step = delta > 0 ? 0.05 : -0.05;
+                root.sink.audio.volume = Math.max(0, Math.min(1, root.volume + step));
+            }
         }
 
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            color: Theme.text
-            font.pixelSize: Theme.fontSmall
-            visible: !root.muted
-            text: root.sink && root.sink.audio ? Math.round(root.volume * 100) + "%" : "--"
-        }
-
-        // Only present when the microphone is muted: an always-on mic glyph
-        // would be noise, but a muted mic is something you want to find out
-        // before talking for a minute.
-        Text {
+        // Only present when the microphone is muted. An always-on mic glyph is
+        // noise; a muted one is what you want to learn before talking for a
+        // minute, so it is an alert rather than a reading.
+        Chip {
             anchors.verticalCenter: parent.verticalCenter
             visible: root.micMuted
-            text: Glyphs.microphoneOff
-            font.family: Theme.fontIconFamily
-            font.pixelSize: Theme.fontIconMicro
-            color: Theme.red
+            tone: "audio"
+            alert: true
+            glyph: Glyphs.microphoneOff
+            onClicked: {
+                if (root.source && root.source.audio) root.source.audio.muted = false;
+            }
         }
     }
 
+    // Middle click still mutes, which the chip has no gesture for.
     MouseArea {
         id: ma
         anchors.fill: parent
+        z: -1
         hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        acceptedButtons: Qt.LeftButton | Qt.RightButton
-        onClicked: mouse => {
-            if (mouse.button === Qt.RightButton) {
-                Menus.toggle(root.menuId);
-                return;
-            }
+        acceptedButtons: Qt.MiddleButton
+        onClicked: {
             if (root.sink && root.sink.audio) root.sink.audio.muted = !root.muted;
-        }
-        onWheel: wheel => {
-            if (!root.sink || !root.sink.audio) return;
-            const delta = wheel.angleDelta.y > 0 ? 0.05 : -0.05;
-            root.sink.audio.volume = Math.max(0, Math.min(1, root.volume + delta));
         }
     }
 

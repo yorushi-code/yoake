@@ -1,9 +1,17 @@
 import QtQuick
 import Quickshell
 
-// Time and date. Split into two hit areas deliberately — one island, but each
-// half opens the panel its label suggests.
-Row {
+// Time and date, stacked.
+//
+// One line became two because the strip is 36 tall and a date set beside the
+// time competes with it: at a glance the eye has to pick the clock out of a
+// phrase. Under it, in caps at the smallest rung, the date is a caption and the
+// time is the subject, which is the relationship those two things actually
+// have.
+//
+// Split into two hit areas deliberately — one widget, but each line opens the
+// panel its content suggests.
+Item {
     id: root
 
     property var barWindow: null
@@ -11,12 +19,21 @@ Row {
     // does not share one open-menu key with this one.
     readonly property string menuId: Menus.idFor(root.barWindow, "clock")
 
-    spacing: Theme.gapWide
+    // Where the bar's midpoint should land, in this widget's coordinates. The
+    // strip composes itself around this rather than centring the zone: the
+    // clock is read by position before it is read at all, and it was the one
+    // thing on the old bar that moved every time the player appeared.
+    readonly property real anchorX: timeRow.x + timeRow.width / 2
+
+    implicitWidth: Math.max(timeRow.width, dateLabel.implicitWidth)
+    implicitHeight: Theme.barHeight
     anchors.verticalCenter: parent ? parent.verticalCenter : undefined
 
     SystemClock {
         id: clock
-        precision: SystemClock.Minutes
+        // Seconds, because the reference has them and because a clock without
+        // them is a thing you read rather than a thing that is running.
+        precision: SystemClock.Seconds
         enabled: true
     }
 
@@ -40,7 +57,7 @@ Row {
         {
             text: "Скопировать время",
             glyph: Glyphs.copy,
-            action: () => Quickshell.clipboardText = Qt.formatDateTime(clock.date, "hh:mm")
+            action: () => Quickshell.clipboardText = Qt.formatDateTime(clock.date, "hh:mm:ss")
         },
         { separator: true },
         {
@@ -50,108 +67,105 @@ Row {
         }
     ]
 
-    Item {
-        id: timeItem
-        width: timeLabel.width
-        height: Theme.barHeight
+    Column {
+        anchors.centerIn: parent
+        spacing: 0
 
-        // Rolling digits, not a label that updates.
-        //
-        // The lock screen and the desktop clock have rolled since RollDigit was
-        // written; the bar -- the clock anyone actually reads, sixty times an
-        // hour, all day -- was still a Text being reassigned. It is the highest
-        // frequency piece of motion this shell can own, it costs one
-        // translation on a column of ten glyphs laid out once, and it is the
-        // difference between a shell that displays the time and one that keeps
-        // it.
-        //
-        // Tabular figures are still what makes it safe: the island's optical
-        // centre is composed against this widget's width, so a clock that
-        // changed width at 09:59 would shove the whole bar.
-        RollClock {
-            id: timeLabel
-            anchors.centerIn: parent
-            hours: clock.date.getHours()
-            minutes: clock.date.getMinutes()
-            pixelSize: Theme.fontLead
-            family: Theme.fontFamily
-            weight: Font.DemiBold
-            ink: Theme.text
-            groupGap: 2
-            separatorRest: Theme.inkStrong
-        }
+        Row {
+            id: timeRow
+            anchors.horizontalCenter: parent.horizontalCenter
+            spacing: 2
 
-        MouseArea {
-            id: clockArea
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-            onClicked: mouse => {
-                if (mouse.button === Qt.RightButton) {
-                    Menus.toggle(root.menuId);
-                    return;
-                }
-                Menus.closeAll();
-                Toggles.dash("control");
+            RollClock {
+                id: hhmm
+                anchors.verticalCenter: parent.verticalCenter
+                hours: clock.date.getHours()
+                minutes: clock.date.getMinutes()
+                pixelSize: Theme.fontLead
+                family: Theme.fontFamily
+                weight: Font.DemiBold
+                ink: Theme.text
+                groupGap: 2
+                separatorRest: Theme.inkStrong
+            }
+
+            // Seconds are set, not rolled.
+            //
+            // A rolling second is an animation starting once a second, forever,
+            // on the one surface that is always on screen -- about a fifth of
+            // the time spent animating for a digit nobody reads deliberately.
+            // The minute rolls, which is the moment worth having; the seconds
+            // simply are.
+            Text {
+                anchors.baseline: hhmm.baseline
+                text: Qt.formatDateTime(clock.date, ":ss")
+                color: Qt.alpha(Theme.text, Theme.inkFaint)
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontMicro
+                font.features: ({ "tnum": 1 })
             }
         }
-
-        // Shared by both halves so the menu appears under whichever was
-        // right-clicked without duplicating the model.
-        ActionMenu {
-            id: menu
-            menuId: root.menuId
-            anchorItem: timeItem
-            model: Menus.isOpen(root.menuId) ? root.menuModel : []
-            open: Menus.isOpen(root.menuId)
-        }
-
-        Tooltip {
-            anchorItem: timeItem
-            active: clockArea.containsMouse && !Menus.isOpen(root.menuId)
-            text: Lang.dateCapitalised(clock.date, "dddd, d MMMM yyyy")
-            subtext: "ЛКМ — панель управления · ПКМ — меню"
-        }
-    }
-
-    Item {
-        id: dateItem
-        width: dateLabel.width
-        height: Theme.barHeight
 
         Text {
             id: dateLabel
-            anchors.centerIn: parent
-            text: Lang.dateCapitalised(clock.date, "ddd, d MMM")
-            color: dateArea.containsMouse ? Theme.text : Theme.subtext0
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: Lang.dateCapitalised(clock.date, "dddd, d MMMM").toUpperCase()
+            color: dateArea.containsMouse ? Theme.subtext1 : Theme.subtext0
             font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSmall
-            font.weight: Font.Medium
+            font.pixelSize: Theme.fontMicro
+            // Caps have no ascenders or descenders to space them; at label
+            // tracking they clot into a bar.
+            font.letterSpacing: Theme.trackCaption
             Behavior on color { ColorAnimation { duration: Theme.animFast } }
         }
+    }
 
-        MouseArea {
-            id: dateArea
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-            onClicked: mouse => {
-                if (mouse.button === Qt.RightButton) {
-                    Menus.toggle(root.menuId);
-                    return;
-                }
-                Menus.closeAll();
-                Toggles.calendarOpen = !Toggles.calendarOpen;
+    MouseArea {
+        id: clockArea
+        anchors.fill: parent
+        anchors.bottomMargin: root.height / 2
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: mouse => {
+            if (mouse.button === Qt.RightButton) {
+                Menus.toggle(root.menuId);
+                return;
             }
+            Menus.closeAll();
+            Toggles.dash("control");
         }
+    }
 
-        Tooltip {
-            anchorItem: dateItem
-            active: dateArea.containsMouse && !Menus.isOpen(root.menuId)
-            text: "Календарь"
-            subtext: "ПКМ — меню"
+    MouseArea {
+        id: dateArea
+        anchors.fill: parent
+        anchors.topMargin: root.height / 2
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: mouse => {
+            if (mouse.button === Qt.RightButton) {
+                Menus.toggle(root.menuId);
+                return;
+            }
+            Menus.closeAll();
+            Toggles.calendarOpen = !Toggles.calendarOpen;
         }
+    }
+
+    ActionMenu {
+        id: menu
+        menuId: root.menuId
+        anchorItem: root
+        model: Menus.isOpen(root.menuId) ? root.menuModel : []
+        open: Menus.isOpen(root.menuId)
+    }
+
+    Tooltip {
+        anchorItem: root
+        active: (clockArea.containsMouse || dateArea.containsMouse) && !Menus.isOpen(root.menuId)
+        text: Lang.dateCapitalised(clock.date, "dddd, d MMMM yyyy")
+        subtext: "Время — панель управления · дата — календарь · ПКМ — меню"
     }
 }

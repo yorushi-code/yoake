@@ -90,37 +90,44 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.gapTight
 
-        BarIcon {
+        // The name of the network, not the fact that one exists.
+        //
+        // This was a glyph and a percentage, which tells you the radio is on
+        // and nothing else. The one thing anyone actually wants from a bar is
+        // *which* network they are on, and that question was unanswerable
+        // without opening something.
+        //
+        // The signal ring is gone with it: `network_wifi_N_bar` already has the
+        // level in the drawing, and two readings of one value is how the bar
+        // ended up loudest in its least interesting state.
+        Chip {
+            id: netChip
             anchors.verticalCenter: parent.verticalCenter
+            tone: "net"
             glyph: Networking.wifiEnabled ? Glyphs.wifiFor(root.signalPercent) : Glyphs.wifiOff
-            color: (root.signalPercent >= 0 && Networking.wifiEnabled) ? Theme.accent : Theme.subtext0
-            // Signal quality as the ring. The four-step Nerd Font glyph only
-            // has four states; the ring shows where inside a step it sits.
-            progress: (Networking.wifiEnabled && root.signalPercent >= 0)
-                ? root.signalPercent / 100 : -1
-            ringColor: root.signalPercent < 30 ? Theme.yellow : Theme.accent
-            hovered: ma.containsMouse
-        }
-
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            color: root.signalPercent >= 0 ? Theme.text : Theme.subtext0
-            font.pixelSize: Theme.fontSmall
-            text: !Networking.wifiEnabled ? "выкл"
-                : (root.signalPercent >= 0 ? root.signalPercent + "%" : "нет сети")
+            label: !Networking.wifiEnabled ? "выкл"
+                : (root.ssid !== "" ? root.ssid : "нет сети")
+            // An SSID can be forty characters. The strip gets a ceiling and the
+            // name gets elided; the panel has room for the whole of it.
+            labelCap: 118
+            live: Networking.wifiEnabled && root.signalPercent >= 0
+            onClicked: {
+                netProc.running = true;
+                Toggles.toggleSheet("net");
+            }
+            onRightClicked: {
+                netProc.running = true;
+                Menus.toggle(root.menuId);
+            }
         }
     }
 
     MouseArea {
         id: ma
         anchors.fill: parent
+        z: -1
         hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        acceptedButtons: Qt.LeftButton | Qt.RightButton
-        onClicked: {
-            netProc.running = true;
-            Menus.toggle(root.menuId);
-        }
+        acceptedButtons: Qt.NoButton
     }
 
     // Scanning runs only while the list is on screen. There is no one-shot scan
