@@ -29,6 +29,19 @@ Singleton {
     property bool valid: false
     property string error: ""
 
+    // ── The forecast ──
+    //
+    // Only the current conditions were ever read, because the only consumer was
+    // a card that had room for one number. A panel is a different question:
+    // "should I take a coat" is answered by the next few hours, and the same
+    // request already carries them -- Open-Meteo bills nothing extra for asking,
+    // so the hourly and daily blocks cost one longer URL and no second round
+    // trip.
+    property var hourly: []   // [{ hour, temp, code, day }] from now forward
+    property var daily: []    // [{ label, code, min, max }], tomorrow onward
+    property string sunrise: ""
+    property string sunset: ""
+
     // Refreshed on the quarter hour rather than continuously: the forecast this
     // reads is itself published hourly.
     readonly property int refreshInterval: 15 * 60 * 1000

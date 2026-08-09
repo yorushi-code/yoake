@@ -21,6 +21,23 @@ Singleton {
     readonly property int minTemperature: 2500
     readonly property int maxTemperature: 6500
 
+    // Where the temperature sits on its own range. Every control that offers it
+    // is a slider over 0..1, and each of them was converting by hand — three
+    // copies of one arithmetic, which is three chances to get the direction
+    // wrong.
+    readonly property real fraction: (root.temperature - root.minTemperature)
+        / (root.maxTemperature - root.minTemperature)
+
+    // Rounded to a hundred kelvin. wlsunset is respawned to change temperature
+    // at all, so a drag that honoured every pixel would be asking the display
+    // server for a new gamma ramp several hundred times on the way across.
+    function setFraction(f) {
+        const span = root.maxTemperature - root.minTemperature;
+        const clamped = Math.max(0, Math.min(1, f));
+        root.temperature =
+            Math.round((root.minTemperature + clamped * span) / 100) * 100;
+    }
+
     // Kept across restarts, like every other preference in this shell. Without
     // it, warming the screen at midnight lasted until the next time the shell
     // was restarted and then quietly undid itself -- and the one thing a
@@ -45,14 +62,22 @@ Singleton {
         root._restart();
     }
 
-    onEnabledChanged: if (Prefs.loaded) Prefs.set("nightLight.enabled", root.enabled)
+    onEnabledChanged: {
+        if (Prefs.loaded) Prefs.set("nightLight.enabled", root.enabled);
+        root._restart();
+    }
 
     function toggle() {
         root.enabled = !root.enabled;
     }
 
+    // No `running:` binding on this, deliberately, and the absence is the bug
+    // this file used to have: _restart() assigns proc.running, and a JS
+    // assignment destroys the binding it lands on. The first restart therefore
+    // severed "run while enabled" for the rest of the session, after which the
+    // toggle changed a boolean and nothing else — it looked like it worked,
+    // because the label followed the flag.
     property Process proc: Process {
-        running: root.enabled
         command: ["wlsunset", "-T", String(root.temperature + 1), "-t", String(root.temperature)]
     }
 
@@ -71,13 +96,28 @@ Singleton {
     function _restart() {
         proc.running = false;
         sweep.running = true;
-        if (root.enabled) proc.running = true;
+        relight.restart();
+    }
+
+    // The sweep above cannot tell a process we have just started from the stale
+    // one it was sent to clear, so the new one waits until the old ones are
+    // gone rather than racing them.
+    property Timer relight: Timer {
+        interval: Theme.animFast
+        onTriggered: proc.running = root.enabled
     }
 
     // wlsunset bakes the temperature in at spawn, so a change while it is
-    // running has to go through a restart.
+    // running has to go through a restart -- and a slider dragged across a
+    // panel would respawn it on every pixel of travel. The restart waits for
+    // the hand to stop; the number under it does not.
+    property Timer settle: Timer {
+        interval: Theme.animNormal
+        onTriggered: if (root.enabled) root._restart()
+    }
+
     onTemperatureChanged: {
         if (Prefs.loaded) Prefs.set("nightLight.temperature", root.temperature);
-        if (root.enabled) root._restart();
+        if (root.enabled) settle.restart();
     }
 }

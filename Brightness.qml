@@ -14,6 +14,15 @@ Singleton {
 
     // 0..1
     property real value: 0
+    // The kernel's name for the backlight — `amdgpu_bl1` here. Shown rather
+    // than hidden: a panel that lists real things names them, and it is the
+    // only thing that would tell an internal panel apart from a second one.
+    property string device: ""
+    // False until a reading lands. A machine with no backlight at all reports
+    // nothing, and a slider offered for hardware that is not there is worse
+    // than an absent one.
+    property bool available: false
+
     // A fresh reading landed, whoever caused it. Anything showing the level
     // follows this.
     signal refreshed()
@@ -40,6 +49,8 @@ Singleton {
                 if (parts.length < 4) return;
                 const pct = parseInt(parts[3]);
                 if (isNaN(pct)) return;
+                root.device = parts[0];
+                root.available = true;
                 root.value = pct / 100;
                 root.refreshed();
                 if (root._announce) {
@@ -57,14 +68,35 @@ Singleton {
         getProc.running = true;
     }
 
+    // Where the hardware is being asked to go. Held separately from `value` so
+    // the coalescing timer below always writes the newest number rather than
+    // whichever one it happened to be started by.
+    property real _pending: 0
+
     function set(fraction) {
         const clamped = Math.max(0.01, Math.min(1, fraction));
         // Applied locally first so a drag tracks the pointer rather than
         // waiting on a process round-trip per frame.
         root.value = clamped;
-        setProc.command = ["brightnessctl", "set", Math.round(clamped * 100) + "%"];
-        setProc.running = true;
+        root._pending = clamped;
+        commit.restart();
         root.refreshed();
+    }
+
+    // A slider dragged across a panel calls set() on every pointer move, and
+    // the direct spelling forked brightnessctl for each of them -- sixty
+    // processes a second to reach one final value, all but the last of which
+    // are immediately overwritten. Coalescing costs one response-length delay
+    // on a single click, which is under the threshold where a backlight change
+    // reads as lagging behind the hand.
+    Timer {
+        id: commit
+        interval: Theme.animFast
+        onTriggered: {
+            setProc.command = ["brightnessctl", "-q", "set",
+                               Math.round(root._pending * 100) + "%"];
+            setProc.running = true;
+        }
     }
 
     Component.onCompleted: root.refresh()

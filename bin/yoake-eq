@@ -1,0 +1,127 @@
+#!/bin/sh
+# The ten-band equaliser's half that lives outside QML.
+#
+# PipeWire's filter-chain is declared by a config file and driven by pw-cli, and
+# neither of those is something a QML binding can be. The split is here rather
+# than inline in Eq.qml because the graph has to be inspectable and repairable
+# from a terminal: an equaliser that can only be debugged by reading a shell's
+# log is one nobody will ever fix.
+#
+#   yoake-eq install          write the filter-chain config (needs a pipewire restart)
+#   yoake-eq id               the node id of the virtual sink, or nothing
+#   yoake-eq get              current gains, one per line, band order
+#   yoake-eq set G1 .. G10    apply gains live, in dB
+set -eu
+
+CONF="${XDG_CONFIG_HOME:-$HOME/.config}/pipewire/pipewire.conf.d/99-yoake-eq.conf"
+NODE="effect_input.yoake-eq"
+
+# The octave ladder the panel draws. Q is wide enough that neighbouring bands
+# overlap into a continuous curve rather than ten separate bumps.
+FREQS="31 63 125 250 500 1000 2000 4000 8000 16000"
+Q=1.4
+
+emit_conf() {
+    printf '%s\n' "# Yoake's ten-band equaliser, as a virtual sink."
+    printf '%s\n' "#"
+    printf '%s\n' "# Written by bin/yoake-eq. Ten bq_peaking sections in series, one per band of"
+    printf '%s\n' "# the 31 Hz .. 16 kHz octave ladder the panel draws, so a band's control name"
+    printf '%s\n' "# is eq_band_N:Gain and the shell can move it live with pw-cli rather than"
+    printf '%s\n' "# rewriting this file and restarting the graph on every drag of a slider."
+    printf '%s\n' "context.modules = ["
+    printf '%s\n' "    { name = libpipewire-module-filter-chain"
+    printf '%s\n' "        args = {"
+    printf '%s\n' "            node.description = \"Yoake Equalizer\""
+    printf '%s\n' "            media.name       = \"Yoake Equalizer\""
+    printf '%s\n' "            filter.graph = {"
+    printf '%s\n' "                nodes = ["
+    n=0
+    for f in $FREQS; do
+        n=$((n + 1))
+        printf '                    { type = builtin name = eq_band_%-2s label = bq_peaking control = { "Freq" = %-8s "Q" = %s "Gain" = 0.0 } }\n' \
+            "$n" "$f.0" "$Q"
+    done
+    printf '%s\n' "                ]"
+    printf '%s\n' "                links = ["
+    n=1
+    while [ "$n" -lt 10 ]; do
+        printf '                    { output = "eq_band_%s:Out"  input = "eq_band_%s:In"  }\n' "$n" "$((n + 1))"
+        n=$((n + 1))
+    done
+    printf '%s\n' "                ]"
+    printf '%s\n' "            }"
+    printf '%s\n' "            audio.channels = 2"
+    printf '%s\n' "            audio.position = [ FL FR ]"
+    printf '%s\n' "            capture.props = {"
+    printf '%s\n' "                node.name   = \"$NODE\""
+    printf '%s\n' "                media.class = Audio/Sink"
+    # Below every real output. The virtual sink must never win a fresh session's
+    # default by accident -- routing through it is a choice the panel makes, and
+    # a machine that silently boots into an effect chain is one whose owner
+    # cannot tell a broken equaliser from broken hardware.
+    printf '%s\n' "                priority.session = 100"
+    printf '%s\n' "            }"
+    printf '%s\n' "            playback.props = {"
+    printf '%s\n' "                node.name    = \"effect_output.yoake-eq\""
+    # Passive, so the chain only links downstream while something is feeding it
+    # and an idle equaliser holds no device open.
+    printf '%s\n' "                node.passive = true"
+    printf '%s\n' "            }"
+    printf '%s\n' "        }"
+    printf '%s\n' "    }"
+    printf '%s\n' "]"
+}
+
+node_id() {
+    pw-cli ls Node 2>/dev/null | awk -v want="node.name = \"$NODE\"" '
+        /^\tid /  { id = $2; sub(",", "", id) }
+        index($0, want) { print id; exit }
+    '
+}
+
+cmd="${1:-}"
+[ "$#" -gt 0 ] && shift
+
+case "$cmd" in
+install)
+    mkdir -p "$(dirname "$CONF")"
+    new="$(emit_conf)"
+    if [ -f "$CONF" ] && [ "$new" = "$(cat "$CONF")" ]; then
+        echo "unchanged"
+        exit 0
+    fi
+    printf '%s\n' "$new" > "$CONF"
+    echo "written"
+    ;;
+id)
+    node_id
+    ;;
+get)
+    id="$(node_id)"
+    [ -n "$id" ] || exit 1
+    # The whole Props object comes back as a flat pod dump, so the gain is the
+    # line after its own key rather than something addressable.
+    pw-cli enum-params "$id" Props 2>/dev/null | awk '
+        /"eq_band_[0-9]+:Gain"/ { want = 1; next }
+        want { print $2; want = 0 }
+    '
+    ;;
+set)
+    id="$(node_id)"
+    [ -n "$id" ] || { echo "no $NODE node; run: yoake-eq install" >&2; exit 1; }
+    args=""
+    n=0
+    for g in "$@"; do
+        n=$((n + 1))
+        args="$args \"eq_band_$n:Gain\" $g"
+    done
+    [ "$n" -gt 0 ] || { echo "set needs at least one gain" >&2; exit 2; }
+    # One pw-cli call for all ten, so a preset lands as a single change to the
+    # graph instead of ten audible steps.
+    pw-cli s "$id" Props "{ params = [$args] }" > /dev/null
+    ;;
+*)
+    sed -n '2,14p' "$0" | cut -c3-
+    exit 2
+    ;;
+esac
