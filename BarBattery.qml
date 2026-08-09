@@ -64,8 +64,7 @@ Item {
             value: Math.round(root.fraction * 100) + "%"
             onClicked: {
                 Power.refresh();
-                // Falls back to the menu until PowerPanel exists.
-                Menus.toggle(root.menuId);
+                Toggles.toggleSheet("power");
             }
             onRightClicked: {
                 Power.refresh();
