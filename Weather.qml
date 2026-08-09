@@ -162,7 +162,13 @@ curl -s -m 8 https://ipapi.co/json/ 2>/dev/null
             + "?latitude=" + root.latitude
             + "&longitude=" + root.longitude
             + "&current=temperature_2m,apparent_temperature,relative_humidity_2m,"
-            + "weather_code,wind_speed_10m,is_day&timezone=auto'"]
+            + "weather_code,wind_speed_10m,is_day"
+            // One request, not three. The forecast blocks cost a longer URL and
+            // no extra round trip, and a panel that has to wait for a second
+            // fetch after it opens shows an empty forecast for a second first.
+            + "&hourly=temperature_2m,weather_code,is_day"
+            + "&daily=weather_code,temperature_2m_max,temperature_2m_min"
+            + "&forecast_days=4&timezone=auto'"]
         stdout: StdioCollector {
             onStreamFinished: {
                 let data = null;
@@ -185,6 +191,42 @@ curl -s -m 8 https://ipapi.co/json/ 2>/dev/null
                 root.isDay = now.is_day === 1;
                 root.error = "";
                 root.valid = true;
+
+                // From now forward, not from midnight. The API returns the
+                // whole day and a forecast that starts eleven hours ago is a
+                // history lesson.
+                const h = data.hourly;
+                if (h && h.time) {
+                    const nowMs = Date.now();
+                    const out = [];
+                    for (let i = 0; i < h.time.length && out.length < 12; i++) {
+                        const at = new Date(h.time[i]);
+                        if (at.getTime() < nowMs - 3600000) continue;
+                        out.push({
+                            hour: Qt.formatDateTime(at, "HH:mm"),
+                            temp: h.temperature_2m[i],
+                            code: h.weather_code[i],
+                            day: h.is_day ? h.is_day[i] === 1 : true
+                        });
+                    }
+                    root.hourly = out;
+                }
+
+                const d = data.daily;
+                if (d && d.time) {
+                    const days = [];
+                    // Index 0 is today, which the card above already is.
+                    for (let i = 1; i < d.time.length; i++) {
+                        const at = new Date(d.time[i]);
+                        days.push({
+                            label: Lang.dateCapitalised(at, "ddd"),
+                            code: d.weather_code[i],
+                            min: d.temperature_2m_min[i],
+                            max: d.temperature_2m_max[i]
+                        });
+                    }
+                    root.daily = days;
+                }
             }
         }
     }

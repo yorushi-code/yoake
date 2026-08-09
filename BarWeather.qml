@@ -24,9 +24,7 @@ Item {
         live: false
         glyph: Weather.glyph
         value: Math.round(Weather.temperature * 10) / 10 + "°"
-        // The dashboard's overview still carries the forecast until
-        // WeatherPanel is built; an empty sheet would be a dead click.
-        onClicked: Toggles.dash("overview")
+        onClicked: Toggles.toggleSheet("weather")
         onRightClicked: Weather.refresh()
     }
 
