@@ -44,53 +44,55 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.gapTight
 
-        BarIcon {
-            id: vpnIcon
+        // The node, by name.
+        //
+        // It said "вкл", or a latency, or a transfer rate -- three answers to
+        // questions nobody had. The one thing worth two centimetres of a bar
+        // that is on screen all day is *which exit the traffic is taking*, and
+        // that was only discoverable by opening the panel.
+        //
+        // The latency moves to the value slot, where it belongs: it qualifies
+        // the node rather than replacing it.
+        Chip {
+            id: vpnChip
             anchors.verticalCenter: parent.verticalCenter
+            tone: "vpn"
+            live: root.up
             glyph: Glyphs.vpn
-            color: root.stateColor
-            hovered: ma.containsMouse
-
-            // Pulses only while the tunnel is coming up — the one moment the
-            // shell has nothing else to say for several seconds.
-            SequentialAnimation on opacity {
-                running: Mihomo.busy
-                loops: Animation.Infinite
-                onStopped: vpnIcon.opacity = 1
-                NumberAnimation { to: 0.35; duration: Theme.animBusy; easing.type: Easing.InOutQuad }
-                NumberAnimation { to: 1.0; duration: Theme.animBusy; easing.type: Easing.InOutQuad }
-            }
-        }
-
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            text: {
+            label: {
                 if (Mihomo.busy) return "…";
                 if (!root.up) return "выкл";
-                if (root.busy) return Mihomo.formatSpeed(root.total);
-                if (Mihomo.currentDelay !== undefined && Mihomo.currentDelay !== null) {
-                    return Mihomo.currentDelay + " мс";
-                }
-                return "вкл";
+                return Mihomo.currentNode !== undefined && Mihomo.currentNode !== ""
+                    ? Mihomo.currentNode : "вкл";
             }
-            color: root.up ? Theme.text : Theme.subtext0
-            font.pixelSize: Theme.fontSmall
+            labelCap: 110
+            value: {
+                if (!root.up || Mihomo.busy) return "";
+                if (root.busy) return Mihomo.formatSpeed(root.total);
+                return Mihomo.currentDelay !== undefined && Mihomo.currentDelay !== null
+                    ? Mihomo.currentDelay + " мс" : "";
+            }
+            alert: root.up && Mihomo.currentDelay === null
+            onClicked: Toggles.vpnPanelOpen = !Toggles.vpnPanelOpen
+            onRightClicked: {
+                Mihomo.probeDelaysIfStale(Mihomo.primaryGroup);
+                Menus.toggle(root.menuId);
+            }
         }
     }
 
     MouseArea {
         id: ma
         anchors.fill: parent
+        z: -1
         hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        acceptedButtons: Qt.RightButton
         onClicked: mouse => {
             if (mouse.button === Qt.RightButton) {
                 Mihomo.probeDelaysIfStale(Mihomo.primaryGroup);
                 Menus.toggle(root.menuId);
                 return;
             }
-            Toggles.exclusive("vpnPanel");
         }
     }
 

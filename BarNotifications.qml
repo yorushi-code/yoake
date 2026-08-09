@@ -16,16 +16,24 @@ Item {
     height: Theme.barHeight
     anchors.verticalCenter: parent ? parent.verticalCenter : undefined
 
-    BarIcon {
+    // Live only when there is something unread. A bell is the one mark in this
+    // bar that is *supposed* to be silent most of the day, and colouring it
+    // permanently would spend the loudest thing in the row on nothing.
+    Chip {
         id: bell
         anchors.centerIn: parent
-        glyph: Notifs.quiet ? Glyphs.bellOff : Glyphs.bell
-        glyphSize: 14
-        color: Notifs.quiet ? Theme.subtext0
-            : (notifArea.containsMouse ? Theme.accent : Theme.text)
-        badge: (Notifs.count > 0 && !Notifs.quiet) ? (Notifs.count > 9 ? "9+" : String(Notifs.count)) : ""
-        hovered: notifArea.containsMouse
-        pressed: notifArea.pressed
+        tone: "alert"
+        live: Notifs.count > 0 && !Notifs.quiet
+        glyph: Notifs.quiet ? Glyphs.bellOff
+            : (Notifs.count > 0 ? Glyphs.bellBadge : Glyphs.bell)
+        value: (Notifs.count > 0 && !Notifs.quiet)
+            ? (Notifs.count > 9 ? "9+" : String(Notifs.count)) : ""
+
+        onClicked: {
+            Menus.closeAll();
+            Toggles.notifCenterOpen = !Toggles.notifCenterOpen;
+        }
+        onRightClicked: Menus.toggle(root.menuId)
 
         // A quick swing when a new notification is registered, so the bar
         // acknowledges it even if the toast was missed.
@@ -42,25 +50,14 @@ Item {
         }
     }
 
+    // Middle click still toggles quiet, which the chip has no gesture for.
     MouseArea {
         id: notifArea
         anchors.fill: parent
-        anchors.margins: -4
+        z: -1
         hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
-        onClicked: mouse => {
-            if (mouse.button === Qt.RightButton) {
-                Menus.toggle(root.menuId);
-                return;
-            }
-            if (mouse.button === Qt.MiddleButton) {
-                Notifs.dnd = !Notifs.dnd;
-                return;
-            }
-            Menus.closeAll();
-            Toggles.notifCenterOpen = !Toggles.notifCenterOpen;
-        }
+        acceptedButtons: Qt.MiddleButton
+        onClicked: Notifs.dnd = !Notifs.dnd
     }
 
     ActionMenu {
