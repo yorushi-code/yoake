@@ -208,6 +208,10 @@ QtObject {
         function calendar() { root.exclusive("calendar"); }
         function wallpaper() { root.exclusive("wallpaperPicker"); }
         function vpn() { root.exclusive("vpnPanel"); }
+        // The sheets have no keybind of their own -- they belong to the chip
+        // that opens them -- but a shell you cannot drive from a script is a
+        // shell nobody can test.
+        function panel(name: string): void { root.toggleSheet(name); }
         function close() { root.closeAll(); Menus.closeAll(); }
     }
 }

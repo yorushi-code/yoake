@@ -27,15 +27,20 @@ Item {
 
     clip: true
 
-    readonly property real waterline: root.height * (1 - Math.max(0, Math.min(1, root.value)))
+    // The animation hangs off this rather than off the waterline, because a
+    // Behavior cannot be attached to a readonly property and the level is the
+    // thing that actually moves -- the waterline is where the geometry puts it.
+    property real level: Math.max(0, Math.min(1, root.value))
 
-    Behavior on waterline {
+    Behavior on level {
         NumberAnimation {
             duration: Theme.animNormal
             easing.type: Easing.Bezier
             easing.bezierCurve: Theme.easeEmphasized
         }
     }
+
+    readonly property real waterline: root.height * (1 - root.level)
 
     // The body of the liquid, below the surface.
     Rectangle {
@@ -57,13 +62,32 @@ Item {
             id: crest
             required property int index
 
+            // A circle squashed by a transform, not a rounded rectangle.
+            //
+            // The obvious spelling -- a wide, short rect with radius = width/2
+            // -- does not work: Qt clamps the radius to half the *shorter*
+            // side, so a 1.9x-wide, 30px-tall box comes out as a stadium and
+            // fills the whole tile instead of arcing across it. Scaling a real
+            // circle gives the ellipse the radius property cannot express.
             readonly property real span: root.width * 1.9
             width: crest.span
-            height: root.height * 1.4
-            radius: width / 2
+            height: crest.span
+            radius: crest.span / 2
             color: root.tint
             opacity: crest.index === 0 ? 1 : Theme.veilFirm
-            y: root.waterline - height + root.swell * (crest.index === 0 ? 1 : 0.5)
+
+            // The centre sits a full semi-axis below the surface, so only the
+            // top of the arc clears the waterline and the rest of the ellipse
+            // is inside the liquid where it cannot be seen.
+            readonly property real bulge: root.swell * (crest.index === 0 ? 1 : 0.6)
+            readonly property real semi: root.height
+            y: root.waterline - crest.bulge - crest.span / 2 + crest.semi
+
+            transform: Scale {
+                origin.x: crest.span / 2
+                origin.y: crest.span / 2
+                yScale: crest.semi / (crest.span / 2)
+            }
 
             SequentialAnimation on x {
                 running: root.active && root.visible

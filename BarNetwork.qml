@@ -113,7 +113,9 @@ Item {
             live: Networking.wifiEnabled && root.signalPercent >= 0
             onClicked: {
                 netProc.running = true;
-                Toggles.toggleSheet("net");
+                // Falls back to the menu until NetworkPanel exists: an empty
+                // sheet is worse than the list that was already there.
+                Menus.toggle(root.menuId);
             }
             onRightClicked: {
                 netProc.running = true;
