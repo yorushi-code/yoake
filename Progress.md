@@ -16,8 +16,8 @@ Status keys: `IMPLEMENTED` / `PARTIAL` / `MISSING` / `WRONG`.
 
 | # | phase | state |
 |---|---|---|
-| 1 | Audit | IN PROGRESS |
-| 2 | Architecture map | MISSING |
+| 1 | Audit | IMPLEMENTED |
+| 2 | Architecture map | IMPLEMENTED |
 | 3 | Visual system | MISSING |
 | 4 | Motion system | MISSING |
 | 5 | Bar composition | MISSING |
@@ -120,6 +120,37 @@ the VPN items below.
 From the VPN audit already done: add / remove subscription, `Mihomo.setCore`,
 group switching, and the two orphan files. The conflict banner and the egress
 row are restored.
+
+## Phase 2 — Architecture map
+
+Checked against the invariants in the brief rather than described in prose. The
+finding is that the architecture holds; it did not need defending, it needed
+verifying, and now it has been.
+
+| invariant | verdict | evidence |
+|---|---|---|
+| Perception may filter input history | HOLDS | axes are read only to produce the Theme Bindings and the debug string; nothing reads a previous decision |
+| Perception may not read its own outputs | HOLDS | no self-reference in `Perception.qml`; the smoothing lives in Theme's Behaviors, downstream, which is the whole point of the split |
+| Theme owns tokens, not sequencing | HOLDS | no `stagger`, `beat`, `cascade` or `delay` in `Theme.qml` except comments recording that `stagger()` moved out |
+| Direction owns sequencing, not state | HOLDS | zero references to CPU, battery, wifi, `Context` or `Perception` in `Direction.qml` |
+| Veto may only remove cost | HOLDS | `_affordable` appears twice: its own definition and the `frost` binding. It reaches nothing else |
+| Veto may not invent semantics | HOLDS | same evidence |
+| Layout owns geometry, no second engine | HOLDS | four manual `x:`/`y:` arithmetic sites in 158 files, all optical centring (a slider handle, a digit in a tile, the bar's optical centre). Not an engine |
+| Optical must not be the universal axis | HOLDS | `optical` drives `inkScale` only. Frost is not on an axis at all |
+| Documentation describes reality | **VIOLATED, now fixed** | see below |
+
+**A2 — `Theme.qml` claimed `frost <- optical`.** The code has bound frost to
+`_affordable && frostWanted` for some time. That comment was the single most
+misleading line in the file, because it is exactly the coupling the brief
+forbids: it would talk the next reader into treating ink and frost as one
+decision. They are not. Frost is a cost and a budget may take it; ink is
+legibility and nothing may. Corrected in place, with the reason recorded so the
+line cannot quietly come back.
+
+**What this means for the phases below.** No architectural surgery is needed.
+Everything remaining is presentation, composition, behaviour and reliability —
+which is where the brief said the real problems were, and the map now supports
+that rather than assuming it.
 
 ---
 

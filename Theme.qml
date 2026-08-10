@@ -27,8 +27,14 @@ QtObject {
     // tempted to reach for whichever one is already in scope.
     //
     //   densityScale  <- spatial     motionScale  <- temporal
-    //   inkScale      <- optical     frost        <- optical
-    //   emphasis      <- hierarchy
+    //   inkScale      <- optical     emphasis     <- hierarchy
+    //   frost         <- performance veto AND taste, never an axis
+    //
+    // The last line used to read `frost <- optical`, and the code has not done
+    // that for some time: frost is `_affordable && frostWanted`. Left standing
+    // it is the one comment in this file that would talk the next person into
+    // coupling ink to frost -- and those are different decisions. Frost is a
+    // cost, so a budget may take it away; ink is legibility, so nothing may.
     property real motionScale: 1.0
     property real densityScale: 1.0
     property real inkScale: 1.0
