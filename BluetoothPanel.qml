@@ -43,20 +43,20 @@ PanelWindow {
             if (Toggles.btPanelOpen) {
                 hideDelay.stop();
                 win.mapped = true;
-                Bluetooth.hold();
+                Bt.hold();
             } else {
                 hideDelay.restart();
-                Bluetooth.release();
+                Bt.release();
             }
         }
     }
     Component.onCompleted: {
         win.mapped = Toggles.btPanelOpen;
-        if (Toggles.btPanelOpen) Bluetooth.hold();
+        if (Toggles.btPanelOpen) Bt.hold();
     }
     // The counter belongs to this window, so an unmap that skips the toggle --
     // a config reload -- must not leave the poll running for nobody.
-    Component.onDestruction: if (Toggles.btPanelOpen) Bluetooth.release()
+    Component.onDestruction: if (Toggles.btPanelOpen) Bt.release()
 
     MouseArea {
         anchors.fill: parent
@@ -87,7 +87,7 @@ PanelWindow {
             }
 
             property int page: 0
-            readonly property var lists: [Bluetooth.connected, Bluetooth.paired, Bluetooth.nearby]
+            readonly property var lists: [Bt.connected, Bt.paired, Bt.nearby]
             readonly property var current: sheet.lists[sheet.page] || []
 
             Column {
@@ -98,12 +98,12 @@ PanelWindow {
 
                 SheetHeader {
                     width: parent.width
-                    title: Bluetooth.primary
-                        ? Bluetooth.primary.name
-                        : (Bluetooth.powered ? "Ничего не подключено" : "Bluetooth выключен")
-                    subtitle: Bluetooth.primary
-                        ? Bluetooth.primary.mac
-                        : (Bluetooth.adapter !== "" ? Bluetooth.adapter : "")
+                    title: Bt.primary
+                        ? Bt.primary.name
+                        : (Bt.powered ? "Ничего не подключено" : "Bluetooth выключен")
+                    subtitle: Bt.primary
+                        ? Bt.primary.mac
+                        : (Bt.adapter !== "" ? Bt.adapter : "")
 
                     Row {
                         spacing: Theme.spacing
@@ -112,9 +112,9 @@ PanelWindow {
                             width: 28
                             height: 28
                             radius: Theme.pill(height)
-                            enabled: Bluetooth.powered
+                            enabled: Bt.powered
                             opacity: enabled ? 1 : Theme.inkFaint
-                            color: Bluetooth.scanning ? Theme.tone("bt")
+                            color: Bt.scanning ? Theme.tone("bt")
                                 : (scanHit.containsMouse ? Qt.alpha(Theme.text, Theme.fillHover)
                                                          : Qt.alpha(Theme.text, Theme.fillMuted))
                             Behavior on color { ColorAnimation { duration: Theme.animFast } }
@@ -123,15 +123,15 @@ PanelWindow {
                                 anchors.centerIn: parent
                                 icon: Glyphs.scan
                                 size: Theme.fontIconSmall
-                                fill: Bluetooth.scanning ? 1 : 0
-                                color: Bluetooth.scanning ? Theme.onTone("bt") : Theme.text
+                                fill: Bt.scanning ? 1 : 0
+                                color: Bt.scanning ? Theme.onTone("bt") : Theme.text
 
                                 // Only while a scan is genuinely running, and
                                 // stopped rather than paused when it is not --
                                 // a permanently running animation costs about a
                                 // fifth of a core for as long as it runs.
                                 RotationAnimator on rotation {
-                                    running: Bluetooth.scanning
+                                    running: Bt.scanning
                                     loops: Animation.Infinite
                                     from: 0
                                     to: 360
@@ -144,7 +144,7 @@ PanelWindow {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: Bluetooth.scan()
+                                onClicked: Bt.scan()
                             }
                         }
 
@@ -152,22 +152,22 @@ PanelWindow {
                             width: 28
                             height: 28
                             radius: Theme.pill(height)
-                            color: Bluetooth.powered ? Theme.tone("bt")
+                            color: Bt.powered ? Theme.tone("bt")
                                 : Qt.alpha(Theme.text, Theme.fillMuted)
                             Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
                             MaterialSymbol {
                                 anchors.centerIn: parent
-                                icon: Bluetooth.powered ? Glyphs.bluetooth : Glyphs.bluetoothOff
+                                icon: Bt.powered ? Glyphs.bluetooth : Glyphs.bluetoothOff
                                 size: Theme.fontIconSmall
-                                fill: Bluetooth.powered ? 1 : 0
-                                color: Bluetooth.powered ? Theme.onTone("bt") : Theme.subtext0
+                                fill: Bt.powered ? 1 : 0
+                                color: Bt.powered ? Theme.onTone("bt") : Theme.subtext0
                             }
 
                             MouseArea {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: Bluetooth.setPowered(!Bluetooth.powered)
+                                onClicked: Bt.setPowered(!Bt.powered)
                             }
                         }
                     }
@@ -195,7 +195,7 @@ PanelWindow {
 
                             width: parent.width
                             tone: "bt"
-                            glyph: Bluetooth.glyphFor(btRow.modelData)
+                            glyph: Bt.glyphFor(btRow.modelData)
                             name: btRow.modelData.name
                             subtitle: btRow.modelData.mac
                             // The battery of the thing on your head, which is
@@ -207,11 +207,11 @@ PanelWindow {
                             hasControl: false
 
                             onActivated: {
-                                if (btRow.modelData.connected) Bluetooth.disconnect(btRow.modelData.mac);
-                                else if (btRow.modelData.paired) Bluetooth.connect(btRow.modelData.mac);
-                                else Bluetooth.pair(btRow.modelData.mac);
+                                if (btRow.modelData.connected) Bt.disconnect(btRow.modelData.mac);
+                                else if (btRow.modelData.paired) Bt.connect(btRow.modelData.mac);
+                                else Bt.pair(btRow.modelData.mac);
                             }
-                            onRightClicked: Bluetooth.forget(btRow.modelData.mac)
+                            onRightClicked: Bt.forget(btRow.modelData.mac)
 
                             opacity: 0
                             Component.onCompleted: intro.restart()
@@ -231,8 +231,8 @@ PanelWindow {
                     EmptyRow {
                         width: parent.width
                         visible: sheet.current.length === 0
-                        glyph: Bluetooth.powered ? Glyphs.bluetooth : Glyphs.bluetoothOff
-                        text: !Bluetooth.powered ? "Bluetooth выключен"
+                        glyph: Bt.powered ? Glyphs.bluetooth : Glyphs.bluetoothOff
+                        text: !Bt.powered ? "Bluetooth выключен"
                             : (sheet.page === 0 ? "Ничего не подключено"
                             : (sheet.page === 1 ? "Нет спаренных устройств"
                             : "Нажмите поиск, чтобы найти устройства"))

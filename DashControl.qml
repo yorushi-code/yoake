@@ -51,6 +51,7 @@ Item {
     Component { id: bluetoothPage; CcBluetoothPage {} }
     Component { id: displayPage; CcDisplayPage {} }
     Component { id: powerPage; CcPowerPage {} }
+    Component { id: sfxPage; SfxCatalog {} }
 
     readonly property Component pageComponent: {
         switch (root.page) {
@@ -58,6 +59,7 @@ Item {
         case "bluetooth": return bluetoothPage;
         case "display": return displayPage;
         case "power": return powerPage;
+        case "sfx": return sfxPage;
         }
         return null;
     }
@@ -68,6 +70,7 @@ Item {
         case "bluetooth": return "Bluetooth";
         case "display": return "Экран";
         case "power": return "Питание";
+        case "sfx": return "Звук событий";
         }
         return "";
     }

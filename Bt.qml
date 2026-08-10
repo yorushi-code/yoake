@@ -5,6 +5,12 @@ import Quickshell.Io
 
 // What is paired, what is connected, and what is in the room.
 //
+// Named Bt rather than Bluetooth because Quickshell.Bluetooth already
+// exports a singleton by that name, and two files here import it. A local
+// singleton shadowing a module's is resolved by import order, which is to
+// say it is resolved differently depending on which file is asking -- and
+// the symptom is a tile that silently stops working rather than an error.
+//
 // The shell had no bluetooth at all -- not a chip, not a list, not a way to
 // reconnect the headphones that dropped. On a laptop that is the plainest gap
 // there was: the sound goes somewhere, and the shell had no opinion about where.

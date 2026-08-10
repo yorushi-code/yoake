@@ -128,7 +128,7 @@ singleton Lang 1.0 Lang.qml
 singleton Audio 1.0 Audio.qml
 singleton Eq 1.0 Eq.qml
 singleton Net 1.0 Net.qml
-singleton Bluetooth 1.0 Bluetooth.qml
+singleton Bt 1.0 Bt.qml
 singleton Layout 1.0 Layout.qml
 singleton Sfx 1.0 Sfx.qml
 Chip 1.0 Chip.qml

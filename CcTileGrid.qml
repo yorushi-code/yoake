@@ -69,6 +69,20 @@ Grid {
 
     CcTile {
         width: root.cellWidth
+        glyph: Sfx.enabled ? Glyphs.volumeHigh : Glyphs.volumeMute
+        label: "Звук"
+        detail: Sfx.enabled ? "события озвучены" : "выключен"
+        active: Sfx.enabled
+        // Expandable, because the switch is not the question. What anyone wants
+        // to know before turning this on is which events will make a noise, and
+        // that is a list rather than a state.
+        expandable: true
+        onToggled: Prefs.set("sfx.enabled", !Sfx.enabled)
+        onPageRequested: root.pageRequested("sfx")
+    }
+
+    CcTile {
+        width: root.cellWidth
         glyph: Glyphs.vpn
         label: "VPN"
         detail: Mihomo.busy

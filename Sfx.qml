@@ -69,11 +69,11 @@ Singleton {
     }
 
     property Connections _bt: Connections {
-        target: Bluetooth
+        target: Bt
         function onConnectedChanged() {
-            if (Bluetooth.connected.length > root._btCount) root.play("device-added");
-            else if (Bluetooth.connected.length < root._btCount) root.play("device-removed");
-            root._btCount = Bluetooth.connected.length;
+            if (Bt.connected.length > root._btCount) root.play("device-added");
+            else if (Bt.connected.length < root._btCount) root.play("device-removed");
+            root._btCount = Bt.connected.length;
         }
     }
     property int _btCount: 0
