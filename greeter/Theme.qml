@@ -30,8 +30,11 @@ Singleton {
     readonly property color crust: Qt.darker(root.background, 1.15)
     readonly property color text: root.foreground
 
-    readonly property string fontFamily: "Inter"
-    readonly property string fontDisplayFamily: "Inter Display"
+    // The same monospaced face as the shell. The login screen is the first
+    // surface of this desktop anyone sees, and a proportional one there
+    // followed by a monospaced one everywhere else reads as two products.
+    readonly property string fontFamily: "JetBrains Mono"
+    readonly property string fontDisplayFamily: "JetBrains Mono"
     // Installed to /usr/share/fonts/yoake by bin/yoake-greeter-install: the
     // shell's own copy lives under a home directory the greeter account cannot
     // read, and a missing icon font here draws the icon's *name*, not a box.
