@@ -1,0 +1,78 @@
+#!/usr/bin/bash
+# Generates the shell's event sounds.
+#
+# Made here rather than taken from a sound theme, for the same reason the icons
+# are one family: a borrowed set is eleven strangers, and the freedesktop theme
+# in particular is a decade of different people's taste. These are all the same
+# instrument -- a sine with a fast attack and an exponential tail -- and the
+# only thing that varies between them is pitch and direction, so the set reads
+# as one voice saying different things.
+#
+# Direction carries the meaning and is the whole vocabulary: up is something
+# arriving, down is something leaving, flat is something to look at, low is
+# something wrong. Nobody has to learn that.
+#
+# Idempotent: a sample that already exists is left alone, so this can be run
+# after an update without rewriting files the user may have replaced.
+set -euo pipefail
+
+HERE=$(cd "$(dirname "$0")/.." && pwd)
+OUT="$HERE/assets/sfx"
+PEAK=-12    # dBFS. Loud enough to hear over a video, quiet enough not to duck it.
+
+mkdir -p "$OUT"
+
+# One tone. Five milliseconds of attack, because anything slower reads as a
+# swell rather than as an event, and an exponential tail because a linear one
+# ends audibly.
+tone() {
+    printf 'sine=frequency=%s:duration=%s,afade=t=in:st=0:d=0.004,afade=t=out:st=%s:d=%s:curve=exp' \
+        "$1" "$2" "$(awk "BEGIN{print $2*0.35}")" "$(awk "BEGIN{print $2*0.65}")"
+}
+
+# One or two tones in series. Two is a direction; one is a statement.
+build() {
+    name=$1; shift
+    path="$OUT/$name.wav"
+    if [ -f "$path" ]; then
+        echo "keep  $name"
+        return
+    fi
+    if [ "$#" -eq 2 ]; then
+        ffmpeg -v error -y -f lavfi -i "$(tone "$1" "$2")" \
+            -af "volume=${PEAK}dB" -ar 44100 -ac 2 "$path"
+    else
+        # f1 d1 f2 d2
+        # The volume stage joins the complex graph rather than following it:
+        # ffmpeg refuses to run a simple -af on a stream that already came out
+        # of a filter_complex, and the error says so only after it has opened
+        # the output file.
+        ffmpeg -v error -y \
+            -f lavfi -i "$(tone "$1" "$2")" \
+            -f lavfi -i "$(tone "$3" "$4")" \
+            -filter_complex "[0:a][1:a]concat=n=2:v=0:a=1,volume=${PEAK}dB[o]" \
+            -map "[o]" -ar 44100 -ac 2 "$path"
+    fi
+    echo "build $name"
+}
+
+# Arriving: up. Leaving: down. The pair is the same two pitches either way
+# round, so a connect and a disconnect are audibly the same event reversed.
+build device-added   660 0.045  990 0.070
+build device-removed 990 0.045  660 0.070
+build network-up     520 0.045  780 0.070
+build network-lost   780 0.055  392 0.110
+build vpn-up         440 0.045  660 0.070
+build vpn-down       660 0.045  440 0.080
+build record-start   880 0.040  880 0.060
+build record-stop    660 0.040  660 0.060
+build complete       660 0.045  990 0.060
+
+# Flat: something to look at, not something that moved.
+build message        740 0.075
+
+# Low and alone. An error that chimes like everything else is an error nobody
+# notices.
+build error          233 0.130
+
+echo "done -> $OUT"
