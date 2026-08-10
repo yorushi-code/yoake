@@ -142,6 +142,11 @@ Item {
         bodyMarkupSupported: true
         imageSupported: true
         actionsSupported: true
+        // Declared, or applications never offer it. A chat client asks the
+        // server what it can do and sends a plain notification if the answer is
+        // no, so this one line is the difference between a reply field existing
+        // and the feature being invisible on both sides.
+        inlineReplySupported: true
 
         onNotification: notification => {
             notification.tracked = true;
@@ -206,7 +211,15 @@ Item {
         implicitHeight: Math.max(1, toastColumn.height)
         color: "transparent"
         exclusiveZone: 0
-        focusable: false
+        // On demand, not never and not exclusively.
+        //
+        // A reply field needs a keyboard, and a window that cannot be focused
+        // has an unusable one -- but a toast that *takes* the keyboard on
+        // arrival would eat the sentence you were typing when it appeared,
+        // which is the worst thing a notification can do. On-demand focus is
+        // exactly the middle: nothing happens until the field is clicked.
+        focusable: true
+        WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
         // Nothing to pop up about while the list is open: the toast landed on
         // top of the very same notification in the centre underneath it, so the
         // one arrival was shown twice and each copy hid half of the other.
@@ -245,6 +258,8 @@ Item {
                     readonly property string body: modelData.body
                     readonly property int urgency: modelData.urgency
                     readonly property int stacked: modelData.stacked || 1
+                    readonly property bool canReply: toastDelegate.notification
+                        && toastDelegate.notification.hasInlineReply === true
 
                     width: toastColumn.width
                     height: toastChrome.height
@@ -561,6 +576,88 @@ Item {
                                     width: parent.width
                                     notification: toastDelegate.notification
                                     onInvoked: root.dismissToast(toastDelegate.notification)
+                                }
+
+                                // Answering where you were asked.
+                                //
+                                // The alternative is raising the application,
+                                // finding the conversation and typing there --
+                                // which is most of a minute for a sentence, and
+                                // the reason a reply field on a toast is the one
+                                // notification feature people miss by name.
+                                Rectangle {
+                                    id: replyBox
+                                    width: parent.width
+                                    visible: toastDelegate.canReply
+                                    height: visible ? 32 : 0
+                                    radius: Theme.radiusChip
+                                    color: Qt.alpha(Theme.text, Theme.fillMuted)
+
+                                    TextInput {
+                                        id: reply
+                                        anchors.left: parent.left
+                                        anchors.right: sendButton.left
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        anchors.leftMargin: Theme.rowPad
+                                        anchors.rightMargin: Theme.spacing
+                                        color: Theme.text
+                                        font.family: Theme.fontFamily
+                                        font.pixelSize: Theme.fontSmall
+                                        clip: true
+
+                                        function send() {
+                                            if (reply.text === "") return;
+                                            toastDelegate.notification.sendInlineReply(reply.text);
+                                            reply.text = "";
+                                            root.dismissToast(toastDelegate.notification);
+                                        }
+
+                                        onAccepted: reply.send()
+                                        // Typing is reading: the countdown must
+                                        // not run out mid-sentence, and the
+                                        // hover hold does not cover a keyboard.
+                                        onActiveFocusChanged: toastDelegate.held = reply.activeFocus
+
+                                        Text {
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            visible: reply.text === ""
+                                            text: toastDelegate.notification
+                                                && toastDelegate.notification.inlineReplyPlaceholder
+                                                ? toastDelegate.notification.inlineReplyPlaceholder
+                                                : "Ответить"
+                                            color: Theme.subtext0
+                                            font.family: Theme.fontFamily
+                                            font.pixelSize: Theme.fontSmall
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        id: sendButton
+                                        anchors.right: parent.right
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        anchors.rightMargin: Theme.gapTight
+                                        width: 24
+                                        height: 24
+                                        radius: Theme.pill(height)
+                                        color: reply.text !== ""
+                                            ? Notifs.accentFor(toastDelegate.urgency)
+                                            : Qt.alpha(Theme.text, Theme.fillMuted)
+                                        Behavior on color { ColorAnimation { duration: Theme.animFast } }
+
+                                        MaterialSymbol {
+                                            anchors.centerIn: parent
+                                            icon: Glyphs.upload
+                                            size: Theme.fontIconMicro
+                                            fill: 1
+                                            color: reply.text !== "" ? Theme.crust : Theme.subtext0
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: reply.send()
+                                        }
+                                    }
                                 }
                             }
                         }
