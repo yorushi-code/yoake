@@ -2,22 +2,29 @@ import QtQuick
 import Quickshell
 import Quickshell.Widgets
 
-// One application in the launcher list.
+// One result in the launcher, whatever kind of result it is.
 //
-// It used to draw its own selection — a tinted fill and an accent rail that
-// appeared here and disappeared on whichever row you came from. That is a
-// cross-fade between two rows, and a cross-fade cannot say you moved *down*;
-// the list now hands that job to one `Traveller` behind the delegates, and what
-// is left here is only what genuinely belongs to a row: how its own content
-// reacts to being the one under the marker.
+// It used to take a `.desktop` entry and nothing else, which is what made the
+// launcher a list of applications and only that. A row now takes a name, a
+// subtitle, an icon and a *kind*, so an open window, a shell action and a sum
+// can appear in the same list without any of them pretending to be an app.
 //
-// The icon comes from the icon theme through Quickshell's own lookup, which is
-// the only way to get the same glyph the rest of the desktop shows for an app —
-// a name-to-file guess gets it right until it meets a themed or scalable icon.
+// The kind is printed on the right. Four kinds in one list with nothing saying
+// which is which is a list that answers the wrong question half the time.
+//
+// It draws no selection of its own: the list hands that to one `Traveller`
+// behind the delegates, because a fill that appears here while another
+// disappears elsewhere is a cross-fade, and a cross-fade cannot say you moved
+// down.
 Item {
     id: root
 
-    required property var entry
+    property string name: ""
+    property string subtitle: ""
+    // An icon theme name, or empty for the glyph fallback.
+    property string iconName: ""
+    property string glyph: Glyphs.apps
+    property string kind: ""
     property bool selected: false
 
     signal activated()
@@ -25,20 +32,19 @@ Item {
 
     height: 52
 
-    // Resolved to a file here rather than handed to IconImage as a name with a
-    // fallback. An icon theme can hold a name at 16, 22 and 24 and nothing
-    // larger; asked for it at 30 by name the engine gives up -- and so does the
-    // generic fallback, which AdwaitaLegacy also stops at 24 -- and IconImage
-    // then draws Qt's magenta checkerboard while still reporting itself Ready,
-    // so no status check can catch it. Given the file, it simply scales the
-    // 24px art up.
-    readonly property string iconSource: Icons.forName(root.entry.icon)
+    // Resolved to a file rather than handed to IconImage as a name. An icon
+    // theme can hold a name at 16, 22 and 24 and nothing larger; asked for it
+    // at 30 by name the engine gives up -- and so does the generic fallback --
+    // and IconImage then draws Qt's magenta checkerboard while still reporting
+    // itself Ready, so no status check can catch it.
+    readonly property string iconSource: root.iconName !== ""
+        ? Icons.forName(root.iconName) : ""
 
     MaterialSymbol {
         anchors.horizontalCenter: icon.horizontalCenter
         anchors.verticalCenter: icon.verticalCenter
         visible: root.iconSource === ""
-        icon: Glyphs.apps
+        icon: root.glyph
         size: Theme.fontIcon
         fill: root.selected ? 1 : 0
         color: root.selected ? Theme.text : Theme.subtext0
@@ -68,8 +74,8 @@ Item {
         id: labels
         anchors.left: icon.right
         anchors.leftMargin: 14
-        anchors.right: parent.right
-        anchors.rightMargin: 16
+        anchors.right: kindLabel.left
+        anchors.rightMargin: Theme.gapWide
         anchors.verticalCenter: parent.verticalCenter
         spacing: 1
 
@@ -87,7 +93,7 @@ Item {
 
         Text {
             width: parent.width
-            text: root.entry.name || ""
+            text: root.name
             color: root.selected ? Theme.text : Theme.subtext1
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontBody
@@ -98,14 +104,25 @@ Item {
 
         Text {
             width: parent.width
-            visible: text !== ""
-            text: root.entry.genericName || root.entry.comment || ""
+            visible: root.subtitle !== ""
+            text: root.subtitle
             color: root.selected ? Theme.subtext1 : Theme.subtext0
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontLabel
             elide: Text.ElideRight
             Behavior on color { ColorAnimation { duration: Theme.animFast } }
         }
+    }
+
+    Text {
+        id: kindLabel
+        anchors.right: parent.right
+        anchors.rightMargin: 18
+        anchors.verticalCenter: parent.verticalCenter
+        text: root.kind
+        color: Theme.subtext0
+        font.family: Theme.fontFamily
+        font.pixelSize: Theme.fontMicro
     }
 
     MouseArea {

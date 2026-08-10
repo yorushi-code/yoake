@@ -76,8 +76,71 @@ Item {
         return 200 - name.length;
     }
 
+    // ── Modes ──
+    //
+    // The launcher found applications and nothing else, so everything adjacent
+    // to "start a thing" -- switch to a window that is already open, run a
+    // shell action, work out a number -- was somewhere else or nowhere. A
+    // prefix is the cheapest possible mode switch: it needs no chrome, it is
+    // one keystroke, and the query itself says which list you are looking at.
+    //
+    // The kind is printed on every row rather than implied by the prefix,
+    // because a list of four kinds with nothing saying which is which answers
+    // the wrong question half the time.
+    readonly property var modes: [
+        { key: "app", prefix: "", label: "Приложения", glyph: Glyphs.apps },
+        { key: "window", prefix: "/", label: "Окна", glyph: Glyphs.monitor },
+        { key: "action", prefix: ">", label: "Действия", glyph: Glyphs.tune },
+        { key: "calc", prefix: "=", label: "Счёт", glyph: Glyphs.plus }
+    ]
+
+    readonly property string mode: {
+        const q = root.query;
+        if (q.startsWith("/")) return "window";
+        if (q.startsWith(">")) return "action";
+        if (q.startsWith("=")) return "calc";
+        return "app";
+    }
+
+    readonly property string needle: root.mode === "app"
+        ? root.query.trim() : root.query.substring(1).trim()
+
+    function setMode(key) {
+        for (const m of root.modes) {
+            if (m.key === key) {
+                input.text = m.prefix;
+                input.forceActiveFocus();
+                return;
+            }
+        }
+    }
+
+    // Arithmetic, with the character set as the whole of the safety argument.
+    //
+    // Anything that reaches a JS evaluator from a text field is a hole; a
+    // whitelist of digits and operators is not a parser but it is a proof that
+    // nothing else can be in the string by the time it is evaluated.
+    function calculate(expression) {
+        const text = expression.replace(/\^/g, "**").replace(/,/g, ".");
+        if (text === "" || !/^[0-9+\-*/(). %]*$/.test(text.replace(/\*\*/g, ""))) return null;
+        try {
+            const value = Function("\"use strict\"; return (" + text + ")")();
+            if (typeof value !== "number" || !isFinite(value)) return null;
+            return Math.round(value * 1e6) / 1e6;
+        } catch (e) {
+            return null;
+        }
+    }
+
     readonly property var results: {
-        const needle = root.query.trim().toLowerCase();
+        if (root.mode === "calc") return root._calcResults();
+        if (root.mode === "window") return root._windowResults();
+        if (root.mode === "action") return root._actionResults();
+        return root._appResults();
+    }
+
+    function _appResults() {
+        const needle = root.needle.toLowerCase();
         // Only when the swap changes something, so a Latin query costs nothing
         // and a Russian app name is still matched by what was actually typed.
         const swapped = root.swapLayout(needle);
@@ -89,14 +152,67 @@ Item {
                 : Math.max(root.score(entry, needle), root.score(entry, swapped));
             if (s < 0) continue;
             const seen = root.usage[entry.id] || 0;
-            out.push({ entry: entry, score: s, uses: seen });
+            out.push({
+                kind: "app", label: "прил.", entry: entry,
+                name: entry.name || "", subtitle: entry.genericName || entry.comment || "",
+                iconName: entry.icon || "", glyph: Glyphs.apps,
+                score: s, uses: seen
+            });
         }
         out.sort((a, b) => {
             if (b.score !== a.score) return b.score - a.score;
             if (b.uses !== a.uses) return b.uses - a.uses;
-            return (a.entry.name || "").localeCompare(b.entry.name || "");
+            return (a.name || "").localeCompare(b.name || "");
         });
         return out.slice(0, 40);
+    }
+
+    function _windowResults() {
+        const needle = root.needle.toLowerCase();
+        const swapped = root.swapLayout(needle);
+        const out = [];
+        for (const w of Niri.windows) {
+            const title = (w.title || "").toLowerCase();
+            const app = (w.app_id || "").toLowerCase();
+            if (needle !== "" && title.indexOf(needle) < 0 && app.indexOf(needle) < 0
+                    && title.indexOf(swapped) < 0 && app.indexOf(swapped) < 0) continue;
+            out.push({
+                kind: "window", label: "окно", windowId: w.id,
+                name: w.title || w.app_id || "Окно",
+                subtitle: w.app_id || "",
+                iconName: w.app_id || "", glyph: Glyphs.monitor,
+                // The one you are on is the least useful thing to switch to.
+                score: w.is_focused ? -1 : 0
+            });
+        }
+        out.sort((a, b) => b.score - a.score);
+        return out;
+    }
+
+    function _actionResults() {
+        const needle = root.needle.toLowerCase();
+        const out = [];
+        for (const item of ShellActions.shellMenu) {
+            if (item.separator) continue;
+            const text = (item.text || "").toLowerCase();
+            if (needle !== "" && text.indexOf(needle) < 0) continue;
+            out.push({
+                kind: "action", label: "действие", act: item.action,
+                name: item.text || "", subtitle: "",
+                iconName: "", glyph: item.glyph || Glyphs.tune
+            });
+        }
+        return out;
+    }
+
+    function _calcResults() {
+        const value = root.calculate(root.needle);
+        if (value === null) return [];
+        return [{
+            kind: "calc", label: "=", value: value,
+            name: String(value), subtitle: root.needle,
+            iconName: "", glyph: Glyphs.plus
+        }];
     }
 
     // Whether a row appearing right now is part of an arrival or is simply
@@ -127,14 +243,26 @@ Item {
     function launch(index) {
         const hit = root.results[index];
         if (!hit) return;
-        const next = Object.assign({}, root.usage);
-        next[hit.entry.id] = (next[hit.entry.id] || 0) + 1;
-        Prefs.set("launcher.usage", next);
-        // Before the close, not after: the process start is the slow part of
-        // this function and holding the flash behind it would put the
+        // Before the close, not after: the slow part of this function is
+        // whatever it starts, and holding the flash behind that would put the
         // acknowledgement after the thing it acknowledges.
         root.committing = true;
-        hit.entry.execute();
+
+        if (hit.kind === "app") {
+            const next = Object.assign({}, root.usage);
+            next[hit.entry.id] = (next[hit.entry.id] || 0) + 1;
+            Prefs.set("launcher.usage", next);
+            hit.entry.execute();
+        } else if (hit.kind === "window") {
+            Niri.focusWindow(hit.windowId);
+        } else if (hit.kind === "action") {
+            if (hit.act) hit.act();
+        } else if (hit.kind === "calc") {
+            // The answer is the point, and an answer you cannot take with you
+            // is a calculator that only talks to itself.
+            Quickshell.clipboardText = String(hit.value);
+        }
+
         Toggles.launcherOpen = false;
     }
 
@@ -398,7 +526,11 @@ Item {
 
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
-                            text: "Найти приложение"
+                            // The prefixes are the whole discoverability of
+                            // the modes: nothing else on screen says they
+                            // exist, and a mode nobody knows about is a mode
+                            // nobody has.
+                            text: "Приложение · / окно · > действие · = счёт"
                             color: Theme.subtext0
                             font.family: Theme.fontFamily
                             font.pixelSize: Theme.fontTitle
@@ -515,7 +647,11 @@ Item {
                         required property int index
 
                         width: list.width
-                        entry: modelData.entry
+                        name: modelData.name
+                        subtitle: modelData.subtitle
+                        iconName: modelData.iconName
+                        glyph: modelData.glyph
+                        kind: modelData.label
                         selected: index === root.selected
                         onActivated: root.launch(index)
                         onHovered: root.selected = index
