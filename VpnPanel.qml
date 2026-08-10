@@ -2,809 +2,310 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 
-// yworld — VPN control, in the shell.
+// The tunnel, in the same language as everything else.
 //
-// This is the whole user interface; ~/yworld is a headless backend with no
-// window of its own. Subscriptions, node selection, latency and the tunnel are
-// all driven from here.
-Item {
-    id: root
+// This was eight hundred lines of layout written before there was a vocabulary
+// to write it in: its own rows, its own headers, its own idea of what a
+// selected thing looks like. None of the logic was wrong -- Mihomo is untouched
+// -- but a panel that draws its own furniture is a panel that stops matching
+// the shell the first time either one changes.
+//
+// What it gains by being rebuilt on the shared parts is the thing every other
+// panel already had: the active row is a solid domain ground with no control of
+// its own, because what is active is controlled by the header.
+PanelWindow {
+    id: win
 
-    // Animations bind to this, not to the toggle. Created lazily, the panel is
-    // born with the toggle already true, and an entry animation bound straight
-    // to the toggle has nothing to animate from.
-    readonly property bool open: Toggles.vpnPanelOpen && root.armed
+    WlrLayershell.layer: WlrLayer.Overlay
+
+    readonly property bool open: Toggles.vpnPanelOpen && win.armed
     property bool armed: false
-    // One handler, because two of them on the same object is not two handlers —
-    // it is "Property value set multiple times" and the file does not load.
-    Component.onCompleted: {
-        armTick.start();
-        if (Prefs.loaded) root.hideDead = Prefs.get("vpn.hideDead", false);
-    }
     property Timer _armTick: Timer {
-        id: armTick
         interval: 16
-        onTriggered: root.armed = true
+        running: true
+        onTriggered: win.armed = true
     }
 
-    // Which selector group's nodes are on screen. Empty means the primary one,
-    // and so does a name that no longer exists — restarting on a different
-    // subscription replaces the whole group list.
-    property string shownGroup: ""
-    readonly property string activeGroup: (root.shownGroup !== ""
-        && Mihomo.groupNamed(root.shownGroup)) ? root.shownGroup : Mihomo.primaryGroup
-    readonly property var activeGroupData: Mihomo.groupNamed(root.activeGroup)
+    property bool mapped: false
+    visible: mapped
 
-    // On a link that blocks most of a subscription, a fifty-row list with eleven
-    // usable rows scattered through it is the whole problem. Read once and
-    // written explicitly: a two-way binding to Prefs is a binding loop.
-    property bool hideDead: false
-    property Connections _prefsReady: Connections {
-        target: Prefs
-        function onLoadedChanged() { root.hideDead = Prefs.get("vpn.hideDead", false); }
+    anchors { top: true; bottom: true; left: true; right: true }
+    color: "transparent"
+    exclusiveZone: 0
+    focusable: Toggles.vpnPanelOpen
+    WlrLayershell.keyboardFocus: Toggles.vpnPanelOpen
+        ? WlrKeyboardFocus.Exclusive
+        : WlrKeyboardFocus.None
+
+    Timer {
+        id: hideDelay
+        interval: Theme.animExit + 60
+        onTriggered: win.mapped = false
     }
 
-    readonly property var allNodes: root.activeGroupData ? root.activeGroupData.nodes : []
-    readonly property int measured: {
-        let n = 0;
-        for (const node of root.allNodes) {
-            if (Mihomo.delays[node] !== undefined) n++;
+    Connections {
+        target: Toggles
+        function onVpnPanelOpenChanged() {
+            if (Toggles.vpnPanelOpen) {
+                hideDelay.stop();
+                win.mapped = true;
+                Mihomo.refresh();
+                Mihomo.probeDelaysIfStale(Mihomo.primaryGroup);
+            } else {
+                hideDelay.restart();
+            }
         }
-        return n;
     }
-    function _delayOf(node) {
-        const d = Mihomo.delays[node];
-        return (d === null || d === undefined) ? -1 : d;
-    }
-
-    // The servers among the group's members. AUTO and DIRECT sit in the same
-    // list and are always usable, so "живых 5 из 7" was counting two things
-    // that cannot be dead as if they were down.
-    readonly property var serverNodes: root.allNodes.filter(n => !Mihomo.isSelectable(n))
-
-    readonly property int aliveCount: {
-        let n = 0;
-        for (const node of root.serverNodes) {
-            // Not a truthy test: a node answering in under a millisecond
-            // reports 0, and counting that as dead is the one case where the
-            // number on screen would disagree with the list under it.
-            if (root._delayOf(node) >= 0) n++;
-        }
-        return n;
+    Component.onCompleted: {
+        win.mapped = Toggles.vpnPanelOpen;
+        if (Toggles.vpnPanelOpen) Mihomo.refresh();
     }
 
-    // Answering nodes first, quickest first; everything else keeps its order
-    // underneath.
-    //
-    // The same reasoning that puts the running subscription at the top of the
-    // footer, and it matters more here: with eleven nodes and two of them
-    // alive, the two you can actually pick were scattered through nine you
-    // cannot, and the list is a scroller.
-    readonly property var orderedNodes: {
-        const list = root.allNodes.slice();
-        list.sort((a, b) => {
-            const da = root._delayOf(a), db = root._delayOf(b);
-            const aliveA = da >= 0, aliveB = db >= 0;
-            if (aliveA !== aliveB) return aliveA ? -1 : 1;
-            if (aliveA && da !== db) return da - db;
-            return 0;
-        });
-        return list;
+    readonly property bool up: Mihomo.running && Mihomo.controllerUp
+
+    // Servers only. AUTO and DIRECT are policies rather than exits, and mixing
+    // them into the list of places the traffic can come out of is how a list of
+    // nodes stops being one.
+    readonly property var nodes: {
+        const group = Mihomo.primary;
+        if (!group || !group.nodes) return [];
+        return group.nodes.filter(n => !Mihomo.isSelectable(n));
     }
 
-    readonly property var shownNodes: {
-        if (!root.hideDead) return root.orderedNodes;
-        return root.orderedNodes.filter(n => Mihomo.delays[n] !== null);
+    MouseArea {
+        anchors.fill: parent
+        onClicked: Toggles.vpnPanelOpen = false
     }
 
-    property bool adding: false
+    Item {
+        anchors.fill: parent
+        focus: win.open
+        Keys.onEscapePressed: Toggles.vpnPanelOpen = false
 
-    // Active subscription first. The footer is a bounded scroller, and with five
-    // providers the one actually running was as likely as not to be below the
-    // fold — which is the row you look for. sort() is stable, so everything else
-    // keeps the backend's alphabetical order.
-    readonly property var orderedSubscriptions: {
-        const list = (Mihomo.subscriptions || []).slice();
-        list.sort((a, b) => (b.active ? 1 : 0) - (a.active ? 1 : 0));
-        return list;
-    }
+        Sheet {
+            id: sheet
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.topMargin: Theme.barHeight + Theme.barMargin * 2
+            anchors.rightMargin: Theme.barMargin
+            width: 460
+            height: Math.min(740, column.implicitHeight + Theme.sheetPad * 2)
+            align: "right"
+            accent: Theme.tone("vpn")
+            shown: win.open
+            onCloseRequested: Toggles.vpnPanelOpen = false
 
-    PanelWindow {
-        id: win
-        // Overlay, not the default Top: niri draws a fullscreen window above
-        // the Top layer, so a panel the user just asked for would open behind
-        // the video they were watching and read as a dead keystroke.
-        WlrLayershell.layer: WlrLayer.Overlay
-        // See ControlCenter: mapping is an explicit bool so the exit animation
-        // is never cut off by a visible-binding race.
-        property bool mapped: false
-        visible: mapped
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+            }
 
-        anchors { top: true; bottom: true; left: true; right: true }
-        color: "transparent"
-        exclusiveZone: 0
-        // Bound to the toggle, not to `open`. `open` waits a frame for `armed`
-        // so the entrance has something to animate from, and a surface mapped
-        // asking for no keyboard never gets offered one afterwards -- which is
-        // a panel that ignores Escape and every key in it.
-        focusable: Toggles.vpnPanelOpen
-        // Exclusive, not merely focusable. `focusable` alone asks for
-        // on-demand interactivity, which means the compositor hands over the
-        // keyboard when the surface is clicked -- so a panel opened from a
-        // keybind ignored Escape until you had clicked it first.
-        WlrLayershell.keyboardFocus: Toggles.vpnPanelOpen
-            ? WlrKeyboardFocus.Exclusive
-            : WlrKeyboardFocus.None
+            property int page: 0
 
-        // Escape closes it, from anywhere inside.
-        Item {
-            anchors.fill: parent
-            focus: true
-            Keys.onPressed: event => {
-                if (event.key === Qt.Key_Escape) {
-                    Toggles.vpnPanelOpen = false;
-                    event.accepted = true;
+            Column {
+                id: column
+                anchors.fill: parent
+                anchors.margins: Theme.sheetPad
+                spacing: Theme.gapCard
+
+                SheetHeader {
+                    width: parent.width
+                    title: Mihomo.busy ? "Подключаюсь…"
+                        : (win.up ? (Mihomo.currentNode || "Туннель поднят") : "Выключен")
+                    subtitle: Mihomo.active !== "" ? Mihomo.active : Mihomo.core
+
+                    Rectangle {
+                        width: 28
+                        height: 28
+                        radius: Theme.pill(height)
+                        color: win.up ? Theme.tone("vpn") : Qt.alpha(Theme.text, Theme.fillMuted)
+                        Behavior on color { ColorAnimation { duration: Theme.animFast } }
+
+                        MaterialSymbol {
+                            anchors.centerIn: parent
+                            icon: Glyphs.vpn
+                            size: Theme.fontIconSmall
+                            fill: win.up ? 1 : 0
+                            color: win.up ? Theme.onTone("vpn") : Theme.subtext0
+
+                            // Only while the tunnel is actually coming up: the
+                            // one moment the shell has nothing else to say for
+                            // several seconds, and stopped the rest of the time
+                            // because a permanent animation costs a fifth of a
+                            // core for as long as it runs.
+                            SequentialAnimation on opacity {
+                                running: Mihomo.busy
+                                loops: Animation.Infinite
+                                onStopped: parent.opacity = 1
+                                NumberAnimation { to: Theme.inkFaint; duration: Theme.animBusy; easing.type: Easing.InOutQuad }
+                                NumberAnimation { to: 1.0; duration: Theme.animBusy; easing.type: Easing.InOutQuad }
+                            }
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: win.up ? Mihomo.stop() : Mihomo.start(Mihomo.active)
+                        }
+                    }
                 }
-            }
-        }
 
-        readonly property int cardWidth: 420
-        readonly property int cardHeight: Math.min(Screen.height - Theme.barHeight - 60, 760)
+                Column {
+                    width: parent.width
+                    spacing: Theme.gapTight
+                    visible: win.up
 
-        Timer {
-            id: hideDelay
-            interval: Theme.animExit + 40
-            onTriggered: win.mapped = false
-        }
-        Connections {
-            target: Toggles
-            function onVpnPanelOpenChanged() {
-                if (Toggles.vpnPanelOpen) {
-                    hideDelay.stop();
-                    win.mapped = true;
-                    root.adding = false;
-                    Mihomo.probeDelaysIfStale(root.activeGroup);
-                } else {
-                    hideDelay.restart();
+                    KeyValue {
+                        width: parent.width
+                        key: "Задержка"
+                        value: Mihomo.currentDelay !== undefined && Mihomo.currentDelay !== null
+                            ? Mihomo.currentDelay + " мс" : "нет ответа"
+                        valueColor: Mihomo.currentDelay === null ? Theme.red : Theme.text
+                    }
+                    KeyValue {
+                        width: parent.width
+                        key: "Приём / отдача"
+                        value: Mihomo.formatSpeed(Mihomo.downSpeed) + " / "
+                            + Mihomo.formatSpeed(Mihomo.upSpeed)
+                    }
+                    KeyValue {
+                        width: parent.width
+                        key: "Ядро"
+                        value: Mihomo.core
+                    }
                 }
-            }
-        }
 
-        // The group list arrives asynchronously — Python reports the process
-        // state, then the controller is asked for the groups — so opening the
-        // panel is usually too early to probe anything.
-        Connections {
-            target: Mihomo
-            function onGroupsChanged() {
-                if (Toggles.vpnPanelOpen) Mihomo.probeDelaysIfStale(root.activeGroup);
-            }
-        }
-        Component.onCompleted: win.mapped = Toggles.vpnPanelOpen
+                Segmented {
+                    width: parent.width
+                    tone: "vpn"
+                    model: ["Узлы", "Подписки"]
+                    current: sheet.page
+                    onPicked: i => sheet.page = i
+                }
 
-        MouseArea {
-            anchors.fill: parent
-            onClicked: Toggles.vpnPanelOpen = false
-        }
+                // ── Узлы ──
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacing
+                    visible: sheet.page === 0
 
-        Item {
-            anchors.fill: parent
-            focus: root.open
-            Keys.onEscapePressed: Toggles.vpnPanelOpen = false
+                    Repeater {
+                        model: win.nodes
 
-            PanelChrome {
-                id: chrome
-                anchors.top: parent.top
-                anchors.right: parent.right
-                anchors.topMargin: Theme.barHeight + Theme.barMargin * 2
-                anchors.rightMargin: Theme.barMargin
-                width: win.cardWidth
-                height: win.cardHeight
-                screenX: Screen.width - Theme.barMargin - win.cardWidth
-                screenY: Theme.barHeight + Theme.barMargin * 2
+                        delegate: DeviceRow {
+                            id: nodeRow
+                            required property var modelData
+                            required property int index
 
-                shown: root.open
-                origin: Item.TopRight
-                onCloseRequested: Toggles.vpnPanelOpen = false
+                            readonly property var delay: Mihomo.delays[nodeRow.modelData]
 
-                // Swallows clicks so the backdrop does not treat a click on the
-                // panel itself as "outside".
-                MouseArea {
-                    anchors.fill: parent
-                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                            width: parent.width
+                            tone: "vpn"
+                            glyph: Glyphs.earth
+                            name: nodeRow.modelData
+                            subtitle: Mihomo.proxyTypes[nodeRow.modelData] || ""
+                            trailing: nodeRow.delay === undefined ? ""
+                                : (nodeRow.delay === null ? "—" : nodeRow.delay + " мс")
+                            active: nodeRow.modelData === Mihomo.currentNode
+                            hasControl: false
+
+                            onActivated: {
+                                const group = Mihomo.primary;
+                                if (group) Mihomo.select(group.name, nodeRow.modelData);
+                            }
+                            onRightClicked: Mihomo.probeDelays(Mihomo.primaryGroup)
+
+                            // Rule 8: choosing a node repaints the list along
+                            // its own length rather than on one frame.
+                            opacity: 0
+                            Component.onCompleted: intro.restart()
+                            SequentialAnimation {
+                                id: intro
+                                PauseAnimation { duration: Direction.sweep(nodeRow.index, win.nodes.length) }
+                                NumberAnimation {
+                                    target: nodeRow; property: "opacity"; to: 1
+                                    duration: Theme.animNormal
+                                    easing.type: Easing.Bezier
+                                    easing.bezierCurve: Theme.easeEmphasized
+                                }
+                            }
+                        }
+                    }
+
+                    EmptyRow {
+                        width: parent.width
+                        visible: win.nodes.length === 0
+                        glyph: Glyphs.vpn
+                        text: win.up ? "Узлов нет" : "Туннель выключен"
+                    }
+                }
+
+                // ── Подписки ──
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacing
+                    visible: sheet.page === 1
+
+                    Repeater {
+                        model: Mihomo.subscriptions
+
+                        delegate: DeviceRow {
+                            required property var modelData
+                            width: parent.width
+                            tone: "vpn"
+                            glyph: Glyphs.earth
+                            name: modelData.name || ""
+                            subtitle: modelData.core || Mihomo.core
+                            active: modelData.name === Mihomo.active
+                            hasControl: false
+                            trailing: modelData.name === Mihomo.active && win.up ? "активна" : ""
+
+                            // Starting a subscription is starting the tunnel on
+                            // it, which is what "switch to this one" means here.
+                            onActivated: Mihomo.start(modelData.name)
+                            onRightClicked: Mihomo.refreshSubscription(modelData.name)
+                        }
+                    }
+
+                    EmptyRow {
+                        width: parent.width
+                        visible: Mihomo.subscriptions.length === 0
+                        glyph: Glyphs.earth
+                        text: "Подписок нет"
+                    }
+                }
+
+                // The two things that are neither a node nor a subscription,
+                // and both of which people reach for when something is wrong.
+                Row {
+                    width: parent.width
+                    spacing: Theme.spacing
+
+                    Chip {
+                        tone: "vpn"
+                        live: false
+                        glyph: Glyphs.refresh
+                        label: "Проверить задержки"
+                        onClicked: Mihomo.probeDelays(Mihomo.primaryGroup)
+                    }
+
+                    Chip {
+                        tone: "vpn"
+                        live: false
+                        glyph: Glyphs.close
+                        label: "Сбросить соединения"
+                        onClicked: Mihomo.resetConnections()
+                    }
                 }
 
                 Text {
-                    anchors.top: parent.top
-                    anchors.left: parent.left
-                    anchors.topMargin: 13
-                    anchors.leftMargin: 16
-                    text: "yworld"
-                    color: Theme.subtext0
-                    font.pixelSize: Theme.fontLabel
-                    font.bold: true
-                    font.letterSpacing: 1.5
-                }
-
-                Item {
-                    anchors.fill: parent
-                    anchors.margins: 16
-                    anchors.topMargin: 36
-
-                    // ── status header ──
-                    Column {
-                        id: head
-                        anchors.top: parent.top
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        spacing: 12
-
-                        Row {
-                            spacing: Theme.gapWide
-
-                            Rectangle {
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: 34
-                                height: 34
-                                radius: Theme.pill(height)
-                                color: Mihomo.running ? Qt.alpha(Theme.accent, 0.18) : Qt.alpha(Theme.text, Theme.fillSubtle)
-                                Behavior on color { ColorAnimation { duration: Theme.animNormal } }
-
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: Glyphs.vpn
-                                    font.family: Theme.fontIconFamily
-                                    font.pixelSize: Theme.fontIconSmall
-                                    color: Mihomo.running ? Theme.accent : Theme.subtext0
-                                    Behavior on color { ColorAnimation { duration: Theme.animNormal } }
-                                }
-
-                                // A ring that only exists while the tunnel is
-                                // coming up: `start` blocks for several seconds
-                                // and silence there reads as a hang.
-                                Rectangle {
-                                    anchors.fill: parent
-                                    anchors.margins: -3
-                                    radius: width / 2
-                                    color: "transparent"
-                                    border.width: 2
-                                    border.color: Theme.accent
-                                    opacity: Mihomo.busy ? 0.8 : 0
-                                    visible: opacity > 0
-                                    Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
-                                    RotationAnimation on rotation {
-                                        running: Mihomo.busy
-                                        loops: Animation.Infinite
-                                        from: 0
-                                        to: 360
-                                        duration: Theme.animDrift
-                                    }
-                                }
-                            }
-
-                            Column {
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: 2
-
-                                Text {
-                                    text: Mihomo.busy
-                                        ? "Подключение…"
-                                        : (Mihomo.running ? (Mihomo.active || "Подключено") : "Отключено")
-                                    color: Theme.text
-                                    font.pixelSize: Theme.fontTitle
-                                    font.bold: true
-                                }
-
-                                Text {
-                                    text: {
-                                        if (!Mihomo.running) return "Туннель не поднят";
-                                        if (!Mihomo.controllerUp) return "Контроллер не отвечает";
-                                        return Mihomo.currentNode !== "" ? Mihomo.currentNode : "Нода не выбрана";
-                                    }
-                                    color: Theme.subtext0
-                                    font.pixelSize: Theme.fontSmall
-                                    elide: Text.ElideRight
-                                    width: 210
-                                }
-                            }
-                        }
-
-                        // Traffic. Streamed from the controller, so this costs
-                        // nothing while the tunnel is down.
-                        Row {
-                            visible: Mihomo.running && Mihomo.controllerUp
-                            spacing: 16
-
-                            Repeater {
-                                model: [
-                                    { glyph: Glyphs.chevronDown, value: Mihomo.downSpeed },
-                                    { glyph: Glyphs.chevronUp, value: Mihomo.upSpeed }
-                                ]
-
-                                delegate: Row {
-                                    id: rate
-                                    required property var modelData
-                                    spacing: Theme.spacing
-
-                                    Text {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        text: rate.modelData.glyph
-                                        font.family: Theme.fontIconFamily
-                                        font.pixelSize: Theme.fontIconMicro
-                                        color: Theme.accent
-                                    }
-                                    Text {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        text: Mihomo.formatSpeed(rate.modelData.value)
-                                        color: Theme.subtext1
-                                        font.pixelSize: Theme.fontSmall
-                                    }
-                                }
-                            }
-                        }
-
-                        // Where traffic actually comes out. The reply also says
-                        // whether that address matches the one the physical link
-                        // has — the only thing that distinguishes a working
-                        // tunnel from one that is up and carrying nothing — but
-                        // the physical address itself is never printed: it is the
-                        // user's real location, and this panel gets screenshotted.
-                        // An Item around the Row, not a bare Row: a Row lays out
-                        // every child it has, so a MouseArea filling it would be
-                        // positioned as content and widen it.
-                        Item {
-                            id: egressRow
-                            width: parent.width
-                            height: egressContent.implicitHeight
-                            visible: Mihomo.running && (Mihomo.egress !== null || Mihomo.checking)
-
-                            Row {
-                                id: egressContent
-                                spacing: Theme.spacing
-
-                                Text {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text: Glyphs.earth
-                                    font.family: Theme.fontIconFamily
-                                    font.pixelSize: Theme.fontIconMicro
-                                    color: Mihomo.leaking ? Theme.red : Theme.accent
-                                    opacity: Mihomo.checking ? 0.5 : 1
-                                    Behavior on opacity { NumberAnimation { duration: Theme.animFast } }
-                                }
-
-                                Text {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text: {
-                                        if (Mihomo.egress === null) return "Проверяю выход…";
-                                        if (Mihomo.leaking) return "Трафик идёт мимо туннеля";
-                                        const e = Mihomo.egress;
-                                        return e.ip + (e.country ? " · " + e.country : "");
-                                    }
-                                    color: Mihomo.leaking ? Theme.red : Theme.subtext1
-                                    font.pixelSize: Theme.fontSmall
-                                    font.underline: egressArea.containsMouse && !Mihomo.checking
-                                }
-                            }
-
-                            MouseArea {
-                                id: egressArea
-                                width: egressContent.width + 8
-                                height: parent.height + 8
-                                anchors.centerIn: egressContent
-                                hoverEnabled: true
-                                enabled: !Mihomo.checking
-                                cursorShape: Qt.PointingHandCursor
-                                // The reading belongs to whichever node was
-                                // selected when it was taken, so it needs a way
-                                // to be retaken without reopening the panel.
-                                onClicked: Mihomo.check()
-                            }
-
-                            Tooltip {
-                                anchorItem: egressRow
-                                active: egressArea.containsMouse && !Mihomo.checking
-                                text: "Проверить выход заново"
-                                subtext: "Запрос идёт через само ядро"
-                            }
-                        }
-
-                        // A core without a TUN is up, healthy and carrying only
-                        // what points at its port — which looks exactly like a
-                        // working tunnel from everywhere else in this panel.
-                        Rectangle {
-                            width: parent.width
-                            height: noTunLabel.implicitHeight + 16
-                            radius: Theme.radius
-                            visible: Mihomo.running && !Mihomo.tunCapable
-                            color: Qt.alpha(Theme.yellow, Theme.tintSubtle)
-
-                            Text {
-                                id: noTunLabel
-                                anchors.left: parent.left
-                                anchors.right: parent.right
-                                anchors.margins: 10
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: Mihomo.core + " не умеет TUN — системный трафик идёт мимо, "
-                                    + "в туннель попадает только то, что настроено на 127.0.0.1:7890"
-                                color: Theme.yellow
-                                font.pixelSize: Theme.fontSmall
-                                wrapMode: Text.WordWrap
-                            }
-                        }
-
-                        Rectangle {
-                            width: parent.width
-                            height: conflictColumn.implicitHeight + 16
-                            radius: Theme.radius
-                            visible: Mihomo.conflict !== ""
-                            color: Qt.alpha(Theme.yellow, Theme.tintSubtle)
-
-                            Column {
-                                id: conflictColumn
-                                anchors.left: parent.left
-                                anchors.right: parent.right
-                                anchors.margins: 10
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: Theme.spacing
-
-                                Text {
-                                    width: parent.width
-                                    text: Mihomo.conflict + " держит маршрут по умолчанию — трафик пойдёт мимо туннеля"
-                                    color: Theme.yellow
-                                    font.pixelSize: Theme.fontSmall
-                                    wrapMode: Text.WordWrap
-                                }
-
-                                // Only when there is a service to stop. Happ's
-                                // tunnel daemon runs as root, so this raises a
-                                // polkit prompt rather than acting silently.
-                                Rectangle {
-                                    width: rivalText.width + 20
-                                    height: 24
-                                    radius: Theme.radiusChip
-                                    visible: Mihomo.conflictCanStop
-                                    color: Qt.alpha(Theme.yellow, rivalArea.containsMouse ? 0.4 : 0.22)
-                                    Behavior on color { ColorAnimation { duration: Theme.animFast } }
-
-                                    Text {
-                                        id: rivalText
-                                        anchors.centerIn: parent
-                                        text: "Остановить " + Mihomo.conflict
-                                        color: Theme.yellow
-                                        font.pixelSize: Theme.fontSmall
-                                        font.bold: true
-                                    }
-
-                                    MouseArea {
-                                        id: rivalArea
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        enabled: !Mihomo.busy
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: Mihomo.stopRival()
-                                    }
-                                }
-                            }
-                        }
-
-                        Text {
-                            width: parent.width
-                            visible: Mihomo.lastError !== ""
-                            text: Mihomo.lastError
-                            color: Theme.red
-                            font.pixelSize: Theme.fontSmall
-                            wrapMode: Text.WordWrap
-                            maximumLineCount: 3
-                            elide: Text.ElideRight
-                        }
-
-                        // ── actions ──
-                        Row {
-                            width: parent.width
-                            spacing: 8
-
-                            Repeater {
-                                model: [
-                                    { label: Mihomo.running ? "Отключить" : "Подключить",
-                                      accent: !Mihomo.running, act: "power", on: true },
-                                    { label: "Пинг", accent: false, act: "delay",
-                                      on: Mihomo.running && Mihomo.controllerUp },
-                                    { label: "Сброс", accent: false, act: "reset",
-                                      on: Mihomo.running && Mihomo.controllerUp }
-                                ]
-
-                                delegate: Rectangle {
-                                    id: action
-                                    required property var modelData
-
-                                    width: (head.width - 16) / 3
-                                    height: 32
-                                    radius: Theme.radius
-                                    color: !action.modelData.on || Mihomo.busy
-                                        ? Qt.alpha(Theme.text, Theme.fillSubtle)
-                                        : action.modelData.accent
-                                            ? (actionArea.containsMouse ? Theme.accent : Qt.alpha(Theme.accent, Theme.veilSolid))
-                                            : Qt.alpha(Theme.text, actionArea.containsMouse ? 0.16 : 0.09)
-                                    Behavior on color { ColorAnimation { duration: Theme.animFast } }
-
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: action.modelData.act === "delay" && Mihomo.probing
-                                            ? "…" : action.modelData.label
-                                        color: !action.modelData.on || Mihomo.busy
-                                            ? Theme.subtext0
-                                            : (action.modelData.accent ? Theme.crust : Theme.text)
-                                        font.pixelSize: Theme.fontBody
-                                        font.bold: true
-                                    }
-
-                                    MouseArea {
-                                        id: actionArea
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        enabled: action.modelData.on && !Mihomo.busy
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: {
-                                            if (action.modelData.act === "power") {
-                                                if (Mihomo.running) Mihomo.stop();
-                                                else Mihomo.start();
-                                            } else if (action.modelData.act === "delay") {
-                                                Mihomo.probeDelays(root.activeGroup);
-                                            } else {
-                                                Mihomo.resetConnections();
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // ── group tabs ──
-                        // Only when there is a choice to make: one group is the
-                        // common case and a single tab is furniture.
-                        Row {
-                            width: parent.width
-                            spacing: Theme.spacing
-                            visible: Mihomo.groups.length > 1
-
-                            Repeater {
-                                model: Mihomo.groups
-
-                                delegate: Rectangle {
-                                    id: tab
-                                    required property var modelData
-
-                                    readonly property bool selected: tab.modelData.name === root.activeGroup
-                                    width: tabText.width + 20
-                                    height: 25
-                                    radius: 12.5
-                                    color: tab.selected ? Qt.alpha(Theme.accent, 0.2)
-                                        : (tabArea.containsMouse ? Qt.alpha(Theme.text, Theme.fillMuted) : "transparent")
-                                    Behavior on color { ColorAnimation { duration: Theme.animFast } }
-
-                                    Text {
-                                        id: tabText
-                                        anchors.centerIn: parent
-                                        text: tab.modelData.name
-                                        color: tab.selected ? Theme.accent : Theme.subtext0
-                                        font.pixelSize: Theme.fontSmall
-                                        font.bold: tab.selected
-                                    }
-
-                                    MouseArea {
-                                        id: tabArea
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: root.shownGroup = tab.modelData.name
-                                    }
-                                }
-                            }
-                        }
-
-                        // How much of the group this network can actually carry.
-                        // Worth its own line: a subscription where two nodes in
-                        // fifty answer is not a subscription problem to solve by
-                        // scrolling, and the number says so at a glance.
-                        Item {
-                            width: parent.width
-                            height: 14
-                            visible: root.measured > 0
-
-                            Text {
-                                anchors.left: parent.left
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: "Живых " + root.aliveCount + " из " + root.serverNodes.length
-                                color: root.aliveCount === 0 ? Theme.red
-                                    : (root.aliveCount * 3 < root.serverNodes.length ? Theme.yellow : Theme.subtext0)
-                                font.pixelSize: Theme.fontLabel
-                                font.bold: true
-                                font.letterSpacing: 1
-                            }
-
-                            Text {
-                                anchors.right: parent.right
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: root.hideDead ? "показать все" : "скрыть недоступные"
-                                color: hideArea.containsMouse ? Theme.accent : Theme.subtext0
-                                font.pixelSize: Theme.fontLabel
-                                font.underline: hideArea.containsMouse
-                                Behavior on color { ColorAnimation { duration: Theme.animFast } }
-
-                                MouseArea {
-                                    id: hideArea
-                                    anchors.fill: parent
-                                    anchors.margins: -5
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        root.hideDead = !root.hideDead;
-                                        Prefs.set("vpn.hideDead", root.hideDead);
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // ── footer: subscriptions ──
-                    Column {
-                        id: foot
-                        anchors.bottom: parent.bottom
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        spacing: 8
-
-                        Item {
-                            width: parent.width
-                            height: 14
-
-                            Text {
-                                anchors.left: parent.left
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: "Подписки"
-                                color: Theme.subtext0
-                                font.pixelSize: Theme.fontLabel
-                                font.bold: true
-                                font.letterSpacing: 1
-                            }
-
-                            Text {
-                                anchors.right: parent.right
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: root.adding ? "отмена" : "добавить"
-                                color: addArea.containsMouse ? Theme.accent : Theme.subtext0
-                                font.pixelSize: Theme.fontLabel
-                                font.underline: addArea.containsMouse
-                                Behavior on color { ColorAnimation { duration: Theme.animFast } }
-
-                                MouseArea {
-                                    id: addArea
-                                    anchors.fill: parent
-                                    anchors.margins: -5
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: root.adding = !root.adding
-                                }
-                            }
-                        }
-
-                        VpnSubscriptionEditor {
-                            width: parent.width
-                            visible: root.adding
-                            busy: Mihomo.busy
-                            onSubmitted: (name, url, userAgent) => {
-                                Mihomo.addSubscription(name, url, userAgent);
-                                root.adding = false;
-                            }
-                        }
-
-                        // Bounded and scrollable. Six subscriptions is 350px of
-                        // rows, and letting the footer take that left the node
-                        // list — the thing the panel is actually for — one row
-                        // tall.
-                        // Wrapped, because a Flickable's children are its
-                        // content and scroll with it — an overlay has to be a
-                        // sibling, and inside a Column a sibling would be laid
-                        // out as another row.
-                        Item {
-                            id: subsBox
-                            width: parent.width
-                            height: Math.min(subsColumn.implicitHeight, 172)
-                            visible: !root.adding
-
-                            Flickable {
-                                id: subsFlick
-                                anchors.fill: parent
-                                contentHeight: subsColumn.implicitHeight
-                                clip: true
-
-                                Column {
-                                    id: subsColumn
-                                    width: parent.width
-                                    spacing: Theme.gapTight
-
-                                    Repeater {
-                                        model: root.orderedSubscriptions
-
-                                        delegate: VpnSubscriptionRow {
-                                            width: subsColumn.width
-                                            busy: Mihomo.busy
-
-                                            onConnectRequested: Mihomo.start(modelData.name)
-                                            onRefreshRequested: Mihomo.refreshSubscription(modelData.name)
-                                            onRemoveRequested: Mihomo.removeSubscription(modelData.name)
-                                            onCoreRequested: core => Mihomo.setCore(modelData.name, core)
-                                        }
-                                    }
-                                }
-                            }
-
-                            ScrollFade { flick: subsFlick }
-                        }
-                    }
-
-                    // ── node list ──
-                    Flickable {
-                        id: nodeFlick
-                        anchors.top: head.bottom
-                        anchors.topMargin: 14
-                        anchors.bottom: foot.top
-                        anchors.bottomMargin: 14
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        contentHeight: nodes.implicitHeight
-                        clip: true
-
-                        Column {
-                            id: nodes
-                            width: parent.width
-                            spacing: 2
-
-                            Repeater {
-                                model: root.shownNodes
-
-                                delegate: VpnNodeRow {
-                                    required property var modelData
-                                    required property int index
-
-                                    width: nodes.width
-                                    name: modelData
-                                    current: root.activeGroupData
-                                        && root.activeGroupData.now === modelData
-                                    delay: Mihomo.delays[modelData]
-                                    probing: Mihomo.probing
-
-                                    // A cascade rather than a wall of rows
-                                    // arriving at once. Direction.stagger caps the
-                                    // delay, so a fifty-node list is not still
-                                    // arriving a second and a half later.
-                                    opacity: root.open ? 1 : 0
-                                    Behavior on opacity {
-                                        SequentialAnimation {
-                                            PauseAnimation { duration: root.open ? Direction.stagger(index) : 0 }
-                                            NumberAnimation {
-                                                duration: Theme.animNormal
-                                                easing.type: Easing.Bezier
-                                                easing.bezierCurve: Theme.easeEmphasized
-                                            }
-                                        }
-                                    }
-
-                                    onActivated: Mihomo.select(root.activeGroup, modelData)
-                                }
-                            }
-                        }
-                    }
-
-                    // Anchored, not in a Column, so a plain sibling is enough.
-                    ScrollFade { flick: nodeFlick }
-
-                    Text {
-                        anchors.centerIn: parent
-                        visible: Mihomo.running && Mihomo.groups.length === 0
-                        text: Mihomo.controllerUp ? "Групп нет" : "Контроллер не отвечает"
-                        color: Theme.subtext0
-                        font.pixelSize: Theme.fontBody
-                    }
+                    width: parent.width
+                    visible: Mihomo.lastError !== ""
+                    text: Mihomo.lastError
+                    color: Theme.red
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontMicro
+                    wrapMode: Text.WordWrap
                 }
             }
         }
