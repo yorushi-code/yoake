@@ -43,11 +43,42 @@ Item {
             // A toast that disappears on a schedule nobody can see reads as the
             // shell losing it, and the one question anyone actually has while
             // reading one is how long they have.
-            timeout: root.timeoutFor(notification)
+            timeout: root.timeoutFor(notification),
+            appName: notification.appName || "",
+            // How many from this application are standing behind this card.
+            stacked: 1
         };
         // Nothing to show and nothing to say — an application sending an empty
         // notification should not leave a blank card on screen.
         if (entry.summary === "" && entry.body === "") return;
+
+        // One card per application, not per message.
+        //
+        // A chat that says nine things in a minute used to put nine cards on
+        // screen, which is the shell repeating what the application already
+        // did badly. The live card takes over the newest message and counts
+        // the rest: the newest is the one anyone reads, and the count is the
+        // only thing the older ones still contribute.
+        //
+        // The entry keeps its id, so the ScriptModel below diffs it as the
+        // same row and the delegate survives -- the card is re-read, not
+        // rebuilt, and its own timer and gestures carry on.
+        if (entry.appName !== "") {
+            for (const existing of root.activeToasts) {
+                if (existing.leaving || existing.appName !== entry.appName) continue;
+                if (existing.timer) existing.timer.restart();
+                root.activeToasts = root.activeToasts.map(t => t === existing
+                    ? Object.assign({}, t, {
+                        notification: notification,
+                        summary: entry.summary,
+                        body: entry.body,
+                        urgency: entry.urgency,
+                        stacked: (t.stacked || 1) + 1
+                    })
+                    : t);
+                return;
+            }
+        }
 
         const timer = toastTimerComponent.createObject(root, {
             notification, interval: entry.timeout
@@ -213,6 +244,7 @@ Item {
                     readonly property string summary: modelData.summary
                     readonly property string body: modelData.body
                     readonly property int urgency: modelData.urgency
+                    readonly property int stacked: modelData.stacked || 1
 
                     width: toastColumn.width
                     height: toastChrome.height
@@ -469,13 +501,49 @@ Item {
                                 width: toastContent.width - 32 - toastContent.spacing - 12
                                 spacing: 4
 
-                                Text {
-                                    width: parent.width
-                                    text: toastDelegate.summary
-                                    color: Notifs.accentFor(toastDelegate.urgency)
-                                    font.pixelSize: Theme.fontLead
-                                    font.bold: true
-                                    wrapMode: Text.WordWrap
+                                Row {
+                                    // Short of the close button, which lives in
+                                    // the card's own corner: a count tucked
+                                    // under an X is a count nobody can read and
+                                    // a button nobody can hit.
+                                    width: parent.width - (counter.visible ? 24 : 0)
+                                    spacing: Theme.spacing
+
+                                    Text {
+                                        width: parent.width - (counter.visible
+                                            ? counter.width + Theme.spacing : 0)
+                                        text: toastDelegate.summary
+                                        color: Notifs.accentFor(toastDelegate.urgency)
+                                        font.family: Theme.fontFamily
+                                        font.pixelSize: Theme.fontLead
+                                        font.bold: true
+                                        wrapMode: Text.WordWrap
+                                    }
+
+                                    // Beside the summary rather than in a
+                                    // corner: the count is part of the sentence
+                                    // "nine of these", and a badge somewhere
+                                    // else is a second thing to find.
+                                    Rectangle {
+                                        id: counter
+                                        anchors.top: parent.top
+                                        visible: toastDelegate.stacked > 1
+                                        width: Math.max(18, countText.implicitWidth + Theme.spacing)
+                                        height: 18
+                                        radius: Theme.pill(height)
+                                        color: Qt.alpha(Notifs.accentFor(toastDelegate.urgency),
+                                                        Theme.tintActive)
+
+                                        Text {
+                                            id: countText
+                                            anchors.centerIn: parent
+                                            text: "+" + (toastDelegate.stacked - 1)
+                                            color: Notifs.accentFor(toastDelegate.urgency)
+                                            font.family: Theme.fontFamily
+                                            font.pixelSize: Theme.fontMicro
+                                            font.weight: Font.DemiBold
+                                        }
+                                    }
                                 }
                                 Text {
                                     width: parent.width
