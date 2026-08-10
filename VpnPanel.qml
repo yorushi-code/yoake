@@ -175,6 +175,104 @@ PanelWindow {
                     }
                 }
 
+                // ── The way out of a jam ──
+                //
+                // Restored after the rewrite dropped it. Another core holding
+                // the default route is the one failure where the tunnel looks
+                // perfectly healthy and none of the traffic is in it, and this
+                // banner is the only place the shell ever says so. Losing it
+                // was the clearest case of a rewrite being smaller rather than
+                // better.
+                Rectangle {
+                    width: parent.width
+                    height: conflictColumn.implicitHeight + Theme.gapCard
+                    radius: Theme.radiusChip
+                    visible: Mihomo.conflict !== ""
+                    color: Qt.alpha(Theme.yellow, Theme.tintSubtle)
+
+                    Column {
+                        id: conflictColumn
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.margins: Theme.spacing
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacing
+
+                        Text {
+                            width: parent.width
+                            text: Mihomo.conflict
+                                + " держит маршрут по умолчанию — трафик пойдёт мимо туннеля"
+                            color: Theme.yellow
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.fontSmall
+                            wrapMode: Text.WordWrap
+                        }
+
+                        // Only when there is a service to stop. Happ's tunnel
+                        // daemon runs as root, so this raises a polkit prompt
+                        // rather than acting silently.
+                        Chip {
+                            visible: Mihomo.conflictCanStop
+                            tone: "alert"
+                            live: true
+                            glyph: Glyphs.stop
+                            label: "Остановить " + Mihomo.conflict
+                            onClicked: if (!Mihomo.busy) Mihomo.stopRival()
+                        }
+                    }
+                }
+
+                // ── Where the traffic actually comes out ──
+                //
+                // Also restored. A tunnel that is up and a tunnel that is
+                // carrying your traffic are different facts, and this is the
+                // only one of the two the shell can check rather than assume.
+                Row {
+                    width: parent.width
+                    spacing: Theme.spacing
+                    visible: Mihomo.running && (Mihomo.egress !== null || Mihomo.checking)
+
+                    MaterialSymbol {
+                        id: egressGlyph
+                        anchors.verticalCenter: parent.verticalCenter
+                        icon: Glyphs.earth
+                        size: Theme.fontIconMicro
+                        fill: 1
+                        color: Mihomo.leaking ? Theme.red : Theme.tone("vpn")
+                        opacity: Mihomo.checking ? Theme.inkFaint : 1
+                        Behavior on opacity { NumberAnimation { duration: Theme.animFast } }
+                    }
+
+                    Text {
+                        id: egressText
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: {
+                            if (Mihomo.egress === null) return "Проверяю выход…";
+                            if (Mihomo.leaking) return "Трафик идёт мимо туннеля";
+                            const e = Mihomo.egress;
+                            return e.ip + (e.country ? " · " + e.country : "");
+                        }
+                        color: Mihomo.leaking ? Theme.red : Theme.subtext1
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSmall
+                        font.underline: egressHit.containsMouse && !Mihomo.checking
+                    }
+
+                    MouseArea {
+                        id: egressHit
+                        width: egressGlyph.width + egressText.width + Theme.spacing
+                        height: egressText.height + Theme.spacing
+                        anchors.verticalCenter: parent.verticalCenter
+                        hoverEnabled: true
+                        enabled: !Mihomo.checking
+                        cursorShape: Qt.PointingHandCursor
+                        // The reading belongs to whichever node was selected
+                        // when it was taken, so it needs a way to be retaken
+                        // without reopening the panel.
+                        onClicked: Mihomo.check()
+                    }
+                }
+
                 Segmented {
                     width: parent.width
                     tone: "vpn"
