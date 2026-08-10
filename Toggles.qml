@@ -105,7 +105,9 @@ QtObject {
         root.weatherPanelOpen = false;
     }
 
-    readonly property var dashPages: ["overview", "media", "system", "control", "desks"]
+    // Matches Dashboard's tabs, and has to: the IPC and every hand-off from a
+    // bar widget select a page by index into this list.
+    readonly property var dashPages: ["overview", "control", "desks"]
 
     function dash(page) {
         const at = root.dashPages.indexOf(page);

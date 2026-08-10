@@ -26,10 +26,18 @@ Item {
         onTriggered: root.armed = true
     }
 
+    // Three, where there were five.
+    //
+    // Media and System were built when this sheet was the only door in the
+    // shell. Every chip in the bar opens its own panel now, and a dashboard tab
+    // that shows the same list one keystroke further away is not a summary, it
+    // is a second copy that will drift from the first.
+    //
+    // What survives is what no panel owns: Overview is the glance -- calendar,
+    // weather, unread, load -- Control is where settings live, and Desks is the
+    // only view of the whole compositor.
     readonly property var tabs: [
         { key: "overview", label: "Обзор", glyph: Glyphs.apps },
-        { key: "media", label: "Медиа", glyph: Glyphs.music },
-        { key: "system", label: "Система", glyph: Glyphs.speedometer },
         { key: "control", label: "Управление", glyph: Glyphs.cog },
         { key: "desks", label: "Столы", glyph: Glyphs.monitor }
     ]
@@ -294,7 +302,7 @@ Item {
                         Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
                     }
 
-                    DashMedia {
+                    DashControl {
                         anchors.fill: parent
                         visible: opacity > 0
                         revealed: root.open && root.tab === 1
@@ -302,26 +310,10 @@ Item {
                         Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
                     }
 
-                    DashSystem {
-                        anchors.fill: parent
-                        visible: opacity > 0
-                        revealed: root.open && root.tab === 2
-                        opacity: root.tab === 2 ? 1 : 0
-                        Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
-                    }
-
-                    DashControl {
-                        anchors.fill: parent
-                        visible: opacity > 0
-                        revealed: root.open && root.tab === 3
-                        opacity: root.tab === 3 ? 1 : 0
-                        Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
-                    }
-
                     DashDesks {
                         anchors.fill: parent
                         visible: opacity > 0
-                        opacity: root.tab === 4 ? 1 : 0
+                        opacity: root.tab === 2 ? 1 : 0
                         Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
                     }
                 }

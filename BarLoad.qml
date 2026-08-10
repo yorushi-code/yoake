@@ -113,7 +113,7 @@ Item {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onClicked: Toggles.dash("system")
+        onClicked: Toggles.dash("overview")
     }
 
     // The card says which processes, because "the machine is busy" without a
