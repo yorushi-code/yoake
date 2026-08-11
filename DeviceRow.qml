@@ -36,15 +36,29 @@ Rectangle {
     implicitHeight: body.implicitHeight + Theme.rowPad * 2 - (root.hasControl ? 0 : Theme.gapTight)
     radius: Theme.radiusRow
 
+    // ── Why the selected row is the accent and not the domain ──
+    //
+    // A filled selected row is universal -- every list on every desktop does
+    // it -- so it stays. What does not stay is filling it with the *domain's*
+    // hue, which was the same borrowed move the bar has already been taken off:
+    // it made each panel a differently-coloured product rather than one of six
+    // relatives, and it spent a colour on the one row in the list that is
+    // already unmistakable by position.
+    //
+    // So the accent fills, and the accent is the shell's own -- derived from
+    // the wallpaper, shared by every panel. The domain survives where it does
+    // real work: tinting the glyph of a row that is *not* selected, which is
+    // what tells you at a glance that this list is about networks rather than
+    // about sinks.
     color: root.active
-        ? Theme.tone(root.tone)
+        ? Theme.accent
         : (hit.containsMouse ? Qt.alpha(Theme.text, Theme.fillHover)
                              : Qt.alpha(Theme.text, Theme.fillSubtle))
     Behavior on color { ColorAnimation { duration: Theme.animNormal } }
 
-    readonly property color ink: root.active ? Theme.onTone(root.tone) : Theme.text
+    readonly property color ink: root.active ? Theme.crust : Theme.text
     readonly property color subInk: root.active
-        ? Qt.alpha(Theme.onTone(root.tone), Theme.inkSoft)
+        ? Qt.alpha(Theme.crust, Theme.inkSoft)
         : Theme.subtext0
 
     Column {
@@ -66,7 +80,10 @@ Rectangle {
                 icon: root.glyph
                 size: Theme.fontIcon
                 fill: root.active ? 1 : 0
-                color: root.ink
+                // The domain lives here, on the rows that are not selected --
+                // the same place it lives in the bar, and for the same reason:
+                // a tint ranks a list without turning every row into a sticker.
+                color: root.active ? root.ink : Theme.tone(root.tone)
             }
 
             Column {

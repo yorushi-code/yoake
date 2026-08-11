@@ -98,7 +98,7 @@ PanelWindow {
             anchors.right: parent.right
             anchors.topMargin: Theme.barHeight + Theme.barMargin * 2
             anchors.rightMargin: Theme.barMargin
-            width: 340
+            width: Theme.sheetToast
             // As tall as it needs to be. A fixed 500 meant one notification sat
             // at the top of a panel with four fifths of nothing under it, which
             // reads as a list that failed to load rather than a quiet day. The

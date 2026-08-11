@@ -38,10 +38,15 @@ Item {
         slotHeight: root.height - 6
         span: root.width
 
+        // The accent, not the domain -- the same rule DeviceRow now follows.
+        // Two different "this is the chosen one" colours inside one panel is
+        // the six-separate-products problem one level down: accent means
+        // chosen, domain means what the panel is about, and a control cannot
+        // hold both jobs.
         Rectangle {
             anchors.fill: parent
             radius: Theme.radiusChip - 2
-            color: Theme.tone(root.tone)
+            color: Theme.accent
         }
     }
 
@@ -64,7 +69,7 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     text: cell.modelData
-                    color: cell.chosen ? Theme.onTone(root.tone)
+                    color: cell.chosen ? Theme.crust
                         : (cellHit.containsMouse ? Theme.text : Theme.subtext0)
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSmall

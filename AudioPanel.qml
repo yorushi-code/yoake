@@ -85,7 +85,7 @@ PanelWindow {
             anchors.right: parent.right
             anchors.topMargin: Theme.barHeight + Theme.barMargin * 2
             anchors.rightMargin: Theme.barMargin
-            width: 430
+            width: Theme.sheetList
             height: Math.min(700, column.implicitHeight + Theme.sheetPad * 2)
             align: "right"
             accent: Theme.tone("audio")

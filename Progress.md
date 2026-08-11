@@ -168,14 +168,29 @@ Newest last.
   and needs nothing else to be found. Colour ranks again, because a coloured
   ground no longer appears while the machine is fine. Lint clean, log clean.
 
-  **Phase 3 is not finished.** Remaining, in order:
-  1. `DeviceRow`'s active row is still a solid `Theme.tone()` ground with
-     `onTone` ink — the same borrowed move one layer down. A filled selected row
-     is a universal pattern, so this needs judging rather than reflex: decide
-     whether the panels keep it, and if so, say why in the file.
-  2. **F4 panel widths** — 430 / 460 / 700 / 520 / 340 / 320 / 218 as raw
-     literals. Give them a ladder in `Theme` (sheet widths are an optical
-     decision about line length, not arithmetic) and move every panel onto it.
-  3. Spacing and radii sweep across the panels written this pass; they were
+  Follow-ups from this decision are below.
+
+- **P3.2 — One rule for colour inside a panel.** The selected `DeviceRow` and
+  the chosen `Segmented` cell were each filled with the *domain's* hue, which
+  put two different "this is the chosen one" colours in one panel and made each
+  panel a differently-coloured product rather than one of six relatives. Both
+  now fill with the shell's own accent. The domain survives where it does real
+  work: tinting the glyph of a row that is not selected, and the liquid in a
+  `LevelTile`, which is subject identity rather than choice.
+
+  The rule, written once so it stops being re-decided: **accent means chosen,
+  domain means what this is about, and no control holds both jobs.**
+
+- **P3.3 — F4 closed. Sheet widths have a ladder.** `sheetList` 430,
+  `sheetReading` 520, `sheetWide` 700, `sheetToast` 340, named by what they hold
+  because they are decisions about line length rather than arithmetic. All eight
+  panels moved onto it; VPN was 460 for no reason anyone recorded and is now on
+  the list rung with the rest.
+
+  **Phase 3 is still not finished.** Remaining:
+  1. Spacing and radii sweep across the panels written this pass — they were
      built fast and never audited against the ladders as a set.
+  2. `Popover.qml` still carries 320 / 218 as raw widths.
+  3. Re-screenshot every panel after the colour change; only the audio panel has
+     been seen since.
 

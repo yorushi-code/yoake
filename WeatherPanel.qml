@@ -66,7 +66,7 @@ PanelWindow {
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.topMargin: Theme.barHeight + Theme.barMargin * 2
-            width: 520
+            width: Theme.sheetReading
             height: column.implicitHeight + Theme.sheetPad * 2
             // Centred, because the chip it belongs to is in the middle of the
             // strip and a sheet has to come from where it was asked for.

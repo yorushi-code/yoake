@@ -80,7 +80,7 @@ PanelWindow {
             anchors.left: parent.left
             anchors.topMargin: Theme.barHeight + Theme.barMargin * 2
             anchors.leftMargin: Theme.barMargin
-            width: 700
+            width: Theme.sheetWide
             height: Math.min(760, column.implicitHeight + Theme.sheetPad * 2)
             align: "left"
             accent: Theme.accent

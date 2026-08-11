@@ -309,6 +309,19 @@ QtObject {
     readonly property int sheetPad: 18
     readonly property int rowPad: 14
 
+    // ── Sheet widths ──
+    //
+    // The last numbers in the shell with no ladder under them: 430, 460, 520,
+    // 700 and 340 were each decided once and never compared. They are optical
+    // decisions about *line length*, not arithmetic -- a column of device names
+    // wants a different measure from a paragraph of forecast -- so they are
+    // named by what they hold rather than by size, and a panel picks the rung
+    // that matches its content instead of inventing a number.
+    readonly property int sheetList: 430      // a column of rows: devices, networks, nodes
+    readonly property int sheetReading: 520   // continuous text: a forecast, a description
+    readonly property int sheetWide: 700      // a panel with a second region beside the first
+    readonly property int sheetToast: 340     // one notification, read at a glance
+
     // A pill for anything whose height is its identity -- a chip, a toggle,
     // a badge. Written as a function so the call site cannot drift from the
     // height it is rounding.
