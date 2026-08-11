@@ -81,7 +81,7 @@ Item {
         }
 
         const timer = toastTimerComponent.createObject(root, {
-            notification, interval: entry.timeout
+            key: entry.id, interval: entry.timeout
         });
         // Handed to the card so hovering can hold it. Stopping only the drawn
         // countdown while the real one ran underneath would make the card lie
@@ -98,8 +98,23 @@ Item {
     // whatever was added to the entry since it was written, and the field it
     // would drop is always the newest one, so the bug arrives with the feature.
     function dismissToast(notification) {
+        for (const t of root.activeToasts) {
+            if (t.notification === notification) {
+                root.dismissKey(t.id);
+                return;
+            }
+        }
+    }
+
+    // Dismissal is by card, and the countdown fires this rather than the one
+    // above. Grouping is why: a card takes over the newest message, so the
+    // notification a timer was created with stops being the one the card is
+    // showing after the second message arrives -- and a timer that dismisses
+    // "its" notification then matches no card at all. The symptom was a
+    // grouped toast that never went away, with nothing in the log to say so.
+    function dismissKey(key) {
         root.activeToasts = root.activeToasts.map(t => {
-            if (t.notification !== notification) return t;
+            if (t.id !== key) return t;
             // The countdown only destroyed itself when it fired. Every toast
             // dismissed by hand -- which is most of them -- left a stopped
             // Timer parented to this object for the life of the session.
@@ -109,27 +124,36 @@ Item {
             }
             return Object.assign({}, t, { leaving: true, timer: null });
         });
-        const reaper = toastReaperComponent.createObject(root, { notification });
+        const reaper = toastReaperComponent.createObject(root, { key: key });
         reaper.start();
     }
 
     Component {
         id: toastTimerComponent
         Timer {
-            property var notification
-            // No destroy() here: dismissToast owns the countdown's lifetime now,
+            // `var`, not `string`: the entry's id comes from the notification
+            // and is a number, and declaring this a string converted it, so
+            // `t.id !== key` compared 109 against "109" and matched nothing.
+            // The countdown fired on time every time and dismissed a card that
+            // did not exist, which is why the log was clean and the toast
+            // stayed on screen forever.
+            property var key
+            // No destroy() here: dismissKey owns the countdown's lifetime now,
             // and it is reached on this path too.
-            onTriggered: root.dismissToast(notification)
+            onTriggered: root.dismissKey(key)
         }
     }
 
     Component {
         id: toastReaperComponent
         Timer {
-            property var notification
+            // By card, for the same reason the countdown is: after grouping,
+            // the notification an entry was created with is no longer the one
+            // it is showing, and a reaper that filters by it removes nothing.
+            property var key
             interval: Theme.animExit + 60
             onTriggered: {
-                root.activeToasts = root.activeToasts.filter(t => t.notification !== notification);
+                root.activeToasts = root.activeToasts.filter(t => t.id !== key);
                 destroy();
             }
         }
@@ -667,3 +691,4 @@ Item {
         }
     }
 }
+

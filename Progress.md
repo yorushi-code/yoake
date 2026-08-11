@@ -22,7 +22,7 @@ Status keys: `IMPLEMENTED` / `PARTIAL` / `MISSING` / `WRONG`.
 | 4 | Motion system | MISSING |
 | 5 | Bar composition | MISSING |
 | 6 | Media / player system | MISSING |
-| 7 | Notifications | MISSING |
+| 7 | Notifications | PARTIAL |
 | 8 | System panels | MISSING |
 | 9 | Performance | MISSING |
 | 10 | Integration testing | MISSING |
@@ -210,4 +210,29 @@ Newest last.
   3. `PowerPanel`'s session actions sit in the same visual class as the power
      profiles above them, so "Выключение" looks like a setting rather than an
      act. Hierarchy problem, not colour.
+
+- **B1 — Notifications never expired. FIXED.** Found by running the brief's own
+  scenario rather than by reading: twenty at once, then wait. The card was still
+  on screen eleven seconds later, and a single notification behaved the same, so
+  it was not a grouping fault.
+
+  Two bugs stacked, and the outer one hid the inner one.
+
+  *The identity bug.* The countdown was created holding the notification it was
+  born with, and grouping makes a card take over the newest message — so after
+  the second message arrives, the timer's notification is no longer the one any
+  card is showing, and dismissing "its" notification matches nothing. The reaper
+  had the same fault. Both now work by the card's own id, which grouping
+  preserves.
+
+  *The bug underneath.* `property string key` against an entry id that is a
+  number. QML converted it, and `t.id !== key` then compared `109` with `"109"`
+  and matched nothing. The countdown fired on time, every time, and dismissed a
+  card that did not exist.
+
+  This is the shape of failure the brief is about, and it is worth keeping as
+  the example: lint clean, log clean, config loaded, no error anywhere — and the
+  feature simply did not work. It was only found by instrumenting the timer and
+  watching it fire into nothing. Verified after the fix in both scenarios:
+  single notification gone at 9s, fifteen grouped gone at 10s.
 
