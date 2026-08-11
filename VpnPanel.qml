@@ -118,15 +118,17 @@ PanelWindow {
                         width: 28
                         height: 28
                         radius: Theme.pill(height)
-                        color: win.up ? Theme.tone("vpn") : Qt.alpha(Theme.text, Theme.fillMuted)
+                        // On/off, not chosen -- see NetworkPanel.
+                        color: Qt.alpha(Theme.text, Theme.fillMuted)
                         Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
                         MaterialSymbol {
+                            id: tunnelGlyph
                             anchors.centerIn: parent
                             icon: Glyphs.vpn
                             size: Theme.fontIconSmall
                             fill: win.up ? 1 : 0
-                            color: win.up ? Theme.onTone("vpn") : Theme.subtext0
+                            color: win.up ? Theme.tone("vpn") : Theme.subtext0
 
                             // Only while the tunnel is actually coming up: the
                             // one moment the shell has nothing else to say for
@@ -136,7 +138,13 @@ PanelWindow {
                             SequentialAnimation on opacity {
                                 running: Mihomo.busy
                                 loops: Animation.Infinite
-                                onStopped: parent.opacity = 1
+                                // By id. An animation is not a visual item and
+                                // has no `parent`, so this wrote to nothing and
+                                // the glyph stayed at whatever opacity the loop
+                                // was interrupted on -- a tunnel that finished
+                                // connecting kept a half-faded icon until the
+                                // panel was rebuilt.
+                                onStopped: tunnelGlyph.opacity = 1
                                 NumberAnimation { to: Theme.inkFaint; duration: Theme.animBusy; easing.type: Easing.InOutQuad }
                                 NumberAnimation { to: 1.0; duration: Theme.animBusy; easing.type: Easing.InOutQuad }
                             }

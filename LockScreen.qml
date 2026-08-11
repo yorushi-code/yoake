@@ -251,6 +251,7 @@ WlSessionLock {
                         Repeater {
                             model: Math.min(LockState.entry.length, 16)
                             delegate: Rectangle {
+                                id: pip
                                 width: 8
                                 height: 8
                                 radius: Theme.radiusPip
@@ -260,7 +261,11 @@ WlSessionLock {
                                 Component.onCompleted: popIn.start()
                                 NumberAnimation {
                                     id: popIn
-                                    target: parent
+                                    // By id: an animation has no `parent`, so
+                                    // this targeted nothing and the pip that
+                                    // marks a typed character has never once
+                                    // popped in.
+                                    target: pip
                                     property: "scale"
                                     from: 0.2
                                     to: 1

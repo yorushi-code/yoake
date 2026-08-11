@@ -83,6 +83,7 @@ Item {
         // Placeholder while the thumbnail is still being generated: a strip of
         // empty rectangles reads as broken, a pulsing one reads as loading.
         Rectangle {
+            id: placeholder
             anchors.fill: parent
             color: Theme.surface1
             visible: !root.thumbReady || thumb.status !== Image.Ready
@@ -91,7 +92,12 @@ Item {
                 id: shimmer
                 property real phase: 0
                 NumberAnimation on phase {
-                    running: parent.visible
+                    // By id, and it matters more here than it reads: a
+                    // property-value-source animation runs by default, and
+                    // `parent` inside one resolves to nothing -- so this
+                    // shimmered forever behind every thumbnail that had already
+                    // loaded, in a grid of them.
+                    running: placeholder.visible
                     loops: Animation.Infinite
                     from: 0
                     to: Math.PI * 2

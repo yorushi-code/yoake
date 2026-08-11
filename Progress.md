@@ -236,3 +236,33 @@ Newest last.
   watching it fire into nothing. Verified after the fix in both scenarios:
   single notification gone at 9s, fifteen grouped gone at 10s.
 
+- **B2 — `parent` inside an animation, three times. FIXED.** Surfaced by a rapid
+  panel toggle: `VpnPanel.qml:139` logged `ReferenceError: parent is not
+  defined`. Swept the tree for the class and found two more, both silent.
+
+  An animation is not a visual item, so it has no `parent`, and QML says so only
+  when the expression is evaluated — which is why two of the three never
+  appeared in a log at all.
+
+  - `VpnPanel` — `onStopped: parent.opacity = 1` wrote to nothing, so a tunnel
+    that finished connecting kept a half-faded icon until the panel was rebuilt.
+  - `LockScreen` — `target: parent` on the pip that marks a typed character.
+    It has never once popped in.
+  - `WallpaperTile` — `running: parent.visible` on a *property-value-source*
+    animation, which runs by default. A broken `running` binding therefore left
+    it shimmering forever behind every thumbnail that had already loaded, in a
+    grid of them. The worst of the three and the only one with a cost.
+
+  Also here: `VpnPanel`'s header toggle still filled with the domain hue and now
+  follows P3.5 like the other two.
+
+- **B3 — Rapid panel toggling is clean.** Ten open/close cycles in a row on the
+  audio panel, then a close: nothing stuck, nothing half-drawn, no stale window,
+  log clean. This scenario passes and does not need revisiting.
+
+- **M1 — Measured, not assumed.** Wallpaper picker open: 48.3% of a core, which
+  is thumbnail decoding and is over the contract while it lasts. Two seconds
+  after closing: 35.6%. Twelve seconds after closing: 7.0%. So the picker leaves
+  nothing running — the tail is decode, not a leak. Recorded because "probably
+  fine" is not an answer and the number was worth having.
+
