@@ -21,7 +21,7 @@ Status keys: `IMPLEMENTED` / `PARTIAL` / `MISSING` / `WRONG`.
 | 3 | Visual system | PARTIAL |
 | 4 | Motion system | MISSING |
 | 5 | Bar composition | MISSING |
-| 6 | Media / player system | MISSING |
+| 6 | Media / player system | PARTIAL |
 | 7 | Notifications | PARTIAL |
 | 8 | System panels | MISSING |
 | 9 | Performance | MISSING |
@@ -84,7 +84,7 @@ overrules it: the centre is content territory. Needs a peripheral zone, and the
 collision with the desktop rail and the bar's right cluster has to be solved
 rather than dodged.
 
-**F2 — Player selection exists and is unreachable. PARTIAL, and a regression.**
+**F2 — Player selection exists and is unreachable. FIXED, see B5.**
 `Media.pinned` / `Media.pin()` are real, and there are two selectors:
 `BarMedia.qml:160` (buried in a right-click menu) and `DashMedia.qml:277`
 (chips) — but `DashMedia` sits on the "Медиа" dashboard tab, which was deleted
@@ -285,4 +285,36 @@ Newest last.
   follows every change, restored, `Configuration Loaded` confirmed. Recorded
   because the night rules say to record it, and because it is the argument for
   checking the log after every single edit rather than at the end of a batch.
+
+- **B5 — Player selection is explicit again.** The shell picked a player on a
+  heuristic -- pinned, else playing, else the first it had heard of -- and never
+  said which, or that there was a choice; and the only visible selector had been
+  orphaned when the Медиа dashboard tab was deleted. The media panel now carries
+  a row of the live players with the controlled one marked, and clicking the
+  chosen one releases the pin and hands the shell back its own judgement.
+
+  Shown only when there is more than one. A list of one is not a choice, and it
+  would be a row of chrome asking to be read every time.
+
+  Also: a pinned player that goes away used to leave a dangling choice. `player`
+  already fell back correctly so nothing looked wrong, but the pin survived and
+  would have silently re-taken control if the same object ever came back. It is
+  cleared the moment the player leaves — honoured or forgotten, never haunting.
+
+  **Not verified with two players.** Only Firefox is alive on this machine
+  tonight and starting a second one would mean making noise while the user
+  sleeps. `playerctld` is installed and would appear as a second MPRIS name;
+  that is the way to check it in the morning.
+
+- **B6 — Two defects on the panel's own face, found by looking at it.**
+  The disc was blank whenever a track reported no artwork, which a browser
+  playing a stream does routinely — an empty circle reads as art that failed
+  rather than as a record with no sleeve. It carries a music glyph now, and the
+  spindle hole is hidden while it does, because a hole punched through the
+  middle of the placeholder made the two read as neither.
+
+  And the source line said "VIA Mozilla org.mozilla.firefox", because that is
+  literally what Firefox puts in its MPRIS `Identity`. Dropping a reverse-DNS
+  token is not guessing at what an application meant; it is refusing to print a
+  field the application filled in badly.
 

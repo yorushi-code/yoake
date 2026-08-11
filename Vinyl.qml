@@ -40,7 +40,20 @@ Item {
         border.width: 2
         border.color: root.ring
 
+        // What a record looks like with no sleeve. Drawn rather than left
+        // blank: an empty circle reads as art that failed to load, and this
+        // happens routinely -- a browser playing a stream often reports no
+        // artwork at all.
+        MaterialSymbol {
+            anchors.centerIn: parent
+            visible: root.source === "" || art.status !== Image.Ready
+            icon: Glyphs.music
+            size: Theme.fontIconHero
+            color: Qt.alpha(Theme.text, Theme.inkGhost)
+        }
+
         Image {
+            id: art
             anchors.fill: parent
             source: root.source
             fillMode: Image.PreserveAspectCrop
@@ -60,8 +73,12 @@ Item {
         }
     }
 
+    // The spindle. Hidden when there is no sleeve, because it is a detail *of*
+    // a sleeve -- drawn over the empty-state glyph it punched a dark dot
+    // through the middle of it and the two together read as neither.
     Rectangle {
         anchors.centerIn: parent
+        visible: root.source !== ""
         width: root.width * root.holeRatio
         height: width
         radius: width / 2

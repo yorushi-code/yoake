@@ -38,6 +38,55 @@ Singleton {
         root.pinned = (root.pinned === target) ? null : target;
     }
 
+    // Everything MPRIS is offering, for a panel that lets a person choose
+    // rather than a heuristic that decides for them. Ordered so the list does
+    // not reshuffle under the pointer: playing first, then whatever order MPRIS
+    // reported, which is stable for the life of a player.
+    readonly property var players: {
+        const list = [...Mpris.players.values];
+        list.sort((a, b) => (b.isPlaying ? 1 : 0) - (a.isPlaying ? 1 : 0));
+        return list;
+    }
+
+    // What to call one on screen. `identity` is the application's own name for
+    // itself and is what a person recognises; the bus name is the fallback for
+    // a player that did not set one.
+    function playerLabel(p) {
+        if (!p) return "";
+        const raw = String(p.identity
+            || String(p.dbusName || "").replace("org.mpris.MediaPlayer2.", ""));
+        // Firefox reports its Identity as "Mozilla org.mozilla.firefox" -- the
+        // name and the application id in one string. Dropping a reverse-DNS
+        // token is not guessing at what an application meant; it is refusing to
+        // print a field the application filled in badly.
+        return raw.split(/\s+/).filter(w => !/^[a-z0-9-]+(\.[a-z0-9-]+){2,}$/.test(w))
+            .join(" ") || raw;
+    }
+
+    // Three states, and they are not the same question. A player can be
+    // chosen, or merely playing, or neither -- and a panel that shows only
+    // "playing" cannot say why the shell is following a paused one.
+    function playerState(p) {
+        if (!p) return "";
+        if (root.pinned === p) return "выбран";
+        if (p.isPlaying) return "играет";
+        return "";
+    }
+
+    // A pinned player that goes away leaves a dangling choice: `player` already
+    // falls back correctly, so nothing breaks visibly, but the pin survives and
+    // would silently re-take control if an application with the same object
+    // ever came back. Cleared as soon as it is gone, so the choice a person
+    // made is either honoured or forgotten -- never haunting.
+    property Connections _playersGone: Connections {
+        target: Mpris.players
+        function onValuesChanged() {
+            if (root.pinned && Mpris.players.values.indexOf(root.pinned) < 0) {
+                root.pinned = null;
+            }
+        }
+    }
+
     // ── Latched metadata (what the UI binds to) ──
     property string title: ""
     property string artist: ""

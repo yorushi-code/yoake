@@ -159,7 +159,7 @@ PanelWindow {
                             Text {
                                 anchors.verticalCenter: parent.verticalCenter
                                 visible: Media.player !== null
-                                text: "VIA " + (Media.player ? Media.player.identity : "")
+                                text: "VIA " + Media.playerLabel(Media.player)
                                 color: Theme.subtext0
                                 font.family: Theme.fontFamily
                                 font.pixelSize: Theme.fontMicro
@@ -255,6 +255,44 @@ PanelWindow {
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+
+                // ── Which player this panel is about ──
+                //
+                // The shell picked one on a heuristic -- pinned, else playing,
+                // else the first it had heard of -- and never said which, or
+                // that there was a choice. With a browser and a music player
+                // both alive that is the panel controlling one of them for
+                // reasons nobody can see.
+                //
+                // Only shown when there is something to choose between. A list
+                // of one is not a choice and would be a row of chrome asking to
+                // be read every time.
+                Row {
+                    width: parent.width
+                    spacing: Theme.spacing
+                    visible: Media.players.length > 1
+
+                    Repeater {
+                        model: Media.players
+
+                        delegate: Chip {
+                            required property var modelData
+                            tone: "media"
+                            // Live means "this is the one being controlled",
+                            // which is the only question the row answers.
+                            live: modelData === Media.player
+                            glyph: modelData.isPlaying ? Glyphs.play : Glyphs.pause
+                            label: Media.playerLabel(modelData)
+                            labelCap: 150
+                            value: Media.playerState(modelData)
+                            // Clicking the one already chosen releases the pin
+                            // and hands the shell back to its own judgement,
+                            // which is what a second click on a choice should
+                            // mean.
+                            onClicked: Media.pin(modelData)
                         }
                     }
                 }
