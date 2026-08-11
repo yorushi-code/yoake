@@ -1,21 +1,40 @@
 import QtQuick
 
-// The bar's one widget.
+// One mark in the bar.
 //
-// Every mark in the bar used to be a glyph, sometimes with a number beside it,
-// all in the same ink. That bar tells you a network exists. It does not tell
-// you *which* network, and the difference between those two sentences is the
-// whole of what makes an interface usable by someone who did not build it.
+// What it has to do has not changed and is worth restating, because the form
+// below is the second attempt at it: a mark must **name its subject in words**,
+// and the row must be **sortable by colour before it is read** — you should be
+// able to find the network without reading anything.
 //
-// A chip names the thing. It also carries a colour that says what kind of thing
-// it is, so the eye sorts the row before reading any of it -- and the colour is
-// the ground rather than a tint, because at this size a colour that is not the
-// ground does not register at all.
+// The first attempt did both by making every mark a saturated pill with dark
+// ink on it. That works, and it was lifted almost whole from the shell this one
+// was measured against, and it has a real fault of its own: when ten things are
+// each a coloured sticker, colour has stopped ranking anything. Everything is
+// accent, so nothing is.
 //
-// `live` is the other half: a coloured chip is a value that is *doing*
-// something, a neutral one is a thing that merely exists. More than about five
-// coloured chips at once means the distinction has stopped being made.
-Rectangle {
+// ── The form this uses instead ──
+//
+// **The ground is never coloured.** The strip is one surface and the marks sit
+// on it; nothing in the normal state of the machine is a separate coloured
+// object. What carries the domain is a hairline **under** the mark, on a
+// baseline shared by the whole row. A row of coloured ticks at one constant y
+// is easier to scan than ten pills at ten different widths — the eye follows a
+// line, not a set of shapes.
+//
+// **Colour as ground is reserved for alert**, and that is the whole reason it
+// stays loud. A filled mark never appears while the machine is fine, so when
+// one appears it is the only filled thing on the bar and needs no size, no
+// motion and no badge to be found.
+//
+// So there are three classes and they are structurally different rather than
+// differently coloured:
+//
+//   passive   neutral ink, no rule          — a thing that merely exists
+//   live      tinted glyph, neutral label,  — a value that is doing something
+//             domain rule beneath
+//   alert     filled ground, dark ink       — something is wrong
+Item {
     id: root
 
     // A key from Theme.domainHue, or "media" / "neutral".
@@ -33,26 +52,43 @@ Rectangle {
     signal rightClicked()
     signal scrolled(int delta)
 
-    readonly property color ground: root.alert ? Theme.tone("alert")
-        : (root.live ? Theme.tone(root.tone) : Qt.alpha(Theme.text, Theme.fillSubtle))
-    readonly property color ink: root.alert ? Theme.onTone("alert")
-        : (root.live ? Theme.onTone(root.tone) : Theme.subtext1)
-
     implicitWidth: row.implicitWidth + Theme.chipPadH * 2
     implicitHeight: Theme.chipHeight
-    radius: Theme.pill(height)
 
-    color: hit.containsMouse ? Qt.lighter(root.ground, 1.12) : root.ground
-    Behavior on color { ColorAnimation { duration: Theme.animFast } }
+    readonly property color domain: Theme.tone(root.tone)
 
-    scale: hit.pressed ? 0.94 : 1
-    Behavior on scale {
-        NumberAnimation { duration: Theme.animFast; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig }
+    // The label is the same ink in every class. Its job is to be read, and a
+    // label that changes colour with state is a label competing with the state.
+    readonly property color labelInk: root.alert
+        ? Theme.onTone("alert")
+        : (root.live ? Theme.text : Theme.subtext0)
+
+    // The glyph is where the domain lives when the mark is live. Passive marks
+    // keep it neutral, because a passive thing has no domain worth ranking.
+    readonly property color glyphInk: root.alert
+        ? Theme.onTone("alert")
+        : (root.live ? root.domain : Theme.subtext0)
+
+    // ── Ground ──
+    //
+    // Present only under the pointer, and filled only in alert. Hover is a
+    // response to the pointer rather than a state of the machine, so it is the
+    // faintest thing here and it does not survive the pointer leaving.
+    Rectangle {
+        anchors.fill: parent
+        radius: Theme.radiusChip
+        color: root.alert
+            ? Theme.tone("alert")
+            : (hit.containsMouse ? Qt.alpha(Theme.text, Theme.fillSubtle) : "transparent")
+        Behavior on color { ColorAnimation { duration: Theme.animFast } }
     }
 
     Row {
         id: row
         anchors.centerIn: parent
+        // Half a step tighter than the ladder's smallest gap: a glyph and the
+        // word it belongs to are one mark, and at label size the ladder's gap
+        // reads as two.
         spacing: Theme.gapTight + 2
 
         MaterialSymbol {
@@ -60,11 +96,12 @@ Rectangle {
             visible: root.glyph !== ""
             icon: root.glyph
             size: Theme.fontIconMicro
-            // Filled on a coloured ground and outlined on a neutral one: a
-            // solid glyph needs the contrast a live chip has and looks like a
-            // blot without it.
-            fill: root.live ? 1 : 0
-            color: root.ink
+            // Solid when the mark is live, outlined when it is not. The fill
+            // axis is doing the same job as the rule below -- saying this one
+            // is *running* -- at a size where the rule alone would be thin.
+            fill: root.live || root.alert ? 1 : 0
+            color: root.glyphInk
+            Behavior on color { ColorAnimation { duration: Theme.animFast } }
         }
 
         Text {
@@ -72,7 +109,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             visible: root.label !== ""
             text: root.label
-            color: root.ink
+            color: root.labelInk
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontLabel
             font.weight: Font.Medium
@@ -80,18 +117,55 @@ Rectangle {
             width: root.labelCap > 0
                 ? Math.min(implicitWidth, root.labelCap)
                 : implicitWidth
+            Behavior on color { ColorAnimation { duration: Theme.animFast } }
         }
 
         Text {
             anchors.verticalCenter: parent.verticalCenter
             visible: root.value !== ""
             text: root.value
-            color: root.ink
+            color: root.labelInk
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontLabel
+            // A number is the thing being reported, so it outranks the noun in
+            // front of it. This is the only weight step in the mark.
             font.weight: Font.DemiBold
             font.features: ({ "tnum": 1 })
+            Behavior on color { ColorAnimation { duration: Theme.animFast } }
         }
+    }
+
+    // ── The rule ──
+    //
+    // Inset to the content rather than the hit area, so the line is the width
+    // of what it underlines and the row of them reads as a set of measurements
+    // rather than as a set of boxes.
+    Rectangle {
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 1
+        width: root.alert ? 0 : row.implicitWidth
+        height: 2
+        radius: height / 2
+        color: root.domain
+        opacity: root.live && !root.alert ? 1 : 0
+
+        // Grows from the middle when a mark comes alive rather than fading in:
+        // the rule is a measurement, and a measurement that appears at full
+        // length has not been taken.
+        Behavior on width {
+            NumberAnimation {
+                duration: Theme.animNormal
+                easing.type: Easing.Bezier
+                easing.bezierCurve: Theme.easeEmphasized
+            }
+        }
+        Behavior on opacity { NumberAnimation { duration: Theme.animFast } }
+    }
+
+    scale: hit.pressed ? 0.94 : 1
+    Behavior on scale {
+        NumberAnimation { duration: Theme.animFast; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig }
     }
 
     MouseArea {

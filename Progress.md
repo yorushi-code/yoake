@@ -18,7 +18,7 @@ Status keys: `IMPLEMENTED` / `PARTIAL` / `MISSING` / `WRONG`.
 |---|---|---|
 | 1 | Audit | IMPLEMENTED |
 | 2 | Architecture map | IMPLEMENTED |
-| 3 | Visual system | MISSING |
+| 3 | Visual system | PARTIAL |
 | 4 | Motion system | MISSING |
 | 5 | Bar composition | MISSING |
 | 6 | Media / player system | MISSING |
@@ -92,7 +92,7 @@ in `043d542`. So the only visible selector was orphaned by this pass. The
 fallback rule itself is sound (`pinned` → first playing → first known), but the
 brief wants selection explicit, and right-click on a bar widget is not explicit.
 
-**F3 — The chip vocabulary is a direct borrowing from the reference. WRONG.**
+**F3 — The chip vocabulary is a direct borrowing. FIXED, see phase 3.**
 Saturated pastel pills with dark ink, one hue per domain, a coloured pill per
 status: that is Serpantinum's visual signature, adopted almost literally in
 `Chip.qml` + `Theme.tone()`. The *principle* (a mark should name its subject,
@@ -157,3 +157,25 @@ that rather than assuming it.
 ## Log
 
 Newest last.
+
+- **P3.1 — Chip redesigned.** The borrowed form (saturated pill, dark ink on
+  colour, one hue per domain as the ground) is gone. Three classes now, and they
+  differ structurally rather than by hue: *passive* is neutral ink with no rule,
+  *live* is a domain-tinted glyph with a neutral label and a domain hairline
+  underneath, *alert* is the only filled ground in the bar. Verified on screen:
+  the rules form a row of ticks on one baseline, which scans better than ten
+  pills at ten widths, and the muted-microphone alert is the single filled mark
+  and needs nothing else to be found. Colour ranks again, because a coloured
+  ground no longer appears while the machine is fine. Lint clean, log clean.
+
+  **Phase 3 is not finished.** Remaining, in order:
+  1. `DeviceRow`'s active row is still a solid `Theme.tone()` ground with
+     `onTone` ink — the same borrowed move one layer down. A filled selected row
+     is a universal pattern, so this needs judging rather than reflex: decide
+     whether the panels keep it, and if so, say why in the file.
+  2. **F4 panel widths** — 430 / 460 / 700 / 520 / 340 / 320 / 218 as raw
+     literals. Give them a ladder in `Theme` (sheet widths are an optical
+     decision about line length, not arithmetic) and move every panel onto it.
+  3. Spacing and radii sweep across the panels written this pass; they were
+     built fast and never audited against the ladders as a set.
+
