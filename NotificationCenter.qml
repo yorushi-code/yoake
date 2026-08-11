@@ -208,28 +208,37 @@ Item {
         }
     }
 
-    // ── Toast popups: under the centre island, auto-dismiss, slide+fade in ──
+    // ── Toasts: under the bell they belong to ──
     //
-    // They fell down the right-hand edge until the desktop rail moved in
-    // underneath them: a notification landed squarely across a 112px clock, so
-    // the one surface that is always readable at a glance was hidden by the
-    // one surface that always arrives unannounced. Centre is the only free
-    // column, and it is the honest one — the centre island is already where
-    // this shell puts "what is going on", and it is what a toast is.
+    // They were centred, and the comment that used to be here defended it: the
+    // desktop rail had taken the right-hand edge, so a notification landed
+    // across a 112px clock. That solved a collision by moving into the one
+    // column that is never free -- the centre is where content is, and a toast
+    // over the middle of the screen interrupts whatever is being read.
+    //
+    // A toast now arrives where its chip is, which is the rule every sheet in
+    // this shell already follows: the bell sits at the right end of the strip,
+    // so its cards come down under the right end of the strip.
+    //
+    // The rail can still be under them, and that is left alone deliberately.
+    // The rail is a widget the user drags and its position is theirs; a toast
+    // that dodged it would be guessing at a layout nobody asked it to know,
+    // and the shell would be reaching across two unrelated surfaces to do it.
+    // On a bare desktop a toast may cross the clock for six seconds. That is a
+    // smaller cost than covering the middle of the screen every time.
     PanelWindow {
         // Overlay, not the default Top: niri draws a fullscreen window above
-        // the Top layer, so a panel the user just asked for would open behind
-        // the video they were watching and read as a dead keystroke.
+        // the Top layer, so a toast would otherwise appear behind whatever is
+        // being watched and be an interruption nobody was shown.
         WlrLayershell.layer: WlrLayer.Overlay
 
-        // Anchored to the top edge alone. With neither side anchored, layer
-        // shell centres the surface on that axis, so this stays centred on any
-        // output without the shell computing a position.
         anchors {
             top: true
+            right: true
         }
         margins {
             top: Theme.barHeight + Theme.barMargin * 2
+            right: Theme.barMargin
         }
         implicitWidth: 340
         implicitHeight: Math.max(1, toastColumn.height)
@@ -439,7 +448,7 @@ Item {
                         id: toastChrome
                         width: parent.width
                         height: toastContent.height + 22
-                        screenX: (Screen.width - toastColumn.width) / 2
+                        screenX: Screen.width - Theme.barMargin - toastColumn.width
                         screenY: Theme.barHeight + Theme.barMargin * 2 + toastDelegate.y
                         onCloseRequested: root.dismissToast(toastDelegate.notification)
 

@@ -76,7 +76,7 @@ not be invented to satisfy a checklist.
 
 ### Findings
 
-**F1 — Notifications are centred. WRONG.**
+**F1 — Notifications are centred. FIXED, see B4.**
 `NotificationCenter.qml:204` anchors the toast window to `top` only, which
 layer-shell centres horizontally. The file's own comment argues the centre is
 "the only free column" because the desktop rail took the right side. The brief
@@ -265,4 +265,24 @@ Newest last.
   after closing: 35.6%. Twelve seconds after closing: 7.0%. So the picker leaves
   nothing running — the tail is decode, not a leak. Recorded because "probably
   fine" is not an answer and the number was worth having.
+
+- **B4 — Toasts moved out of the centre.** They now arrive under the right end
+  of the strip, where the bell is, which is the rule every sheet in this shell
+  already follows: a surface comes from the chip that owns it. The centre is
+  where content is, and the old comment defending it was solving a collision
+  with the desktop rail by moving into the one column that is never free.
+
+  The rail can still be under a toast on a bare desktop, and that is left alone
+  on purpose. The rail is a widget the user drags and its position is theirs; a
+  toast that dodged it would be guessing at a layout nobody asked it to know,
+  and two unrelated surfaces would have to know about each other to do it. Six
+  seconds across the clock is a smaller cost than covering the middle of the
+  screen every time.
+
+  **Broke the shell doing it** — the edit that replaced the comment block also
+  swallowed the `PanelWindow {` opening and its layer declaration, so the
+  configuration failed to load for about a minute. Caught by the log check that
+  follows every change, restored, `Configuration Loaded` confirmed. Recorded
+  because the night rules say to record it, and because it is the argument for
+  checking the log after every single edit rather than at the end of a batch.
 
