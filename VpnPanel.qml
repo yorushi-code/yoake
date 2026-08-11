@@ -356,6 +356,7 @@ PanelWindow {
                         model: Mihomo.subscriptions
 
                         delegate: DeviceRow {
+                            id: subRow
                             required property var modelData
                             width: parent.width
                             tone: "vpn"
@@ -369,7 +370,65 @@ PanelWindow {
                             // Starting a subscription is starting the tunnel on
                             // it, which is what "switch to this one" means here.
                             onActivated: Mihomo.start(modelData.name)
-                            onRightClicked: Mihomo.refreshSubscription(modelData.name)
+                            // Refresh, core and delete are three actions and a
+                            // row has two gestures, so they go where every other
+                            // list of actions in this shell goes.
+                            onRightClicked: Menus.toggle(subRow.menuId)
+
+                            readonly property string menuId:
+                                Menus.idFor(win, "vpnsub/" + (modelData.name || ""))
+
+                            ActionMenu {
+                                menuId: subRow.menuId
+                                anchorItem: subRow
+                                open: Menus.isOpen(subRow.menuId)
+                                model: Menus.isOpen(subRow.menuId) ? [
+                                    {
+                                        text: "Обновить",
+                                        glyph: Glyphs.refresh,
+                                        action: () => Mihomo.refreshSubscription(subRow.modelData.name)
+                                    },
+                                    { separator: true },
+                                    {
+                                        text: "Ядро: mihomo",
+                                        checkable: true,
+                                        checked: (subRow.modelData.core || Mihomo.core) === "mihomo",
+                                        action: () => Mihomo.setCore(subRow.modelData.name, "mihomo")
+                                    },
+                                    {
+                                        text: "Ядро: sing-box",
+                                        checkable: true,
+                                        checked: (subRow.modelData.core || Mihomo.core) === "sing-box",
+                                        action: () => Mihomo.setCore(subRow.modelData.name, "sing-box")
+                                    },
+                                    {
+                                        text: "Ядро: xray",
+                                        checkable: true,
+                                        checked: (subRow.modelData.core || Mihomo.core) === "xray",
+                                        action: () => Mihomo.setCore(subRow.modelData.name, "xray")
+                                    },
+                                    { separator: true },
+                                    {
+                                        text: "Удалить подписку",
+                                        glyph: Glyphs.close,
+                                        destructive: true,
+                                        action: () => Mihomo.removeSubscription(subRow.modelData.name)
+                                    }
+                                ] : []
+                            }
+                        }
+                    }
+
+                    // Adding one. Restored: the rewrite dropped the editor
+                    // entirely, so a subscription could be started, refreshed
+                    // and deleted but never added -- the shell could operate the
+                    // list it was given and not build one.
+                    VpnSubscriptionEditor {
+                        width: parent.width
+                        busy: Mihomo.busy
+                        onSubmitted: (name, url, userAgent) => {
+                            Mihomo.addSubscription(name, url, userAgent);
+                            reset();
                         }
                     }
 

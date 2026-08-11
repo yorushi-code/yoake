@@ -111,15 +111,17 @@ Correct for a panel the user asked for, and untested during a fullscreen game.
 Needs a real check: open one over a game and confirm the game keeps its input
 and gets it back cleanly on close.
 
-**F6 — `VpnNodeRow.qml` and `VpnSubscriptionRow.qml` are orphaned**, along with
+**F6 — `VpnNodeRow.qml` and `VpnSubscriptionRow.qml` were orphaned. FIXED, see B7.**
+Originally:, along with
 the subscription editor's reachability. Carried over from the earlier list; see
 the VPN items below.
 
-### Carried over, still open
+### Carried over
 
-From the VPN audit already done: add / remove subscription, `Mihomo.setCore`,
-group switching, and the two orphan files. The conflict banner and the egress
-row are restored.
+Closed in B7 below, except **group switching** — the panel still hardcodes
+`Mihomo.primaryGroup` ("PROXY"). The old panel could show another group. Left
+open deliberately: this machine has one group, so the feature cannot be verified
+here, and shipping an unverifiable control is worse than a recorded gap.
 
 ## Phase 2 — Architecture map
 
@@ -317,4 +319,20 @@ Newest last.
   literally what Firefox puts in its MPRIS `Identity`. Dropping a reverse-DNS
   token is not guessing at what an application meant; it is refusing to print a
   field the application filled in badly.
+
+- **B7 — The VPN panel can build a list again, not just operate one.** The
+  rewrite had left it able to start, refresh and delete nothing — adding a
+  subscription was gone with the editor, and so were removal and per-subscription
+  core switching. `VpnSubscriptionEditor` is wired back into the Подписки tab,
+  and refresh / core / delete live in a right-click menu, which is where every
+  other list of actions in this shell already goes: three actions do not fit in
+  a row's two gestures.
+
+  `VpnNodeRow.qml` and `VpnSubscriptionRow.qml` are deleted along with their
+  qmldir entries. `DeviceRow` covers what the first did and the menu covers what
+  the second did, and a registered type that nothing instantiates is a trap for
+  whoever reads the file list next.
+
+  Verified on screen: the node list renders with types and the restored egress
+  row reads `2a12:bec4:1b50:2fe::2 · United Kingdom`.
 
