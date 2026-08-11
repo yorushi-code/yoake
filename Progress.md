@@ -336,3 +336,21 @@ Newest last.
   Verified on screen: the node list renders with types and the restored egress
   row reads `2a12:bec4:1b50:2fe::2 · United Kingdom`.
 
+- **B8 — The weather panel stated things the machine did not know.** Only the
+  empty row was gated on `Weather.valid`; the reading itself was not. So before
+  the first fetch landed, and after any failure, the panel drew a complete and
+  confident **0°** with a blank description and a blank place, and three
+  key-values reading 0°, 0 км/ч, 0%. A designed surface asserting a fact nobody
+  had is worse than an empty one, and it is exactly the "beautiful state that
+  does not match the state of the system" the brief names.
+
+  Everything that is a reading is now gated on there being one, and the empty
+  case is three states rather than one: looking for a location, waiting for the
+  fetch, or failed — and only the last carries an action, because only the last
+  has one. Verified with data present: the ready panel is unchanged.
+
+  **Not verified:** the error branch itself. Forcing it means breaking the
+  network, which the night rules forbid. The loading branch is transient and was
+  not caught on camera either. Both are one screenshot each with the network
+  briefly down, in the morning.
+

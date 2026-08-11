@@ -85,9 +85,15 @@ PanelWindow {
                 anchors.margins: Theme.sheetPad
                 spacing: Theme.gapCard
 
+                // Everything below is a reading, so none of it is drawn until
+                // there is one. Before this the panel showed a complete and
+                // confident "0°" with a blank place under it whenever the fetch
+                // had not landed -- a designed surface stating something the
+                // machine did not know, which is worse than an empty one.
                 Row {
                     width: parent.width
                     spacing: Theme.gapCard
+                    visible: Weather.valid
 
                     MaterialSymbol {
                         anchors.verticalCenter: parent.verticalCenter
@@ -129,6 +135,7 @@ PanelWindow {
                 Column {
                     width: parent.width
                     spacing: Theme.gapTight
+                    visible: Weather.valid
 
                     KeyValue {
                         width: parent.width
@@ -151,7 +158,7 @@ PanelWindow {
                 Row {
                     width: parent.width
                     spacing: Theme.spacing
-                    visible: Weather.hourly.length > 0
+                    visible: Weather.valid && Weather.hourly.length > 0
 
                     Repeater {
                         model: Weather.hourly.slice(0, 8)
@@ -211,7 +218,7 @@ PanelWindow {
                 Column {
                     width: parent.width
                     spacing: Theme.spacing
-                    visible: Weather.daily.length > 0
+                    visible: Weather.valid && Weather.daily.length > 0
 
                     Repeater {
                         model: Weather.daily
@@ -229,11 +236,29 @@ PanelWindow {
                     }
                 }
 
-                EmptyRow {
+                // Waiting and failing are different sentences, and only one of
+                // them has anything a person can do about it.
+                Column {
                     width: parent.width
                     visible: !Weather.valid
-                    glyph: Glyphs.weatherCloudy
-                    text: Weather.error !== "" ? Weather.error : "Погода ещё не загрузилась"
+                    spacing: Theme.gapWide
+
+                    EmptyRow {
+                        width: parent.width
+                        glyph: Weather.error !== "" ? Glyphs.wifiOff : Glyphs.weatherCloudy
+                        text: Weather.error !== "" ? Weather.error
+                            : (Weather.located ? "Смотрю за окно…" : "Ищу, где вы")
+                    }
+
+                    Chip {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        visible: Weather.error !== ""
+                        tone: "neutral"
+                        live: false
+                        glyph: Glyphs.refresh
+                        label: "Попробовать снова"
+                        onClicked: Weather.refresh()
+                    }
                 }
             }
         }
