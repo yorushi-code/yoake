@@ -23,6 +23,12 @@ Rectangle {
     property bool muted: false
     // Set false for the active row: its value belongs to the header.
     property bool hasControl: true
+    // A row that *does* something rather than one that is a setting. It has no
+    // active state to show -- the panel is gone a moment after it is clicked --
+    // and the one that ends the session says so under the pointer rather than
+    // permanently: a row that is red before anyone has reached for it is a row
+    // that shouts at a person for opening a panel.
+    property bool danger: false
     property real value: 0
     property string trailing: ""
 
@@ -52,8 +58,10 @@ Rectangle {
     // about sinks.
     color: root.active
         ? Theme.accent
-        : (hit.containsMouse ? Qt.alpha(Theme.text, Theme.fillHover)
-                             : Qt.alpha(Theme.text, Theme.fillSubtle))
+        : (hit.containsMouse
+            ? (root.danger ? Qt.alpha(Theme.tone("alert"), Theme.tintActive)
+                           : Qt.alpha(Theme.text, Theme.fillHover))
+            : Qt.alpha(Theme.text, Theme.fillSubtle))
     Behavior on color { ColorAnimation { duration: Theme.animNormal } }
 
     readonly property color ink: root.active ? Theme.crust : Theme.text
@@ -83,7 +91,9 @@ Rectangle {
                 // The domain lives here, on the rows that are not selected --
                 // the same place it lives in the bar, and for the same reason:
                 // a tint ranks a list without turning every row into a sticker.
-                color: root.active ? root.ink : Theme.tone(root.tone)
+                color: root.active ? root.ink
+                    : (root.danger && hit.containsMouse ? Theme.tone("alert")
+                                                        : Theme.tone(root.tone))
             }
 
             Column {

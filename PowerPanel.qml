@@ -202,15 +202,37 @@ PanelWindow {
                         value: Power.chargeLimit + "%"
                     }
 
-                    // Named actions rather than a row of glyphs. Four unlabelled
-                    // icons where one of them powers the machine off is a
-                    // guessing game with a bad prize.
+                    // ── Settings above, acts below ──
+                    //
+                    // A profile is a choice that persists and shows which one is
+                    // current. An action is a verb: it happens once, the panel
+                    // is gone a moment later, and one of them ends the session.
+                    // Drawn in the same class they read as four more settings,
+                    // which is how "Выключение" ends up looking like something
+                    // you can browse.
+                    Rectangle {
+                        width: parent.width
+                        height: 1
+                        color: Qt.alpha(Theme.text, Theme.fillMuted)
+                    }
+
+                    Text {
+                        text: "СЕАНС"
+                        color: Theme.subtext0
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontMicro
+                        font.letterSpacing: Theme.trackCaption
+                    }
+
+                    // Named, not a row of glyphs. Four unlabelled icons where
+                    // one of them powers the machine off is a guessing game
+                    // with a bad prize.
                     Repeater {
                         model: [
-                            { text: "Заблокировать", glyph: Glyphs.lock, act: () => Power.lock() },
-                            { text: "Спящий режим", glyph: Glyphs.sleep, act: () => Power.suspend() },
-                            { text: "Перезагрузка", glyph: Glyphs.restart, act: () => Power.reboot() },
-                            { text: "Выключение", glyph: Glyphs.power, act: () => Power.powerOff() }
+                            { text: "Заблокировать", glyph: Glyphs.lock, danger: false, act: () => Power.lock() },
+                            { text: "Спящий режим", glyph: Glyphs.sleep, danger: false, act: () => Power.suspend() },
+                            { text: "Перезагрузка", glyph: Glyphs.restart, danger: true, act: () => Power.reboot() },
+                            { text: "Выключение", glyph: Glyphs.power, danger: true, act: () => Power.powerOff() }
                         ]
 
                         delegate: DeviceRow {
@@ -220,6 +242,7 @@ PanelWindow {
                             glyph: modelData.glyph
                             name: modelData.text
                             hasControl: false
+                            danger: modelData.danger
                             onActivated: modelData.act()
                         }
                     }

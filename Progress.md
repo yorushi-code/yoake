@@ -209,9 +209,7 @@ Newest last.
      built fast and never audited against the ladders as a set.
   2. Screenshot the bluetooth, media, weather and VPN panels; only audio,
      network and power have been seen since the colour change.
-  3. `PowerPanel`'s session actions sit in the same visual class as the power
-     profiles above them, so "Выключение" looks like a setting rather than an
-     act. Hierarchy problem, not colour.
+  3. Done — see B9.
 
 - **B1 — Notifications never expired. FIXED.** Found by running the brief's own
   scenario rather than by reading: twenty at once, then wait. The card was still
@@ -353,4 +351,16 @@ Newest last.
   network, which the night rules forbid. The loading branch is transient and was
   not caught on camera either. Both are one screenshot each with the network
   briefly down, in the morning.
+
+- **B9 — Settings and acts stopped sharing a visual class.** A power profile is
+  a choice that persists and shows which one is current; a session action is a
+  verb that happens once and takes the panel with it. Drawn identically, the
+  four verbs read as four more settings, which is how "Выключение" ends up
+  looking like something you can browse.
+
+  A rule and a caption separate them now, and `DeviceRow` learned one property:
+  `danger`. Reboot and power-off tint alert **under the pointer** rather than
+  permanently — a row that is red before anyone has reached for it is a row that
+  shouts at a person for opening a panel. Caught on camera with the pointer over
+  Перезагрузка, so the state is verified rather than assumed.
 
