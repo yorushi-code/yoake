@@ -108,15 +108,18 @@ PanelWindow {
                     Row {
                         spacing: Theme.spacing
 
+                        // On/off, not chosen. A header toggle reports a live
+                        // state, and in this shell a live state is a tinted glyph
+                        // rather than a filled ground -- filling it put a second
+                        // "chosen" colour beside the accent one row down.
                         Rectangle {
                             width: 28
                             height: 28
                             radius: Theme.pill(height)
                             enabled: Bt.powered
                             opacity: enabled ? 1 : Theme.inkFaint
-                            color: Bt.scanning ? Theme.tone("bt")
-                                : (scanHit.containsMouse ? Qt.alpha(Theme.text, Theme.fillHover)
-                                                         : Qt.alpha(Theme.text, Theme.fillMuted))
+                            color: scanHit.containsMouse ? Qt.alpha(Theme.text, Theme.fillHover)
+                                : Qt.alpha(Theme.text, Theme.fillMuted)
                             Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
                             MaterialSymbol {
@@ -124,7 +127,7 @@ PanelWindow {
                                 icon: Glyphs.scan
                                 size: Theme.fontIconSmall
                                 fill: Bt.scanning ? 1 : 0
-                                color: Bt.scanning ? Theme.onTone("bt") : Theme.text
+                                color: Bt.scanning ? Theme.tone("bt") : Theme.text
 
                                 // Only while a scan is genuinely running, and
                                 // stopped rather than paused when it is not --
@@ -152,8 +155,7 @@ PanelWindow {
                             width: 28
                             height: 28
                             radius: Theme.pill(height)
-                            color: Bt.powered ? Theme.tone("bt")
-                                : Qt.alpha(Theme.text, Theme.fillMuted)
+                            color: Qt.alpha(Theme.text, Theme.fillMuted)
                             Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
                             MaterialSymbol {
@@ -161,7 +163,7 @@ PanelWindow {
                                 icon: Bt.powered ? Glyphs.bluetooth : Glyphs.bluetoothOff
                                 size: Theme.fontIconSmall
                                 fill: Bt.powered ? 1 : 0
-                                color: Bt.powered ? Theme.onTone("bt") : Theme.subtext0
+                                color: Bt.powered ? Theme.tone("bt") : Theme.subtext0
                             }
 
                             MouseArea {

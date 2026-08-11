@@ -185,7 +185,7 @@ Item {
     Popover {
         anchorItem: root
         hovered: ma.containsMouse && !Menus.isOpen(root.menuId)
-        minWidth: 244
+        minWidth: Theme.popoverWidth
 
         Column {
             spacing: Theme.gapWide

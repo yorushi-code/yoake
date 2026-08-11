@@ -163,7 +163,7 @@ Item {
     Popover {
         anchorItem: root
         hovered: ma.containsMouse && !Toggles.vpnPanelOpen && !Menus.isOpen(root.menuId)
-        minWidth: 248
+        minWidth: Theme.popoverWidth
 
         Column {
             spacing: Theme.gapWide

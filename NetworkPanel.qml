@@ -110,13 +110,16 @@ PanelWindow {
                     Row {
                         spacing: Theme.spacing
 
+                        // On/off, not chosen. A header toggle reports a live
+                        // state, and in this shell a live state is a tinted glyph
+                        // rather than a filled ground -- filling it put a second
+                        // "chosen" colour beside the accent one row down.
                         Rectangle {
                             width: 28
                             height: 28
                             radius: Theme.pill(height)
-                            color: Net.scanning ? Theme.tone("net")
-                                : (scanHit.containsMouse ? Qt.alpha(Theme.text, Theme.fillHover)
-                                                         : Qt.alpha(Theme.text, Theme.fillMuted))
+                            color: scanHit.containsMouse ? Qt.alpha(Theme.text, Theme.fillHover)
+                                : Qt.alpha(Theme.text, Theme.fillMuted)
                             Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
                             MaterialSymbol {
@@ -124,7 +127,7 @@ PanelWindow {
                                 icon: Glyphs.scan
                                 size: Theme.fontIconSmall
                                 fill: Net.scanning ? 1 : 0
-                                color: Net.scanning ? Theme.onTone("net") : Theme.text
+                                color: Net.scanning ? Theme.tone("net") : Theme.text
                             }
 
                             MouseArea {
@@ -140,8 +143,7 @@ PanelWindow {
                             width: 28
                             height: 28
                             radius: Theme.pill(height)
-                            color: Net.wifiEnabled ? Theme.tone("net")
-                                : Qt.alpha(Theme.text, Theme.fillMuted)
+                            color: Qt.alpha(Theme.text, Theme.fillMuted)
                             Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
                             MaterialSymbol {
@@ -149,7 +151,7 @@ PanelWindow {
                                 icon: Net.wifiEnabled ? Glyphs.wifi : Glyphs.wifiOff
                                 size: Theme.fontIconSmall
                                 fill: Net.wifiEnabled ? 1 : 0
-                                color: Net.wifiEnabled ? Theme.onTone("net") : Theme.subtext0
+                                color: Net.wifiEnabled ? Theme.tone("net") : Theme.subtext0
                             }
 
                             MouseArea {

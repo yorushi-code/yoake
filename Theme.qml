@@ -321,6 +321,11 @@ QtObject {
     readonly property int sheetReading: 520   // continuous text: a forecast, a description
     readonly property int sheetWide: 700      // a panel with a second region beside the first
     readonly property int sheetToast: 340     // one notification, read at a glance
+    // A hover card on a bar chip. One measure, because six callers had 236,
+    // 240, 244, 244, 248 and 264 -- values inside 28px of each other, which is
+    // what a token looks like before anyone has written it down. It is a floor
+    // rather than a width: the card still grows to its content.
+    readonly property int popoverWidth: 256
 
     // A pill for anything whose height is its identity -- a chip, a toggle,
     // a badge. Written as a function so the call site cannot drift from the

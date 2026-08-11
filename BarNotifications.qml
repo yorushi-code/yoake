@@ -95,7 +95,7 @@ Item {
     Popover {
         anchorItem: root
         hovered: notifArea.containsMouse && !Menus.isOpen(root.menuId)
-        minWidth: 264
+        minWidth: Theme.popoverWidth
 
         Column {
             spacing: Theme.gapWide
@@ -155,11 +155,17 @@ Item {
                         }
 
                         Column {
+                            // Measured against the card rather than against
+                            // itself: a Column takes its width from its widest
+                            // child, so a child that asks its parent for a width
+                            // is a loop, and the symptom is a row that renders
+                            // at zero or at whatever Qt resolved first.
+                            width: Theme.popoverWidth - 3 - item.spacing - Theme.gapCard
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: 1
 
                             Text {
-                                width: 226
+                                width: parent.width
                                 text: (item.entry && item.entry.appName) || "Уведомление"
                                 color: Theme.subtext0
                                 font.family: Theme.fontFamily
@@ -168,7 +174,7 @@ Item {
                             }
 
                             Text {
-                                width: 226
+                                width: parent.width
                                 text: (item.entry && (item.entry.summary || item.entry.body)) || ""
                                 color: Theme.subtext1
                                 font.family: Theme.fontFamily
@@ -181,7 +187,7 @@ Item {
             }
 
             Rectangle {
-                width: 238
+                width: parent.width
                 height: 1
                 color: Qt.alpha(Theme.text, Theme.fillHover)
             }
@@ -189,7 +195,7 @@ Item {
             // Sibling of the row, not a child of it: a MouseArea inside a Row
             // is laid out as another column of it.
             Item {
-                width: 238
+                width: parent.width
                 height: 22
 
                 Row {

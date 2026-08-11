@@ -121,7 +121,7 @@ Item {
     Popover {
         anchorItem: root
         hovered: loadArea.containsMouse
-        minWidth: 240
+        minWidth: Theme.popoverWidth
 
         Column {
             spacing: Theme.gapWide

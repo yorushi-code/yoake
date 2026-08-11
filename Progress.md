@@ -187,10 +187,27 @@ Newest last.
   panels moved onto it; VPN was 460 for no reason anyone recorded and is now on
   the list rung with the rest.
 
+- **P3.4 — Popover has one measure.** Six callers passed 236, 240, 244, 244, 248
+  and 264 — values inside 28px of each other, which is what a token looks like
+  before anyone writes it down. `Theme.popoverWidth` 256, and it is a floor: the
+  card still grows to its content. The notification card's inner column asked
+  its parent for a width while being the thing that gave the parent its width;
+  that is a loop, and its symptom is a row rendering at whatever Qt resolved
+  first rather than an error. It measures against the card now.
+
+- **P3.5 — Header toggles tint instead of filling.** The wifi and bluetooth
+  power switches were filled with the domain hue, which put a second "chosen"
+  colour directly above an accent-filled selected row. A header toggle reports
+  an on/off state, and a live state in this shell is a tinted glyph on the
+  surface's own ground. Verified: network and power panels now read as
+  relatives, one selection colour each, domain surviving in the glyphs.
+
   **Phase 3 is still not finished.** Remaining:
   1. Spacing and radii sweep across the panels written this pass — they were
      built fast and never audited against the ladders as a set.
-  2. `Popover.qml` still carries 320 / 218 as raw widths.
-  3. Re-screenshot every panel after the colour change; only the audio panel has
-     been seen since.
+  2. Screenshot the bluetooth, media, weather and VPN panels; only audio,
+     network and power have been seen since the colour change.
+  3. `PowerPanel`'s session actions sit in the same visual class as the power
+     profiles above them, so "Выключение" looks like a setting rather than an
+     act. Hierarchy problem, not colour.
 
