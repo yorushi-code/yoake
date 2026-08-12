@@ -181,7 +181,7 @@ Item {
 
                 Column {
                     anchors.verticalCenter: parent.verticalCenter
-                    spacing: 1
+                    spacing: Theme.gapPair
 
                     Text {
                         width: 190

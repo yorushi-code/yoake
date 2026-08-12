@@ -22,7 +22,7 @@ Item {
         anchors.right: slot.left
         anchors.rightMargin: Theme.gapWide
         anchors.verticalCenter: parent.verticalCenter
-        spacing: 2
+        spacing: Theme.gapPair
 
         Text {
             width: parent.width

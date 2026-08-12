@@ -83,7 +83,7 @@ Item {
         // wider than its left in every list that has no kinds to tell apart.
         anchors.rightMargin: root.kind === "" ? 0 : Theme.gapWide
         anchors.verticalCenter: parent.verticalCenter
-        spacing: 1
+        spacing: Theme.gapPair
 
         // Leans into the marker as it lands. Two pixels, which is below the
         // threshold at which anyone would name it and above the one at which

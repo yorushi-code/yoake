@@ -62,7 +62,7 @@ Column {
             // Explicit, so the caption elides at the panel edge instead of
             // being clipped mid-word by it.
             width: root.width - root.swatchSize * 1.6 - 10
-            spacing: 2
+            spacing: Theme.gapPair
 
             Text {
                 width: parent.width

@@ -70,7 +70,7 @@ Item {
 
     Column {
         anchors.centerIn: parent
-        spacing: 1
+        spacing: Theme.gapPair
 
         Text {
             anchors.horizontalCenter: parent.horizontalCenter

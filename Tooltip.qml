@@ -81,7 +81,7 @@ PopupWindow {
         Column {
             id: body
             anchors.centerIn: parent
-            spacing: 2
+            spacing: Theme.gapPair
 
             Text {
                 text: root.text

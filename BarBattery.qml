@@ -132,7 +132,7 @@ Item {
 
                 Column {
                     anchors.verticalCenter: parent.verticalCenter
-                    spacing: 1
+                    spacing: Theme.gapPair
 
                     Text {
                         text: Math.round(root.fraction * 100) + "% · "

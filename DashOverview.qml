@@ -90,7 +90,7 @@ Item {
                         anchors.right: parent.right
                         anchors.leftMargin: Theme.gapWide
                         anchors.verticalCenter: parent.verticalCenter
-                        spacing: 1
+                        spacing: Theme.gapPair
 
                         Text {
                             width: parent.width
@@ -182,7 +182,7 @@ Item {
         Column {
             anchors.centerIn: parent
             visible: Weather.valid
-            spacing: 2
+            spacing: Theme.gapPair
 
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter

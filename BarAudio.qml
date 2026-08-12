@@ -154,7 +154,7 @@ Item {
 
                 Column {
                     anchors.verticalCenter: parent.verticalCenter
-                    spacing: 1
+                    spacing: Theme.gapPair
 
                     Text {
                         text: root.muted ? "Звук выключен"

@@ -74,7 +74,7 @@ Item {
         Row {
             id: timeRow
             anchors.horizontalCenter: parent.horizontalCenter
-            spacing: 2
+            spacing: Theme.gapPair
 
             RollClock {
                 id: hhmm

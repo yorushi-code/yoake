@@ -18,7 +18,7 @@ Status keys: `IMPLEMENTED` / `PARTIAL` / `MISSING` / `WRONG`.
 |---|---|---|
 | 1 | Audit | IMPLEMENTED |
 | 2 | Architecture map | IMPLEMENTED |
-| 3 | Visual system | PARTIAL |
+| 3 | Visual system | IMPLEMENTED |
 | 4 | Motion system | MISSING |
 | 5 | Bar composition | MISSING |
 | 6 | Media / player system | PARTIAL |
@@ -475,3 +475,74 @@ Newest last.
 
   Verified on screen: the panel reads Bluetooth / fedora / Ничего не подключено,
   which is subject, identity, state, in that order and each said once.
+
+- **B13 — Phase 3 closed: the sweep, and what it actually found.** The remaining
+  phase-3 item assumed the panels written this pass were built too fast to be on
+  the ladders. Checked rather than assumed, and the assumption was wrong.
+
+  *Radii.* Eighteen raw `radius:` literals in the tree and every one of them is
+  half of its own width — a 3px rule at 1.5, a 1.5px marker at 0.75, a 13px pill
+  at 6.5. Those are geometry written out, not drift. The ladder holds.
+
+  *Panel spacing.* Zero raw spacing or margin literals in all seven panels
+  rewritten this pass. Nothing to sweep.
+
+  *What the sweep did find*, in the places nobody was looking:
+
+  1. **The pair gap was off the ladder.** Nineteen sites set `spacing: 1` or
+     `spacing: 2` on a Column holding a name over the line that belongs to it —
+     eleven at 1, six at 2, chosen by eye every time. It is the F4 pattern
+     exactly: values inside a pixel of each other is what a token looks like
+     before anyone writes it down. Worse, it was the one gap in the shell that
+     did not scale with density while every other one did. `Theme.gapPair`, and
+     all nineteen moved onto it. `BarMedia`'s spectrum gap was left alone: two
+     pixels between two-pixel bars is geometry, not typography.
+  2. **`NotificationPanel` was the one file with real drift** — ten raw margins
+     against zero in the seven panels. Its header sat sixteen pixels from the
+     left edge and its list of cards ten, so the title and the cards it names
+     did not share a left edge. Close enough that nobody could name it, far
+     enough to look untidy at every scroll position. Both on `Theme.gapCard`
+     now, and the header's other three literals onto `rowPad` and `spacing`.
+     Verified against a real notification.
+  3. **The B12 defect again, in the panel I had not opened.** With nothing
+     unread the notification centre's title read "Нет уведомлений", above a
+     sleeping cat, above the word "Тихо" — three statements of one fact in a
+     panel with nothing in it. The title is the subject now.
+
+  The card internals in `NotificationPanel` (9/9 vertical, 18 left after the
+  urgency rule, 10 right) are left as literals deliberately: they are internally
+  consistent and balanced around a 3px rule, and snapping them to the ladder
+  without seeing a long history on screen would be moving numbers by feel.
+
+- **M3 — Verify the reload before believing the screenshot.** Edited
+  `NotificationPanel`, opened it twice, and both screenshots showed the old
+  text. The string was gone from the source. `touch` on the same file produced
+  `Reloading configuration…` immediately, and then the change was there.
+
+  Whatever the watcher missed, the lesson is procedural and cost twenty minutes:
+  `qs log | grep -c "Configuration Loaded"` before and after, and only then read
+  the screenshot. A screenshot of a shell that has not reloaded is a screenshot
+  of the previous edit.
+
+- **B14 — Panels seen, and one finding left open.** Bluetooth, media, the
+  notification centre and VPN have now been looked at since the colour change.
+  All four follow the rule: accent fills the chosen node, the chosen segment and
+  the chosen preset; the domain survives in the glyphs. The VPN panel's egress
+  row reads `2a12:bec4:1b50:2fe::2 · United Kingdom` and its node list marks
+  `direct policy` as current.
+
+  **Open finding, not fixed.** The VPN panel ends with the core's raw log tail,
+  in red, wrapped over three lines: `-0400 2026-08-12 07:58:39 ERROR
+  [2182309428 16m56s] connection: open connection to 149.154.167.41:443 using
+  outbound/vless[direct policy]: read tcp …: network is unreachable`. It is the
+  only undesigned surface left in the shell — a mangled timestamp, a goroutine
+  id and a port, pasted under a composed panel. It is also the most useful thing
+  on that panel when the tunnel is broken, which it was at the time, and
+  "Задержка: нет ответа" agreed with it. Reshaping it means deciding what a
+  person needs from a core error without throwing away the line an operator
+  needs, and that is a decision to make deliberately rather than at the end of a
+  night shift.
+
+  Also unverified still: the media panel's disc was empty of artwork in one
+  capture and correct in the next two, both times matching what the desktop card
+  showed. That was a reload transient, not a defect.

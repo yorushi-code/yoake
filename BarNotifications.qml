@@ -162,7 +162,7 @@ Item {
                             // at zero or at whatever Qt resolved first.
                             width: Theme.popoverWidth - 3 - item.spacing - Theme.gapCard
                             anchors.verticalCenter: parent.verticalCenter
-                            spacing: 1
+                            spacing: Theme.gapPair
 
                             Text {
                                 width: parent.width

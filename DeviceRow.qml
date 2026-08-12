@@ -99,7 +99,7 @@ Rectangle {
             Column {
                 width: parent.width - (root.glyph !== "" ? Theme.fontIcon + Theme.gapWide : 0)
                     - (trailingText.visible ? trailingText.width + Theme.gapWide : 0)
-                spacing: 1
+                spacing: Theme.gapPair
 
                 Text {
                     width: parent.width

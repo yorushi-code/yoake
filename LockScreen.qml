@@ -93,7 +93,7 @@ WlSessionLock {
             // one block, so the block is centred rather than the clock. At 0.18
             // the screen was top-heavy with a third of it empty underneath.
             anchors.topMargin: parent.height * 0.24
-            spacing: 2
+            spacing: Theme.gapPair
             opacity: surface.entered ? 1 : 0
             transform: Translate {
                 y: surface.entered ? 0 : 26

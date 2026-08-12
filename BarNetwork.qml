@@ -205,7 +205,7 @@ Item {
 
                 Column {
                     anchors.verticalCenter: parent.verticalCenter
-                    spacing: 1
+                    spacing: Theme.gapPair
 
                     Text {
                         text: !Networking.wifiEnabled ? "Wi-Fi выключен"

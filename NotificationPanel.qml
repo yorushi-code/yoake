@@ -123,14 +123,17 @@ PanelWindow {
                 id: header
                 anchors.top: parent.top
                 anchors.left: parent.left
-                anchors.topMargin: 14
-                anchors.leftMargin: 16
-                spacing: 8
+                anchors.topMargin: Theme.rowPad
+                anchors.leftMargin: Theme.gapCard
+                spacing: Theme.spacing
 
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
-                    text: Notifs.tracked.length === 0
-                        ? "Нет уведомлений" : "Уведомления"
+                    // The subject, always. Empty, this panel already says so
+                    // twice below -- a sleeping cat and the word "Тихо" -- and
+                    // a title that changed to "Нет уведомлений" made three
+                    // statements of one fact in a panel with nothing in it.
+                    text: "Уведомления"
                     color: Theme.subtext1
                     font.pixelSize: Theme.fontBody
                 }
@@ -198,8 +201,13 @@ PanelWindow {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                anchors.margins: 10
-                anchors.topMargin: 8
+                // The same inset as the header above, so the cards and the
+                // word that names them share a left edge. They did not: the
+                // title sat sixteen pixels in and the list ten, which is close
+                // enough that nobody could name it and far enough that the
+                // column looked untidy at every scroll position.
+                anchors.margins: Theme.gapCard
+                anchors.topMargin: Theme.spacing
                 contentHeight: historyColumn.height
                 clip: true
 
@@ -280,7 +288,7 @@ PanelWindow {
 
                                 Column {
                                     width: histContent.width - 24 - 18 - 9 - 10
-                                    spacing: 2
+                                    spacing: Theme.gapPair
                                     Text {
                                         width: parent.width
                                         text: modelData.summary

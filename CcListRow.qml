@@ -40,7 +40,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.rightMargin: 12
         anchors.verticalCenter: parent.verticalCenter
-        spacing: 1
+        spacing: Theme.gapPair
 
         Text {
             width: parent.width

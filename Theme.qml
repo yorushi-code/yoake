@@ -389,6 +389,16 @@ QtObject {
     //
     // Scaled by the mood, and rounded: a fractional gap lands type on a half
     // pixel and the whole shell goes soft mid-transition.
+    // Below the ladder, and the only rung that is not a multiple of four: the
+    // gap inside a pair, where a name sits directly over the line that belongs
+    // to it. It is not rhythm, it is attachment -- the two lines have to read
+    // as one object, so the gap has to be smaller than any gap *between*
+    // objects, which is what four already is.
+    //
+    // Named because it was chosen by eye seventeen times and came out 1 in
+    // eleven of them and 2 in six, and because a literal was the one gap in the
+    // shell that did not scale with density while every other one did.
+    readonly property int gapPair: Math.round(2 * densityScale)
     readonly property int gapTight: Math.round(4 * densityScale)
     readonly property int spacing: Math.round(8 * densityScale)
     readonly property int gapWide: Math.round(12 * densityScale)

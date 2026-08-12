@@ -105,7 +105,7 @@ PanelWindow {
 
                     Column {
                         anchors.verticalCenter: parent.verticalCenter
-                        spacing: 2
+                        spacing: Theme.gapPair
 
                         Text {
                             text: Math.round(Weather.temperature) + "°"
