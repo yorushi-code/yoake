@@ -496,8 +496,6 @@ Item {
                                 spacing: Theme.spacing
 
                                 opacity: 0
-                                scale: Theme.revealScale
-                                transformOrigin: Item.Top
                                 Component.onCompleted: categoryEntryAnim.start()
                                 CascadeEntry {
                                     id: categoryEntryAnim

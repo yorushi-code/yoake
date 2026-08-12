@@ -807,3 +807,51 @@ Newest last.
   their header; a group of toasts arrived under the bar with its `+2` badge; the
   cheat sheet's five columns of categories all landed. Test notifications cleared
   afterwards.
+
+- **B22 — A row inside a surface that grew was growing again.** `Direction.md`
+  recorded, after B21, that list rows disagree about whether they scale: the
+  notification history, the toasts and the cheat sheet faded *and* grew, the
+  wifi and bluetooth pages only faded, "both defensible and one of them wrong".
+  It is not a matter of taste. It is the `Reveal` defect one level up.
+
+  `PanelChrome` gives every panel a `Reveal` that grows it from
+  `Theme.revealScale`. A delegate inside that also grew from `Theme.revealScale`
+  composed with it: **the card began at 0.81 of its size**, and one visual
+  dimension had two animations owning it, agreeing only by luck. Checked rather
+  than assumed — `NotificationPanel` binds `shown: win.open` and `CheatSheet`
+  binds `shown: root.open`, so both chromes really do transition.
+
+  The rule, written down once: **the surface owns its size; a row inside it
+  fades, and travels if it comes from somewhere.** Under it everything lines up
+  and nothing is left to preference — the wifi and bluetooth rows were right all
+  along, and so were the action menu's.
+
+  The toasts are the exception that proves it, and the reason is in the code:
+  their `PanelChrome` never sets `shown`, and it defaults to `true`, so the
+  `Reveal` inside is born shown and never transitions. Nothing else animates a
+  toast's size, so the toast declares the grow itself — inside the shared
+  arrival, after the one wait, beside its drop from under the bar.
+
+  Verified on screen, all three: four history cards at full size and aligned
+  with their header, a grouped toast with its `+2` badge, the cheat sheet's
+  columns intact. Test notifications cleared.
+
+- **A4 — Rule 5 is an authoring rule, not a missing feature.** `Direction.md`
+  has listed "the rest beat is defined and nothing enforces it" as outstanding.
+  Enforcing it globally would mean a scheduler that holds animations back until
+  the last large movement has settled — a second engine, which the brief forbids
+  for geometry and which would be worse here, because it would sit between every
+  surface and its own motion.
+
+  The one interaction where it plainly applies was checked instead: switching
+  sheets. `toggleSheet` closes the old one and opens the new one on the same
+  frame, which reads as a rule 1 violation waiting to happen. Captured at forced
+  slow tempo (`perception force temporal 1.0`, tempo 352ms): the audio panel
+  leaves, there is a clean frame with neither panel on screen, and then the
+  network panel arrives at partial opacity. **No overlap.** The gap comes from
+  `LazyPanel` having to build the incoming panel, which costs the frame that
+  rule 5 asks for.
+
+  So the rule holds where it matters, by construction rather than by
+  enforcement, and it is written in `Direction.md` as what it is: a rule authors
+  obey when they write a sequence, like rules 2 and 3, not a mechanism.

@@ -410,6 +410,17 @@ Item {
                             duration: Theme.animSlow
                             easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig
                         }
+
+                        // The grow lives here rather than in `CascadeEntry`
+                        // because a toast is the only one of these lists whose
+                        // chrome does not grow underneath it: `PanelChrome` is
+                        // born `shown`, so its `Reveal` never transitions and
+                        // this is the only animation that owns the size.
+                        NumberAnimation {
+                            target: toastDelegate; property: "scale"; to: 1
+                            duration: Theme.animSlow
+                            easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig
+                        }
                     }
 
                     // Leaves the way it came, accelerating out, instead of
