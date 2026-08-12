@@ -114,6 +114,20 @@ Item {
             // the material, after the container holding it has already
             // stopped.
             //
+            // It carries no opacity of its own, and that is the correction.
+            //
+            // This layer holds every child a caller passes, so it *is* the
+            // surface — there is nothing else inside beat 2 for beat 2 to
+            // fade. Fading here as well multiplied the two, and since this one
+            // sat at zero until the content beat began, the product was zero
+            // for the whole of the object beat: beat 2 was invisible, and the
+            // arrival every panel in the shell actually played was a scale
+            // nobody could see followed by a plain fade. The four beats were
+            // real in the code and two of them on screen.
+            //
+            // One property per beat now. Space is the scale, the object is the
+            // fade, the accent is exposed, and this is the travel.
+            //
             // Leaving is not sequenced. A cascade on the way out looks like
             // the panel struggling to close — beats direct attention toward
             // something, and on the way out there is nothing to direct it to.
@@ -122,7 +136,6 @@ Item {
                 anchors.fill: parent
                 x: root.shown ? 0 : root.slideX
                 y: root.shown ? 0 : root.slideY
-                opacity: root.shown ? 1 : 0
 
                 Behavior on x {
                     SequentialAnimation {
@@ -141,16 +154,6 @@ Item {
                             duration: root.shown ? Theme.animSlow : Theme.animExit
                             easing.type: Easing.Bezier
                             easing.bezierCurve: root.shown ? Theme.easeSpringBig : Theme.easeExit
-                        }
-                    }
-                }
-                Behavior on opacity {
-                    SequentialAnimation {
-                        PauseAnimation { duration: root.shown ? root.delay + root._beats.content : 0 }
-                        NumberAnimation {
-                            duration: root.shown ? Theme.animNormal : Theme.animExit
-                            easing.type: Easing.Bezier
-                            easing.bezierCurve: root.shown ? Theme.easeEmphasized : Theme.easeExit
                         }
                     }
                 }

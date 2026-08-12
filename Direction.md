@@ -114,29 +114,57 @@ Implemented:
   which of its children carries the emphasis — without that the fourth beat
   would be unplayable and the sequence would be three beats pretending to be
   four.
-- `DashCard.qml` is the first real consumer. Every dashboard card now assembles
-  instead of appearing, and its eyebrow is bound to the accent beat.
-- `BarIsland.qml` is the second, and the one that matters most: the bar is the
-  surface that is on screen before anything else and was the only one that
-  never said hello. Left, then right, then centre, so the accent lands last —
-  which is rule 3 and also the build anyone would choose. No slide: the layer
-  surface is exactly as tall as the island, so anything moved vertically is
-  cropped rather than travelling, and the space beat is the scale.
+
+  **One property per beat**, and it took a correction to get there. The content
+  layer used to carry an opacity of its own as well as the travel. That layer
+  holds every child a caller passes, so it *is* the surface the object beat
+  fades — the two opacities multiplied, and because the inner one sat at zero
+  until the content beat, the product was zero for the whole of the object
+  beat. Beat 2 could not be seen by anyone. What every panel in this shell
+  actually played was a scale nobody could see followed by a plain fade: four
+  beats in the code, two on screen. Space is the scale, the object is the fade,
+  the accent is exposed, the content is the travel, and no beat shares a
+  property with another.
+- Five consumers: `PanelChrome.qml` (and through it all seven system sheets),
+  `DashCard.qml`, `DashControl.qml`, `Trail.qml` and `BarStrip.qml`.
+  `DashCard` was the first, and is still the only one that binds the accent
+  beat — its eyebrow rides `accentProgress`.
+- `BarStrip.qml` is the one that matters most: the bar is on screen before
+  anything else and was the only surface that never said hello. It arrives left,
+  then right, then centre, so the accent lands last — rule 3, and also the build
+  anyone would choose. No vertical slide: the layer surface is exactly as tall
+  as the strip, so anything moved vertically is cropped rather than travelling,
+  and the space beat is the scale. (This paragraph described `BarIsland.qml`
+  until the bar became one strip; the file is gone and the choreography moved
+  with it.)
 - `Traveller.qml` and rule 7. Consumers: the workspace pill, which travels
   between fixed cells rather than being redrawn wide somewhere else, and the
   launcher's selection.
 - the bar is a composer rather than a container. The clock is what is centred
-  and the island grows around it, so starting music opens room to the clock's
+  and the strip grows around it, so starting music opens room to the clock's
   left instead of sliding the clock right by half a player's width. Written
-  without a `Behavior` on purpose: the island's `x` and the clock's position
-  inside it come from one layout pass, so they move on the same frame and the
-  clock is exactly still while the island widens under it.
+  without a `Behavior` on purpose: the widths and the clock's position inside
+  them come from one layout pass, so they move on the same frame and the clock
+  is exactly still while the strip fills under it.
+- rule 8 — a change that crosses a row travels along it. `Direction.crossing`
+  and `sweep()`, with the VPN node list as the consumer.
+- `Traveller` will *place* rather than travel when the list under it is being
+  rebuilt (`snapping`). The journey is a claim about continuity, and a list that
+  did not exist a frame ago has none to claim. The launcher holds it for the
+  length of its restage.
 
 Not done:
 
-- **`Reveal` had one caller** and now has two. `ActionMenu`, `VpnPanel`,
-  `CcWifiPage`, `CcBluetoothPage` and the notification stack still spell their
-  own motion out.
+- **The list cascades still spell their own arrival out.** `ActionMenu`,
+  `CcWifiPage`, `CcBluetoothPage`, `CheatSheet`, `NotificationPanel` and
+  `NotificationCenter` each animate a delegate's opacity and scale on the same
+  frame, from a `ParallelAnimation` of two `SequentialAnimation`s that each
+  wait out the same `Direction.stagger(index)`. They are on the *stagger*, so
+  the cascade is right; they are not on the *beats*, so each card still arrives
+  as one event where the shell's own wrapper would give it four. `Reveal` takes
+  `delay` precisely so a delegate can compose a stagger with the beats. The
+  work is mechanical but it changes each delegate's layout tree, so it wants a
+  screen to verify on.
 - the **rest** beat is defined and nothing enforces it. Rule 5 is currently an
   intention.
 - rule 7 has two consumers and at least two more places that want it: the

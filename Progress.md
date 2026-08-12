@@ -19,7 +19,7 @@ Status keys: `IMPLEMENTED` / `PARTIAL` / `MISSING` / `WRONG`.
 | 1 | Audit | IMPLEMENTED |
 | 2 | Architecture map | IMPLEMENTED |
 | 3 | Visual system | IMPLEMENTED |
-| 4 | Motion system | MISSING |
+| 4 | Motion system | PARTIAL |
 | 5 | Bar composition | MISSING |
 | 6 | Media / player system | PARTIAL |
 | 7 | Notifications | PARTIAL |
@@ -546,3 +546,97 @@ Newest last.
   Also unverified still: the media panel's disc was empty of artwork in one
   capture and correct in the next two, both times matching what the desktop card
   showed. That was a reload transient, not a defect.
+
+## Phase 4 — Motion system
+
+- **B15 — Two of the four beats never played.** `Reveal` is the shell's arrival
+  wrapper and it is where the four beats live: space, object, accent, content.
+  Read end to end, it had one layer too many carrying opacity.
+
+  The content layer holds every child a caller passes — `default property alias
+  content: contentLayer.children` — so it *is* the surface that the object beat
+  fades. It carried an opacity of its own as well, and the two multiplied.
+  Because the inner one sat at zero until the content beat began, the product
+  was zero for the whole of the object beat.
+
+  The arithmetic, at tempo 220: the scale starts at 0 over `animSlow` 420; the
+  object fade starts at 44 over `animNormal`; the content fade starts at 143.
+  Nothing is visible at all until 143ms, by which point a spring curve has taken
+  the scale from 0.90 to about 0.98. So the space beat happened where nobody
+  could see it and the object beat could not be seen by anyone at any tempo.
+  What every panel in this shell actually played was an invisible scale followed
+  by a plain fade: four beats in the code, two on screen.
+
+  One property per beat now — space is the scale, the object is the fade, the
+  accent is exposed, the content is the travel. The file's own comment for the
+  content beat already said it was "the only beat that travels"; the opacity was
+  the accident. This reaches all seven system sheets through `PanelChrome`, plus
+  `DashCard`, `DashControl`, `Trail` and `BarStrip`.
+
+  **Not verified on screen.** The proof here is arithmetic, which is sound, but
+  a 350ms arrival cannot be caught with `grim` bursts and the machine was in use.
+  One slow-tempo capture in the morning: `qs ipc call perception force temporal
+  1.0`, open a panel, capture, then `qs ipc call perception auto`.
+
+- **B16 — `Direction.md` described a bar that no longer exists.** Its State
+  section named `BarIsland.qml` as the second and most important `Reveal`
+  consumer. That file was deleted when the bar became one strip. It also said
+  `Reveal` had two callers; it has five. Same class as A2 — the code was right
+  and the document was talking about a previous version of the shell, which is
+  worse than no document because it is believed.
+
+  Rewritten to reality, including the beat correction above, rule 8, and
+  `Traveller.snapping`. The "Not done" list is now accurate: the list cascades,
+  the unenforced rest beat, and the two remaining places that want rule 7.
+
+- **F5 — evidence at last, and it is not good.** A fullscreen game (DDNet) was
+  running when a panel was opened over it by IPC. Two seconds later the
+  screenshot showed the game and no panel. Every sheet is on `WlrLayer.Overlay`,
+  which is above a fullscreen window and is exactly the reason `Launcher` gives
+  for not using `Top` — so the panel should have been there.
+
+  Not chased further: the user was in a live match and a surface that takes
+  `WlrKeyboardFocus.Exclusive` would have taken their keyboard mid-game. One
+  observation, no confirmation, and the wrong moment to experiment.
+
+  The suspect is in `Toggles.holdsFocus`, which names only the dashboard and the
+  launcher. The seven sheets are not in it, so the compositor's `attentionMoved`
+  runs `closeTransient()` on them — and `Niri._applyWindowFocusChanged` ignores
+  a *null* focus, which is what opening a layer surface normally produces, but a
+  fullscreen game may produce a real window id instead. If so, the sheet closes
+  itself on the frame it opens.
+
+  **Next concrete action**, with the machine free: start any window fullscreen,
+  run `qs ipc call toggles panel audio`, and watch `qs ipc call context state`
+  for the focus field while capturing. If the panel closes itself, the fix is
+  one line — the sheets belong in `holdsFocus` for the same reason the dashboard
+  does.
+
+- **M4 — Measured while gaming, and M2 repeated itself.** Spot readings during
+  the game gave 39.6 / 44.2 / 45.8, then 54.4 / 49.2 / 47.8 — against a game
+  costing 20%. A shell more expensive than the game it is sitting behind would
+  be a serious defect.
+
+  Sampled properly instead, ten samples at three seconds: **7.0 – 9.9%**, steady.
+  The spikes were my own IPC calls, screenshots and a panel opening and closing.
+  Occlusion is working, which is why: `qs ipc call wallpaper state` reports
+  `desktopVisible=false` and `occluded={"eDP-1":true}` with the game up, so the
+  wallpaper and all twenty-eight spectrum delegates are dropped rather than
+  drawn behind an opaque window.
+
+  This is the second time a spot reading nearly started a rewrite. Sampling is
+  not optional.
+
+  **Recorded, not chased: RSS is 1.45 GB.** Stable, not a spike, and large for a
+  shell. Wallpaper decoding, album art and the icon cache are the candidates.
+  Needs a proper look with the machine free, not a guess at night.
+
+**Phase 4 remaining, in order:**
+1. The list cascades onto `Reveal` — `ActionMenu`, `CcWifiPage`,
+   `CcBluetoothPage`, `CheatSheet`, `NotificationPanel`, `NotificationCenter`.
+   Each currently runs a `ParallelAnimation` of two `SequentialAnimation`s that
+   separately wait out the same `Direction.stagger(index)`, so a card arrives as
+   one event instead of four. `Reveal` takes `delay` for exactly this. Mechanical
+   but it changes each delegate's layout tree, so it needs a screen.
+2. Rule 5: the `rest` beat is defined and nothing enforces it.
+3. Rule 7 in the control centre's pager and the dashboard's navigation.
