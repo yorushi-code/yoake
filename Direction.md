@@ -55,6 +55,15 @@ one.
 250–400ms — a constant is dead air at a fast tempo and an overlap at a slow one,
 which is rule 1 reintroduced through the back door.
 
+This is a rule an author obeys when writing a sequence, like 2 and 3, and not a
+mechanism. Enforcing it globally would mean a scheduler holding every animation
+back until the last large movement had settled, which is a second engine sitting
+between every surface and its own motion. Checked where it plainly applies —
+switching sheets closes one and opens another on the same frame — and it holds:
+at forced slow tempo the old panel leaves, there is a clean frame with neither on
+screen, and the new one arrives. `LazyPanel` has to build the incoming panel, and
+that costs exactly the frame the rule asks for.
+
 **6. Only what is in focus may move.** Everything else holds still.
 
 **7. A change with a before and an after is a journey, not a cross-fade.** If
@@ -168,12 +177,7 @@ Implemented:
 
 Not done:
 
-- the **rest** beat is defined and nothing enforces it. Rule 5 is currently an
-  intention.
-- list rows do not agree on whether they grow. The notification history, the
-  toasts and the cheat sheet fade *and* scale; the wifi and bluetooth pages fade
-  only. Both are defensible and one of them is wrong. Wants a screen and a
-  decision, not a sweep.
+- the `acknowledge` type still has no consumer, for the reason above.
 - the `acknowledge` type has no consumer and cannot easily get one. The OSD is
   what it was written for, and the OSD spells its motion out because `Surface`
   samples the backdrop from a fixed `screenX`/`screenY` — a scale transform on
