@@ -453,3 +453,25 @@ Newest last.
   The rule for the rest of this work: drive the UI through `qs ipc call toggles`
   and read it with `grim`. Anything that needs a keystroke waits for the user.
   It also cost a measurement — see M2, whose spike was partly this.
+
+- **B12 — Three panels printed the same sentence twice.** Found by finally
+  looking at the bluetooth panel, which phase 3 had never screenshotted: the
+  title said "Ничего не подключено" and the empty row a hundred and forty pixels
+  below said "Ничего не подключено". One short panel, one sentence, twice.
+
+  The cause is the same in all three: the header title falls back to a *state*
+  when there is no subject to name, and the body reports that same state
+  underneath. `SheetHeader` names what the panel is about; `EmptyRow` says what
+  it is doing, and does it per page, which one title never could.
+
+  - Bluetooth — the subject with nothing connected is the radio itself, so the
+    title is "Bluetooth" over the adapter's name.
+  - Network — "Wi-Fi выключен" was duplicated word for word; the title is
+    "Wi-Fi" now. "Не подключено" stays, because with Wi-Fi on the body is a list
+    of networks rather than an empty row and nothing repeats it.
+  - VPN — "Выключен" over "Туннель выключен" became "VPN". "Подключаюсь…" stays
+    a title: it is not a state the body reports, it is an operation in flight,
+    and the header is where this shell puts what is currently happening.
+
+  Verified on screen: the panel reads Bluetooth / fedora / Ничего не подключено,
+  which is subject, identity, state, in that order and each said once.

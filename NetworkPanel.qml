@@ -103,8 +103,14 @@ PanelWindow {
 
                 SheetHeader {
                     width: parent.width
+                    // Off is a state, and the empty row below already reports it
+                    // in those words. Printed here as well it was the same
+                    // sentence twice, so the title falls back to the subject --
+                    // the radio -- and lets the body do the reporting. "Не
+                    // подключено" stays: with Wi-Fi on the body is a list of
+                    // networks rather than an empty row, so nothing repeats it.
                     title: Net.activeSsid !== "" ? Net.activeSsid
-                        : (Net.wifiEnabled ? "Не подключено" : "Wi-Fi выключен")
+                        : (Net.wifiEnabled ? "Не подключено" : "Wi-Fi")
                     subtitle: Net.activeIp !== "" ? Net.activeIp : Net.iface
 
                     Row {

@@ -96,11 +96,18 @@ PanelWindow {
                 anchors.margins: Theme.sheetPad
                 spacing: Theme.gapCard
 
+                // The header names the subject; the body reports the state.
+                //
+                // With nothing connected there is no device to name, and falling
+                // back to the state sentence printed it twice in a panel barely
+                // two hundred pixels tall -- once as the title and once,
+                // verbatim, in the empty row directly beneath it. The subject
+                // when no device is connected is the radio itself, which is what
+                // the adapter is, and `EmptyRow` already says what it is doing
+                // and says it per page, which a single title never could.
                 SheetHeader {
                     width: parent.width
-                    title: Bt.primary
-                        ? Bt.primary.name
-                        : (Bt.powered ? "Ничего не подключено" : "Bluetooth выключен")
+                    title: Bt.primary ? Bt.primary.name : "Bluetooth"
                     subtitle: Bt.primary
                         ? Bt.primary.mac
                         : (Bt.adapter !== "" ? Bt.adapter : "")

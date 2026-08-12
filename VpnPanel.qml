@@ -110,8 +110,13 @@ PanelWindow {
 
                 SheetHeader {
                     width: parent.width
+                    // Down is a state and the empty row says so in those words;
+                    // the title names the subject instead. "Подключаюсь…" stays
+                    // a title because it is not a state the body reports -- it
+                    // is an operation in flight, and the header is where this
+                    // shell puts the thing that is currently happening.
                     title: Mihomo.busy ? "Подключаюсь…"
-                        : (win.up ? (Mihomo.currentNode || "Туннель поднят") : "Выключен")
+                        : (win.up ? (Mihomo.currentNode || "Туннель поднят") : "VPN")
                     subtitle: Mihomo.active !== "" ? Mihomo.active : Mihomo.core
 
                     Rectangle {
