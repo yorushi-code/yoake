@@ -109,10 +109,29 @@ QtObject {
     // bar widget select a page by index into this list.
     readonly property var dashPages: ["overview", "control", "desks"]
 
+    // Asking for a page is not the same gesture as toggling the panel.
+    //
+    // This toggled unconditionally, so asking for a page that was not the one
+    // showing *closed* the dashboard and left the page selected behind it: the
+    // load widget opens Обзор, the shell menu's "Управление" then shuts the
+    // panel, and getting to the page you asked for takes two goes. `toggleSheet`
+    // has worked correctly since the sheets were written — the same name closes,
+    // a different name switches — and this is that gesture on a panel whose
+    // siblings are pages.
+    //
+    // An unknown page now does nothing at all rather than toggling the panel on
+    // a name the shell does not have. `dashboard()` is the entry point for
+    // toggling without choosing.
     function dash(page) {
         const at = root.dashPages.indexOf(page);
-        if (at >= 0) root.dashPage = at;
-        root.exclusive("dashboard");
+        if (at < 0) return;
+        const showing = root.dashboardOpen && root.dashPage === at;
+        root.dashPage = at;
+        if (showing) {
+            root.dashboardOpen = false;
+        } else if (!root.dashboardOpen) {
+            root.exclusive("dashboard");
+        }
     }
 
     // Opening one panel closes the others: two frosted sheets overlapping read

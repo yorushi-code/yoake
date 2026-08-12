@@ -687,3 +687,78 @@ Newest last.
   `BarWorkspaces` is also the one place outside `Reveal` that plays a beat
   correctly: the workspace numeral is held to `Direction.beatContent` so it
   confirms the arrival instead of announcing it.
+
+- **B18 — Rule 7 finished, and one of the two places already had it.**
+  `Direction.md` listed the control centre's pager and the dashboard's
+  navigation as wanting rule 7. `CcPager` has had it all along — the detail page
+  slides in from the right while the main view drifts 22% of the width the other
+  way rather than leaving at the same speed, with the reason written beside it:
+  "the page is what the eye should follow". The document was stale again.
+
+  The dashboard genuinely was cross-fading. Three pages, each
+  `opacity: root.tab === N ? 1 : 0` with a Behavior, so one went down while
+  another came up on the same frame. The tab marker travelled and the content
+  did not, which means half the navigation said "you moved right" and the other
+  half said "something was repainted".
+
+  They are three adjacent places, so they lie in a row and the row slides. The
+  offset is `(N - tab) * width * 0.10` on a `Translate`, so the direction is
+  never tracked or stored — going back moves the other way because the
+  arithmetic does, and a two-tab jump travels twice as far because it is twice
+  as far. A transform rather than `x` because the pages are anchor-filled and
+  anchors win against a plain x; it is also the cheaper of the two. Verified on
+  screen at rest: the current page sits exactly centred.
+
+- **B19 — A finding that was wrong, and how it got that far.** For most of an
+  hour this file was going to record that niri draws a fullscreen window above
+  every layer surface, that the shell is therefore invisible under one, and that
+  it burns a third of a core drawing frames nobody receives. Two observations
+  supported it: a panel opened over a fullscreen DDNet match did not appear, and
+  the dashboard opened over a fullscreen video did not appear. A CPU measurement
+  seemed to confirm the panel was alive and unseen — 5% idle against 30% with the
+  dashboard "open".
+
+  All of it was wrong, and the launcher disproved it in one screenshot: it draws
+  over the same fullscreen video perfectly. So does the dashboard.
+
+  The cause was in the test, not the shell. `Toggles.dash(page)` toggles, so
+  stepping `overview → control → desks` opened, **closed**, and opened again —
+  and the frame I read was the middle one. The dashboard was never hidden; it
+  was shut, by me, and I photographed the shutting and called it a compositor.
+
+  Two lessons, both procedural and both cheap:
+  1. **A negative observation needs a positive control.** "The panel is not
+     there" means nothing until something else known-good is put in the same
+     place under the same conditions. One launcher screenshot would have ended
+     this at the start.
+  2. **Read the tool before trusting the test.** `dash()` is one line and says
+     `exclusive()`, which is named for what it does.
+
+  The DDNet observation is still unexplained — that call had no toggle-parity
+  trap. It stays open as the only live part of F5. **Next concrete action:** with
+  a fullscreen game up, open the *launcher* first as the control, then a sheet,
+  and compare.
+
+- **B20 — Asking for a page closed the panel.** Falling out of B19: `dash(page)`
+  toggled the dashboard unconditionally, so asking for a page that was not the
+  one showing closed the panel and left the page selected behind it. The load
+  widget opens Обзор; the shell menu's "Управление" then shuts the dashboard;
+  getting to the page you asked for takes two goes. Three callers had it —
+  `BarLoad`, `ShellActions` and the IPC.
+
+  `toggleSheet` has been correct since the sheets were written: the same name
+  closes, a different name switches. `dash` is that gesture on a panel whose
+  siblings are pages, and now behaves the same way. An unknown page does nothing
+  rather than toggling the panel on a name the shell does not have; `dashboard()`
+  remains the entry point for toggling without choosing.
+
+  Verified on screen: open on Обзор, ask for Управление, the panel stays up and
+  shows Управление; ask for Управление again and it closes.
+
+- **M5 — Check which file you appended to.** The B18 and B19 entries were written
+  while the shell's working directory had drifted to the scratch directory, so
+  they landed in a `Progress.md` that is not this one, and the commit that should
+  have carried them carried only the code. Found by grepping for an entry that
+  should have existed. Same family as M3: the check is cheap, the silence is
+  total, and `cd` into the project explicitly at the start of every command that
+  writes.
