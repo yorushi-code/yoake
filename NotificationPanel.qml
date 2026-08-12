@@ -231,7 +231,7 @@ PanelWindow {
                             // so a long history doesn't queue a visibly
                             // slow cascade on first open.
                             opacity: 0
-                            scale: 0.92
+                            scale: Theme.revealScale
                             transformOrigin: Item.Top
                             Component.onCompleted: histEntryAnim.start()
                             ParallelAnimation {

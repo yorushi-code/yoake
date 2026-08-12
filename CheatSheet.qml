@@ -496,7 +496,7 @@ Item {
                                 spacing: Theme.spacing
 
                                 opacity: 0
-                                scale: 0.94
+                                scale: Theme.revealScale
                                 transformOrigin: Item.Top
                                 Component.onCompleted: categoryEntryAnim.start()
                                 ParallelAnimation {

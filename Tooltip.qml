@@ -61,7 +61,7 @@ PopupWindow {
         border.width: 1
 
         opacity: root.shouldShow ? 1 : 0
-        scale: root.shouldShow ? 1 : 0.9
+        scale: root.shouldShow ? 1 : Theme.revealScale
         transformOrigin: Item.Top
         Behavior on opacity {
             NumberAnimation {

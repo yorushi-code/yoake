@@ -109,7 +109,7 @@ Item {
             readonly property bool hovered: cardHover.hovered
 
             opacity: root.open ? 1 : 0
-            scale: root.open ? 1 : 0.94
+            scale: root.open ? 1 : Theme.revealScale
             transformOrigin: Item.Top
             Behavior on opacity {
                 NumberAnimation {

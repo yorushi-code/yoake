@@ -490,6 +490,12 @@ QtObject {
     // How far a panel or row travels on the way in. Kept here rather than
     // spelled out per file so a cascade in the control centre and one in a
     // menu have visibly the same hand.
+    // How small a surface starts before it arrives. One answer, because seven
+    // surfaces had seven — 0.80, 0.88, 0.90, 0.92, 0.92, 0.94, 0.94 — and every
+    // one of them meant "the panels' entrance language". `Reveal` was built to
+    // stop exactly this drift and could only reach the surfaces that use it;
+    // the menus, the popover, the tooltip, the toasts and the OSD spell their
+    // own entrance out and never saw the token.
     readonly property real revealScale: 0.90
     readonly property real revealSlide: 18
 

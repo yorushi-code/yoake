@@ -76,7 +76,7 @@ PopupWindow {
         tintOpacity: 0.84
 
         opacity: root.open ? 1 : 0
-        scale: root.open ? 1 : 0.88
+        scale: root.open ? 1 : Theme.revealScale
         transformOrigin: Item.Top
         Behavior on opacity {
             NumberAnimation {

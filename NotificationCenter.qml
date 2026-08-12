@@ -376,7 +376,7 @@ Item {
                     // slight overshoot for a "tactile" pop rather than a
                     // plain slide, staggered when several land at once.
                     opacity: 0
-                    scale: 0.92
+                    scale: Theme.revealScale
                     // Down from under the bar, now that they come from there —
                     // through a transform rather than through `y`, because the
                     // Column owns `y` and an animation writing it would be

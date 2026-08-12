@@ -640,3 +640,50 @@ Newest last.
    but it changes each delegate's layout tree, so it needs a screen.
 2. Rule 5: the `rest` beat is defined and nothing enforces it.
 3. Rule 7 in the control centre's pager and the dashboard's navigation.
+
+- **B17 — Seven surfaces entered at seven different sizes.** `PanelChrome`'s own
+  header comment has said "0.88, 0.90, 0.94 and revealScale — four answers to a
+  question that has one" for some time. Counted properly it is worse than four:
+  0.80, 0.88, 0.90, 0.92, 0.92, 0.94, 0.94, and every one of them was written
+  meaning "the panels' entrance language".
+
+  `Reveal` exists to stop this drift and it did — for the five surfaces that go
+  through it. The menus, the popover, the tooltip, the toasts, the history cards,
+  the cheat sheet and the OSD all spell their own entrance out, so the token
+  never reached them. All seven are on `Theme.revealScale` now, and the token
+  carries the count so the next person can see what it is for.
+
+  Left alone deliberately: `MenuItemRow`'s 0.4 and `BarWorkspaces`' 0.6. A check
+  mark popping in and a numeral arriving on the content beat are not surface
+  entrances, and the second is tuned against the pill it lands on.
+
+  The worst of them was the OSD at 0.80 — the largest pop in the shell, spent on
+  the surface that should announce itself least. It also had no way to say that
+  its beats are all zero *on purpose*: `Direction`'s `acknowledge` type is
+  documented as existing for exactly this surface and has had no consumer at all.
+  It cannot become one without changing shape — `Surface` samples the backdrop
+  from a fixed `screenX`/`screenY` and a scale transform on an ancestor slides
+  the sampled rectangle out from under the glass, which is why the OSD spells
+  its entrance out in the first place. Verified in `Surface.qml`: `screenX` and
+  `screenY` are passed straight to `FrostedBackground`. So the reason is written
+  down in the file instead, where the next reader will look.
+
+  **Not verified on screen.** `qs ipc call osd brightness` only announces a
+  reading that changed, so the OSD never appeared for the capture. One volume key
+  in the morning shows it.
+
+- **A3 — Rule 1 holds; checked rather than assumed.** Walked every `.qml` file
+  counting how many properties a single item animates simultaneously — four or
+  more is where "a space rearranging itself" turns into a demo effect. Four sites
+  in the tree, and all four are one event rather than several:
+
+  | site | properties | verdict |
+  |---|---|---|
+  | `GeneratedColors` | eleven colours | one palette change, not eleven objects |
+  | `Theme` | the four Perception axes | the documented smoothing, downstream of the split |
+  | `Traveller` | opacity, x, y, width, height | one marker: the journey, its slot, its presence — and the size settles faster than the position on purpose |
+  | `BarWorkspaces` dot | color, width, scale, opacity | four different triggers that never coincide: window count, focus, hover |
+
+  `BarWorkspaces` is also the one place outside `Reveal` that plays a beat
+  correctly: the workspace numeral is held to `Direction.beatContent` so it
+  confirms the arrival instead of announcing it.

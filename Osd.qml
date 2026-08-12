@@ -152,8 +152,19 @@ Item {
 
             opacity: root.shown ? 1 : 0
             // Matches the panels' entrance language (bigger overshoot, slower
-            // arrival) instead of the flat fade it used to have.
-            scale: root.shown ? 1 : 0.8
+            // arrival) instead of the flat fade it used to have. It intended to
+            // match and did not: it entered from 0.80 against the token's 0.90,
+            // which is the largest pop in the shell spent on the surface that
+            // should announce itself least.
+            //
+            // Every beat at zero, and that is deliberate rather than missing.
+            // This is Direction's `acknowledge` type: on a volume key the accent
+            // *is* the message and holding it back by a beat turns a keypress
+            // into lag. It spells the motion out rather than going through
+            // `Reveal` because `Surface` samples the backdrop from `screenX` and
+            // `screenY`, and a scale transform on an ancestor moves the sampled
+            // rectangle out from under the thing being frosted.
+            scale: root.shown ? 1 : Theme.revealScale
             Behavior on opacity {
                 NumberAnimation {
                     duration: root.shown ? Theme.animNormal : Theme.animExit
