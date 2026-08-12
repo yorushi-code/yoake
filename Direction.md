@@ -152,21 +152,28 @@ Implemented:
   rebuilt (`snapping`). The journey is a claim about continuity, and a list that
   did not exist a frame ago has none to claim. The launcher holds it for the
   length of its restage.
+- `CascadeEntry.qml` is the one arrival every cascading list plays: fade and
+  grow from `Theme.revealScale` after `Direction.stagger(index)`, on the
+  durations and curves `Reveal` uses for its space and object beats. Consumers:
+  the notification history, the toasts and the cheat sheet.
+
+  It is deliberately **not** `Reveal`. A wrapper would add an Item and four
+  Behaviors to every row of every list, and the beats it would buy are worth
+  nothing there: a delegate is `ambient` by the table above — present, never the
+  subject — and at that type the beats fall 15 to 42 ms apart depending on
+  tempo, under the threshold at which a sequence reads as a sequence. What the
+  lists actually needed was the *one* thing they each spelled out separately,
+  and a list whose items come from a direction adds its travel inside the shared
+  arrival rather than beside it, so the drop and the fade cannot come apart.
 
 Not done:
 
-- **The list cascades still spell their own arrival out.** `ActionMenu`,
-  `CcWifiPage`, `CcBluetoothPage`, `CheatSheet`, `NotificationPanel` and
-  `NotificationCenter` each animate a delegate's opacity and scale on the same
-  frame, from a `ParallelAnimation` of two `SequentialAnimation`s that each
-  wait out the same `Direction.stagger(index)`. They are on the *stagger*, so
-  the cascade is right; they are not on the *beats*, so each card still arrives
-  as one event where the shell's own wrapper would give it four. `Reveal` takes
-  `delay` precisely so a delegate can compose a stagger with the beats. The
-  work is mechanical but it changes each delegate's layout tree, so it wants a
-  screen to verify on.
 - the **rest** beat is defined and nothing enforces it. Rule 5 is currently an
   intention.
+- list rows do not agree on whether they grow. The notification history, the
+  toasts and the cheat sheet fade *and* scale; the wifi and bluetooth pages fade
+  only. Both are defensible and one of them is wrong. Wants a screen and a
+  decision, not a sweep.
 - the `acknowledge` type has no consumer and cannot easily get one. The OSD is
   what it was written for, and the OSD spells its motion out because `Surface`
   samples the backdrop from a fixed `screenX`/`screenY` — a scale transform on

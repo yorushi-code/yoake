@@ -234,24 +234,10 @@ PanelWindow {
                             scale: Theme.revealScale
                             transformOrigin: Item.Top
                             Component.onCompleted: histEntryAnim.start()
-                            ParallelAnimation {
+                            CascadeEntry {
                                 id: histEntryAnim
-                                SequentialAnimation {
-                                    PauseAnimation { duration: Direction.stagger(histDelegate.index) }
-                                    NumberAnimation {
-                                        target: histDelegate; property: "opacity"; to: 1
-                                        duration: Theme.animNormal
-                                        easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeEmphasized
-                                    }
-                                }
-                                SequentialAnimation {
-                                    PauseAnimation { duration: Direction.stagger(histDelegate.index) }
-                                    NumberAnimation {
-                                        target: histDelegate; property: "scale"; to: 1
-                                        duration: Theme.animNormal
-                                        easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpring
-                                    }
-                                }
+                                item: histDelegate
+                                index: histDelegate.index
                             }
 
                             Rectangle {

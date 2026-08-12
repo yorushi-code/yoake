@@ -395,31 +395,20 @@ Item {
                             drain.start();
                         }
                     }
-                    ParallelAnimation {
+                    // The travel is declared here rather than in `CascadeEntry`
+                    // because only this list has one: a toast comes down from
+                    // under the bar it belongs to. It runs inside the shared
+                    // arrival, after the one wait, so the drop and the fade
+                    // cannot come apart.
+                    CascadeEntry {
                         id: entryAnim
-                        SequentialAnimation {
-                            PauseAnimation { duration: Direction.stagger(toastDelegate.index) }
-                            NumberAnimation {
-                                target: toastDelegate; property: "opacity"; to: 1
-                                duration: Theme.animNormal
-                                easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeEmphasized
-                            }
-                        }
-                        SequentialAnimation {
-                            PauseAnimation { duration: Direction.stagger(toastDelegate.index) }
-                            NumberAnimation {
-                                target: drop; property: "y"; to: 0
-                                duration: Theme.animSlow
-                                easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig
-                            }
-                        }
-                        SequentialAnimation {
-                            PauseAnimation { duration: Direction.stagger(toastDelegate.index) }
-                            NumberAnimation {
-                                target: toastDelegate; property: "scale"; to: 1
-                                duration: Theme.animSlow
-                                easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig
-                            }
+                        item: toastDelegate
+                        index: toastDelegate.index
+
+                        NumberAnimation {
+                            target: drop; property: "y"; to: 0
+                            duration: Theme.animSlow
+                            easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig
                         }
                     }
 

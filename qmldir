@@ -51,6 +51,7 @@ VpnSubscriptionEditor 1.0 VpnSubscriptionEditor.qml
 WallpaperView 1.0 WallpaperView.qml
 DesktopLayer 1.0 DesktopLayer.qml
 PalettePreview 1.0 PalettePreview.qml
+CascadeEntry 1.0 CascadeEntry.qml
 Reveal 1.0 Reveal.qml
 MotionAdd 1.0 MotionAdd.qml
 MotionMove 1.0 MotionMove.qml

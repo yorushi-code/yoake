@@ -762,3 +762,48 @@ Newest last.
   should have existed. Same family as M3: the check is cheap, the silence is
   total, and `cd` into the project explicitly at the start of every command that
   writes.
+
+- **B21 — Three lists spelled the same arrival, and waited for it seven times.**
+  Phase 4's recorded next action was to put the list cascades on `Reveal`. Doing
+  it would have been wrong, and working out why was the useful part.
+
+  What the six cascading lists actually had:
+
+  | list | properties | pauses |
+  |---|---|---|
+  | notification history | opacity, scale | 2 |
+  | cheat sheet categories | opacity, scale | 2 |
+  | toasts | opacity, scale, a `Translate` y | 3 |
+  | action menu | opacity | 1 |
+  | wifi page, bluetooth page | opacity, via a Behavior | 1 |
+
+  Every pause counts the same `Direction.stagger(index)`. Seven timers across
+  three lists for three delays — three chances for the parts of one arrival to
+  come apart, and three animation objects built and torn down per delegate for a
+  job that needs one. They had drifted the usual quiet way too: the toasts grew
+  over `animSlow` with the big spring, the other two over `animNormal` with the
+  small one, all three meaning "the entrance the panels have".
+
+  `CascadeEntry.qml` is that sentence written once — one wait, then opacity and
+  scale in parallel, on the durations and curves `Reveal` plays for its space and
+  object beats. Anything declared inside it joins that parallel group, which is
+  how the toasts keep their drop from under the bar without a second clock.
+
+  **Why not `Reveal`.** It would add an Item and four Behaviors to every row of
+  every list, and buy beats that cannot be seen. A delegate is `ambient` by
+  Direction's own table — present, never the subject — and ambient's beats are
+  0 and 0.12 of a tempo, which at the range Perception can reach is 15 to 42 ms
+  apart: under the threshold at which a sequence reads as a sequence. Wrapping
+  in `narrative` would be worse: each card would take ~200ms to arrive while
+  cards are staggered 19ms apart, so ten of them would be mid-arrival at once,
+  which is mush. The coherence was worth having. The layer was not.
+
+  The action menu and the two control-centre pages were left alone: they already
+  wait once, and converting them would *add* a scale pop they do not have. That
+  disagreement — some list rows grow, some only fade — is real and is recorded in
+  `Direction.md` as wanting a decision rather than a sweep.
+
+  Verified on screen, all three: four history cards arrived and sit aligned with
+  their header; a group of toasts arrived under the bar with its `+2` badge; the
+  cheat sheet's five columns of categories all landed. Test notifications cleared
+  afterwards.

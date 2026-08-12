@@ -499,24 +499,10 @@ Item {
                                 scale: Theme.revealScale
                                 transformOrigin: Item.Top
                                 Component.onCompleted: categoryEntryAnim.start()
-                                ParallelAnimation {
+                                CascadeEntry {
                                     id: categoryEntryAnim
-                                    SequentialAnimation {
-                                        PauseAnimation { duration: Direction.stagger(categoryDelegate.index) }
-                                        NumberAnimation {
-                                            target: categoryDelegate; property: "opacity"; to: 1
-                                            duration: Theme.animNormal
-                                            easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeEmphasized
-                                        }
-                                    }
-                                    SequentialAnimation {
-                                        PauseAnimation { duration: Direction.stagger(categoryDelegate.index) }
-                                        NumberAnimation {
-                                            target: categoryDelegate; property: "scale"; to: 1
-                                            duration: Theme.animNormal
-                                            easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpring
-                                        }
-                                    }
+                                    item: categoryDelegate
+                                    index: categoryDelegate.index
                                 }
 
                                 Text {
