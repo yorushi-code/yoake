@@ -291,9 +291,41 @@ Item {
                     anchors.margins: 18
                     anchors.topMargin: 14
 
+                    // Rule 7, in the place Direction.md says wants it.
+                    //
+                    // The three pages used to cross-fade: one went to zero while
+                    // another came up on the same frame, which says the state
+                    // changed without saying from what, and left the eye nothing
+                    // to follow. The tab marker travelled and the content did
+                    // not, so half the navigation said "you moved right" and the
+                    // other half said "something was repainted".
+                    //
+                    // They are three adjacent places, so they lie in a row and
+                    // the row slides. The offset falls out of the index
+                    // difference, which means the direction is never tracked or
+                    // stored -- going back moves the other way because the
+                    // arithmetic does, and a two-tab jump travels twice as far
+                    // because it is twice as far.
+                    //
+                    // A transform rather than `x`: these are anchor-filled, and
+                    // anchors win against a plain x. It is also the cheaper of
+                    // the two, being a scene-graph transform rather than a
+                    // relayout.
+                    readonly property real drift: pages.width * 0.10
+
                     DashOverview {
                         anchors.fill: parent
                         visible: opacity > 0
+                        transform: Translate {
+                            x: (0 - root.tab) * pages.drift
+                            Behavior on x {
+                                NumberAnimation {
+                                    duration: Theme.animNormal
+                                    easing.type: Easing.Bezier
+                                    easing.bezierCurve: Theme.easeEmphasized
+                                }
+                            }
+                        }
                         // Cards play their entrance when the sheet opens *and*
                         // when this page becomes the one on screen, so switching
                         // tabs is an arrival rather than a swap.
@@ -305,6 +337,16 @@ Item {
                     DashControl {
                         anchors.fill: parent
                         visible: opacity > 0
+                        transform: Translate {
+                            x: (1 - root.tab) * pages.drift
+                            Behavior on x {
+                                NumberAnimation {
+                                    duration: Theme.animNormal
+                                    easing.type: Easing.Bezier
+                                    easing.bezierCurve: Theme.easeEmphasized
+                                }
+                            }
+                        }
                         revealed: root.open && root.tab === 1
                         opacity: root.tab === 1 ? 1 : 0
                         Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
@@ -313,6 +355,16 @@ Item {
                     DashDesks {
                         anchors.fill: parent
                         visible: opacity > 0
+                        transform: Translate {
+                            x: (2 - root.tab) * pages.drift
+                            Behavior on x {
+                                NumberAnimation {
+                                    duration: Theme.animNormal
+                                    easing.type: Easing.Bezier
+                                    easing.bezierCurve: Theme.easeEmphasized
+                                }
+                            }
+                        }
                         opacity: root.tab === 2 ? 1 : 0
                         Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
                     }

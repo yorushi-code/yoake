@@ -167,6 +167,19 @@ Not done:
   screen to verify on.
 - the **rest** beat is defined and nothing enforces it. Rule 5 is currently an
   intention.
-- rule 7 has two consumers and at least two more places that want it: the
-  control centre's pager, where a page slides in and the main view drifts, and
-  the dashboard's own navigation.
+- the `acknowledge` type has no consumer and cannot easily get one. The OSD is
+  what it was written for, and the OSD spells its motion out because `Surface`
+  samples the backdrop from a fixed `screenX`/`screenY` — a scale transform on
+  an ancestor slides the sampled rectangle out from under the glass. The type is
+  still worth having as the place the argument is written down, but it is an
+  unplayed card and should be recorded as one rather than looking like coverage.
+
+Rule 7 is done in all four places it was wanted:
+
+- the workspace pill and the launcher's selection, via `Traveller`
+- `CcPager` — the detail page slides in from the right while the main view
+  drifts 22% of the width the other way, rather than leaving at the same speed:
+  "the page is what the eye should follow"
+- the dashboard's three pages, which used to cross-fade. They lie in a row now
+  and the row slides; the offset is the index difference, so the direction falls
+  out of the arithmetic and a two-tab jump travels twice as far
