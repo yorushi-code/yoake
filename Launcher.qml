@@ -51,18 +51,32 @@ Item {
         return out;
     }
 
+    // The substring ladder, shared by every kind so that an application, an open
+    // window and a shell action can be ranked against each other on one scale.
+    //
+    // Subsequence matching is deliberately not in here. It earns its place
+    // against a short application name -- "fox" finding Firefox -- and it ruins
+    // a window title, where sixty characters of prose contain the letters of
+    // almost any query in order and every window would match everything.
+    function _textScore(text, needle) {
+        if (needle === "") return 0;
+        if (text === needle) return 1000;
+        if (text.startsWith(needle)) return 900 - text.length;
+        // A word boundary inside the name: "code" should find "Visual Studio
+        // Code" well ahead of anything that merely contains the letters.
+        if (text.indexOf(" " + needle) >= 0) return 800 - text.length;
+        if (text.indexOf(needle) >= 0) return 700 - text.length;
+        return -1;
+    }
+
     function score(entry, needle) {
         if (needle === "") return 0;
         const name = (entry.name || "").toLowerCase();
+        const direct = root._textScore(name, needle);
+        if (direct >= 0) return direct;
+
         const generic = (entry.genericName || "").toLowerCase();
         const exec = (entry.execString || "").toLowerCase();
-
-        if (name === needle) return 1000;
-        if (name.startsWith(needle)) return 900 - name.length;
-        // A word boundary inside the name: "code" should find "Visual Studio
-        // Code" well ahead of anything that merely contains the letters.
-        if (name.indexOf(" " + needle) >= 0) return 800 - name.length;
-        if (name.indexOf(needle) >= 0) return 700 - name.length;
         if (generic.indexOf(needle) >= 0) return 500;
         if (exec.indexOf(needle) >= 0) return 400;
 
@@ -84,9 +98,10 @@ Item {
     // prefix is the cheapest possible mode switch: it needs no chrome, it is
     // one keystroke, and the query itself says which list you are looking at.
     //
-    // The kind is printed on every row rather than implied by the prefix,
-    // because a list of four kinds with nothing saying which is which answers
-    // the wrong question half the time.
+    // A prefix *narrows*; typing without one asks the whole question. So the
+    // default is not "applications" but "everything that matches", and the
+    // prefixes are there for the times you already know which list you want.
+    // Searching for firefox when firefox is open should not hide the window.
     readonly property var modes: [
         { key: "app", prefix: "", label: "Приложения", glyph: Glyphs.apps },
         { key: "window", prefix: "/", label: "Окна", glyph: Glyphs.monitor },
@@ -136,9 +151,54 @@ Item {
         if (root.mode === "calc") return root._calcResults();
         if (root.mode === "window") return root._windowResults();
         if (root.mode === "action") return root._actionResults();
-        return root._appResults();
+        return root._combinedResults();
     }
 
+    // The kind is worth printing exactly when it tells the rows apart.
+    //
+    // It used to be printed always, and the row type was written for a list of
+    // four kinds -- but a prefix selects exactly one generator, so every list
+    // this launcher could produce was homogeneous and the badge said the same
+    // four letters forty times down the right edge. That is not a label, it is
+    // a texture. Now that a plain query really can return an application, a
+    // window and an action together, the badge has its job back, and it appears
+    // only in the lists that have that job to do.
+    readonly property bool mixed: {
+        const rows = root.results;
+        for (let i = 1; i < rows.length; i++) {
+            if (rows[i].kind !== rows[0].kind) return true;
+        }
+        return false;
+    }
+
+    // Ties go to the kind you more often meant. Two things matching a query
+    // equally well is common -- an application and its own open window match
+    // their shared name identically -- and "launch it" is the more frequent
+    // intent, so it leads and the window sits directly under it.
+    readonly property var _kindRank: ({ "app": 0, "window": 1, "action": 2, "calc": 3 })
+
+    function _combinedResults() {
+        const apps = root._appResults();
+        // An empty query is "what can I run", not "everything this session
+        // contains". With nothing typed there is no ranking to speak of, a list
+        // of every open window is noise, and `/` asks that question directly.
+        const out = root.needle === ""
+            ? apps
+            : apps.concat(root._windowResults(), root._actionResults());
+
+        out.sort((a, b) => {
+            if (b.score !== a.score) return b.score - a.score;
+            const ka = root._kindRank[a.kind], kb = root._kindRank[b.kind];
+            if (ka !== kb) return ka - kb;
+            if ((b.uses || 0) !== (a.uses || 0)) return (b.uses || 0) - (a.uses || 0);
+            return (a.name || "").localeCompare(b.name || "");
+        });
+        return out.slice(0, 40);
+    }
+
+    // Unsorted: the caller merges these with the other kinds and ranks the lot
+    // in one pass, because sorting a slice of a list twice ranks it by the
+    // wrong thing the first time.
     function _appResults() {
         const needle = root.needle.toLowerCase();
         // Only when the swap changes something, so a Latin query costs nothing
@@ -159,12 +219,7 @@ Item {
                 score: s, uses: seen
             });
         }
-        out.sort((a, b) => {
-            if (b.score !== a.score) return b.score - a.score;
-            if (b.uses !== a.uses) return b.uses - a.uses;
-            return (a.name || "").localeCompare(b.name || "");
-        });
-        return out.slice(0, 40);
+        return out;
     }
 
     function _windowResults() {
@@ -174,15 +229,23 @@ Item {
         for (const w of Niri.windows) {
             const title = (w.title || "").toLowerCase();
             const app = (w.app_id || "").toLowerCase();
-            if (needle !== "" && title.indexOf(needle) < 0 && app.indexOf(needle) < 0
-                    && title.indexOf(swapped) < 0 && app.indexOf(swapped) < 0) continue;
+            // Against the application id as well as the title, and the better of
+            // the two wins: a window is findable by what program it is and by
+            // what is currently in it, which are rarely the same word.
+            let s = Math.max(root._textScore(app, needle), root._textScore(title, needle));
+            if (swapped !== needle) {
+                s = Math.max(s, root._textScore(app, swapped), root._textScore(title, swapped));
+            }
+            if (s < 0) continue;
             out.push({
                 kind: "window", label: "окно", windowId: w.id,
                 name: w.title || w.app_id || "Окно",
                 subtitle: w.app_id || "",
                 iconName: w.app_id || "", glyph: Glyphs.monitor,
                 // The one you are on is the least useful thing to switch to.
-                score: w.is_focused ? -1 : 0
+                // Below every other match rather than merely last among windows,
+                // now that windows share a scale with everything else.
+                score: w.is_focused ? s - 2000 : s
             });
         }
         out.sort((a, b) => b.score - a.score);
@@ -195,11 +258,13 @@ Item {
         for (const item of ShellActions.shellMenu) {
             if (item.separator) continue;
             const text = (item.text || "").toLowerCase();
-            if (needle !== "" && text.indexOf(needle) < 0) continue;
+            const s = root._textScore(text, needle);
+            if (s < 0) continue;
             out.push({
                 kind: "action", label: "действие", act: item.action,
                 name: item.text || "", subtitle: "",
-                iconName: "", glyph: item.glyph || Glyphs.tune
+                iconName: "", glyph: item.glyph || Glyphs.tune,
+                score: s
             });
         }
         return out;
@@ -601,6 +666,11 @@ Item {
                         id: marker
                         z: -1
                         active: root.results.length > 0
+                        // Exactly the window in which this list is being
+                        // rebuilt -- an open, or a new query. Outside it the
+                        // marker travels, because then the selection really did
+                        // move within a list that stayed put.
+                        snapping: root.cascading
                         slotX: 0
                         slotY: root.selected * chrome.rowHeight
                         slotWidth: list.width
@@ -651,7 +721,7 @@ Item {
                         subtitle: modelData.subtitle
                         iconName: modelData.iconName
                         glyph: modelData.glyph
-                        kind: modelData.label
+                        kind: root.mixed ? modelData.label : ""
                         selected: index === root.selected
                         onActivated: root.launch(index)
                         onHovered: root.selected = index

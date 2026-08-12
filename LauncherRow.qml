@@ -9,8 +9,11 @@ import Quickshell.Widgets
 // subtitle, an icon and a *kind*, so an open window, a shell action and a sum
 // can appear in the same list without any of them pretending to be an app.
 //
-// The kind is printed on the right. Four kinds in one list with nothing saying
-// which is which is a list that answers the wrong question half the time.
+// The kind is printed on the right, and only when the list actually holds more
+// than one -- the caller decides that and passes an empty string otherwise.
+// Four kinds in one list with nothing saying which is which answers the wrong
+// question half the time; one kind labelled forty times is forty labels that
+// answer nothing.
 //
 // It draws no selection of its own: the list hands that to one `Traveller`
 // behind the delegates, because a fill that appears here while another
@@ -75,7 +78,10 @@ Item {
         anchors.left: icon.right
         anchors.leftMargin: 14
         anchors.right: kindLabel.left
-        anchors.rightMargin: Theme.gapWide
+        // No badge, no gap for one: an empty label still sits at the right
+        // inset, and reserving its margin anyway would pad the row's right side
+        // wider than its left in every list that has no kinds to tell apart.
+        anchors.rightMargin: root.kind === "" ? 0 : Theme.gapWide
         anchors.verticalCenter: parent.verticalCenter
         spacing: 1
 

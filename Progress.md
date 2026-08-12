@@ -364,3 +364,92 @@ Newest last.
   shouts at a person for opening a panel. Caught on camera with the pointer over
   Перезагрузка, so the state is verified rather than assumed.
 
+
+- **B10 — The launcher printed the same word forty times.** Every row carried a
+  kind badge on the right: `прил.`, `прил.`, `прил.`, all the way down. The row
+  type was written for a list of four kinds and says so in its own comment — but
+  a prefix selects exactly one generator, so every list the launcher could
+  produce was homogeneous by construction and the badge could never once tell
+  two rows apart. Forty labels answering nothing, in the one surface that opens
+  on a keystroke.
+
+  Two ways out: delete the badge, or make its premise true. The premise is the
+  better product and the row type was already built for it, so it is finished
+  rather than removed. A plain query now searches applications, open windows and
+  shell actions together — searching for firefox while firefox is open no longer
+  hides the window — and the three prefixes stay for asking one list directly.
+
+  Ranking had to become one scale for that to mean anything. The substring
+  ladder moved out of `score()` into `_textScore()` and is shared; subsequence
+  matching stayed behind, because "every letter in order" earns its place
+  against a short application name and makes any sixty-character window title
+  match almost any query. Ties go to the kind you more often meant: an
+  application and its own window score identically on their shared name, and
+  launching is the commoner intent, so the app leads and the window sits under
+  it. The window you are already looking at drops below everything — switching
+  to where you already are is the one row that can do nothing.
+
+  An empty query is still applications only. Nothing has been typed, so there is
+  no ranking to speak of, and a list of every open window is noise.
+
+  The badge appears exactly when the list holds more than one kind. Verified on
+  screen both ways: `fire` returns Firefox, Fedora Media Writer and the open
+  Firefox window with two kinds marked; an empty query returns a clean right
+  edge with no badges at all.
+
+- **B11 — The selection marker travelled through lists that no longer existed.**
+  Caught on camera by accident: a screenshot taken 1.6s after opening the
+  launcher had the marker parked halfway between two rows, mid-journey, with no
+  row selected.
+
+  `Traveller`'s journey is a sentence about continuity — *the thing you had is
+  now this thing instead* — and `_primed` already refuses to say it on the very
+  first placement. But the launcher window is hidden, not destroyed, so every
+  reopen was primed: select the eighth row, close, reopen, and the marker glides
+  up through eight rows of a list that was built a frame ago. Typing did it too,
+  since a new query resets the selection to the top.
+
+  `Traveller` learned `snapping`, which stands the four geometry Behaviors down
+  and suppresses the deformation, and the launcher holds it for exactly the
+  window in which the list is being rebuilt — `root.cascading`, which already
+  existed for the row entrance and is already the right length, because rows
+  arriving in a cascade keep moving the slot for several frames after the query
+  changed. Outside that window the marker still travels, because then the
+  selection really did move within a list that stayed put.
+
+  Checked the other three callers: workspaces, dashboard tabs and `Segmented`
+  all mark a stable set, so their journeys are always true and none of them
+  wants this.
+
+- **M2 — A 45% reading that was not a bug.** Measured the shell at 44.7 / 45.3 /
+  44.8 across three samples with every panel closed and music playing, against a
+  contract of 20. Followed it into `Cava` and its six consumers and had a
+  rewrite half-planned — twenty-eight `Glow` items in `WidgetSpectrum` whose
+  amount changes on every cava frame is exactly what an expensive shell looks
+  like.
+
+  Then measured again at rest: 14.9 / 8.0 / 7.0. Open the launcher and hold it
+  open: 9.9 / 6.0 / 5.0. The spike was my own test load — repeated screenshots,
+  synthetic input, the launcher opening and closing in a loop — and it is not
+  reproducible.
+
+  Reading the code afterwards showed why the rewrite would have been wrong.
+  `Glow` is a `RectangularShadow` with fixed geometry that animates opacity and
+  grows by transform, precisely so the blur is rasterised once instead of per
+  frame, and the file records the 4.4-points-of-a-core measurement that taught
+  it. `Cava` smooths the fall itself rather than through 42 per-bar Behaviors,
+  and `WidgetSpectrum` drops its delegates rather than hiding them, both with
+  the measurement written next to them. Three rounds of this fight are already
+  won. **One number is not a measurement.** Recorded so the next pass does not
+  start the same rewrite from the same single sample.
+
+- **E1 — Synthetic keyboard input is not safe on this machine, and stopped.**
+  `wtype` was used to type into the launcher, which worked once and then did
+  not: the layout was on Russian, six `wtype -k Down` presses arrived as six
+  Cyrillic characters instead of arrow keys, and the stray text landed in
+  whatever surface held focus — at one point a Telegram window. Nothing was
+  sent, and no further synthetic input was used.
+
+  The rule for the rest of this work: drive the UI through `qs ipc call toggles`
+  and read it with `grim`. Anything that needs a keystroke waits for the user.
+  It also cost a measurement — see M2, whose spike was partly this.

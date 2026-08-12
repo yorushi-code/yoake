@@ -33,6 +33,20 @@ Item {
     // leave the marker parked on a stale row.
     property bool active: true
 
+    // Place, do not travel.
+    //
+    // The journey is a sentence about continuity: it says the thing you had
+    // selected is now this thing instead. That sentence is false the moment the
+    // list itself is replaced -- a launcher opening, a query rebuilding every
+    // row -- because row 0 of the new list was not anywhere a moment ago and the
+    // slot the marker is leaving belonged to a list that no longer exists.
+    //
+    // Held by the caller for as long as the rebuild lasts, rather than released
+    // on a tick of its own: rows arriving in a cascade keep moving the slot for
+    // several frames after the query changed, and a marker that started
+    // travelling in the middle of that would chase them.
+    property bool snapping: false
+
     // How much a full-length journey deforms the marker, as a fraction of its
     // length. Past about a third it stops reading as mass and starts reading as
     // a rubber band.
@@ -62,6 +76,7 @@ Item {
     }
 
     Behavior on x {
+        enabled: !root.snapping
         NumberAnimation {
             duration: Theme.animNormal
             easing.type: Easing.Bezier
@@ -69,6 +84,7 @@ Item {
         }
     }
     Behavior on y {
+        enabled: !root.snapping
         NumberAnimation {
             duration: Theme.animNormal
             easing.type: Easing.Bezier
@@ -78,6 +94,7 @@ Item {
     // The size settles faster than the position. A marker that is still growing
     // after it has arrived reads as two arrivals.
     Behavior on width {
+        enabled: !root.snapping
         NumberAnimation {
             duration: Theme.animFast
             easing.type: Easing.Bezier
@@ -85,6 +102,7 @@ Item {
         }
     }
     Behavior on height {
+        enabled: !root.snapping
         NumberAnimation {
             duration: Theme.animFast
             easing.type: Easing.Bezier
@@ -129,6 +147,8 @@ Item {
         const distance = Math.hypot(dx, dy);
         // Under a pixel is a rounding artefact of the layout, not a move.
         if (distance < 1) return;
+        // A placement deforms nothing: there was no departure to leave a tail.
+        if (root.snapping) return;
         root._axis = Math.abs(dx) >= Math.abs(dy) ? 0 : 1;
         root._backward = (root._axis === 0 ? dx : dy) < 0;
         root._reach = Math.min(1, distance / root.span);
