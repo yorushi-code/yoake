@@ -19,7 +19,7 @@ Status keys: `IMPLEMENTED` / `PARTIAL` / `MISSING` / `WRONG`.
 | 1 | Audit | IMPLEMENTED |
 | 2 | Architecture map | IMPLEMENTED |
 | 3 | Visual system | IMPLEMENTED |
-| 4 | Motion system | PARTIAL |
+| 4 | Motion system | IMPLEMENTED |
 | 5 | Bar composition | MISSING |
 | 6 | Media / player system | PARTIAL |
 | 7 | Notifications | PARTIAL |
@@ -855,3 +855,21 @@ Newest last.
   So the rule holds where it matters, by construction rather than by
   enforcement, and it is written in `Direction.md` as what it is: a rule authors
   obey when they write a sequence, like rules 2 and 3, not a mechanism.
+
+**Phase 4 closed.** What it consisted of, so the next pass does not reopen it:
+
+| item | outcome |
+|---|---|
+| `Reveal` plays four beats | B15 — two of them could not be seen; one property per beat now |
+| documentation describes the motion system | B16 and the updates after it |
+| entrance scale | B17 — seven answers became one |
+| rule 1, no demo effects | A3 — checked across every file, four sites, all one event |
+| rule 5, rest | A4 — an authoring rule, verified where it applies, not a mechanism |
+| rule 7, journeys not cross-fades | B18 — all four places, dashboard was the last |
+| list cascades share one arrival | B21 — one wait instead of seven |
+| one owner per property | B22 — the surface owns its size |
+
+Left open on purpose, with the argument recorded in `Direction.md`: the
+`acknowledge` surface type has no consumer and cannot easily get one, because
+the OSD it was written for cannot be wrapped without moving the rectangle
+`Surface` samples its frost from.
