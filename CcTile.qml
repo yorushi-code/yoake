@@ -24,7 +24,8 @@ Rectangle {
     signal toggled()
     signal pageRequested()
 
-    height: 70
+    // From the content, with a floor. See the column below for why it is not 70.
+    height: Math.max(70, labels.y + labels.height + 12)
     radius: Theme.radius + 4
     color: root.active && root.stateful
         ? Theme.accent
@@ -72,33 +73,48 @@ Rectangle {
         Behavior on color { ColorAnimation { duration: Theme.animFast } }
     }
 
-    Text {
+    // The name and what it is doing, as one block.
+    //
+    // They were anchored to opposite edges — the name below the icon, the detail
+    // to the *bottom of the tile* — so the space between two lines of type was
+    // not a value anybody had chosen, it was whatever the tile had left over.
+    // At this tile's size there was nothing left over: 12 + icon + 5 + name and
+    // then a detail line reaching up from the bottom margin put the two of them
+    // through each other by about seven pixels, and "Питание" sat on top of
+    // "Сбалансированный" on the shipped control centre.
+    //
+    // A column makes the leading a number instead of a residue, and the tile
+    // takes its height from what is in it rather than from a 70 that happened to
+    // be true when there were no subtitles. The floor keeps the grid even, since
+    // not every tile has a second line.
+    Column {
+        id: labels
         anchors.left: parent.left
         anchors.leftMargin: 14
         anchors.right: parent.right
         anchors.rightMargin: 12
         anchors.top: mark.bottom
-        anchors.topMargin: 5
-        text: root.label
-        color: root.contentColor
-        font.pixelSize: Theme.fontBody
-        font.bold: true
-        elide: Text.ElideRight
-        Behavior on color { ColorAnimation { duration: Theme.animFast } }
-    }
+        anchors.topMargin: 4
+        spacing: Theme.gapPair
 
-    Text {
-        anchors.left: parent.left
-        anchors.leftMargin: 14
-        anchors.right: parent.right
-        anchors.rightMargin: 12
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 10
-        visible: root.detail !== ""
-        text: root.detail
-        color: root.active && root.stateful ? Qt.alpha(Theme.crust, Theme.veilDense) : Theme.subtext0
-        font.pixelSize: Theme.fontLabel
-        elide: Text.ElideRight
+        Text {
+            width: parent.width
+            text: root.label
+            color: root.contentColor
+            font.pixelSize: Theme.fontBody
+            font.bold: true
+            elide: Text.ElideRight
+            Behavior on color { ColorAnimation { duration: Theme.animFast } }
+        }
+
+        Text {
+            width: parent.width
+            visible: root.detail !== ""
+            text: root.detail
+            color: root.active && root.stateful ? Qt.alpha(Theme.crust, Theme.veilDense) : Theme.subtext0
+            font.pixelSize: Theme.fontLabel
+            elide: Text.ElideRight
+        }
     }
 
     // Its own hit area, and a visible one: the chevron is the difference

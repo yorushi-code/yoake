@@ -1897,3 +1897,26 @@ argued about correctly and fixed in the wrong place.
   arrival onto `PanelArm` and a tooltip whose gate never opens is exactly the
   class of bug being hunted. Hovering a desk pill produces "Рабочий стол 2 · 1
   окно · колесо — переключение", on screen, after the change.
+
+- **B53 — Every tile in the control centre had its two lines of type through each
+  other.** Found by finally looking at the control page at 3× instead of at a
+  distance. "Питание" and "Сбалансированный" are not adjacent on the shipped
+  panel, they are *overlapping*, and so is every other tile carrying a second
+  line — which is all but three of them.
+
+  The cause is a shape worth naming, because it reads as correct in the source.
+  The name was anchored below the icon; the detail was anchored to the **bottom
+  of the tile**. Neither was anchored to the other, so the leading between two
+  lines of type was not a number anybody had chosen — it was whatever the tile
+  had left over after both ends had taken what they wanted. At `height: 70` with
+  this font ladder there was nothing left over: 12 + a 16px icon + 5 + the name
+  came to about 54, and a 10px bottom margin put the detail's top at 47. Seven
+  pixels of overlap, drawn faithfully, for as long as tiles have had subtitles.
+
+  A `Column` makes the leading a value. The tile's height now comes from what is
+  in it, with 70 as a floor so the grid stays even for the tiles that have only
+  one line — the 70 was never a design decision about tiles, it was a number that
+  was true back when none of them had a second line.
+
+  Verified by eye at 3× on the tile that was worst, and across the whole page:
+  twelve tiles, twelve pairs of lines with air between them.
