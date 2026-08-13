@@ -16,7 +16,26 @@ Item {
 
     width: mediaRow.width
     height: Theme.barHeight
-    visible: width > 0
+
+    // Visible when there is something to show, **not** when the row has come out
+    // wider than zero. Those read as the same test and the second is a deadlock:
+    // the row's width comes from the title's `implicitWidth`, and Qt does not lay
+    // text out inside an invisible subtree — so a chip that starts hidden,
+    // because the shell reached this line before MPRIS had answered, never
+    // measures the title it is later handed, never gains a width, and so never
+    // becomes visible. It is hidden *because* it is hidden.
+    //
+    // That is every login. Measured on a cold start with a player already
+    // playing: `hasPlayer` true, `title` 34 characters, `contentWidth` **0**,
+    // `visible` false — and still false minutes later. It survived this long
+    // because editing any file in this directory cures it: a reload builds the
+    // chip with `Media` already populated, so the text is laid out once before
+    // the guard can hide it. Nobody who works on the shell ever sees the state a
+    // login leaves it in.
+    //
+    // `Cava.active` is here because the spectrum is the row's other occupant and
+    // can be the only one.
+    visible: Media.hasPlayer || Cava.active || root.width > 0
 
     Row {
         id: mediaRow
@@ -31,7 +50,9 @@ Item {
             spacing: 2
             width: Cava.active ? implicitWidth : 0
             opacity: Cava.active ? 1 : 0
-            visible: width > 0
+            // `Cava.active` first for the reason the title carries below; the
+            // width term stays so the collapse animation is not cut off.
+            visible: Cava.active || width > 0
             clip: true
             Behavior on width {
                 NumberAnimation { duration: Theme.animNormal; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeEmphasized }
@@ -78,14 +99,38 @@ Item {
             }
         }
 
+        // The title's natural width, measured off the layout entirely.
+        //
+        // It used to be `Math.min(implicitWidth, 190)` read off the Text itself,
+        // which is the usual idiom and is a latch here. The width is bound to the
+        // measurement and the measurement is taken from the thing being sized: if
+        // the width is ever 0 when the text arrives — and it is, at every login,
+        // because the chip is built before MPRIS answers — the elide fits the
+        // string into no pixels, `implicitWidth` reports 0 for a string that is
+        // there, and the binding has no way back. Measured side by side on a cold
+        // start: this element 230.78, the Text 0, same string, same font.
+        //
+        // `TextMetrics` is not in the layout, so nothing can starve it.
+        TextMetrics {
+            id: trackMetrics
+            font: trackText.font
+            text: trackText.text
+        }
+
         Text {
             id: trackText
             anchors.verticalCenter: parent.verticalCenter
             // Gated on the text alone, not on Cava.active: tying it to live
             // audio levels made the title flicker away during quiet passages
             // and between tracks.
-            width: text.length > 0 ? Math.min(implicitWidth, 190) : 0
-            visible: width > 0
+            width: text.length > 0 ? Math.min(trackMetrics.width, 190) : 0
+            // **This** is where the deadlock was. `visible: width > 0` alone,
+            // against a width that comes from `implicitWidth`, cannot recover
+            // from starting empty: Qt does not lay text out inside an invisible
+            // item, so the title handed over a moment later is never measured,
+            // the width stays 0 and the item stays invisible. Leading with the
+            // text breaks it; the width term stays so the collapse still plays.
+            visible: text.length > 0 || width > 0
             clip: true
             elide: Text.ElideRight
             text: {
@@ -93,6 +138,15 @@ Item {
                 return Media.artist ? `${Media.artist} — ${Media.title}` : Media.title;
             }
             color: mediaArea.containsMouse ? Theme.text : Theme.subtext1
+            // Named, like every other label in the bar. This was the only one
+            // that let the family default, and the default is resolved by the
+            // GTK platform theme — which is not settled at process start. A Text
+            // whose family has not resolved measures zero, and a zero here is
+            // load-bearing: the width comes from `implicitWidth`. That is the
+            // rest of the cold-start fault, and it was visible all along without
+            // being noticed, because the track title was the one proportional
+            // thing on a bar that is monospace everywhere else.
+            font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSmall
             Behavior on color { ColorAnimation { duration: Theme.animFast } }
 

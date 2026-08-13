@@ -2070,3 +2070,49 @@ argued about correctly and fixed in the wrong place.
   Amusing, and left alone: the README's file table has said "the three bar
   islands" all along. It was wrong for the whole time the bar was one strip and
   is correct again now, without anybody touching it.
+
+- **B55 — The bar has been missing its player after every login, and the fault
+  was a measurement that starved itself.** Found by restarting the shell rather
+  than reloading it, which nobody had done in a long time: everything above was
+  developed against a process that has been hot-reloading since 10 August.
+
+  On a cold start, with a player already playing, the left island came up as bare
+  desk dots. Two minutes later, still bare. Edit any file in this directory and
+  the title appears at once — which is exactly why this survived: **the state a
+  login leaves the bar in is one that no one working on the shell ever sees.**
+
+  Three layers of the same shape, and only the innermost was load-bearing:
+
+      root:      width: mediaRow.width      visible: width > 0
+      spectrum:  width: Cava.active ? …     visible: width > 0
+      title:     width: min(implicitWidth, 190)   visible: width > 0
+
+  Each says "hide me if I came out empty", and each is a claim about a width that
+  is itself derived from what is inside. Fixing the outer two was not enough and
+  the probes said so: the chip became visible and still measured nothing.
+
+  **The title is the latch.** Its width is bound to its own `implicitWidth` and it
+  elides. The chip is built before MPRIS has answered, so the text is empty and
+  the width is 0; the title arrives a moment later, Qt elides a 35-character
+  string into zero pixels, and `implicitWidth` for a fully elided string is 0. The
+  width is bound to a measurement taken *through* the width. Once it is 0 there is
+  no path back, and the usual `Math.min(implicitWidth, cap)` idiom is what builds
+  the trap.
+
+  Proved rather than reasoned: a second `Text` with the same string and the same
+  font, no explicit width and no elide, was put beside it and both were logged on
+  a cold start. **230.78 against 0.** Same text, same font, same frame.
+
+  `TextMetrics` is the fix. It measures a string against a font without being in
+  the layout, so nothing can starve it, and the visible Text keeps its elide
+  without being asked to measure itself. The two outer guards keep a `|| width > 0`
+  term so a collapse still animates, but each now leads with the thing it is
+  actually about — `Media.hasPlayer`, `Cava.active`, `text.length > 0`.
+
+  And one thing that was visible all along: the track title was the **only** label
+  in the bar that let its font family default, on a bar that is JetBrains Mono
+  everywhere else. It was the one proportional thing on screen and nobody had
+  named it. It is named now.
+
+  Verified on a cold start, five restarts deep: the chip comes up with the title
+  in it, elided at the cap, in the same face as everything beside it.
