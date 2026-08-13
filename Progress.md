@@ -1282,3 +1282,39 @@ the empty-tray gap, the stale header — is done and on screen.
      does not honour a keyboard-interactivity upgrade on an already-mapped
      surface, and the commit path needs a remap rather than a rebind. Clicking
      outside and moving the pointer away both still close it either way.
+
+- **B37 — A failed cover printed itself into the log, four kilobytes at a time.**
+  Found by accident: the log tail was unreadable, filled with
+  `quickshell.colorquantizer: Failed to load image from "data:image/jpeg;base64,…"`
+  followed by the entire payload. Twenty such lines were sitting in a buffer that
+  holds about five hundred, so a couple of track changes wipe out the whole
+  diagnostic history. It cost me two investigations tonight before I looked at
+  what was doing it.
+
+  `MediaTint` already knew half of this. Its comment records that the quantizer
+  fails on every `image://qsimage` handle while the same source draws fine as an
+  `Image` — it reads files, not QML image providers — and it excluded those by
+  name. A `data:` URL is not a file either, some players publish one as their
+  art, and it sailed straight through a guard written as a blacklist.
+
+  The guard is a whitelist now: `file:` or an absolute path, nothing else. The
+  next scheme nobody has thought of fails closed instead of loudly. No behaviour
+  is lost — a failed quantise emitted nothing and the watchdog reset the tint to
+  the fallback, which is exactly what handing it nothing does, minus the decode
+  attempt and the log.
+
+- **Open, and not answered tonight: does `Popover` grab focus on hover?**
+  `Tooltip` sets `grabFocus: false` with a comment about why, `MenuSurface` sets
+  it to its open state, and `Popover` — which appears on hover over any bar chip
+  — sets nothing at all and takes the `PopupWindow` default. Quickshell's type
+  metadata does not record that default.
+
+  It matters because of B35 and B36: if the default is true, resting the pointer
+  on a bar chip takes the keyboard the same way a toast and a peek did. Tried to
+  settle it by logging `popup.grabFocus` from the popover's root — the probe
+  never appeared, because the quantizer flood above had already pushed it out of
+  the buffer. Reverted the probe.
+
+  **Next concrete action:** re-run that probe now that the log is quiet, or hover
+  a bar chip while typing and watch for a `Window focus changed` on
+  `niri msg event-stream`.

@@ -41,13 +41,21 @@ Singleton {
 
     ColorQuantizer {
         id: quantizer
-        // Not the notification-owned handles. The quantizer failed on every
-        // image://qsimage cover it was given -- twice out of twice, across a
-        // restart -- while the same source drew fine as an Image, so it reads
-        // files and not QML image providers. Handing it one buys a warning in
-        // the log and nothing else; the watchdog below turns the silence that
-        // follows into a reset.
-        source: Media.cover.startsWith("image://") ? "" : Media.cover
+        // Only a file. Anything else is handed nothing.
+        //
+        // This used to exclude `image://` handles by name, having learned that
+        // the quantizer failed on every one of them while the same source drew
+        // fine as an `Image` -- it reads files, not QML image providers. The
+        // lesson was right and was not generalised: a `data:image/jpeg;base64`
+        // URL is not a file either, some players publish one as their art, and
+        // the failure prints **the entire payload** as a warning. Four kilobytes
+        // per track change into a log that holds about five hundred lines, which
+        // wipes out the whole diagnostic history -- twice tonight, while chasing
+        // something else.
+        //
+        // Written as what is allowed rather than as what is not, so the next
+        // scheme nobody has thought of fails closed instead of loudly.
+        source: /^(file:|\/)/.test(Media.cover) ? Media.cover : ""
         // Sixteen buckets: enough that a sleeve with one bright detail on a
         // dark field still surfaces the detail, few enough that the pass is
         // cheap and runs once per track.
