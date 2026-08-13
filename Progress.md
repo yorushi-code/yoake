@@ -1191,3 +1191,48 @@ the empty-tray gap, the stale header — is done and on screen.
   Layers audited while there: wallpaper Background, desktop widgets Bottom, bar
   and both OSDs Top, everything the user summons Overlay. The bar being hidden by
   a fullscreen window is correct and stays.
+
+- **B35 — Notifications were stealing keyboard focus, and that is why the cursor
+  appeared.** Reported from use: "почему всё ещё когда приходит уведомление
+  появляется курсор, особенно раздражает когда я играю и параллельно работает
+  музыка".
+
+  Measured on niri's own event stream rather than guessed at. With a toast
+  arriving, the stream carries exactly one event: **`Window focus changed:
+  None`**. The toast window is `focusable: true` with
+  `WlrKeyboardFocus.OnDemand`, and mapping an on-demand layer surface takes the
+  keyboard off the focused window there and then — nobody clicked anything. A
+  game that loses keyboard focus releases the pointer, so the system cursor comes
+  back over the middle of a match. Music makes it constant, because a track
+  change is a notification.
+
+  The file's own comment asserted the opposite — "on-demand focus is exactly the
+  middle: nothing happens until the field is clicked" — and that premise is false
+  on this compositor. It also broke a stated invariant of the brief outright:
+  notifications never steal focus.
+
+  Two experiments settled the fix rather than one:
+
+  | configuration | focus changes on arrival |
+  |---|---|
+  | `focusable: true`, OnDemand, mapped on arrival | 1 — `None` |
+  | `focusable: false`, `None` | 0 |
+  | `focusable: true`, OnDemand, **already mapped** | 0 |
+
+  The third row is the important one: **the map is the event, not the
+  interactivity.** So the surface stays up with nothing in it and only its
+  contents come and go. Nothing is given up — the inline reply field, which the
+  file rightly calls the one notification feature people miss by name, keeps its
+  keyboard, and notifications stop taking focus.
+
+  The input region follows the cards instead of the window (`mask: Region { item:
+  toastColumn }`, the pattern `MediaOsd` already uses), so an empty stack is a
+  surface nothing can land on: with no toasts the column is zero high and clicks
+  at the top right go through to whatever is underneath.
+
+  Opening the notification centre may still unmap it, and that is left alone: the
+  user just did something on purpose, unlike a notification arriving.
+
+  Verified on the event stream — zero focus changes — and on camera: a critical
+  toast renders normally, and an ordinary one during a fullscreen game is
+  suppressed by B33 as intended.

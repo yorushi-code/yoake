@@ -264,10 +264,35 @@ Item {
         // exactly the middle: nothing happens until the field is clicked.
         focusable: true
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+
+        // ── Why this window stays mapped with nothing in it ──
+        //
+        // The paragraph above was right about on-demand focus and wrong about
+        // when it costs anything. Measured on niri's event stream: the moment a
+        // toast arrived, `Window focus changed: None`. Mapping an on-demand
+        // layer surface takes the keyboard off the focused window there and
+        // then — nobody has clicked anything. A game that loses focus releases
+        // the pointer, so the cursor came back over the middle of a match every
+        // time a track changed, which is how this was reported.
+        //
+        // The map is the event, not the interactivity: with the window already
+        // mapped, the same notification produces no focus change at all. So the
+        // surface is kept up and empty, and only its contents come and go. That
+        // keeps the reply field, which is the one notification feature people
+        // miss by name, and it stops notifications taking focus, which the shell
+        // is not allowed to do.
+        //
+        // The input region follows the cards rather than the window, so an empty
+        // stack is a surface nothing can land on: with no toasts the column is
+        // zero high and there is nothing to hit.
+        mask: Region { item: toastColumn }
+
         // Nothing to pop up about while the list is open: the toast landed on
         // top of the very same notification in the centre underneath it, so the
-        // one arrival was shown twice and each copy hid half of the other.
-        visible: root.activeToasts.length > 0 && !Toggles.notifCenterOpen
+        // one arrival was shown twice and each copy hid half of the other. This
+        // one may unmap the window, because opening the centre is something the
+        // user just did on purpose -- unlike a notification arriving.
+        visible: !Toggles.notifCenterOpen
 
         Column {
             id: toastColumn
