@@ -184,6 +184,12 @@ Item {
         NumberAnimation { duration: Theme.animFast; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig }
     }
 
+    // Whether the pointer is on it. Exposed because a chip is the whole of most
+    // bar widgets, and the three that carry a tooltip had no way to ask: they
+    // were left bound to a literal `false`, which is a tooltip that can never
+    // appear and looks exactly like one that simply has nothing to say.
+    readonly property alias hovered: hit.containsMouse
+
     MouseArea {
         id: hit
         anchors.fill: parent

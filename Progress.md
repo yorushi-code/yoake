@@ -985,3 +985,47 @@ the OSD it was written for cannot be wrapped without moving the rectangle
      items it is zero-wide but still visible, and a positioner puts spacing
      around a zero-width visible child. Four to six pixels, only when the tray is
      empty, and this machine's tray never is.
+
+- **B26 — Three chips had a tooltip wired to a literal `false`.** The bar has
+  three hover behaviours, not one: six widgets show a `Popover` card (load, vpn,
+  network, audio, battery, notifications), five show a `Tooltip` (media,
+  workspaces, clock, recorder, tray), and three show **nothing at all** —
+  weather, keyboard layout and bluetooth. Each of those three carries a fully
+  written `Tooltip` with its text and subtext filled in and `active: false`
+  hardcoded, which is a tooltip that can never appear and looks from the outside
+  exactly like a widget that has nothing to say.
+
+  `Tooltip.active` means "the pointer is on the anchor" and every working caller
+  binds it to a `MouseArea`'s `containsMouse`. These three have no MouseArea of
+  their own, because a `Chip` is the whole of them and `Chip` kept its hit area
+  private. So the content was written, the display was switched off pending
+  something to bind to, and nobody came back.
+
+  `Chip.hovered` now exposes it, and the three are bound. The bluetooth one
+  matters most: when the sound is *not* going over bluetooth the chip is a bare
+  glyph with no label, so the tooltip was the only thing that could ever have
+  said "Встроенный выход" — the exact case where a person is asking the question.
+
+  **Not verified on screen.** A tooltip needs a pointer on the chip and there is
+  no safe way to move the pointer here (see E1). Lint clean, the shell loads, all
+  three `chip` ids resolve and no `ReferenceError` appears in the log, which is
+  the class of failure this would have. One hover each in the morning.
+
+- **B27 — The cheat sheet promised a menu that four widgets do not have.** It
+  said "ПКМ — Меню на любом виджете и на пустом месте бара". Counted: workspaces,
+  keyboard layout, load and bluetooth have no right-click of their own, so the
+  event falls through to the bar's background area and opens the *shell* menu —
+  which is something, but it is not what the line says.
+
+  The line now says what happens: "Меню виджета; где его нет — меню шелла."
+  Verified on screen.
+
+  **Not built, and recorded instead:** bluetooth is the odd one out among its own
+  neighbours — network, audio and battery all sit beside it in the right cluster
+  and all three carry a menu. It should have one (power toggle, open the panel,
+  disconnect the current device). It is not built tonight because there is no way
+  to open a right-click menu without a pointer, so it could not be seen, and the
+  VPN group-switching precedent applies: an unverifiable control is worse than a
+  recorded gap. Workspaces, layout and load are left as they are on purpose —
+  there is no obvious menu for a desk, and left-click already does the useful
+  thing on the other two.

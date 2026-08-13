@@ -30,7 +30,7 @@ Item {
 
     Tooltip {
         anchorItem: root
-        active: false
+        active: chip.hovered
         text: Weather.summary
         subtext: Weather.place
     }

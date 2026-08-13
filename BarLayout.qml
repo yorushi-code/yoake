@@ -29,7 +29,7 @@ Item {
 
     Tooltip {
         anchorItem: root
-        active: false
+        active: chip.hovered
         text: Layout.current < Layout.names.length ? Layout.names[Layout.current] : ""
         subtext: "Клик — следующая раскладка"
     }

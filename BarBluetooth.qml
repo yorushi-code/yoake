@@ -49,7 +49,7 @@ Item {
 
     Tooltip {
         anchorItem: root
-        active: false
+        active: chip.hovered
         text: root.deviceName
         subtext: root.wireless ? "Bluetooth" : "Встроенный выход"
     }
