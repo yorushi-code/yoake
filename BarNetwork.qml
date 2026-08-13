@@ -122,13 +122,16 @@ Item {
         }
     }
 
-    MouseArea {
-        id: ma
-        anchors.fill: parent
-        z: -1
-        hoverEnabled: true
-        acceptedButtons: Qt.NoButton
-    }
+    // A HoverHandler, not the MouseArea below.
+    //
+    // The sensor was a `hoverEnabled` MouseArea at `z: -1`, and z does not enter
+    // into hover delivery: `Chip` has a hoverEnabled area of its own that sits
+    // above this one and takes the event, so `containsMouse` here was false for
+    // the entire life of the widget. The card this feeds has therefore never
+    // opened once. A handler is passive — it sees the pointer whatever is on top
+    // of it — which is the same correction `Popover` already carries for its own
+    // card, made in the one place that actually needed it.
+    HoverHandler { id: ma }
 
     // Scanning runs only while the list is on screen. There is no one-shot scan
     // in the API — the old `scan()` call was not a function at all and threw on
@@ -184,7 +187,7 @@ Item {
     // is the one thing people reach for without wanting the whole list.
     Popover {
         anchorItem: root
-        hovered: ma.containsMouse && !Menus.isOpen(root.menuId)
+        hovered: ma.hovered && !Menus.isOpen(root.menuId)
         minWidth: Theme.popoverWidth
 
         Column {

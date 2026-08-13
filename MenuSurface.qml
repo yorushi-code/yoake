@@ -38,6 +38,10 @@ PopupWindow {
         : 0
     readonly property real sampleY: Theme.barHeight + Theme.barMargin * 2
 
+    // The arrival waits for the surface to be up; `open` still maps it and
+    // still takes the focus. See PanelArm.
+    property PanelArm _entrance: PanelArm { id: entrance; requested: root.open }
+
     Timer {
         id: hideDelay
         interval: Theme.animExit + 40
@@ -75,21 +79,21 @@ PopupWindow {
         screenY: root.sampleY
         tintOpacity: 0.84
 
-        opacity: root.open ? 1 : 0
-        scale: root.open ? 1 : Theme.revealScale
+        opacity: entrance.open ? 1 : 0
+        scale: entrance.open ? 1 : Theme.revealScale
         transformOrigin: Item.Top
         Behavior on opacity {
             NumberAnimation {
-                duration: root.open ? Theme.animNormal : Theme.animExit
+                duration: entrance.open ? Theme.animNormal : Theme.animExit
                 easing.type: Easing.Bezier
-                easing.bezierCurve: root.open ? Theme.easeEmphasized : Theme.easeExit
+                easing.bezierCurve: entrance.open ? Theme.easeEmphasized : Theme.easeExit
             }
         }
         Behavior on scale {
             NumberAnimation {
-                duration: root.open ? Theme.animNormal : Theme.animExit
+                duration: entrance.open ? Theme.animNormal : Theme.animExit
                 easing.type: Easing.Bezier
-                easing.bezierCurve: root.open ? Theme.easeSpringBig : Theme.easeExit
+                easing.bezierCurve: entrance.open ? Theme.easeSpringBig : Theme.easeExit
             }
         }
 

@@ -86,11 +86,21 @@ Item {
     }
 
     // Middle click still mutes, which the chip has no gesture for.
+    // A HoverHandler, not the MouseArea below.
+    //
+    // The sensor was a `hoverEnabled` MouseArea at `z: -1`, and z does not enter
+    // into hover delivery: `Chip` has a hoverEnabled area of its own that sits
+    // above this one and takes the event, so `containsMouse` here was false for
+    // the entire life of the widget. The card this feeds has therefore never
+    // opened once. A handler is passive — it sees the pointer whatever is on top
+    // of it — which is the same correction `Popover` already carries for its own
+    // card, made in the one place that actually needed it.
+    HoverHandler { id: maHover }
+
     MouseArea {
         id: ma
         anchors.fill: parent
         z: -1
-        hoverEnabled: true
         acceptedButtons: Qt.MiddleButton
         onClicked: {
             if (root.sink && root.sink.audio) root.sink.audio.muted = !root.muted;
@@ -135,7 +145,7 @@ Item {
     // microphone, which is what people actually reach for.
     Popover {
         anchorItem: root
-        hovered: ma.containsMouse && !Menus.isOpen(root.menuId)
+        hovered: maHover.hovered && !Menus.isOpen(root.menuId)
         minWidth: Theme.popoverWidth
 
         Column {

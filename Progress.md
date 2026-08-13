@@ -1753,3 +1753,44 @@ argued about correctly and fixed in the wrong place.
   Measured at 60fps on a brightness announcement: ten frames of continuous
   change before it settles, the steps largest early and tapering, which is the
   emphasized curve doing what B46 bought.
+
+- **B51 — The rest of the surfaces, same fault.** B47 swept the thirteen lazy
+  panels and B50 caught the OSD. Four more map their own window and animated on
+  the same frame: `MediaOsd`, `MenuSurface` (every right-click menu and tray
+  menu in the shell), `Popover` and `Tooltip`. All four now route their arrival
+  through `PanelArm` while the original flag keeps mapping and dismissal.
+
+  `Tooltip` was the worst of the family. Its window is mapped by a 500 ms
+  `showDelay` after the pointer arrives, and its fade was bound to `shouldShow`
+  — which goes true at the *start* of that half second. The animation therefore
+  ran to completion, in full, before the tooltip existed: it appeared at full
+  opacity every single time. It needs both conditions, because `visible` alone
+  stays true through the exit so the fade has somewhere to play: asked for *and*
+  on screen.
+
+- **B52 — Six cards that had never once been on screen.** Found while verifying
+  the above, by hovering a bar chip and watching nothing happen.
+
+  Every popover-carrying widget in the bar — audio, VPN, battery, notifications,
+  network — sensed the pointer with this:
+
+      MouseArea { id: ma; anchors.fill: parent; z: -1; hoverEnabled: true }
+
+  **`z` does not enter into hover delivery.** `Chip` has a `hoverEnabled` area of
+  its own that sits above this one and takes the event, so `containsMouse` here
+  was false for the entire life of every one of these widgets. `Popover.open` was
+  never set. The cards behind them have never been seen by anybody: the battery's
+  charge estimate with its power-profile buttons — whose own comment says it
+  exists "so switching profile no longer requires knowing that right-click
+  exists" — the notification card, the network detail, all of it.
+
+  A `HoverHandler` is passive: it sees the pointer whatever is on top of it.
+  `Popover` already carries this exact correction for its own card, one file
+  away, in a comment explaining that a hoverEnabled MouseArea further up the
+  stack consumes the hover. The lesson had been learnt and not applied to the
+  thing feeding it. The two widgets whose MouseArea existed *only* to sense hover
+  lost it entirely; the three that also carry a middle- or right-click keep the
+  area for the click and hand the hover to a handler.
+
+  Verified on camera, both shapes: the notification card and the battery card,
+  each opening under a parked pointer where a moment before there was nothing.

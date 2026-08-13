@@ -73,6 +73,8 @@ Item {
     PopupWindow {
         id: popup
         visible: root.open || card.opacity > 0.01
+        // `open` maps the popup; the arrival waits until it is up. See PanelArm.
+        property PanelArm _entrance: PanelArm { id: entrance; requested: root.open }
         implicitWidth: Math.max(root.minWidth, body.implicitWidth + 28)
         implicitHeight: body.implicitHeight + 26
         color: "transparent"
@@ -108,21 +110,21 @@ Item {
             anchors.fill: parent
             readonly property bool hovered: cardHover.hovered
 
-            opacity: root.open ? 1 : 0
-            scale: root.open ? 1 : Theme.revealScale
+            opacity: entrance.open ? 1 : 0
+            scale: entrance.open ? 1 : Theme.revealScale
             transformOrigin: Item.Top
             Behavior on opacity {
                 NumberAnimation {
-                    duration: root.open ? Theme.animNormal : Theme.animExit
+                    duration: entrance.open ? Theme.animNormal : Theme.animExit
                     easing.type: Easing.Bezier
-                    easing.bezierCurve: root.open ? Theme.easeEmphasized : Theme.easeExit
+                    easing.bezierCurve: entrance.open ? Theme.easeEmphasized : Theme.easeExit
                 }
             }
             Behavior on scale {
                 NumberAnimation {
-                    duration: root.open ? Theme.animNormal : Theme.animExit
+                    duration: entrance.open ? Theme.animNormal : Theme.animExit
                     easing.type: Easing.Bezier
-                    easing.bezierCurve: root.open ? Theme.easeSpringBig : Theme.easeExit
+                    easing.bezierCurve: entrance.open ? Theme.easeSpringBig : Theme.easeExit
                 }
             }
 

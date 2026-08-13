@@ -31,6 +31,21 @@ PopupWindow {
 
     readonly property bool shouldShow: root.active && root.text !== ""
 
+    // Both conditions, and this one is the worst case of the family the rest of
+    // the shell had. The window is mapped by `showDelay` half a second after the
+    // pointer arrives, while the arrival was bound to `shouldShow` — which went
+    // true at the start of that half second. The fade therefore ran to
+    // completion, in full, before the tooltip existed: it appeared at full
+    // opacity, always, every time.
+    //
+    // `visible` alone will not do either: it stays true through the exit so the
+    // fade has somewhere to play, so gating on it would hold the tooltip lit
+    // until the window unmapped underneath it. Asked for *and* on screen.
+    property PanelArm _entrance: PanelArm {
+        id: entrance
+        requested: root.shouldShow && root.visible
+    }
+
     Timer {
         id: showDelay
         interval: 500
@@ -60,21 +75,21 @@ PopupWindow {
         border.color: Qt.alpha(Theme.text, Theme.strokeSoft)
         border.width: 1
 
-        opacity: root.shouldShow ? 1 : 0
-        scale: root.shouldShow ? 1 : Theme.revealScale
+        opacity: entrance.open ? 1 : 0
+        scale: entrance.open ? 1 : Theme.revealScale
         transformOrigin: Item.Top
         Behavior on opacity {
             NumberAnimation {
-                duration: root.shouldShow ? Theme.animFast : Theme.animExit
+                duration: entrance.open ? Theme.animFast : Theme.animExit
                 easing.type: Easing.Bezier
-                easing.bezierCurve: root.shouldShow ? Theme.easeEmphasized : Theme.easeExit
+                easing.bezierCurve: entrance.open ? Theme.easeEmphasized : Theme.easeExit
             }
         }
         Behavior on scale {
             NumberAnimation {
-                duration: root.shouldShow ? Theme.animNormal : Theme.animExit
+                duration: entrance.open ? Theme.animNormal : Theme.animExit
                 easing.type: Easing.Bezier
-                easing.bezierCurve: root.shouldShow ? Theme.easeSpring : Theme.easeExit
+                easing.bezierCurve: entrance.open ? Theme.easeSpring : Theme.easeExit
             }
         }
 

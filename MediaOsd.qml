@@ -42,6 +42,10 @@ PanelWindow {
     // through the whole exit instead of unmapping instantly.
     property bool mapped: false
     visible: mapped
+    // The arrival waits for the surface, the way every other one in the shell
+    // does now. `Media.osdShown` maps the window; animating from it as well put
+    // the whole entrance behind the compositor.
+    property PanelArm _entrance: PanelArm { id: entrance; requested: Media.osdShown }
 
     property real dragOffset: 0
 
@@ -76,23 +80,23 @@ PanelWindow {
         anchors.verticalCenter: parent.verticalCenter
 
         x: 0
-        opacity: Media.osdShown ? 1 : 0
+        opacity: entrance.open ? 1 : 0
         // Rises into place rather than just fading — reinforces that it came
         // from the bottom edge. On exit it sinks back down with an accelerate
         // curve, matching the other panels.
-        y: Media.osdShown ? 0 : 20
+        y: entrance.open ? 0 : 20
         Behavior on opacity {
             NumberAnimation {
-                duration: Media.osdShown ? Theme.animNormal : Theme.animExit
+                duration: entrance.open ? Theme.animNormal : Theme.animExit
                 easing.type: Easing.Bezier
-                easing.bezierCurve: Media.osdShown ? Theme.easeEmphasized : Theme.easeExit
+                easing.bezierCurve: entrance.open ? Theme.easeEmphasized : Theme.easeExit
             }
         }
         Behavior on y {
             NumberAnimation {
-                duration: Media.osdShown ? Theme.animNormal : Theme.animExit
+                duration: entrance.open ? Theme.animNormal : Theme.animExit
                 easing.type: Easing.Bezier
-                easing.bezierCurve: Media.osdShown ? Theme.easeSpring : Theme.easeExit
+                easing.bezierCurve: entrance.open ? Theme.easeSpring : Theme.easeExit
             }
         }
 

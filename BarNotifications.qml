@@ -51,11 +51,21 @@ Item {
     }
 
     // Middle click still toggles quiet, which the chip has no gesture for.
+    // A HoverHandler, not the MouseArea below.
+    //
+    // The sensor was a `hoverEnabled` MouseArea at `z: -1`, and z does not enter
+    // into hover delivery: `Chip` has a hoverEnabled area of its own that sits
+    // above this one and takes the event, so `containsMouse` here was false for
+    // the entire life of the widget. The card this feeds has therefore never
+    // opened once. A handler is passive — it sees the pointer whatever is on top
+    // of it — which is the same correction `Popover` already carries for its own
+    // card, made in the one place that actually needed it.
+    HoverHandler { id: notifAreaHover }
+
     MouseArea {
         id: notifArea
         anchors.fill: parent
         z: -1
-        hoverEnabled: true
         acceptedButtons: Qt.MiddleButton
         onClicked: Notifs.dnd = !Notifs.dnd
     }
@@ -94,7 +104,7 @@ Item {
     // what they want is which application wants them, and whether it can wait.
     Popover {
         anchorItem: root
-        hovered: notifArea.containsMouse && !Menus.isOpen(root.menuId)
+        hovered: notifAreaHover.hovered && !Menus.isOpen(root.menuId)
         minWidth: Theme.popoverWidth
 
         Column {
