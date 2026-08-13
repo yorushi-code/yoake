@@ -1824,3 +1824,41 @@ argued about correctly and fixed in the wrong place.
   and `frost=false` for most of this work, because recording and encoding video
   on the same machine is enough load for it to start economising. Durations
   measured tonight are eight tenths of nominal.)
+
+- **V — The three islands, in the states nobody had seen them in.** B45 changed
+  the shape of the bar and was signed off on one screenshot of one content
+  state, which is not a check, it is a photograph. Four states forced and
+  measured; nothing was broken, and the value of writing it down is that the
+  next person does not have to wonder.
+
+  **The clock does not move.** The invariant the whole centre layout exists for.
+  Rather than start a real screen recording, `BarRecorder` was forced visible in
+  place — the layout is what is under test, not the recorder — and the clock was
+  located by template-matching the date line, which is stable text where the
+  time is not. Baseline `@60,29`; with the recorder chip inserted and the
+  weather pushed along after it, `@60,29`. Not approximately: the same pixel.
+
+  **An empty left island is a workspace island.** With the player gone the media
+  chip and the divider that belongs to it both leave the row, and what remains
+  is a pill sized to the desk dots with equal air at both ends — no stranded
+  rule, no pill padded for content that is not there.
+
+  **An empty tray takes its rule with it.** Same at the other end: no tray items
+  and one keyboard layout leaves the right island starting cleanly at the VPN
+  chip.
+
+  **The islands cannot collide.** The left island grows rightward from the edge
+  and the centre is pinned to the midpoint, so nothing structurally stops them
+  meeting. In practice the track title is capped at 190px and the spectrum adds
+  54, which puts the left island's ceiling near 380 against a centre island that
+  starts at 935 — about 550px of slack on this display. Worth knowing rather
+  than worth guarding.
+
+  **A note on how the middle two were nearly got wrong.** The first attempt hid
+  the tray with `visible: false` and reported a stranded divider — a real-looking
+  bug that cannot happen. The divider asks `barTray.width > 0`, and `BarTray`
+  derives its *own* visibility from that same width, so width and visibility can
+  never disagree in the running shell; forcing one without the other invents a
+  state and then finds a fault in it. Emptying the tray's model instead — the
+  thing that actually happens when the last icon leaves — hid the rule correctly.
+  A test that can produce a state the program cannot is testing itself.
