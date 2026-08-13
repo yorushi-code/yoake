@@ -90,8 +90,29 @@ ShellRoot {
         onTriggered: root.creating = false
     }
 
+    // Past the point of no return.
+    //
+    // This is the rest of the "niri session is busy" report, and the half the
+    // rate limit above could not reach. Rate-limiting the *retry* stopped two
+    // creates racing during login; it did nothing about a create issued after
+    // the login had already succeeded.
+    //
+    // The path: the password is accepted, `onReadyToLaunch` fires, `launch()`
+    // starts the session. If anything then comes back on the error channel, the
+    // old handler cleared `busy` and called `begin.restart()` — so the greeter
+    // began asking greetd for a *new* session for a user who is in the middle of
+    // being logged in. greetd holds one session at a time, so it refused, and
+    // the refusal is worded as the session being taken. Every refusal restarted
+    // the retry, so it said so repeatedly, on a machine that had no session
+    // until a moment ago.
+    //
+    // After this is set, nothing creates a session again. There is nothing left
+    // to retry for: the only correct outcome from here is the session starting
+    // or the greeter dying with it.
+    property bool launching: false
+
     function begin() {
-        if (root.currentUser === "" || root.creating) return;
+        if (root.currentUser === "" || root.creating || root.launching) return;
         root.creating = true;
         createGuard.restart();
         root.ready = false;
@@ -126,6 +147,7 @@ ShellRoot {
 
         function onAuthFailure(message) {
             root.creating = false;
+            if (root.launching) return;
             root.busy = false;
             root.ready = false;
             root.entry = "";
@@ -138,6 +160,10 @@ ShellRoot {
 
         function onReadyToLaunch() {
             root.creating = false;
+            // Before the launch, not after: the error channel is what reports a
+            // failed launch, and it has to already know that the session is on
+            // its way by the time it hears about it.
+            root.launching = true;
             root.busy = true;
             root.message = "";
             Greetd.launch([root.session]);
@@ -145,8 +171,14 @@ ShellRoot {
 
         function onError(err) {
             root.creating = false;
-            root.busy = false;
             root.message = err;
+            // A password was accepted and the session is starting. Whatever this
+            // is, another `createSession` is not the answer to it — that is the
+            // request greetd refuses with the wording the user read as "the niri
+            // session is busy". The spinner stays up, because from here the
+            // session is genuinely on its way.
+            if (root.launching) return;
+            root.busy = false;
             begin.restart();
         }
     }
@@ -164,7 +196,7 @@ ShellRoot {
         repeat: true
         property int tries: 0
         onTriggered: {
-            if (root.ready || root.busy) {
+            if (root.ready || root.busy || root.launching) {
                 begin.stop();
                 begin.tries = 0;
                 return;
@@ -371,6 +403,9 @@ ShellRoot {
                     enabled: root.users.length > 1
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
+                        // Not once a session is starting: cancelling it there
+                        // would tear down a login that has already succeeded.
+                        if (root.launching) return;
                         root.userIndex = (root.userIndex + 1) % root.users.length;
                         root.entry = "";
                         root.message = "";

@@ -1667,3 +1667,56 @@ argued about correctly and fixed in the wrong place.
   back on bare wallpaper afterwards. Captured at 4×, the same chip with and
   without the pointer on it: no ground and a grey glyph, against a clear pill and
   a white one. E1 stands for keystrokes.
+
+- **B49 — The greeter fix was never on the machine, and it was half a fix.**
+  Reported again in the same words, which was the clue: B41 was written, was
+  correct as far as it went, and then sat in a file nothing reads.
+
+  **The greeter does not run from this repository.** greetd starts
+  `/usr/local/bin/yoake-greeter`, which loads `/usr/share/yoake/greeter/`, and
+  that copy is only refreshed by `bin/yoake-greeter-install` — which needs root.
+  The installed `shell.qml` is dated **10 August**: no `creating` flag, no guard,
+  none of B41. Every login since has run the pre-fix greeter. B41 was recorded as
+  "not verified"; it was in fact not *installed*, which is a different and worse
+  thing, and the difference is invisible from inside the repo. Anything under
+  `greeter/` is source for a package, not a running program.
+
+  **And the rate limit could not have fixed this on its own.** B41 stopped two
+  `createSession` calls racing *during* login. It said nothing about one issued
+  *after* login had already succeeded, which is what the report actually
+  describes — the message arrives on success.
+
+  The path: the password is accepted, `onReadyToLaunch` fires, `launch()` starts
+  the session. Anything arriving on the error channel from that moment on hit an
+  `onError` that cleared `busy` and called `begin.restart()` — so the greeter
+  asked greetd for a **new** session for the user it was in the middle of logging
+  in. greetd holds one session at a time and refused, and the refusal is worded
+  as the session being taken. Each refusal restarted the retry, so it said so
+  again, and again, on a machine that had had no session at all a moment before.
+
+  A `launching` flag now latches at `onReadyToLaunch`, before `launch()` rather
+  than after, because the error channel has to already know the session is on its
+  way by the time it hears about it. Past that point nothing creates a session
+  again: there is nothing left to retry for. The user-switcher refuses too —
+  cancelling there would tear down a login that has already succeeded.
+
+  **Every one of these changes is gated behind `launching`**, and `launching` is
+  set nowhere except after a password has been accepted. The whole path up to and
+  including a successful authentication is therefore behaviourally identical to
+  before, which is the property that matters for a file that stands between the
+  user and their machine: it cannot prevent a login that would otherwise have
+  worked.
+
+  **Verified as far as it can be without logging out.** The greeter was staged
+  exactly as the installer lays it out and run under `cage`, nested inside the
+  session: it loads with no QML error and renders correctly — clock, date,
+  avatar, password field, session name, the sleeping cat, the power row. The only
+  errors are `Greetd is not available`, which is what a greeter outside a login
+  says. Four of them in six seconds rather than twenty-five, which is the B41
+  rate limit working in front of a witness for the first time.
+
+  **Not installed.** Replacing a login screen while its owner is asleep and
+  cannot test it is not a call to make unattended, and the attempt was refused by
+  the sandbox besides. One command, and it needs a password:
+
+      sudo ~/.config/quickshell/bin/yoake-greeter-install
