@@ -1988,3 +1988,38 @@ argued about correctly and fixed in the wrong place.
   the workspace pill, and the bar's own three islands. The ones that were cuts
   are movements; the ones that were already right — the exit, the pill, the toast
   — are recorded as right so nobody rewrites them looking for a bug.
+
+- **V — Three islands cost less glass than one strip did, not three times more.**
+  The obvious worry about B45, raised against itself: one full-width `Surface`
+  became three, each with its own `FrostedBackground` sampling at its own offset,
+  which reads like three blur passes where there was one. On a shell held under
+  20% of a core that would be the kind of regression this file exists to catch.
+
+  It is not one, for two reasons, and the first makes the second almost
+  redundant.
+
+  **There is no blur pass.** `FrostedBackground` has not computed a blur since
+  the wallpaper pipeline started writing a pre-blurred copy to disk — its own
+  comment says so: what used to be twenty `MultiEffect` chains all computing the
+  same image is now "four plain draws over one small shared texture", the same
+  cached pixmap in every surface, offset by each one's screen position. Three
+  surfaces are three clipped draws of one texture, not three anythings.
+
+  **And the area went down.** The strip clipped that texture across the whole
+  1910px width; the islands clip it across about 1150 — 68,760 px² against
+  41,472, or **60% of what it was**. The change made the frosted layer cheaper.
+
+  Measured anyway, since arithmetic about a renderer is a hypothesis: shell CPU
+  off `/proc`, utime+stime over fixed 15s windows rather than sampled by `top`.
+  Flat, as the machine actually runs: **5.3% and 5.6%** of one core. Frosted:
+  5.3% and 7.6%. Frosted with two of the three surfaces switched to plain fill —
+  same geometry, one texture draw instead of three: 7.8%, 5.2%, 4.9%. The two
+  conditions overlap completely, which is the honest result: the difference is
+  under the noise floor of a desktop with music playing and a clock ticking, and
+  everything is a quarter of the budget.
+
+  Worth recording separately: **this machine runs the shell flat.** `frostWanted`
+  is false and persisted in `prefs.json`, which is why the control centre's
+  material tile reads "плоское". The frosted path was forced on for the
+  measurement and put back; the saved preference is false again, confirmed in
+  the file.
