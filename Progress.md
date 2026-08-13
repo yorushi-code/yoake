@@ -1731,3 +1731,25 @@ argued about correctly and fixed in the wrong place.
   moved from window 3 to window 2; the chip is still lit in both frames. The
   pointer did not go anywhere. With `warp-mouse-to-focus` on it would have
   landed on the newly focused window and the chip would have gone dark.
+
+- **B50 — The surface seen most often was the one arriving worst.** The volume
+  and brightness OSD is not lazily built, so it was not in B47's sweep of the
+  thirteen — and it had the same fault for the same reason. `root.shown` both
+  maps the window and drives the arrival, so the fade and the scale started on
+  the frame the surface was asked for and were finished before it reached the
+  screen.
+
+  It matters more here than on any panel. A panel is opened deliberately, a few
+  times a day; this answers a volume key, which is the most-pressed key on the
+  machine, and `Osd` itself says it is "of every surface in this shell the one
+  that least tolerates being invisible". It was arriving as a cut.
+
+  `shown` keeps mapping and the dismiss timer; only the arrival waits, on the
+  same `PanelArm` the panels use. Named `entrance` there, because this file
+  already has an `armed` that answers an unrelated question — it suppresses the
+  OSD for the first seconds after startup so restoring the volume does not
+  announce itself.
+
+  Measured at 60fps on a brightness announcement: ten frames of continuous
+  change before it settles, the steps largest early and tapering, which is the
+  emphasized curve doing what B46 bought.

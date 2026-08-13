@@ -121,6 +121,11 @@ Item {
         // unmapping the instant root.shown flips false.
         property bool mapped: false
         visible: mapped
+        // Named `entrance` rather than `arm` because this file already has an
+        // `armed`, and that one is a different question: it suppresses the OSD
+        // for the first seconds after startup so restoring the volume does not
+        // announce itself. This one gates the arrival on the surface existing.
+        property PanelArm _entrance: PanelArm { id: entrance; requested: root.shown }
         anchors.bottom: true
         // Lifts above the media OSD when that one is up, so a volume change
         // during playback doesn't land on top of the now-playing card.
@@ -161,7 +166,16 @@ Item {
             screenY: Screen.height - win.margins.bottom - height
             tintOpacity: 0.78
 
-            opacity: root.shown ? 1 : 0
+            // Bound to the arm rather than to `shown`, for the reason
+            // `PanelArm` carries: `shown` also maps the window, so animating
+            // from it played the entrance into a surface the compositor had not
+            // put up yet. That mattered more here than anywhere else — this is
+            // the surface the user sees most, once per volume key, and it was
+            // the one arriving as a hard cut.
+            //
+            // `shown` still owns mapping and the dismiss timer. Only the
+            // arrival waits.
+            opacity: entrance.open ? 1 : 0
             // Matches the panels' entrance language (bigger overshoot, slower
             // arrival) instead of the flat fade it used to have. It intended to
             // match and did not: it entered from 0.80 against the token's 0.90,
@@ -175,19 +189,19 @@ Item {
             // `Reveal` because `Surface` samples the backdrop from `screenX` and
             // `screenY`, and a scale transform on an ancestor moves the sampled
             // rectangle out from under the thing being frosted.
-            scale: root.shown ? 1 : Theme.revealScale
+            scale: entrance.open ? 1 : Theme.revealScale
             Behavior on opacity {
                 NumberAnimation {
-                    duration: root.shown ? Theme.animNormal : Theme.animExit
+                    duration: entrance.open ? Theme.animNormal : Theme.animExit
                     easing.type: Easing.Bezier
-                    easing.bezierCurve: root.shown ? Theme.easeEmphasized : Theme.easeExit
+                    easing.bezierCurve: entrance.open ? Theme.easeEmphasized : Theme.easeExit
                 }
             }
             Behavior on scale {
                 NumberAnimation {
-                    duration: root.shown ? Theme.animSlow : Theme.animExit
+                    duration: entrance.open ? Theme.animSlow : Theme.animExit
                     easing.type: Easing.Bezier
-                    easing.bezierCurve: root.shown ? Theme.easeSpringBig : Theme.easeExit
+                    easing.bezierCurve: entrance.open ? Theme.easeSpringBig : Theme.easeExit
                 }
             }
 
