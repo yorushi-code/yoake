@@ -1315,6 +1315,13 @@ the empty-tray gap, the stale header — is done and on screen.
   never appeared, because the quantizer flood above had already pushed it out of
   the buffer. Reverted the probe.
 
-  **Next concrete action:** re-run that probe now that the log is quiet, or hover
-  a bar chip while typing and watch for a `Window focus changed` on
-  `niri msg event-stream`.
+  **Answered.** Re-ran the probe with the log quiet: all six popovers report
+  `grabFocus=false`, so `PopupWindow` defaults to not grabbing and hovering a bar
+  chip takes nothing. `Tooltip`'s explicit `false` is documentation rather than a
+  correction. Probe removed.
+
+  That closes the focus-theft sweep: of everything that maps without being asked
+  for, only the toast stack (B35) and the dashboard peek (B36) ever took the
+  keyboard, and both are fixed. Menus, sheets, the launcher, the dashboard proper
+  and the lock screen all take focus deliberately, on an action the user
+  performed.
