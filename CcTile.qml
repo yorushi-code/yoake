@@ -85,8 +85,13 @@ Rectangle {
     //
     // A column makes the leading a number instead of a residue, and the tile
     // takes its height from what is in it rather than from a 70 that happened to
-    // be true when there were no subtitles. The floor keeps the grid even, since
-    // not every tile has a second line.
+    // be true when there were no subtitles.
+    //
+    // The floor is for a tile with no second line. All twelve currently have
+    // one, in every branch of every expression, so the grid is uniform because
+    // the content is — not because anything here enforces it. A tile added
+    // without a detail would sit shorter than its row, and that is the moment to
+    // reserve the line rather than collapse it.
     Column {
         id: labels
         anchors.left: parent.left
