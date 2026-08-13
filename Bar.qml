@@ -111,13 +111,29 @@ PanelWindow {
         // to one side or the other of a clock that never moves.
         centreAnchorX: barClock.x + barClock.anchorX
 
+        // Workspaces first, against the fixed edge.
+        //
+        // The player used to lead, and the player is the widest variable thing
+        // in the shell: its width follows the track title up to a cap and grows
+        // again when the spectrum appears with the audio. Everything after it in
+        // the row moved by that much — so the desk indicator, which is the one
+        // widget in this bar that is *pointed at*, slid sideways whenever a
+        // track changed or music started.
+        //
+        // That is the argument the centre zone already makes about the clock:
+        // read by position before it is read at all. The same is true of a desk
+        // you are aiming a click at, and truer, because a clock only has to be
+        // found and a desk has to be hit. What varies goes after what does not.
+        //
+        // The divider goes with the player rather than staying put: a rule with
+        // nothing on one side of it is not a boundary, it is a mark.
         leftItems: [
-            BarMedia { barWindow: bar },
-            BarStrip.Divider {},
             BarWorkspaces {
                 anchors.verticalCenter: parent ? parent.verticalCenter : undefined
                 output: bar.barScreen.name
-            }
+            },
+            BarStrip.Divider { visible: barMedia.visible },
+            BarMedia { id: barMedia; barWindow: bar }
         ]
 
         centreItems: [
@@ -132,9 +148,13 @@ PanelWindow {
         ]
 
         rightItems: [
-            BarTray { barWindow: bar },
-            BarLayout {},
-            BarStrip.Divider {},
+            BarTray { id: barTray; barWindow: bar },
+            BarLayout { id: barLayout },
+            // Same rule as the left: only a boundary if there is something on
+            // both sides of it. The tray can be empty and the layout chip is
+            // hidden on a machine with one keyboard layout, and with both gone
+            // this was a rule against the zone's own leading edge.
+            BarStrip.Divider { visible: barTray.width > 0 || barLayout.visible },
             BarLoad { barWindow: bar },
             BarVpn { barWindow: bar },
             BarNetwork { barWindow: bar },

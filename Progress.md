@@ -935,3 +935,53 @@ the OSD it was written for cannot be wrapped without moving the rectangle
   old load lines fall off as fast as new ones arrive and the count sits still
   while reloads are happening. M3's check needs restating: look for a
   `Configuration Loaded` in the *tail* after the edit, not at a count.
+
+- **B25 — The desk indicator moved whenever a track changed.** The left zone read
+  `[player, divider, workspaces]` and sat at a fixed left inset, so everything
+  after the player moved by whatever the player's width happened to be. That
+  width follows the track title up to its 190px cap, and grows again by about
+  forty pixels when the spectrum appears with the audio. So the workspace
+  indicator slid sideways whenever a track changed, whenever music started, and
+  whenever it stopped.
+
+  This lesson had already been learned once, in this same bar, for the clock —
+  `BarClock` says so where `anchorX` is defined: "the clock is read by position
+  before it is read at all, and it was the one thing on the old bar that moved
+  every time the player appeared." It was not carried across to the one widget
+  that is not merely read by position but *aimed at*: a clock has to be found, a
+  desk has to be hit.
+
+  Workspaces first now, against the fixed edge; the player last, where its width
+  changes nothing but itself. The divider went with the player rather than
+  staying put, because a rule with nothing on one side of it is not a boundary.
+
+  The same fault was one step from happening on the right, where the divider sits
+  after the tray and the layout chip: the tray can be empty and the layout chip
+  is hidden on a machine with one keyboard layout, and with both gone the rule
+  would have stood against the zone's own leading edge. It is now conditional on
+  something being there.
+
+  Verified on screen: the dots sit at the strip's left inset with the title after
+  them, and the right cluster is unchanged.
+
+- **A5 — The clock really is still, and it is provable.** `BarStrip` claims the
+  centre zone composes around a clock that never moves. Checked by derivation
+  rather than by trying to trigger it: the zone's x is
+  `round(width/2 - centreAnchorX)` and `centreAnchorX` is `barClock.x +
+  barClock.anchorX`, so the clock's absolute position is
+  `round(width/2 - barClock.anchorX)` — and `anchorX` is `timeRow.x +
+  timeRow.width / 2`, which depends only on the clock's own contents. The
+  recorder appearing and the weather chip disappearing cannot move it. Recorded
+  because the alternative was starting a screen recording to find out.
+
+- **Phase 5 open, with the next actions.**
+  1. **Zone overflow is unhandled.** The left zone sits at a fixed inset, the
+     right zone at `width - rightRow.width - pad`, and the centre around the
+     clock. Nothing stops them meeting. On this 1920 output the left zone is
+     about 330px and the centre starts near 800, so there is room; a narrower
+     output, a long SSID and a full tray could collide. Needs a second output or
+     a resolution change to test, so it is recorded rather than guessed at.
+  2. **An empty tray still costs one gap.** `BarTray` is a `Row`, so with no
+     items it is zero-wide but still visible, and a positioner puts spacing
+     around a zero-width visible child. Four to six pixels, only when the tray is
+     empty, and this machine's tray never is.
