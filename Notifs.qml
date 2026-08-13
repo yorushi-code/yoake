@@ -187,6 +187,22 @@ Singleton {
     })
 
     signal arrived()
+
+    // An arrival the shell is actually allowed to interrupt with.
+    //
+    // `arrived` fires for every notification and always will: the bell swings
+    // inside the bar, which interrupts nothing and is how the history stays
+    // honest. A *sound* is an interruption in exactly the way a toast is, and
+    // the filter's own wording has always coupled the two -- "everything pops,
+    // and makes its sound", "nothing pops and nothing sounds". It was not
+    // coupled in the code: `Sfx` played on `arrived`, so "Беззвучно" still
+    // pinged, a ping still went into an open microphone during a call, and after
+    // the fullscreen rule the shell held the card back and played the sound
+    // anyway.
+    //
+    // Emitted by whoever admits the toast, so there is one decision and not two
+    // that can drift.
+    signal interrupted()
     // NotificationCenter owns the list, so clearing is a request rather than
     // something this singleton can carry out itself.
     signal clearAllRequested()

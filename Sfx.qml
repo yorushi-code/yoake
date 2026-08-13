@@ -104,9 +104,12 @@ Singleton {
         }
     }
 
+    // `interrupted`, not `arrived`: the second fires for every notification,
+    // including the ones the shell has deliberately decided not to interrupt
+    // with. See Notifs.
     property Connections _notif: Connections {
         target: Notifs
-        function onArrived() {
+        function onInterrupted() {
             root.play("message");
         }
     }

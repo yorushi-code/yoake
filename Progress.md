@@ -1325,3 +1325,35 @@ the empty-tray gap, the stale header — is done and on screen.
   keyboard, and both are fixed. Menus, sheets, the launcher, the dashboard proper
   and the lock screen all take focus deliberately, on an action the user
   performed.
+
+- **B38 — The notification sound obeyed nothing.** `Sfx` played "message" on
+  `Notifs.arrived`, which fires for every notification the server receives. It
+  therefore ignored all three rules the shell has about interrupting:
+
+  - **"Беззвучно" still pinged.** The mode's own documentation reads "nothing
+    pops and nothing sounds". Nothing popped; it sounded.
+  - **A ping went into an open microphone.** `contextQuiet` exists because
+    "interrupting someone while a microphone is open is the costliest thing this
+    shell can do -- a toast slides over the window they are sharing". A sound
+    does not slide over the window, it goes down the call.
+  - **After B33 the shell held the card back and played the sound anyway**,
+    which is worse than either alone: the interruption survived and the
+    explanation for it disappeared.
+
+  This is B32 one layer out. The toast asks `shouldToast`; the sound asked
+  nothing, so a rule written once was enforced in one of the two places it
+  governs.
+
+  `Notifs.interrupted()` now carries the decision, emitted by whoever admits the
+  toast, and `Sfx` listens to that instead of to `arrived`. `arrived` keeps every
+  arrival, because the bell swinging inside the bar interrupts nobody and is how
+  the history stays honest — and `Context`'s bus event keeps it too, being data
+  rather than interruption.
+
+  A notification suppressed because the shell is already showing the track in the
+  corner does not ping either, for the same reason it does not pop.
+
+  Verified: the signal connects with no QML warning, the shell loads clean, and a
+  test notification sent while `mode=meeting` — the user was in a call — produced
+  neither card nor sound. `Sfx.enabled` defaults to false on this machine, so
+  nothing was audible in either direction; the wiring is what was checked.

@@ -190,6 +190,11 @@ Item {
             if (Notifs.shouldToast(notification.urgency)
                     && !Media.announcesTrack(notification)) {
                 root.appendToast(notification);
+                // The same decision drives the sound. A ping is an interruption
+                // in exactly the way the card is, and the one that is suppressed
+                // because the shell is already showing the track in the corner
+                // does not want announcing twice either.
+                Notifs.interrupted();
             }
             Notifs.arrived();
         }
