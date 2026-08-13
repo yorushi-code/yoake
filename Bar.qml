@@ -2,14 +2,19 @@ import QtQuick
 import Quickshell
 import QtQuick.Effects
 
-// Split into separate floating islands rather than one full-width strip: the
-// wallpaper shows through between them, which is what makes the shell read as
-// sitting *on* the desktop instead of cropping it.
+// The window the bar lives in, and nothing else.
 //
-// This file is now only layout and window plumbing — each widget lives in its
-// own Bar*.qml. It had grown to 620 lines with hit areas, poll loops, tray
-// D-Bus handling and menu logic all inline, which is how the tray's broken
-// right-click went unnoticed for as long as it did.
+// This file is layout and window plumbing — each widget lives in its own
+// Bar*.qml, and the strip itself in `BarStrip.qml`. It had grown to 620 lines
+// with hit areas, poll loops, tray D-Bus handling and menu logic all inline,
+// which is how the tray's broken right-click went unnoticed for as long as it
+// did.
+//
+// It said here, until this was written, that the bar is "separate floating
+// islands rather than one full-width strip". It has been one strip for some
+// time; `BarStrip.qml` carries the argument for the change and this paragraph
+// was describing the shell as it was two rewrites ago, at the top of the file
+// anyone opens first.
 PanelWindow {
     id: bar
 

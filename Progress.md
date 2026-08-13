@@ -873,3 +873,65 @@ Left open on purpose, with the argument recorded in `Direction.md`: the
 `acknowledge` surface type has no consumer and cannot easily get one, because
 the OSD it was written for cannot be wrapped without moving the rectangle
 `Surface` samples its frost from.
+
+## Phase 5 — Bar composition
+
+- **B23 — A chip was loud unless it said otherwise.** `Chip.live` defaulted to
+  `true`, so the loudest of the three classes — domain-tinted glyph, domain rule
+  underneath — was what a widget got for saying nothing about its subject. One
+  widget had said nothing: the battery has carried a permanent power-coloured
+  rule since the classes were written, because a rule under a percentage looks
+  deliberate and nobody caught it.
+
+  Counted on screen before the change: five marks in a 250px cluster — mauve
+  under the VPN, green under the network, yellow-green under the battery, amber
+  under the bell, and one filled alert. Colour was supposed to rank; four rules
+  at once rank nothing.
+
+  `Reveal` defaults the other way on purpose, and the reasoning is written there:
+  a surface that forgot to declare itself should look overdressed, because
+  overdressed gets noticed and fixed. That argument fails here on its own terms —
+  this *was* overdressed, for weeks, and went unnoticed. The deeper reason the
+  two defaults differ: narrative-or-instant is how a surface arrives and both are
+  honest, while live-or-passive is a claim about the data. The rule says this
+  subsystem is doing something. Asserting that for a widget that never described
+  its subject is a lie told by a default.
+
+  Every other chip in the tree already decides for itself — seventeen call sites,
+  and only the battery and the mic-muted alert did not. The alert is unaffected
+  either way, since `alert` suppresses the rule.
+
+  The battery now reads like its neighbours: **live while the charge is actually
+  moving.** Audio is live when not muted, the tunnel when it is up, the bell when
+  something is unread; a battery sitting full on the mains is the one state where
+  the subsystem is doing nothing. It keeps its three-state ladder — passive on
+  mains, live on battery, filled alert when low.
+
+  Written as `UPower.onBattery` and not as a `UPowerDeviceState.Discharging`
+  comparison. Only `Charging` is used anywhere else in the tree, so `Discharging`
+  was unverified, and an enum member that does not exist evaluates to `undefined`
+  and compares false forever — a bug no lint and no log would show. `onBattery`
+  is the property the wallpaper already pauses on, so it is known to work here.
+
+  Verified on screen: three marks where there were five, and the battery reads
+  100% in neutral ink with no rule. **Not verified:** the live and alert states,
+  which need the machine off the mains.
+
+- **B24 — `Bar.qml` opened by claiming the bar is three floating islands.** It
+  has been one strip since the rewrite, and `BarStrip.qml` carries the argument.
+  The stale paragraph was the first thing in the first file anyone opens to
+  understand the bar. Same class as A2 and B16.
+
+- **M6 — M5 happened again, and the log count is not a counter.** Two things,
+  both about trusting a check that does not hold:
+
+  The scratch directory caught another `Progress.md` append, for the same reason
+  as M5 — a compound command whose earlier part had left the shell somewhere
+  else. Writes to this file use the absolute path from here on; a `cd` at the
+  front of the line is not enough when the line is long.
+
+  And `qs log | grep -c "Configuration Loaded"` stopped being a reliable
+  reload check: the log is a rolling buffer of about 540 lines, so once it wraps,
+  old load lines fall off as fast as new ones arrive and the count sits still
+  while reloads are happening. M3's check needs restating: look for a
+  `Configuration Loaded` in the *tail* after the edit, not at a count.

@@ -42,7 +42,23 @@ Item {
     property string glyph: ""
     property string label: ""
     property string value: ""
-    property bool live: true
+    // A chip is passive unless it says otherwise.
+    //
+    // This defaulted to `true`, which put the loudest of the three classes on
+    // any widget that never thought about the question — and one had not: the
+    // battery has carried a permanent power-coloured rule under it since the
+    // classes were written, because a rule under a percentage looks deliberate
+    // and nobody caught it. That is the argument. `Reveal` defaults the other
+    // way on purpose, so a surface that forgot to declare itself looks
+    // overdressed and gets noticed; the same reasoning fails here, because it
+    // *was* overdressed for weeks and went unnoticed.
+    //
+    // The deeper reason is that the two defaults are not the same kind of
+    // thing. Narrative-or-instant is how a surface arrives, and both are
+    // honest. Live-or-passive is a claim about the data: the rule says this
+    // subsystem is doing something. Asserting that on behalf of a widget that
+    // never described its subject is a lie told by a default.
+    property bool live: false
     property bool alert: false
     // Long strings -- an SSID, a device name -- get a ceiling rather than the
     // bar getting wider. Zero means no ceiling.

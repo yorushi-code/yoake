@@ -59,6 +59,18 @@ Item {
             id: batteryChip
             anchors.verticalCenter: parent.verticalCenter
             tone: "power"
+            // Live while the charge is actually moving. Every other chip in the
+            // bar reads the same way — audio is live when it is not muted, the
+            // tunnel when it is up, the bell when something is unread — so a
+            // battery sitting full on the mains is the one state where this
+            // subsystem is doing nothing and should say nothing.
+            //
+            // `UPower.onBattery` rather than a `Discharging` state comparison:
+            // an enum member that does not exist evaluates to `undefined` and
+            // the comparison is quietly false forever, which is a bug no lint
+            // and no log would ever show. This property is the one the wallpaper
+            // already pauses on, so it is known to work on this machine.
+            live: root.charging || UPower.onBattery
             alert: root.low
             glyph: root.low ? Glyphs.batteryAlert : Glyphs.batteryFor(root.fraction, root.charging)
             value: Math.round(root.fraction * 100) + "%"
