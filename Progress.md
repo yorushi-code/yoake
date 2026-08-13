@@ -1357,3 +1357,53 @@ the empty-tray gap, the stale header — is done and on screen.
   test notification sent while `mode=meeting` — the user was in a call — produced
   neither card nor sound. `Sfx.enabled` defaults to false on this machine, so
   nothing was audible in either direction; the wiring is what was checked.
+
+## Reported from use, 13 August
+
+- **B39 — The cursor jumped to whatever window took focus.** Not the shell:
+  `warp-mouse-to-focus` was on in `~/.config/niri/config.d/00-input.kdl`, beside
+  `focus-follows-mouse`. Together those two chase each other — the warp puts the
+  pointer on the newly focused window, and focus-follows-mouse then makes the
+  pointer's new position authoritative. Commented out with the reason; niri
+  reloaded the config on save (confirmed in its own log).
+
+- **B40 — Panels stayed up after you had gone somewhere else.** `closeTransient`
+  exempted the dashboard and the launcher from the compositor's attention
+  signal, on the grounds that niri reports a focus change when they open and
+  closing on it would dismiss them as they were used.
+
+  Measured on the event stream instead of assumed. Opening the dashboard emits
+  `Window focus changed: None` and then `Some(2)` as focus-follows-mouse
+  re-asserts the window under the stationary pointer — and
+  `Niri._applyWindowFocusChanged` drops both: the null by its own guard, and the
+  `Some(2)` because the id has not actually changed. The exemption was guarding
+  against something already guarded, and what it did instead was leave a panel
+  standing after the user had clicked into a window, which is the "shell looks
+  stuck" case the signal exists to prevent.
+
+  Verified both directions on camera: the dashboard survives its own opening,
+  and closes the moment focus moves to a different window.
+
+- **B41 — The greeter said the niri session was busy on a machine with no
+  session.** The retry that creates a greetd session fires every 200 ms until
+  the password prompt arrives, and it fired blind: a fresh `createSession` every
+  tick while the first was still travelling. greetd holds one session at a time
+  and answers the extras with an error — and the error it hands back *after* a
+  password has been accepted is the one that reads as the session being busy.
+
+  The retry itself is right and stays: `Greetd.available` is read once at startup
+  while the socket connects asynchronously, so a single attempt could find it
+  false and leave a login screen that never asks for a password. It is
+  rate-limited now — one create in the air at a time, the flight cleared by any
+  answer from greetd, and a 1.5 s guard so a create that is never answered can
+  still be retried.
+
+  **Not verified.** Testing it means logging out, and the installer is off limits
+  tonight. The change is confined to `greeter/shell.qml`.
+
+- **Escape was tested and works.** Reported as not closing the islands; measured
+  the opposite. An open audio sheet and an open dashboard both close on Escape —
+  captured before and after. What does *not* answer Escape is a dashboard **peek**
+  (the hover preview), and deliberately so since B36: a peek takes no keyboard at
+  all, because taking one is what was stealing keystrokes from whatever was being
+  typed into. A peek leaves when the pointer does.

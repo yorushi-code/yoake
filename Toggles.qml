@@ -45,15 +45,22 @@ QtObject {
         || root.netPanelOpen || root.btPanelOpen || root.powerPanelOpen
         || root.weatherPanelOpen
 
-    // Panels that take keyboard focus for themselves. niri reports a window
-    // focus change when they open, and closing on that signal means a panel
-    // dismisses itself the moment it is used. They close on Escape or on a
-    // click outside, which they already handle.
-    readonly property bool holdsFocus: root.dashboardOpen || root.launcherOpen
-
-    // Everything the compositor's attention signal should take with it.
+    // Everything the compositor's attention signal should take with it —
+    // which is everything.
+    //
+    // The dashboard and the launcher used to be exempt, on the grounds that
+    // niri reports a window focus change when they open and closing on that
+    // signal would dismiss them the moment they were used. Measured on the
+    // event stream: opening the dashboard emits `Window focus changed: None`,
+    // and `Niri._applyWindowFocusChanged` has ignored a null focus for exactly
+    // this reason since it was written. The exemption was guarding against
+    // something that was already guarded.
+    //
+    // What it did instead was leave them up after the user had gone somewhere
+    // else: click into a window with the dashboard open and it stayed, which is
+    // the "shell looks stuck" case this signal exists to prevent. Reported from
+    // use, and this is the fix.
     function closeTransient() {
-        if (root.holdsFocus) return;
         root.closeAll();
     }
 

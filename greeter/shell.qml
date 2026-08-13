@@ -69,8 +69,31 @@ ShellRoot {
         }
     }
 
+    // One create at a time.
+    //
+    // The retry below exists for a real reason: `Greetd.available` is read once
+    // at startup while the socket connects asynchronously, so a single attempt
+    // could find it false and give up, leaving a login screen that never asks
+    // for a password. But it retried blind — a fresh `createSession` every two
+    // hundred milliseconds while the first was still travelling. greetd holds
+    // one session at a time and answers the extras with an error, and the error
+    // it hands back *after* a password has been accepted is the one that reads
+    // "the niri session is busy" on a machine that has no session at all.
+    //
+    // Rate-limited rather than latched: if greetd never answers at all, the
+    // guard expires and the retry is allowed to try again, which is what the
+    // retry was for. Two creates can no longer be in the air together.
+    property bool creating: false
+    property Timer _createGuard: Timer {
+        id: createGuard
+        interval: 1500
+        onTriggered: root.creating = false
+    }
+
     function begin() {
-        if (root.currentUser === "") return;
+        if (root.currentUser === "" || root.creating) return;
+        root.creating = true;
+        createGuard.restart();
         root.ready = false;
         Greetd.createSession(root.currentUser);
     }
@@ -86,6 +109,7 @@ ShellRoot {
         target: Greetd
 
         function onAuthMessage(message, error, responseRequired, echoResponse) {
+            root.creating = false;
             if (error) {
                 root.message = message;
                 return;
@@ -101,6 +125,7 @@ ShellRoot {
         }
 
         function onAuthFailure(message) {
+            root.creating = false;
             root.busy = false;
             root.ready = false;
             root.entry = "";
@@ -112,12 +137,14 @@ ShellRoot {
         }
 
         function onReadyToLaunch() {
+            root.creating = false;
             root.busy = true;
             root.message = "";
             Greetd.launch([root.session]);
         }
 
         function onError(err) {
+            root.creating = false;
             root.busy = false;
             root.message = err;
             begin.restart();
