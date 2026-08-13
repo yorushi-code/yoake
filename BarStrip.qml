@@ -1,17 +1,28 @@
 import QtQuick
 
-// The bar, as one strip.
+// The bar, as three islands sized to what is in them.
 //
-// It was three floating islands, and the air between them was the whole
-// argument for them: the wallpaper showed through, so the shell read as lying
-// *on* the desktop rather than cropping it. What that air cost was the grid.
-// The space between two islands is not *between* anything — it is three objects
-// with holes punched around them — so nothing in the bar had a place, only a
-// neighbour, and every chip had to be found by reading its glyph.
+// It has been all three shapes now, and the argument moved each time because
+// each shape was answering a different complaint.
 //
-// One strip is a row with slots in it. The zones are separated by order and by
-// a hairline, which is a boundary a person can see; a gap is only a boundary if
-// you already know one is supposed to be there.
+// It was islands, then one full-width strip. The case for the strip was the
+// grid: the space between two islands is not *between* anything, so nothing in
+// the bar had a place, only a neighbour. That is true, and it is not what a
+// person notices. What a person notices on a 1920px screen is that the strip
+// was about a thousand pixels of content and nine hundred of nothing — a
+// surface stretched over half a screen of dead glass, with the frost and the
+// hairline and the shadow all drawn faithfully around emptiness. Reported as
+// "the length of the bar, too much space", which is exactly what it was.
+//
+// So the grid argument is answered rather than dropped. A zone is a *group*
+// now, and a group with an edge around it is a stronger boundary than a hairline
+// inside a continuous surface ever was: the left island is what you are doing,
+// the centre is when, the right is how the machine is. A chip is still found by
+// position, and now it is found by which object it is on before that.
+//
+// The air comes back for free, and it was the original argument for islands:
+// the wallpaper shows through between them, so the shell reads as lying on the
+// desktop rather than cropping the top off it.
 Item {
     id: root
 
@@ -22,32 +33,36 @@ Item {
     property alias centreItems: centreRow.data
     property alias rightItems: rightRow.data
 
-    // The centre zone, for handlers that want the whole of it rather than one
-    // widget inside it — the dashboard peek is the only one.
-    readonly property alias centreArea: centreZone
-
-    // Which point of the centre zone lands on the bar's midpoint, measured from
-    // that zone's own left edge. Negative means "whatever is in the middle of
-    // it".
+    // Which point of the centre island lands on the bar's midpoint, measured
+    // from that island's own row rather than from its edge.
     //
-    // The clock is what has to be centred, not the zone around it. Centring the
-    // zone puts its *midpoint* on the bar's, so the clock would slide sideways
-    // by half the recorder chip's width the moment a recording started — and a
-    // clock is read by position before it is read at all. Composing the zone
+    // The clock is what has to be centred, not the island around it. Centring
+    // the island puts its *midpoint* on the bar's, so the clock would slide
+    // sideways by half the recorder chip's width the moment a recording started
+    // — and a clock is read by position before it is read at all. Composing
     // against a fixed point instead means everything else opens room around a
     // clock that never moves.
     property real centreAnchorX: -1
 
-    // Inset from the ends of the strip. The strip is nearly the width of the
-    // screen, so this is the only air the layout has and it has to read as
-    // deliberate at both ends.
-    readonly property int pad: Theme.gapWide
+    // How far the outer islands sit from the ends of the screen, on top of the
+    // window's own margin. Small: the point of the change was to stop spending
+    // width, and an island held far off the edge spends it at both ends.
+    readonly property int pad: Theme.gapTight
 
-    // A zone boundary, written once.
+    // The air inside an island, between its edge and the first chip. It has to
+    // clear the corner radius, or the outermost glyph sits in the curve.
+    readonly property int islandPad: Theme.gapWide
+
+    // A pill. At a 36px bar a full round is the shape the eye reads as one
+    // object rather than as a rectangle with softened corners, and three of them
+    // in a row have to read as three objects — that is the entire change.
+    readonly property int islandRadius: Math.round(root.height / 2)
+
+    // A boundary inside one island, written once.
     //
-    // Derived from the bar's height rather than pinned at 16: a rule that is
-    // 45% of the strip stays a rule if the strip ever changes, where a literal
-    // becomes either a tick or a full-height wall.
+    // Still wanted, and it means something narrower than it did: it separates
+    // two runs of chips that belong to the same group, where the gap between
+    // islands separates the groups themselves.
     component Divider: Rectangle {
         width: 1
         height: Math.round(Theme.barHeight * 0.45)
@@ -68,47 +83,51 @@ Item {
         onTriggered: root.arrived = true
     }
 
-    // The strip plays the space beat for everything on it: one surface stretching
-    // out, and the three zones arriving into a room that is already made.
-    Reveal {
-        id: entrance
-        anchors.fill: parent
-        shown: root.arrived
-
-        Surface {
-            anchors.fill: parent
-            radius: Theme.radiusStrip
-            elevation: "bar"
-            // The window is itself inset by barMargin, so the glass behind the
-            // strip samples from there rather than from the screen origin.
-            screenX: Theme.barMargin
-            screenY: Theme.barMargin
-        }
-    }
-
-    // ── The zones ──
+    // ── The islands ──
     //
-    // Each arrives on its own beat, and the two ends travel inward from the
-    // edge they belong to. No vertical slide anywhere: the window is exactly as
-    // tall as the strip, so anything moved in y is cropped by the layer surface
-    // instead of travelling. The scale beat is the strip's, not theirs — a zone
-    // that also grew would be the same event played twice at two sizes.
+    // Each is one object and arrives as one: the surface and the chips on it
+    // scale, fade and travel together inside a single `Reveal`, rather than a
+    // strip that grew while its contents slid about inside it. That was two
+    // events drawn as one thing; this is one event, three times, on three beats.
+    //
+    // Left, then right, then centre, so the thing carrying the light lands last
+    // — rule 3, and also the build anyone would choose. No vertical slide
+    // anywhere: the window is exactly as tall as the islands, so anything moved
+    // in y would be cropped by the layer surface instead of travelling.
+    //
+    // An island with nothing on it is not a small island, it is not there. The
+    // tray empties, and a pill holding no chips is a bubble of glass in the bar.
+
     Item {
-        id: leftZone
+        id: leftIsland
         x: root.pad
         y: 0
-        width: leftRow.width
+        width: leftRow.width + root.islandPad * 2
         height: root.height
+        visible: leftRow.width > 0
 
         Reveal {
             anchors.fill: parent
             shown: root.arrived
             delay: Direction.stagger(0)
-            fromScale: 1
             slideX: -Theme.revealSlide
+
+            Surface {
+                anchors.fill: parent
+                radius: root.islandRadius
+                elevation: "bar"
+                // The window is itself inset by barMargin, and each island sits
+                // at its own offset inside it, so the glass behind one samples
+                // from where that island actually is. One shared origin would
+                // hand the centre and right islands the left one's slice of
+                // wallpaper.
+                screenX: Theme.barMargin + leftIsland.x
+                screenY: Theme.barMargin
+            }
 
             Row {
                 id: leftRow
+                x: root.islandPad
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: Theme.chipGap
             }
@@ -116,21 +135,30 @@ Item {
     }
 
     Item {
-        id: rightZone
-        x: root.width - rightRow.width - root.pad
+        id: rightIsland
+        x: root.width - width - root.pad
         y: 0
-        width: rightRow.width
+        width: rightRow.width + root.islandPad * 2
         height: root.height
+        visible: rightRow.width > 0
 
         Reveal {
             anchors.fill: parent
             shown: root.arrived
             delay: Direction.stagger(1)
-            fromScale: 1
             slideX: Theme.revealSlide
+
+            Surface {
+                anchors.fill: parent
+                radius: root.islandRadius
+                elevation: "bar"
+                screenX: Theme.barMargin + rightIsland.x
+                screenY: Theme.barMargin
+            }
 
             Row {
                 id: rightRow
+                x: root.islandPad
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: Theme.chipGap
             }
@@ -138,29 +166,38 @@ Item {
     }
 
     Item {
-        id: centreZone
+        id: centreIsland
         // Deliberately without a Behavior. This and the clock's own position
         // inside the row are recomputed from the same layout pass, so they move
-        // on the same frame and the clock stays exactly still while the zone
+        // on the same frame and the clock stays exactly still while the island
         // widens under it. Animating it would make the clock wobble by the
         // difference between two curves.
         x: Math.round(root.width / 2
-                      - (root.centreAnchorX >= 0 ? root.centreAnchorX : centreRow.width / 2))
+                      - (root.centreAnchorX >= 0
+                         ? root.islandPad + root.centreAnchorX
+                         : width / 2))
         y: 0
-        width: centreRow.width
+        width: centreRow.width + root.islandPad * 2
         height: root.height
+        visible: centreRow.width > 0
 
         Reveal {
             anchors.fill: parent
             shown: root.arrived
-            // Last, so the thing carrying the light lands after the shell has
-            // told you where you are and how the machine is.
             delay: Direction.stagger(2)
-            fromScale: 1
             slideX: 0
+
+            Surface {
+                anchors.fill: parent
+                radius: root.islandRadius
+                elevation: "bar"
+                screenX: Theme.barMargin + centreIsland.x
+                screenY: Theme.barMargin
+            }
 
             Row {
                 id: centreRow
+                x: root.islandPad
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: Theme.chipGap
             }

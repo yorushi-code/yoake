@@ -1507,3 +1507,39 @@ argued about correctly and fixed in the wrong place.
 
   Verified: the dashboard opens from the keybind and renders unchanged, the lint
   is clean and no reference to the peek survives anywhere in the tree.
+
+- **B45 — Nine hundred pixels of nothing, drawn faithfully.** "Длина бара —
+  слишком много пространства", and the measurement agrees: on a 1920px screen
+  the strip carried about a thousand pixels of content and nine hundred of air,
+  and it drew the air the same way it drew the chips — frosted, sampled,
+  hairlined, shadowed.
+
+  The bar has been all three shapes now. It was islands; it became one strip
+  because the space between two islands is not *between* anything, so nothing in
+  the bar had a place, only a neighbour. That argument is correct and it is not
+  what a person sees. What a person sees is a surface stretched over half a
+  screen of dead glass.
+
+  Three islands again, each the width of what is on it. The grid argument is
+  answered rather than dropped: a zone is a *group* now, and an edge drawn round
+  a group is a stronger boundary than a hairline inside a continuous surface ever
+  was — what you are doing on the left, when it is in the middle, how the machine
+  is on the right. A chip is still found by position, and now it is found by
+  which of three objects it is on before that. The air that comes back is the
+  original argument for islands: the wallpaper shows through, so the shell lies
+  on the desktop instead of cropping the top off it.
+
+  Two things had to be got right rather than moved. Each island samples the glass
+  from **its own** offset — one shared origin would hand the centre and right
+  islands the left one's slice of wallpaper — and the centre is still composed
+  around the clock rather than centred as a box, so starting music opens room
+  beside a clock that does not move. The pill radius is derived from the bar's
+  height, so it stays a pill if the bar is ever resized.
+
+  Each island is now one object in one `Reveal`: surface and chips scale, fade
+  and travel together, on three beats, left then right then centre. Before, the
+  strip grew while its contents slid about inside it — two events drawn as one
+  thing.
+
+  Verified by eye at 2× on all three islands: the pills are sharp, each carries
+  its own blur of the wallpaper behind it, and the gaps show the desktop.
