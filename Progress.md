@@ -1862,3 +1862,38 @@ argued about correctly and fixed in the wrong place.
   state and then finds a fault in it. Emptying the tray's model instead — the
   thing that actually happens when the last icon leaves — hid the rule correctly.
   A test that can produce a state the program cannot is testing itself.
+
+- **V — The rest of the hunt for dead interactions, which came up empty.**
+  B52's six invisible cards were found by accident, which is a bad way to find
+  six of anything, so the same fault was looked for deliberately everywhere else.
+  Nothing further is broken, and that is worth writing down once so it is not
+  re-searched.
+
+  **Only a widget that contains a `Chip` can have this fault**, because the
+  shadowing needs something above that covers the *whole* widget, and `Chip` is
+  the only thing in this shell that both covers its parent entirely and enables
+  hover. Of the ten tooltip consumers, three read `chip.hovered` — the alias
+  added the last time this bit — and the other seven (`BarClock`, `BarMedia`,
+  `BarRecorder`, `BarTray`, `BarWorkspaces`, and two inside popover content)
+  contain no `Chip` at all, so their own areas are the topmost thing over them.
+
+  **`DeviceRow` looked like the same bug and is not.** Its hit area is also at
+  `z: -1`, but what sits above it there is the slider and the mute button, which
+  cover part of the row rather than all of it — which is exactly what the
+  comment says it is for: "the slider and the mute button take their own clicks
+  and only the rest of the row selects it". Verified by eye rather than by
+  reading: pointer on the label area of a device row, and the row's ground
+  lightens. That also closes the half of **B42** that was recorded as unverified
+  — the press feedback added there hangs off this same MouseArea, so a hover
+  that arrives means a press would too. The press itself still cannot be
+  checked; clicking remains out (E1).
+
+  **No dead signals.** Every widget that carries a `Chip` connects `clicked`;
+  `rightClicked` is connected wherever there is a menu to open; `scrolled` is
+  connected by the two chips where scrolling means something — volume and
+  keyboard layout — and by nothing else, which is correct rather than missing.
+
+  **And the tooltip still works**, which needed checking because B51 moved its
+  arrival onto `PanelArm` and a tooltip whose gate never opens is exactly the
+  class of bug being hunted. Hovering a desk pill produces "Рабочий стол 2 · 1
+  окно · колесо — переключение", on screen, after the change.
