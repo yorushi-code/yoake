@@ -79,7 +79,6 @@ PanelWindow {
         anchors.fill: parent
         focus: win.open
         Keys.onEscapePressed: Toggles.audioPanelOpen = false
-        Timer { interval: 700; running: true; onTriggered: console.warn("YOAKE-FOCUS open=" + win.open + " focus=" + keyHost.focus + " active=" + keyHost.activeFocus) }
 
         Sheet {
             id: sheet

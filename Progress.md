@@ -1543,3 +1543,57 @@ argued about correctly and fixed in the wrong place.
 
   Verified by eye at 2× on all three islands: the pills are sharp, each carries
   its own blur of the wallpaper behind it, and the gaps show the desktop.
+
+- **B46 — Every animation in the shell was over in a tenth of a second, and two
+  thirds of them were never on screen at all.** "Анимации слишком хуёвые",
+  twice, about a shell whose durations were all sensible. They were. The
+  durations were never the problem.
+
+  **The curves.** A cubic does not set how long a motion takes, it sets where
+  inside that time the travel happens, and all three of this shell's put nearly
+  all of it in the first tenth. Progress against elapsed time, as they were:
+
+  | | 5% | 10% | 20% | 35% | 50% | peak |
+  |---|---|---|---|---|---|---|
+  | `easeEmphasized` | 0.45 | 0.62 | 0.78 | 0.90 | 0.95 | 1.00 |
+  | `easeSpringBig` | 0.43 | 0.76 | 1.14 | 1.31 | 1.25 | **1.31** |
+
+  So `animSlow`, 420 ms, spent 84 ms travelling and the remaining 336 ms
+  arriving at a value it had already reached. And `springBig` overshot by
+  **31 per cent** — on a 920px panel, 28px of rebound inside a fifth of a
+  second, which is not a spring, it is a wobble, and a wobble is the loudest
+  "cheap" tell an interface has. The four-beat choreography `Direction` is built
+  around was real in the code and invisible on screen: every beat finished
+  before the next one started.
+
+  Replaced with curves whose travel is spread across the duration — emphasized
+  now reaches half way at 20% rather than at 5%, and the two springs settle at
+  4% and 10% past instead of 14% and 31%. **No duration changed.** What changed
+  is that they are now spent moving.
+
+  **The bigger half: the entrance was played to an empty screen.** `armed` — the
+  frame's grace every panel waits before animating, so a lazily-built panel has
+  a `false` to animate from — was set once at construction and never reset. The
+  loader lingers after a close, so *every open after the first* reused a live
+  object whose `armed` was already true: `open` went true on the same frame the
+  window was asked to map, and the whole arrival played into a surface the
+  compositor had not put on screen yet.
+
+  Measured at 60fps rather than argued: a cold open showed four frames of fade,
+  a warm reopen showed **none** — one frame from bare desktop to fully painted
+  panel. Same curves, same durations, and one of them was a hard cut. Cold opens
+  looked better only by accident, because building the panel took long enough to
+  cover the map.
+
+  Re-armed on every open, against `Theme.animMap`, and that number is measured
+  too: a `FrameAnimation` inside the panel window reports its first painted
+  frame 54–60 ms after the map is requested, so 90 ms covers presentation with a
+  frame or two to spare and is still well inside the tenth of a second at which
+  a delay stops reading as instant. It deliberately does not scale with the
+  tempo — it is the one number here about the compositor rather than about the
+  eye.
+
+  Verified on camera, warm reopen, before and after: a single-frame cut becomes
+  five frames in which the panel is visibly translucent and undersized before it
+  solidifies. Probes removed afterwards, including a `YOAKE-FOCUS` timer an
+  earlier session left running in `AudioPanel` and recorded as deleted.

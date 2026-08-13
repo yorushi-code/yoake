@@ -432,6 +432,23 @@ QtObject {
     // there's no visible snap at the end (see easeExit).
     readonly property int animExit: Math.round(170 * motionScale)
 
+    // How long a surface is given to reach the screen before its entrance
+    // starts playing.
+    //
+    // Not a motion length — the one number here that is about the compositor
+    // rather than about the eye, which is why it does not scale with the tempo:
+    // a machine at 3am maps a layer surface in exactly as long as it does at
+    // noon.
+    //
+    // A panel asks to be mapped and animates from the same frame, and the
+    // wlroots surface is not on screen for some time after that. Everything in
+    // between is played to nobody. It was invisible because it only bit on the
+    // *second* open of a panel — the lazy loader lingers, so the first open
+    // paid for its own construction and that delay happened to cover the map.
+    // Every open after it was a hard cut: measured at 60fps, four frames of
+    // fade cold and a single frame warm, from desktop to fully-painted panel.
+    readonly property int animMap: 90
+
     // Ambient motion, which is not response motion. The three rungs above say
     // how fast the shell answers; these two say how fast something breathes to
     // show it is alive, and the difference between them carries meaning:
@@ -463,22 +480,61 @@ QtObject {
     // thing in the shell that should look slower than the room it is in.
     readonly property int animDoze: Math.round(2400 * motionScale)
 
-    // Material-3-style "emphasized" decelerate curve — everything that
-    // settles into place (panel open, hover fill, list reveal) uses this
-    // instead of a plain cubic so motion reads as designed rather than a
-    // stock Qt tween. easeSpring adds a slight overshoot for elements that
-    // should feel tactile (focused workspace pill, toast pop-in) — this is
-    // the single biggest lever for the "caelestia-grade" cohesive-motion
-    // look, since every animated Behavior in the shell pulls from the same
-    // two curves instead of each panel inventing its own.
-    readonly property var easeEmphasized: [0.05, 0.7, 0.1, 1.0, 1, 1]
-    readonly property var easeSpring: [0.34, 1.70, 0.60, 1.0, 1, 1]
-    // Harder overshoot for panel entrances — a small scale change reads as
-    // barely animated, so opens punch in with this and a wider scale delta.
-    // The overshoot is what carries "animated", not the duration: raising the
-    // amplitude makes motion read as more deliberate, where raising the
-    // duration would only make the shell feel slow to answer.
-    readonly property var easeSpringBig: [0.22, 2.15, 0.45, 1.0, 1, 1]
+    // ── The curves ──
+    //
+    // Every animated Behavior in the shell pulls from these three, so their
+    // shape *is* how the shell moves. All three were measured and all three
+    // were wrong in the same direction, which is why the shell was reported as
+    // having bad animation while every duration in this file was sensible.
+    //
+    // A curve was being read as if its duration were its length. It is not: a
+    // cubic decides *where the travel happens inside* the duration, and these
+    // put almost all of it in the first tenth. Progress against elapsed time,
+    // as they were:
+    //
+    //     at 5%   10%   20%   35%   50%      peak
+    //     ────────────────────────────────────────
+    //     0.45  0.62  0.78  0.90  0.95      emphasized
+    //     0.43  0.76  1.14  1.31  1.25      springBig
+    //
+    // So `animSlow`, 420ms, spent 84ms travelling and 336ms arriving at a value
+    // it had already reached. A panel entrance was a 50ms pop followed by a
+    // third of a second of nothing — confirmed on a 60fps capture of the
+    // dashboard opening, where the surface goes from absent to fully covering
+    // in three frames. The four-beat choreography in `Direction` was real in
+    // the code and invisible on screen, because every beat finished before the
+    // next one started.
+    //
+    // And `springBig` overshot by **31%**. On a 920px panel that is 28px of
+    // rebound in under a fifth of a second, which is not a spring, it is a
+    // wobble — the single loudest "cheap" tell an interface has.
+    //
+    // Replaced with curves whose travel is spread across the duration:
+    //
+    //     at 5%   10%   20%   35%   50%      peak
+    //     ────────────────────────────────────────
+    //     0.03  0.16  0.50  0.75  0.88      emphasized
+    //     0.19  0.36  0.63  0.89  1.01      spring     (peak 1.043)
+    //     0.22  0.40  0.70  0.98  1.09      springBig  (peak 1.098)
+    //
+    // Nothing here got slower. The durations are untouched; what changed is
+    // that they are now spent moving.
+
+    // Material 3's emphasized curve — a slow start, the travel in the middle,
+    // a soft settle. Everything that settles into place uses it. This is the
+    // one that was `emphasized decelerate`, which is a curve for something
+    // already on its way in and reads as a cut when it is the only thing
+    // playing.
+    readonly property var easeEmphasized: [0.20, 0.00, 0.00, 1.0, 1, 1]
+    // A settle you feel rather than a bounce you notice: four per cent past,
+    // and past it late — the peak lands at two thirds of the duration, so it
+    // reads as the thing coming to rest rather than snapping back.
+    readonly property var easeSpring: [0.34, 1.36, 0.64, 1.0, 1, 1]
+    // Ten per cent, for the tactile end: a chip under a finger, a pill taking
+    // focus. Still ordered above `spring`, as the names have always promised
+    // and the old numbers did not deliver — the old `spring` overshot 14% and
+    // this overshot 31%, so both were the same gesture at two volumes.
+    readonly property var easeSpringBig: [0.34, 1.56, 0.64, 1.0, 1, 1]
     // Accelerate curve for exits. easeEmphasized/easeSpring are decelerate
     // curves tuned for arrival — reused on close they leave the panel
     // lingering at low opacity until the hard unmap cuts it off, which is the
