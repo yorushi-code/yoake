@@ -28,7 +28,20 @@ Rectangle {
     readonly property color contentColor: root.active ? Theme.crust : Theme.text
 
     // Expanding is the whole-row action now that the switch owns toggling.
+    // Only when there is something to press. A row that cannot expand is a
+    // readout, and a readout that gives under the finger is lying about being a
+    // control.
+    scale: expandHit.pressed ? Theme.pressScale : 1
+    Behavior on scale {
+        NumberAnimation {
+            duration: Theme.animFast
+            easing.type: Easing.Bezier
+            easing.bezierCurve: Theme.easeSpringBig
+        }
+    }
+
     MouseArea {
+        id: expandHit
         anchors.fill: parent
         enabled: root.expandable
         cursorShape: root.expandable ? Qt.PointingHandCursor : Qt.ArrowCursor

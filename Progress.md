@@ -1407,3 +1407,32 @@ the empty-tray gap, the stale header — is done and on screen.
   (the hover preview), and deliberately so since B36: a peek takes no keyboard at
   all, because taking one is what was stealing keystrokes from whatever was being
   typed into. A peek leaves when the pointer does.
+
+- **B42 — Pressing a row did nothing.** Reported as the interaction feeling bad,
+  and this is most of what that means. `Chip`, `MediaButton` and `CcTile` give
+  under the finger; `DeviceRow`, `CcListRow` and `ToggleRow` gave nothing at all
+  — and `DeviceRow` is every row of every system panel, the most-touched control
+  in the shell.
+
+  A press was answered only by its *result*: for a Wi-Fi network that is a round
+  trip, and for a row that is already selected it is never. A control that does
+  not answer the press reads as a control that did not hear it.
+
+  They speak the language the shell already had — a small give on
+  `Theme.animFast` with the big spring, instant because a press is *answered*
+  rather than narrated, which is Direction's `acknowledge` type in the smallest
+  place it applies.
+
+  The two that had it disagreed about how far (0.94 and 0.97), so it is a token
+  now with two rungs named for what they are for: `pressScale` for a row or a
+  tile, `pressScaleSmall` for a chip. One number cannot serve both — the travel
+  should read as constant, so the smaller the control the larger the fraction.
+
+  `ToggleRow` gives only when it is expandable: a row that cannot be pressed is
+  a readout, and a readout that gives under the finger is lying about being a
+  control. `Segmented` is left alone deliberately — its marker travels to the
+  cell you pressed, which is already an instant answer.
+
+  **Not verified by eye.** Press feedback needs a press and there is no safe way
+  to click here (see E1). The panels render unchanged and the pattern is the one
+  already proven in `Chip` and `CcTile`.

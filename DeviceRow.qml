@@ -64,6 +64,27 @@ Rectangle {
             : Qt.alpha(Theme.text, Theme.fillSubtle))
     Behavior on color { ColorAnimation { duration: Theme.animNormal } }
 
+    // It gives under the finger.
+    //
+    // Every row of every system panel is one of these, and pressing one used to
+    // produce nothing at all: the colour has a hover Behavior, but a press said
+    // nothing until the *result* arrived — which for a Wi-Fi network is a
+    // round trip, and for a row that is already selected is never. A control
+    // that does not answer the press reads as a control that did not hear it,
+    // and that is most of what "the interaction feels bad" means.
+    //
+    // The same language `Chip` and `CcTile` already speak, on the shell's own
+    // acknowledgement timing: instant, because a press is answered rather than
+    // narrated.
+    scale: hit.pressed ? Theme.pressScale : 1
+    Behavior on scale {
+        NumberAnimation {
+            duration: Theme.animFast
+            easing.type: Easing.Bezier
+            easing.bezierCurve: Theme.easeSpringBig
+        }
+    }
+
     readonly property color ink: root.active ? Theme.crust : Theme.text
     readonly property color subInk: root.active
         ? Qt.alpha(Theme.crust, Theme.inkSoft)

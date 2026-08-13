@@ -32,7 +32,7 @@ Rectangle {
             ? Qt.alpha(Theme.text, Theme.fillHover) : Qt.alpha(Theme.text, Theme.fillSubtle))
     Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
-    scale: body.pressed ? 0.97 : 1
+    scale: body.pressed ? Theme.pressScale : 1
     Behavior on scale {
         NumberAnimation { duration: Theme.animFast; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig }
     }

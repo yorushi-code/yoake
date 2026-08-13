@@ -61,6 +61,17 @@ Rectangle {
         }
     }
 
+    // See DeviceRow: a row that answers nothing when pressed reads as a row
+    // that did not hear the press.
+    scale: ma.pressed ? Theme.pressScale : 1
+    Behavior on scale {
+        NumberAnimation {
+            duration: Theme.animFast
+            easing.type: Easing.Bezier
+            easing.bezierCurve: Theme.easeSpringBig
+        }
+    }
+
     MouseArea {
         id: ma
         anchors.fill: parent

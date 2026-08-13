@@ -496,6 +496,19 @@ QtObject {
     // stop exactly this drift and could only reach the surfaces that use it;
     // the menus, the popover, the tooltip, the toasts and the OSD spell their
     // own entrance out and never saw the token.
+    // How far a control gives under a press.
+    //
+    // Two rungs, because one number cannot serve a 24px chip and a 200px tile:
+    // the *travel* should read as constant, so the smaller the control the
+    // larger the fraction. A big surface dropping six per cent is a lurch; a
+    // small one dropping three is invisible.
+    //
+    // Named because the shell had these as literals in two of the places that
+    // had them at all, and no press feedback whatsoever in the controls people
+    // touch most -- every row of every system panel.
+    readonly property real pressScale: 0.97
+    readonly property real pressScaleSmall: 0.94
+
     readonly property real revealScale: 0.90
     readonly property real revealSlide: 18
 

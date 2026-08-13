@@ -179,7 +179,7 @@ Item {
         Behavior on opacity { NumberAnimation { duration: Theme.animFast } }
     }
 
-    scale: hit.pressed ? 0.94 : 1
+    scale: hit.pressed ? Theme.pressScaleSmall : 1
     Behavior on scale {
         NumberAnimation { duration: Theme.animFast; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig }
     }
