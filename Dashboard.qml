@@ -59,17 +59,26 @@ Item {
         exclusiveZone: 0
         // See Launcher: bound to the toggle, because `open` waits a frame for
         // `armed` and a surface mapped asking for no keyboard never gets one.
-        focusable: Toggles.dashboardOpen
-        // Exclusive when it was asked for, on demand when it was only pointed
-        // at. A peek that seized the keyboard was the whole problem: a surface
-        // mapped asking for no keyboard is never offered one afterwards, so
-        // the choice has to be made here rather than by flipping `focusable`
-        // once the peek is clicked.
-        WlrLayershell.keyboardFocus: !Toggles.dashboardOpen
+        //
+        // A peek asks for no keyboard at all, and that is a correction.
+        //
+        // It used to map on demand, on the belief that on-demand takes nothing
+        // until something is clicked. Measured on niri's event stream while
+        // chasing the same fault in the toast stack: mapping an on-demand layer
+        // surface emits `Window focus changed: None` immediately — the keyboard
+        // leaves the focused window the moment the surface appears, with nobody
+        // having clicked anything. So brushing the centre of the bar for four
+        // hundred milliseconds took the keys out from under whatever was being
+        // typed into, which is the exact fault the comment here says was solved.
+        //
+        // The peek is a pointer gesture from beginning to end: it opens by
+        // pointing, it closes when the pointer leaves, and it is committed by a
+        // click. Committing promotes it to `Exclusive` on a surface that is
+        // already up.
+        focusable: Toggles.dashboardOpen && !Toggles.dashboardPeek
+        WlrLayershell.keyboardFocus: !Toggles.dashboardOpen || Toggles.dashboardPeek
             ? WlrKeyboardFocus.None
-            : (Toggles.dashboardPeek
-                ? WlrKeyboardFocus.OnDemand
-                : WlrKeyboardFocus.Exclusive)
+            : WlrKeyboardFocus.Exclusive
 
         Timer {
             id: hideDelay

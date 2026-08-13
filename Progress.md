@@ -1249,3 +1249,36 @@ the empty-tray gap, the stale header — is done and on screen.
   Third time a spot reading has pointed at the wrong culprit tonight (M2, M4).
   The rule that keeps working: A/B the change itself, then look at the whole
   machine before believing a number about one process.
+
+- **B36 — The same theft, in the dashboard peek.** B35 measured the mechanism;
+  this is the other place it applies. Pointing at the centre of the bar for four
+  hundred milliseconds calls `Toggles.dashPeek()`, which sets `dashboardOpen`
+  and `dashboardPeek` and maps the dashboard with `WlrKeyboardFocus.OnDemand`.
+  By B35's measurement that takes the keyboard off the focused window on the
+  frame the surface appears.
+
+  The comment sitting on that binding describes the very fault: "A peek that
+  seized the keyboard was the whole problem: brushing past the clock on the way
+  to the tray stole the keyboard from whatever was being typed into." It was
+  fixed by moving from `Exclusive` to `OnDemand`, on the belief that on-demand
+  takes nothing until something is clicked. That belief is false on this
+  compositor, so the fault was never actually fixed — only made quieter.
+
+  A peek asks for no keyboard at all now. It is a pointer gesture from beginning
+  to end: it opens by pointing, closes when the pointer leaves, and is committed
+  by a click, at which point it promotes to `Exclusive` on a surface that is
+  already up.
+
+  One path is deliberately lost: `Keys.onPressed` in the dashboard also called
+  `dashCommit()`, so typing while a peek was up committed it. That only ever
+  worked *because* the peek had stolen the keyboard, which is the bug — it was
+  the fault presenting itself as a feature.
+
+  **Two morning checks**, neither runnable tonight because both need a pointer
+  and the machine is in a live match:
+  1. Brush the centre of the bar while typing somewhere and confirm the
+     keystrokes keep landing where they were going.
+  2. Click a peek to commit it, then press Escape. If it does not close, niri
+     does not honour a keyboard-interactivity upgrade on an already-mapped
+     surface, and the commit path needs a remap rather than a rebind. Clicking
+     outside and moving the pointer away both still close it either way.
