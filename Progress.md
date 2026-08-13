@@ -1929,3 +1929,24 @@ argued about correctly and fixed in the wrong place.
   faults. Nothing found. The bottom row of Overview *looks* cut off in a
   screenshot cropped at 560px and is not — the panel is taller than that, which
   is worth knowing before someone fixes it.
+
+- **V — The pill travels, and it is the best thing in the shell.** The marker in
+  `BarWorkspaces` moves on every desk switch, which makes it the most-repeated
+  deliberate animation here after hover, and it had never been looked at — it was
+  written, argued for in `Direction` rule 7, and then trusted.
+
+  Recorded at 60fps across `focus-workspace 4`. Seven frames of travel, 46px,
+  decelerating cleanly: +13, +10, +7, +6, +4.5, +3, +1, then settling. That
+  first-frame 28% is `easeSpring` doing what B46 rebuilt it to do — before, the
+  same curve was 77% through the journey by a fifth of its duration and then
+  overshot 14%, which at this size is a twitch rather than a movement.
+
+  The deformation is visible on the strip and it is the whole point: the pill
+  stretches along its direction of travel as it sets off, carries its glow with
+  it, and rounds back up as it lands. It reads as one object with mass going
+  somewhere, not as a highlight being repainted in a new cell — which is exactly
+  the claim rule 7 makes and the first time anyone has checked it.
+
+  The desk number is held back and fades in after the pill has arrived, as its
+  comment says it should. Nothing to fix here; recorded because "the most-seen
+  motion in the shell is good" is worth knowing as firmly as the opposite.
