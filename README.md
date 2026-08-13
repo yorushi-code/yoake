@@ -26,7 +26,7 @@ honest.
 | `Launcher*.qml` | app launcher (`Mod+D`) |
 | `LockScreen.qml`, `LockState.qml` | session lock (`Super+Alt+L`) |
 | `Wallpaper*.qml` | wallpaper layer, picker and palette plumbing |
-| `Cc*.qml`, `ControlCenter.qml` | control centre (`Mod+P`) |
+| `Dashboard.qml`, `Dash*.qml`, `Cc*.qml` | the dashboard and its three pages: the glance, the controls (`Mod+P`) and the desks |
 | `Notif*.qml`, `Notifs.qml` | notification server, toasts and history (`Mod+N`) |
 | `Vpn*.qml`, `Mihomo*.qml` | the front end for `~/yworld` |
 | `Desktop*.qml`, `Widget*.qml` | desktop widgets (`Mod+Shift+E` to move them) |
@@ -92,6 +92,35 @@ sample taken four seconds later measures the transition. The first attempt at
 this reported a 1080p source as cheaper than its own downscale, which is
 impossible and was the giveaway.
 
+This used to point at a `wallbench.sh` under `~/.claude/jobs/*/tmp/`, which is a
+scratch directory that gets collected — the reference had already rotted. The
+method is the part worth keeping, and it is short enough to inline. Read the
+counters rather than sampling with `top`: `utime + stime` over a fixed window is
+exactly the CPU the process was given, where a sampler guesses at it.
+
+```sh
+pid=$(pgrep -x qs); hz=$(getconf CLK_TCK); w=15
+a=$(awk '{print $14+$15}' /proc/$pid/stat); sleep $w
+b=$(awk '{print $14+$15}' /proc/$pid/stat)
+awk -v a=$a -v b=$b -v w=$w -v hz=$hz 'BEGIN{printf "%.2f%% of one core\n",(b-a)/hz/w*100}'
 ```
-~/.claude/jobs/*/tmp/wallbench.sh <wallpaper> [wallpaper...]
+
+Interleave the conditions and take several windows each: on a live desktop, with
+music playing and a clock ticking, two runs of the *same* configuration differ
+by two or three points. A difference smaller than that is not a difference.
+
+## The greeter does not run from this directory
+
+`greetd` starts `/usr/local/bin/yoake-greeter`, which loads
+`/usr/share/yoake/greeter/`. Everything under `greeter/` here is **source for a
+package**, and editing it changes nothing about the machine until:
+
 ```
+sudo bin/yoake-greeter-install
+```
+
+This is written down because it has already cost one fix: a correction to the
+login screen was made, committed, and recorded as done, while every login for
+days afterwards ran the older copy that was actually installed. From inside the
+repo the two are indistinguishable — `git` is perfectly happy, and the file it
+is happy about is not the file being executed.

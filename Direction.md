@@ -142,19 +142,31 @@ Implemented:
   anything else and was the only surface that never said hello. It arrives left,
   then right, then centre, so the accent lands last — rule 3, and also the build
   anyone would choose. No vertical slide: the layer surface is exactly as tall
-  as the strip, so anything moved vertically is cropped rather than travelling,
-  and the space beat is the scale. (This paragraph described `BarIsland.qml`
-  until the bar became one strip; the file is gone and the choreography moved
-  with it.)
+  as the bar, so anything moved vertically is cropped rather than travelling,
+  and the space beat is the scale.
+
+  The bar is three islands again, and the choreography reads better on them than
+  it did on the strip it briefly was. Each island is one `Reveal` holding its own
+  surface *and* its own chips, so the thing that scales, fades and travels is the
+  object you can see — where the strip grew as one surface while its contents
+  slid about inside it, which is two events drawn as one thing. Three objects on
+  three beats is what the rule was asking for.
+
+  (This paragraph has now described `BarIsland.qml`, then `BarStrip.qml` as a
+  single strip, then this. The shape keeps changing and the beats have not,
+  which is the argument for keeping them somewhere other than in the file that
+  draws them.)
 - `Traveller.qml` and rule 7. Consumers: the workspace pill, which travels
   between fixed cells rather than being redrawn wide somewhere else, and the
   launcher's selection.
 - the bar is a composer rather than a container. The clock is what is centred
-  and the strip grows around it, so starting music opens room to the clock's
-  left instead of sliding the clock right by half a player's width. Written
-  without a `Behavior` on purpose: the widths and the clock's position inside
-  them come from one layout pass, so they move on the same frame and the clock
-  is exactly still while the strip fills under it.
+  and the centre island composes itself around it, so a recording starting opens
+  room to the clock's right instead of sliding the clock left by half a chip.
+  Written without a `Behavior` on purpose: the island's width and the clock's
+  position inside it come from one layout pass, so they move on the same frame
+  and the clock is exactly still while the island widens under it. Measured
+  since: the recorder chip forced in and the weather pushed along after it, and
+  the clock lands on the same pixel it was on before.
 - rule 8 — a change that crosses a row travels along it. `Direction.crossing`
   and `sweep()`, with the VPN node list as the consumer.
 - `Traveller` will *place* rather than travel when the list under it is being
@@ -177,13 +189,34 @@ Implemented:
 
 Not done:
 
-- the `acknowledge` type still has no consumer, for the reason above.
 - the `acknowledge` type has no consumer and cannot easily get one. The OSD is
   what it was written for, and the OSD spells its motion out because `Surface`
   samples the backdrop from a fixed `screenX`/`screenY` — a scale transform on
   an ancestor slides the sampled rectangle out from under the glass. The type is
   still worth having as the place the argument is written down, but it is an
   unplayed card and should be recorded as one rather than looking like coverage.
+
+  (This was two bullets making the same point, one of them ending "for the reason
+  above" and pointing at the other. Merged.)
+
+## Whether any of it reached the screen
+
+Everything above describes what the code does, and for most of the time it
+described something nobody could see. Two faults, both fixed and both recorded
+in `Progress.md` as B46 and B47, meant the beats were played into a void:
+
+- the curves put nearly all of their travel in the first tenth of the duration,
+  so each beat had finished before the next one began — four beats in the code,
+  a single pop on screen
+- and the arrival started on the frame the window was asked to map, which is
+  50–60 ms before the compositor puts it there, so on every open after the first
+  the whole sequence had run before anything was visible at all
+
+The sequence is now measured rather than asserted. At 60fps: the dashboard, the
+launcher, the OSD and the toast all show continuous arrivals of seven to ten
+frames where the warm reopen used to be a single frame of hard cut. **A
+choreography is a claim about what a person sees, and it has to be filmed to be
+believed.**
 
 Rule 7 is done in all four places it was wanted:
 

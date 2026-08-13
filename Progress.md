@@ -2023,3 +2023,50 @@ argued about correctly and fixed in the wrong place.
   material tile reads "плоское". The frosted path was forced on for the
   measurement and put back; the saved preference is false again, confirmed in
   the file.
+
+- **B54 — The documents described a shell that had stopped existing.** This repo
+  keeps catching itself at this — `Bar.qml` carried a paragraph calling the bar
+  "separate floating islands" for two rewrites after it had stopped being them —
+  so after a night of changing the bar's shape and the whole motion vocabulary,
+  every claim in the three documents was checked against the tree rather than
+  assumed to have kept up.
+
+  **`Direction.md`** described the bar as one strip throughout. Corrected, and
+  the note about the choreography now says what actually improved: three islands
+  each in their own `Reveal` means the thing that scales and fades *is* the
+  object you can see, where the strip grew as one surface while its contents slid
+  about inside it — two events drawn as one thing. The composer paragraph
+  described the clock opening room to its left as the player grew, which is the
+  old geometry; it is the centre island widening around it now, and that has been
+  measured since.
+
+  Its "Not done" list had **the same bullet twice**, one of them ending "for the
+  reason above" and pointing at the other. Merged.
+
+  And it gained the section it most needed: everything in that file describes
+  what the code does, and for most of the time it described something **nobody
+  could see** — the curves finished each beat before the next began, and the
+  arrival ran 50–60 ms before the surface reached the screen. The document
+  asserted a choreography that was not being played. It now records that the
+  sequence is filmed rather than asserted.
+
+  **`README.md`** listed `ControlCenter.qml` in its file table. That file does
+  not exist and has not for some time; the control centre is a dashboard page,
+  which is what `Mod+P` actually opens. Its "Budget" section pointed the reader
+  at `~/.claude/jobs/*/tmp/wallbench.sh` — a scratch directory that gets
+  collected, so the instruction had already rotted to nothing. The *method* is
+  what was worth keeping, so it is four lines of inline shell now, reading
+  `utime+stime` off `/proc` rather than sampling with `top`, plus the honest
+  warning that two runs of the same configuration differ by two or three points
+  on a live desktop.
+
+  It also gained a section that would have saved this project a night:
+  **the greeter does not run from this directory.** `greetd` loads
+  `/usr/share/yoake/greeter/`, everything under `greeter/` here is source for a
+  package, and from inside the repo the installed copy and the committed one are
+  indistinguishable — git is perfectly happy, and the file it is happy about is
+  not the file being executed. See B49.
+
+  Amusing, and left alone: the README's file table has said "the three bar
+  islands" all along. It was wrong for the whole time the bar was one strip and
+  is correct again now, without anybody touching it.
