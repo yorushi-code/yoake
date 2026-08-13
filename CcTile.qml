@@ -32,7 +32,13 @@ Rectangle {
             ? Qt.alpha(Theme.text, Theme.fillHover) : Qt.alpha(Theme.text, Theme.fillSubtle))
     Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
-    scale: body.pressed ? Theme.pressScale : 1
+    // The ground already answers the pointer here; the lift is what makes the
+    // tile read as sitting above the page rather than as a rectangle that got
+    // brighter. `hoverScale` rather than the small rung — this is 70px tall,
+    // and the travel should read the same as on a chip a third the size.
+    scale: body.pressed ? Theme.pressScale
+                        : ((body.containsMouse || chevronArea.containsMouse)
+                           ? Theme.hoverScale : 1)
     Behavior on scale {
         NumberAnimation { duration: Theme.animFast; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig }
     }

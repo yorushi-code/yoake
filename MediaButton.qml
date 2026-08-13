@@ -24,7 +24,12 @@ Rectangle {
     }
     Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
-    scale: ma.pressed ? 0.9 : (ma.containsMouse ? 1.08 : 1.0)
+    // This is where the shell already had the right answer, spelled in two
+    // literals: a transport button has lifted under the pointer and given under
+    // the press since it was written, and nothing else copied it because there
+    // was no name to copy. There is one now, and this reads from it.
+    scale: ma.pressed ? Theme.pressScaleSmall
+                      : (ma.containsMouse ? Theme.hoverScaleSmall : 1.0)
     Behavior on scale {
         NumberAnimation { duration: Theme.animFast; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpring }
     }

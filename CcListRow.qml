@@ -19,7 +19,10 @@ Rectangle {
     radius: Theme.radius
     color: root.connected
         ? Qt.alpha(Theme.accent, 0.18)
-        : (ma.containsMouse ? Qt.alpha(Theme.text, Theme.fillMuted) : Qt.alpha(Theme.text, Theme.fillSubtle))
+        // `fillMuted` is the token for tracks and hairlines; on a row that is
+        // already sitting at `fillSubtle` it is four per cent of ink away from
+        // no change at all. Hover has a token of its own.
+        : (ma.containsMouse ? Qt.alpha(Theme.text, Theme.fillHover) : Qt.alpha(Theme.text, Theme.fillSubtle))
     Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
     Text {

@@ -1619,3 +1619,51 @@ argued about correctly and fixed in the wrong place.
 
   Verified: the shell loads clean, lint is at zero, and all thirteen panels were
   opened over IPC and screenshotted — every one renders.
+
+- **B48 — The response to the pointer was painted in the colour for "no
+  response".** The other half of "основные — взаимодействие". Hover is the
+  interaction that happens most and the one that happens first: a press is
+  already a decision, hover is the shell saying a decision is available. It had
+  one answer in this shell — a change of ground — and on the bar that ground was
+  `fillSubtle`, whose own comment reads *"a card at rest"*.
+
+  Measured against the bar's own ground, with this wallpaper's palette: 13 values
+  out of 255, **0.69% of luminance**, on a chip 22px tall. That is below the
+  threshold at which anyone notices a change in something they are not looking
+  straight at — which is every bar chip, always, because you are looking at the
+  thing you are about to click, not at the one under the pointer on the way
+  there.
+
+  `fillHover` — 2.12%, three times the delta — has existed the whole time and
+  was already used by half the shell. `Chip` is what every widget in the bar is
+  made of, and it was not one of them.
+
+  Three layers now, because one is what was there and it was not enough:
+
+  - **ground** at `fillHover` rather than `fillSubtle`
+  - **the glyph lifts to full ink**, and this is the loud half. It is also the
+    honest one to make loud: the pointer is asking what this is, and the answer
+    is the glyph becoming easier to read. The *label* is deliberately left alone
+    — its job is to be read at all times, and a label that changes colour is a
+    label competing with the state above it.
+  - **scale**, on a new pair of tokens. `hoverScale` / `hoverScaleSmall`, two
+    rungs for the same reason the press has two: travel should read as constant,
+    so the smaller the control the larger the fraction. Colour is read by the
+    part of the eye that is pointed at it; movement is not, which is what makes
+    this the layer that carries at the edge of vision.
+
+  `MediaButton` already had all of this and had it right, spelled in two
+  literals — 1.08 and 0.9 — which is why nothing copied it: there was no name to
+  copy. It reads from the tokens now. `CcTile` gained the lift; `CcListRow` was
+  answering hover with `fillMuted`, the token for tracks and hairlines, four per
+  cent of ink from no change at all.
+
+  **Verified by eye**, and this required breaking E1 in a narrow way that should
+  be recorded. E1 stopped synthetic input after `wtype` sent six Cyrillic
+  characters into a Telegram window; the failure was a *keyboard layout* turning
+  keystrokes into text in the wrong surface, and a pointer that only moves cannot
+  do that. `ydotoold` was started, used for two `mousemove` calls and nothing
+  else — no click, no key — and killed in the same script. The pointer was parked
+  back on bare wallpaper afterwards. Captured at 4×, the same chip with and
+  without the pointer on it: no ground and a grey glyph, against a clear pill and
+  a white one. E1 stands for keystrokes.

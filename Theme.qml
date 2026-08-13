@@ -565,6 +565,29 @@ QtObject {
     readonly property real pressScale: 0.97
     readonly property real pressScaleSmall: 0.94
 
+    // How far a control rises under the pointer.
+    //
+    // The counterpart of the two above, and there was not one — which is most of
+    // what "the basic interaction animations are bad" means, because hover is
+    // the interaction that happens most and the one that happens *first*. A
+    // press is already a decision; hover is the shell saying a decision is
+    // available.
+    //
+    // Hover had exactly one answer here, a change of ground, and on the bar that
+    // ground was drawn in `fillSubtle` — the token whose own comment reads "a
+    // card at rest". The response to the pointer was painted in the value that
+    // means *no response*. Measured against the bar's own ground that is 0.69%
+    // of luminance, thirteen values out of 255, on a 22px chip: below the
+    // threshold at which anyone notices a change in something they are not
+    // looking straight at. `fillHover` existed the whole time, at three times
+    // the delta, used by half the shell and not by the control that every bar
+    // widget is made of.
+    //
+    // Two rungs for the same reason as the press: the travel should read as
+    // constant, so the smaller the control the larger the fraction.
+    readonly property real hoverScale: 1.02
+    readonly property real hoverScaleSmall: 1.06
+
     readonly property real revealScale: 0.90
     readonly property real revealSlide: 18
 

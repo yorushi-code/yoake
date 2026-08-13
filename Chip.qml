@@ -81,21 +81,35 @@ Item {
 
     // The glyph is where the domain lives when the mark is live. Passive marks
     // keep it neutral, because a passive thing has no domain worth ranking.
+    //
+    // Under the pointer a passive glyph lifts to full ink. The ground alone is
+    // a small change on a small object; this is the loud half of the answer, and
+    // it is the honest one to make loud — the pointer is asking what this is,
+    // and the reply is the glyph becoming easier to read. The label is left
+    // alone deliberately: its job is to be read at all times, and a label that
+    // changes colour is a label competing with the state above it.
     readonly property color glyphInk: root.alert
         ? Theme.onTone("alert")
-        : (root.live ? root.domain : Theme.subtext0)
+        : (root.live ? root.domain
+                     : (hit.containsMouse ? Theme.text : Theme.subtext0))
 
     // ── Ground ──
     //
     // Present only under the pointer, and filled only in alert. Hover is a
-    // response to the pointer rather than a state of the machine, so it is the
-    // faintest thing here and it does not survive the pointer leaving.
+    // response to the pointer rather than a state of the machine, so it stays
+    // the faintest thing here and it does not survive the pointer leaving.
+    //
+    // Faint, though, has to mean visible. This was `fillSubtle`, whose own
+    // comment reads "a card at rest" — the response to the pointer drawn in the
+    // token for no response — and against the bar's ground that is 0.69% of
+    // luminance on a 22px chip. `fillHover` is the token for this and was
+    // already used by half the shell.
     Rectangle {
         anchors.fill: parent
         radius: Theme.radiusChip
         color: root.alert
             ? Theme.tone("alert")
-            : (hit.containsMouse ? Qt.alpha(Theme.text, Theme.fillSubtle) : "transparent")
+            : (hit.containsMouse ? Qt.alpha(Theme.text, Theme.fillHover) : "transparent")
         Behavior on color { ColorAnimation { duration: Theme.animFast } }
     }
 
@@ -179,7 +193,11 @@ Item {
         Behavior on opacity { NumberAnimation { duration: Theme.animFast } }
     }
 
-    scale: hit.pressed ? Theme.pressScaleSmall : 1
+    // Down under a finger, up under a pointer. The third signal, and the one
+    // that carries at the edge of vision: colour changes are read by the part
+    // of the eye that is pointed at them, and movement is not.
+    scale: hit.pressed ? Theme.pressScaleSmall
+                       : (hit.containsMouse ? Theme.hoverScaleSmall : 1)
     Behavior on scale {
         NumberAnimation { duration: Theme.animFast; easing.type: Easing.Bezier; easing.bezierCurve: Theme.easeSpringBig }
     }
