@@ -1920,3 +1920,12 @@ argued about correctly and fixed in the wrong place.
 
   Verified by eye at 3× on the tile that was worst, and across the whole page:
   twelve tiles, twelve pairs of lines with air between them.
+
+- **V — The rest of the audit.** B53 came out of looking at the control page at
+  3×; the same was then done to everything else that opens, and the rest is
+  sound. The dashboard's Overview and Столы, the notification centre in its empty
+  state, the calendar and the cheat sheet were all read at size for clipped type,
+  colliding baselines, text out of its box and empty states that look like
+  faults. Nothing found. The bottom row of Overview *looks* cut off in a
+  screenshot cropped at 560px and is not — the panel is taller than that, which
+  is worth knowing before someone fixes it.
