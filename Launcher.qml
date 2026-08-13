@@ -28,6 +28,24 @@ Item {
     property string query: ""
     property int selected: 0
 
+    // Whether the pointer owns the selection.
+    //
+    // It did, unconditionally, and that is most of what "Win+D is buggy" meant.
+    // A row claimed the selection on `entered`, and `entered` fires whenever the
+    // row arrives under the pointer — which is not the same event as the pointer
+    // arriving on the row. Opening the launcher maps a list under a mouse that
+    // has been sitting still since whenever it was last used, so the launcher
+    // opened with the seventh row selected, and Enter launched it. Typing was
+    // worse: every keystroke restages the list, so whatever ranked into the slot
+    // under the stationary pointer took the selection away from the top match on
+    // every letter.
+    //
+    // So the pointer earns the selection by moving, and gives it back to the
+    // keyboard on any key that moves it. This is what a launcher, a menu and a
+    // command palette all do, and none of them say so out loud, which is
+    // probably why it was written the other way.
+    property bool pointerLive: false
+
     // How often each .desktop id has been launched, and when it last was.
     // Persisted, because a launcher that has to be re-taught your habits every
     // login is just a list.
@@ -333,6 +351,10 @@ Item {
 
     function move(delta) {
         if (root.results.length === 0) return;
+        // An arrow key takes the selection back. Without this the list scrolls
+        // under a stationary pointer, the row that lands beneath it reports a
+        // hover, and the selection snaps back to the mouse on the next keypress.
+        root.pointerLive = false;
         root.selected = Math.max(0, Math.min(root.results.length - 1, root.selected + delta));
         root.reveal(root.selected);
     }
@@ -357,6 +379,9 @@ Item {
     }
 
     onQueryChanged: {
+        // The list is about to be rebuilt under whatever the pointer is resting
+        // on, and the top match is the answer to what was just typed.
+        root.pointerLive = false;
         root.selected = 0;
         list.positionViewAtBeginning();
         root.restage();
@@ -395,6 +420,11 @@ Item {
             win.mapped = true;
             root.query = "";
             root.selected = 0;
+            // The pointer has not moved since the launcher was last used, and
+            // wherever it is resting is not a choice anybody just made.
+            root.pointerLive = false;
+            pointer.lastX = -1;
+            pointer.lastY = -1;
             root.committing = false;
             root.restage();
             input.text = "";
@@ -461,6 +491,33 @@ Item {
                 } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                     root.launch(root.selected);
                     event.accepted = true;
+                }
+            }
+
+            // What counts as the pointer moving, measured once for the whole
+            // launcher rather than per row.
+            //
+            // It has to be measured here because a row cannot tell the two cases
+            // apart: scrolling the list under a still mouse changes the pointer's
+            // position *inside* the delegate exactly as much as moving the mouse
+            // does, and Qt re-delivers a hover move for both. This handler's
+            // coordinates are the window's, and the window does not move when the
+            // list scrolls — so a position that changed here is a hand that moved.
+            //
+            // Passive on purpose: a HoverHandler observes without taking the
+            // events, so the rows keep their own hover and their own cursor.
+            HoverHandler {
+                id: pointer
+                property real lastX: -1
+                property real lastY: -1
+                onPointChanged: {
+                    const p = pointer.point.position;
+                    if (pointer.lastX >= 0
+                            && (Math.abs(p.x - pointer.lastX) > 0.5
+                                || Math.abs(p.y - pointer.lastY) > 0.5))
+                        root.pointerLive = true;
+                    pointer.lastX = p.x;
+                    pointer.lastY = p.y;
                 }
             }
 
@@ -724,7 +781,7 @@ Item {
                         kind: root.mixed ? modelData.label : ""
                         selected: index === root.selected
                         onActivated: root.launch(index)
-                        onHovered: root.selected = index
+                        onHovered: if (root.pointerLive) root.selected = index
 
                         // Rows arrive one after another, from the left, but
                         // only when the list itself is new -- see

@@ -1436,3 +1436,41 @@ the empty-tray gap, the stale header — is done and on screen.
   **Not verified by eye.** Press feedback needs a press and there is no safe way
   to click here (see E1). The panels render unchanged and the pattern is the one
   already proven in `Chip` and `CcTile`.
+
+## Reported again, the same night
+
+The list came back unchanged, which is the useful part: the fixes filed against
+it the first time were mostly right and mostly invisible. What follows is the
+second pass, and it starts by reproducing rather than by reasoning — three of
+the four things below were argued about in this file already and one of them was
+argued about correctly and fixed in the wrong place.
+
+- **B43 — The mouse was choosing what the keyboard had already chosen.** "Win+D
+  баганный", and this is it. The launcher opened with the seventh row selected
+  and Enter launched it.
+
+  `LauncherRow` claimed the selection on `entered`, and `entered` is not the
+  event it was being read as. It fires when the row arrives under the pointer,
+  which is a different thing from the pointer arriving on the row — and opening
+  a launcher maps a whole list under a mouse that has been sitting still since
+  whenever it was last touched. Typing was worse: every keystroke restages the
+  list, so whatever ranked into the slot under the stationary pointer took the
+  selection away from the top match, on every letter.
+
+  Caught on camera before anything was changed: the pointer resting on
+  *Alacritty*, the seventh row, and *Alacritty* selected on a launcher that had
+  just been opened with an empty query. `root.selected = 0` had run; the hover
+  overwrote it in the same frame.
+
+  The pointer earns the selection by **moving** now, and hands it back to the
+  keyboard on any key that moves it. The measurement has to be made for the list
+  as a whole rather than per row, because a row cannot tell the two cases apart:
+  scrolling the list under a still mouse changes the pointer's position inside
+  the delegate exactly as much as moving the mouse does, and Qt re-delivers a
+  hover move for both. A `HoverHandler` on the launcher's own window measures it
+  in window coordinates, which the list scrolling does not change — so a position
+  that moved there is a hand that moved. It is passive, so the rows keep their
+  own hover and their own cursor.
+
+  Verified by eye, pointer parked on the same row across the change: *Alacritty*
+  selected before, *Firefox* — the top match — selected after.

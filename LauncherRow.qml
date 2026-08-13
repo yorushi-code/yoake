@@ -137,6 +137,12 @@ Item {
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onEntered: root.hovered()
+        // Also on movement inside the row, not only on crossing into it. The
+        // list decides whether a hover may take the selection and only says yes
+        // once the pointer has moved — so a mouse nudged while already resting
+        // on a row would otherwise have to leave and come back before the row it
+        // is plainly pointing at could be selected.
+        onPositionChanged: root.hovered()
         onClicked: root.activated()
     }
 }
