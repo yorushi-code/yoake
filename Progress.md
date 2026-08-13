@@ -2116,3 +2116,32 @@ argued about correctly and fixed in the wrong place.
 
   Verified on a cold start, five restarts deep: the chip comes up with the title
   in it, elided at the cap, in the same face as everything beside it.
+
+- **E2 — A prophylactic fix for a bug that was not happening broke a thing that
+  was working.** Recorded because the reasoning was sound at every step and the
+  result was still a regression.
+
+  B55 found the latch — a `Text` whose width is bound to its own `implicitWidth`
+  while it elides — and the obvious next move was to look for the same shape
+  elsewhere. It is in two more places: `KeyValue`, in four system panels, where
+  the width also depends on a `root.width` that starts at 0 and so *can* reach
+  the latch; and the tooltip's subtext. Neither was failing. Both got the same
+  `TextMetrics` treatment anyway, on the argument that it is the same one line
+  and there is no reason to leave it armed.
+
+  It cost "Сигнал" its last two letters. `TextMetrics.width` is not
+  interchangeable with a `Text`'s `implicitWidth` — the measurement is close but
+  not equal, and in `KeyValue` it feeds the row's own `implicitWidth`, so a
+  slightly smaller number shrinks the row, which shrinks the space left for the
+  key, which elides it. Caught only because the panels were screenshotted after
+  the change and compared against a capture from three hours earlier: **Приём /
+  отдача → Приём / отда…**, **Сигнал → Сигн…**.
+
+  Both reverted. `BarMedia` keeps the fix, because there the bug is real,
+  reproduced on five cold starts, and measured at 230.78 against 0.
+
+  The rule this leaves: **a fix for a fault nobody has observed has to clear a
+  higher bar than one that has been, not a lower one.** The proven case justified
+  a change to the mechanism; the unproven ones justified nothing, and "same shape,
+  same line, why not" is how a night of careful work ships a typographic
+  regression into four panels.
