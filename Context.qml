@@ -12,10 +12,22 @@ import Quickshell.Services.Pipewire
 // is going on right now. That was left to each surface to guess at, so the
 // notification stack had its own idea of "busy" and nothing else had one.
 //
-// Only states that can be observed are derived. There is no `gaming`, because
-// niri does not report fullscreen in its window list and a mode that guesses
-// would be worse than no mode: a shell that goes quiet because it thinks you
-// are playing something is a shell that swallows a message while you work.
+// Only states that can be observed are derived, and the standard is high: a
+// shell that goes quiet because it *thinks* you are busy is a shell that
+// swallows a message while you work.
+//
+// This paragraph used to end "there is no `gaming`, because niri does not
+// report fullscreen in its window list". That was true when it was written and
+// is not true now. `Niri.desktopOccludedOn` was added later, for the wallpaper,
+// and it carries the proof: niri gives a fullscreen window a tile the size of
+// the whole output, gaps and bar strip included, and nothing else gets one.
+// Confirmed against this machine — tiled windows report 942x1005 and 1896x1005
+// against a 1920x1080 output, because the bar's 46px exclusive zone means a
+// window that is not fullscreen can never reach the full height.
+//
+// So the observation exists, and it is `fullscreen` below. The old sentence
+// survived long enough to cost a feature: two files knew half of this each and
+// never met.
 Singleton {
     id: root
 
@@ -46,6 +58,21 @@ Singleton {
             return true;
         }
         return false;
+    }
+
+    // A window that has taken a whole output.
+    //
+    // The strongest statement about attention the machine can observe without
+    // guessing: a person who gives one application the entire screen has said
+    // what they want covered. Deliberately *not* in the `mode` word below — that
+    // word feeds Perception's mood, and this is about interruption rather than
+    // about how the shell should look.
+    readonly property bool fullscreen: {
+        const win = Niri.focusedWindow;
+        if (!win) return false;
+        const ws = Niri.workspaces.find(w => w.id === win.workspace_id);
+        if (!ws) return false;
+        return Niri.desktopOccludedOn(ws.output);
     }
 
     readonly property string focusedApp: Niri.focusedWindow && Niri.focusedWindow.app_id
@@ -111,6 +138,7 @@ Singleton {
                 + "\ncapturing=" + root.capturing
                 + "\nloaded=" + root.loaded
                 + "\ncoding=" + root.coding
+                + "\nfullscreen=" + root.fullscreen
                 + "\nfocus=" + root.focusedApp
                 + "\npart=" + root.partOfDay;
         }

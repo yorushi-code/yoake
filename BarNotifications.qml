@@ -120,7 +120,8 @@ Item {
                     // were waiting for.
                     text: Notifs.contextQuiet ? "Тихо: занят микрофон"
                         : (Notifs.dnd ? "Не беспокоить"
-                        : (Notifs.count > 0 ? "Уведомлений: " + Notifs.count : "Тихо"))
+                        : (Context.fullscreen ? "Только важное: полный экран"
+                        : (Notifs.count > 0 ? "Уведомлений: " + Notifs.count : "Тихо")))
                     color: Theme.text
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSmall

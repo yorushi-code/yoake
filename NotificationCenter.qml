@@ -179,7 +179,18 @@ Item {
             notification.closed.connect(() => root.dismissToast(notification));
             // Do-not-disturb suppresses the popup only; the notification is
             // still tracked, so nothing is lost from the history.
-            if (!Notifs.quiet && !Media.announcesTrack(notification)) root.appendToast(notification);
+            //
+            // Through `Notifs.shouldToast` rather than by re-deciding here. That
+            // function exists precisely so this rule lives in one place, and it
+            // had no callers at all: this line asked only about `quiet`, so the
+            // user's "important only" mode admitted everything exactly like
+            // "all", and the fullscreen rule had nowhere to take effect. The
+            // drift the function was written to prevent had already happened to
+            // the function itself.
+            if (Notifs.shouldToast(notification.urgency)
+                    && !Media.announcesTrack(notification)) {
+                root.appendToast(notification);
+            }
             Notifs.arrived();
         }
     }

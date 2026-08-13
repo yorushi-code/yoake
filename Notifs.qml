@@ -116,6 +116,16 @@ Singleton {
     function shouldToast(urgency) {
         if (root.quiet) return false;
         if (root.filter === "important") return urgency === NotificationUrgency.Critical;
+        // A window that has taken the whole output is the clearest statement
+        // about attention the machine can observe, and a toast lands squarely on
+        // top of it — verified on camera, over a live game's scoreboard.
+        //
+        // Held to the same rule as the user's own "important" filter rather than
+        // silenced outright: critical still gets through, everything else waits
+        // in the history with the count on the bell. Absolute silence is kept
+        // for the microphone, which is the one case the shell can be certain
+        // costs more than a missed message.
+        if (Context.fullscreen) return urgency === NotificationUrgency.Critical;
         return true;
     }
 

@@ -20,7 +20,7 @@ Status keys: `IMPLEMENTED` / `PARTIAL` / `MISSING` / `WRONG`.
 | 2 | Architecture map | IMPLEMENTED |
 | 3 | Visual system | IMPLEMENTED |
 | 4 | Motion system | IMPLEMENTED |
-| 5 | Bar composition | MISSING |
+| 5 | Bar composition | IMPLEMENTED |
 | 6 | Media / player system | PARTIAL |
 | 7 | Notifications | PARTIAL |
 | 8 | System panels | MISSING |
@@ -1085,3 +1085,83 @@ the OSD it was written for cannot be wrapped without moving the rectangle
   sheets would still close on Escape, on a click outside and on another panel
   opening, which is exactly what the dashboard and launcher do today. That is a
   trade to make with the bug reproduced in front of you, not from a theory.
+
+**Phase 5 closed**, with one recorded gap: zone overflow (B25's list, item 1) needs
+an output this machine does not have. Everything else — the loud-by-default chip,
+the moving desk indicator, the dead tooltips, the hint naming a page nobody has,
+the empty-tray gap, the stale header — is done and on screen.
+
+## Phase 6/7 — a chain that started with one stale sentence
+
+- **B30 — "niri does not report fullscreen" had stopped being true.**
+  `Context.qml` opened with a paragraph refusing to derive a gaming state: "there
+  is no `gaming`, because niri does not report fullscreen in its window list and
+  a mode that guesses would be worse than no mode". Correct when written.
+
+  `Niri.desktopOccludedOn` was added later, for the wallpaper, and it carries the
+  proof: niri gives a fullscreen window a tile the size of the whole output,
+  gaps and bar strip included, and nothing else gets one. Confirmed against this
+  machine — tiled windows report 942x1005 and 1896x1005 against 1920x1080,
+  because the bar's 46px exclusive zone means a window that is not fullscreen can
+  never reach the full height.
+
+  So two files each knew half of it and never met, and the stale sentence cost a
+  feature for as long as it stood. `Context.fullscreen` exists now, with the
+  proof written beside it and the old paragraph corrected. Deliberately **not**
+  added to the `mode` word: that word feeds Perception's mood, and this is about
+  interruption rather than about how the shell should look.
+
+- **B31 — The shell did not know what was focused until you changed focus.**
+  Found while checking the new property: `context state` reported `focus=` empty
+  and `fullscreen=false` with DDNet plainly fullscreen and focused.
+
+  `Niri.focusedWindowId` is set only by the `WindowFocusChanged` event. niri also
+  sends the whole window list on connect, every record carrying `is_focused`, and
+  that was thrown away — `root.windows = evt.WindowsChanged.windows` and nothing
+  else. So from startup, and from **every configuration reload**, `focusedWindow`
+  was null until the user next switched windows, and with it `Context.focusedApp`,
+  `Context.coding`, and `Media.ownerFocused` — the test that stops the shell
+  announcing a track over the player you are already looking at.
+
+  It healed itself on the first window switch, which is exactly why it survived.
+
+  Seeded from the snapshot now, only when there is nothing yet, and deliberately
+  without `attentionMoved`: a snapshot arriving is not attention moving, and
+  emitting it there would shut every panel on a bulk window change. Verified by
+  IPC: `focus=ddnet`, `fullscreen=true`.
+
+- **B32 — `Notifs.shouldToast` had no callers.** Its own comment: "The one
+  question the toast stack asks. Kept here rather than in `NotificationCenter` so
+  the bar's card, the history header and the popup rule cannot drift into three
+  different ideas of what a mode means." The drift it was written to prevent had
+  happened to it: `NotificationCenter.onNotification` asked `!Notifs.quiet` and
+  decided for itself.
+
+  The consequence was a broken feature, not just duplication. `quiet` is
+  `filter === "silent" || contextQuiet`, so with the filter set to **"important"**
+  `quiet` is false and every toast was admitted — the important-only mode behaved
+  exactly like "all". The function that implements it was sitting right there,
+  written and unreferenced.
+
+  The toast stack asks it now, and it is finally the one question.
+
+- **B33 — Toasts landed on a fullscreen game, on camera.** Sent one test
+  notification while DDNet was fullscreen: the card drew straight over the
+  scoreboard. Every message that arrives during a match covers part of the
+  screen.
+
+  `shouldToast` holds ordinary notifications back while `Context.fullscreen`, and
+  lets **critical** through — the same rule as the user's own "important" filter
+  rather than silence. Absolute silence stays reserved for the microphone, which
+  is the one case the shell can be certain costs more than a missed message.
+  Nothing is discarded: the history takes everything and the bell keeps counting.
+
+  The media OSD is held back by the same observation, for the same reason —
+  `ownerFocused` already refuses to announce a track over the player itself, and
+  a track name over someone's game is the least urgent thing the shell has to say.
+
+  The bell's card says which quiet is in force: "Только важное: полный экран".
+
+  Verified on camera, both directions: an ordinary notification during a
+  fullscreen match produced no toast, and a critical one immediately after
+  produced its card with the red rule. Test notifications cleared.

@@ -109,6 +109,30 @@ Singleton {
         root.attentionMoved();
     }
 
+    // The full window list, which niri sends on connect and on bulk changes.
+    //
+    // Every record in it carries `is_focused`, and that was being thrown away.
+    // The focus *event* is only sent when focus changes, so from startup — and
+    // from every configuration reload — the shell did not know what was focused
+    // at all: `focusedWindow` was null, and with it `Context.focusedApp`, the
+    // coding mode, `Context.fullscreen`, and the media OSD's test for whether
+    // the player is the window you are looking at. It healed itself the first
+    // time the user switched windows, which is exactly why it survived.
+    //
+    // Seeded only when there is nothing yet, and deliberately without
+    // `attentionMoved`: a snapshot arriving is not attention moving, and
+    // emitting it here would shut every panel on a bulk window change.
+    function _applyWindowsChanged(payload) {
+        root.windows = payload.windows;
+        if (root.focusedWindowId !== null) return;
+        for (const w of payload.windows) {
+            if (w && w.is_focused) {
+                root.focusedWindowId = w.id;
+                return;
+            }
+        }
+    }
+
     function _applyWorkspacesChanged(payload) {
         root.workspaces = payload.workspaces;
     }
@@ -172,7 +196,7 @@ Singleton {
                 }
                 if (evt.WorkspacesChanged) root._applyWorkspacesChanged(evt.WorkspacesChanged);
                 else if (evt.WorkspaceActivated) root._applyWorkspaceActivated(evt.WorkspaceActivated);
-                else if (evt.WindowsChanged) root.windows = evt.WindowsChanged.windows;
+                else if (evt.WindowsChanged) root._applyWindowsChanged(evt.WindowsChanged);
                 else if (evt.WindowOpenedOrChanged) root._applyWindowOpenedOrChanged(evt.WindowOpenedOrChanged);
                 else if (evt.WindowClosed) root.windows = root.windows.filter(w => w.id !== evt.WindowClosed.id);
                 else if (evt.WindowFocusChanged) root._applyWindowFocusChanged(evt.WindowFocusChanged);

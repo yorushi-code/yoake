@@ -250,7 +250,13 @@ Singleton {
     }
 
     function showOsd() {
+        // Not over a window that has the whole screen. `ownerFocused` already
+        // refuses to announce a track over the player itself; this is the same
+        // refusal for the case where the person has given some other
+        // application everything, and a track name is the least urgent thing
+        // the shell has to say.
         if (!root.hasPlayer || !root.osdEnabled || root.ownerFocused) return;
+        if (Context.fullscreen) return;
         root.osdShown = true;
         osdTimer.interval = 4000;
         osdTimer.restart();
