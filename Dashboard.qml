@@ -60,25 +60,17 @@ Item {
         // See Launcher: bound to the toggle, because `open` waits a frame for
         // `armed` and a surface mapped asking for no keyboard never gets one.
         //
-        // A peek asks for no keyboard at all, and that is a correction.
+        // Exclusive whenever it is up, with no second mode. The dashboard is
+        // only ever opened by a keybind or by clicking the clock, and both of
+        // those are somebody asking for it — a surface asked for by name may
+        // hold the keyboard, and holding it is what makes Escape work.
         //
-        // It used to map on demand, on the belief that on-demand takes nothing
-        // until something is clicked. Measured on niri's event stream while
-        // chasing the same fault in the toast stack: mapping an on-demand layer
-        // surface emits `Window focus changed: None` immediately — the keyboard
-        // leaves the focused window the moment the surface appears, with nobody
-        // having clicked anything. So brushing the centre of the bar for four
-        // hundred milliseconds took the keys out from under whatever was being
-        // typed into, which is the exact fault the comment here says was solved.
-        //
-        // The peek is a pointer gesture from beginning to end: it opens by
-        // pointing, it closes when the pointer leaves, and it is committed by a
-        // click. Committing promotes it to `Exclusive` on a surface that is
-        // already up.
-        focusable: Toggles.dashboardOpen && !Toggles.dashboardPeek
-        WlrLayershell.keyboardFocus: !Toggles.dashboardOpen || Toggles.dashboardPeek
-            ? WlrKeyboardFocus.None
-            : WlrKeyboardFocus.Exclusive
+        // The peek that used to need a weaker setting here is gone; Toggles
+        // carries why.
+        focusable: Toggles.dashboardOpen
+        WlrLayershell.keyboardFocus: Toggles.dashboardOpen
+            ? WlrKeyboardFocus.Exclusive
+            : WlrKeyboardFocus.None
 
         Timer {
             id: hideDelay
@@ -110,9 +102,6 @@ Item {
             focus: root.open
 
             Keys.onPressed: event => {
-                // Typing into it is asking for it, for the same reason a click
-                // is.
-                Toggles.dashCommit();
                 if (event.key === Qt.Key_Escape) {
                     Toggles.dashboardOpen = false;
                     event.accepted = true;
@@ -146,20 +135,12 @@ Item {
                 origin: Item.Top
                 onCloseRequested: Toggles.dashboardOpen = false
 
-                // Reports the pointer to the peek, which watches this surface
-                // and the bar island together — neither window can see the
-                // other's hover, so each says where the pointer is and the
-                // decision is made in one place.
-                HoverHandler {
-                    onHoveredChanged: Toggles.dashPointerOnSheet = hovered
-                }
-
+                // Swallows clicks that land on the sheet, so they do not reach
+                // the full-screen catcher behind it and close the panel the
+                // user is working in.
                 MouseArea {
                     anchors.fill: parent
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
-                    // Clicking it is asking for it. From here it stays until
-                    // it is dismissed, like a dashboard opened by the key.
-                    onPressed: Toggles.dashCommit()
                 }
 
                 // ── Tabs ──

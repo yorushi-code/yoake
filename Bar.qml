@@ -165,35 +165,22 @@ PanelWindow {
         ]
     }
 
-    // Pointing at the centre of the strip opens the dashboard. It is the part
-    // of the bar that is already about "what is going on" rather than about a
-    // single control, so it is where the summary of everything belongs -- and
-    // reaching it should not require remembering a key.
+    // The centre of the strip used to open the dashboard by being pointed at,
+    // and that is gone.
     //
-    // A HoverHandler on the zone, not a MouseArea under the widgets: underneath
-    // it only saw the pointer in the gaps between the clock and its
-    // neighbours, so pointing at the island's actual contents did nothing.
-    HoverHandler {
-        id: dashHover
-        parent: strip.centreArea
-        onHoveredChanged: {
-            // The peek watches both surfaces, so the strip reports where the
-            // pointer is rather than deciding on its own when to close.
-            Toggles.dashPointerOnBar = hovered;
-            if (hovered) dashOpen.restart();
-            else dashOpen.stop();
-        }
-    }
-
-    Timer {
-        id: dashOpen
-        // Long enough that crossing the bar on the way somewhere else does not
-        // summon it.
-        interval: Theme.animSlow
-        // A peek, not an open: it asks for no keyboard and it leaves with the
-        // pointer. Pointing at something is not the same as asking for it.
-        onTriggered: if (dashHover.hovered && !Menus.anyOpen) {
-            Toggles.dashPeek();
-        }
-    }
+    // Two things were wrong with it and only one of them was fixable. Pointing
+    // at a bar is not asking for anything — resting the pointer on the way to
+    // the tray put a panel over two thirds of the screen on a gesture nobody
+    // performed — and the peek was the one surface in the shell that could not
+    // answer Escape. That second part is not a bug that was left unfixed; it is
+    // the design. A surface answers Escape only while it holds the keyboard, and
+    // the whole argument for the peek was that it must never take the keyboard,
+    // because taking it is what stole keystrokes from whatever was being typed
+    // into. Non-intrusive and dismissible were the same knob turned opposite
+    // ways, so it was going to be one or the other.
+    //
+    // What settles it is that the gesture was never needed: the clock under this
+    // very handler already opens the dashboard on a click, and has all along. A
+    // click is deliberate, it takes the keyboard honestly, and Escape closes it.
+    // The peek was a second way to reach one panel, worse in both directions.
 }

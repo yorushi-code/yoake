@@ -149,77 +149,29 @@ QtObject {
         root[name + "Open"] = wanted;
     }
 
-    // ── The dashboard peek ──
+    // ── The dashboard peek, and why there isn't one ──
     //
-    // Pointing at the bar's centre island for 420ms opened the full sheet and
-    // took the keyboard exclusively with it. So brushing past the clock on the
-    // way to the tray stole the keyboard from whatever was being typed into,
-    // and left a sheet that then had to be dismissed by hand — a gesture
-    // nobody performed on purpose, with two consequences that both had to be
-    // undone.
+    // Pointing at the bar's centre for 420ms used to open the dashboard. It was
+    // built twice: once taking the keyboard exclusively, which stole keystrokes
+    // from whatever was being typed into, and once taking no keyboard at all,
+    // which fixed the theft and made it the only surface in the shell that could
+    // not be closed with Escape.
     //
-    // A peek is the same sheet without either commitment. It asks for the
-    // keyboard on demand rather than exclusively, so it takes nothing until it
-    // is clicked, and it leaves when the pointer does.
-    property bool dashboardPeek: false
-
-    // Where the pointer is, as far as the peek is concerned. Two flags because
-    // there are two surfaces in two windows: the island that opens it and the
-    // sheet it opens, and neither can see the other's hover.
+    // Those two are the same knob. A surface answers Escape only while it holds
+    // the keyboard, so a panel that must never take the keyboard can never be
+    // dismissed by one — there was no third setting, and the second version
+    // shipped with "it leaves when the pointer does" standing in for a dismissal
+    // the user could actually perform.
     //
-    // One pointer, so one flag each rather than a count. On two monitors two
-    // bars write the same flag and the enter and leave are not ordered across
-    // windows, so crossing from one bar to the other can close a peek a beat
-    // early. That is the whole cost, and a reference count would leak the
-    // first time a surface unmapped while hovered.
-    property bool dashPointerOnBar: false
-    property bool dashPointerOnSheet: false
-
-    function dashPeek() {
-        if (root.dashboardOpen) return;
-        root.dashboardPeek = true;
-        root.exclusive("dashboard");
-    }
-
-    // Any deliberate input promotes it: you meant it after all, and from here
-    // it behaves like a dashboard somebody asked for.
-    function dashCommit() {
-        root.dashboardPeek = false;
-    }
-
-    onDashboardOpenChanged: {
-        if (root.dashboardOpen) return;
-        root.dashboardPeek = false;
-        // The sheet's window is about to unmap, and a hover flag left standing
-        // on a surface that no longer exists would keep the *next* peek from
-        // ever closing itself.
-        root.dashPointerOnSheet = false;
-    }
-
-    onDashPointerOnBarChanged: root._peekTick()
-    onDashPointerOnSheetChanged: root._peekTick()
-
-    function _peekTick() {
-        if (root.dashPointerOnBar || root.dashPointerOnSheet) {
-            peekOut.stop();
-        } else if (root.dashboardPeek) {
-            peekOut.restart();
-        }
-    }
-
-    property Timer _peekOut: Timer {
-        id: peekOut
-        // Long enough to cross the gap between the island and the sheet, which
-        // is only the bar's own margin, and short enough that a sheet nobody is
-        // pointing at does not sit there.
-        interval: Theme.animNormal
-        onTriggered: {
-            if (root.dashboardPeek && !root.dashPointerOnBar
-                    && !root.dashPointerOnSheet) {
-                root.dashboardOpen = false;
-            }
-        }
-    }
+    // Reported as exactly that, twice, in the same words as the panels that
+    // would not leave. What ends the argument is that the gesture was redundant:
+    // the clock in the centre of the bar opens the dashboard on a click and
+    // always did. One panel had two ways in, and the second one opened without
+    // being asked and would not close when told.
+    //
+    // Removed rather than fixed. The seventy lines of pointer bookkeeping that
+    // used to live here — two hover flags across two windows, a settle timer and
+    // a commit — existed only to give a gesture nobody performed a way out.
 
     property IpcHandler handler: IpcHandler {
         target: "toggles"

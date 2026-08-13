@@ -1474,3 +1474,36 @@ argued about correctly and fixed in the wrong place.
 
   Verified by eye, pointer parked on the same row across the change: *Alacritty*
   selected before, *Firefox* — the top match — selected after.
+
+- **B44 — The panel that could not be told to go away.** Reported twice in the
+  same words: the islands do not close on Escape. Measured the first time and
+  answered "they do" — which was true of every surface except the one the report
+  was actually about, and that one was called deliberate.
+
+  The dashboard peek opened by pointing at the centre of the bar for 420 ms and
+  answered no key at all. That is not an oversight left in the design, it *is*
+  the design, and the design was a contradiction: a surface answers Escape only
+  while it holds the keyboard, and the entire argument for the peek was that it
+  must never hold the keyboard, because holding it is what stole keystrokes from
+  whatever was being typed into. Non-intrusive and dismissible were one knob
+  turned opposite ways. There was never going to be a version with both.
+
+  Shipped, that reads as: a panel covering two thirds of the screen appears
+  because the pointer stopped on its way to the tray, and the key everyone
+  presses to make a thing go away does nothing. "Представь что ты человек" is
+  the correct review.
+
+  What ends it is that the gesture was redundant the whole time. The clock in
+  the middle of the bar — the thing directly under that hover handler — already
+  opens the dashboard on a click, and always did. One panel had two ways in: one
+  deliberate, keyboard-holding and closeable, and one that opened without being
+  asked and would not close when told.
+
+  Removed rather than repaired: the handler and its timer in `Bar`, seventy lines
+  of pointer bookkeeping in `Toggles` (two hover flags across two windows, a
+  settle timer, a commit), and the split focus mode in `Dashboard`. The dashboard
+  is `Exclusive` whenever it is up now, with no second mode, because everything
+  that opens it is somebody asking for it by name.
+
+  Verified: the dashboard opens from the keybind and renders unchanged, the lint
+  is clean and no reference to the peek survives anywhere in the tree.
