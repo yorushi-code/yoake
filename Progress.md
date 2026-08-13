@@ -1720,3 +1720,14 @@ argued about correctly and fixed in the wrong place.
   the sandbox besides. One command, and it needs a password:
 
       sudo ~/.config/quickshell/bin/yoake-greeter-install
+
+- **B39 — verified, and by the hover fix.** The cursor warp was fixed in niri's
+  config the first night and recorded as confirmed only from niri's own log,
+  which says the config reloaded and nothing about what it now does.
+
+  Measurable now, because B48 gave the bar a visible hover: park the pointer on
+  the battery chip so the chip is lit, change the focused window out from under
+  it with `niri msg action focus-window`, and photograph the chip again. Focus
+  moved from window 3 to window 2; the chip is still lit in both frames. The
+  pointer did not go anywhere. With `warp-mouse-to-focus` on it would have
+  landed on the newly focused window and the chip would have gone dark.
