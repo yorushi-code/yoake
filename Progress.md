@@ -1968,3 +1968,23 @@ argued about correctly and fixed in the wrong place.
   was there the whole time — a full-screen grab found it immediately. Frame the
   region to the thing being measured, or the instrument answers about the
   wallpaper.
+
+- **V — And the launcher, which is the one they named.** Filmed on a *warm*
+  reopen specifically, because that is the case B47 was about and the case the
+  user meets every time but the first: the loader lingers, so the second open
+  onward reused a live object whose arming had already fired.
+
+  Ten frames of continuous arrival, decelerating — the card drops from
+  `revealSlide` and fades up, visibly translucent for the first half of it. Under
+  the old arrangement this exact sequence was one frame from nothing to a fully
+  painted 620px card.
+
+  The strip also shows *Firefox* selected throughout, which is B43 still holding:
+  the top match owns the selection on open, and the pointer parked elsewhere on
+  screen does not take it.
+
+  That closes the sweep. Every surface that arrives in this shell has now been
+  filmed at 60fps: the dashboard in and out, the OSD, the launcher, the toast,
+  the workspace pill, and the bar's own three islands. The ones that were cuts
+  are movements; the ones that were already right — the exit, the pill, the toast
+  — are recorded as right so nobody rewrites them looking for a bug.
