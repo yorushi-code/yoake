@@ -1165,3 +1165,29 @@ the empty-tray gap, the stale header — is done and on screen.
   Verified on camera, both directions: an ordinary notification during a
   fullscreen match produced no toast, and a critical one immediately after
   produced its card with the red rule. Test notifications cleared.
+
+- **B34 — The volume OSD was drawn behind the thing it was answering.** `Osd.qml`
+  set no layer, so it took the default `Top`, and niri draws a fullscreen window
+  above `Top`. Turn the volume down inside a fullscreen video or a game and the
+  confirmation appeared behind it: the key read as dead.
+
+  `Launcher` has carried the argument for years — "Overlay, not the default Top:
+  niri draws a fullscreen window above the Top layer, so a panel the user just
+  asked for would open behind the video they were watching and read as a dead
+  keystroke" — and every sheet, the dashboard, the cheat sheet and the toast
+  stack were moved to `Overlay` on the strength of it. The one surface that
+  exists *only* to answer a keypress was left behind. It is Direction's
+  `acknowledge` type; of everything in this shell it least tolerates being
+  invisible.
+
+  Verified on camera over a live fullscreen game: "Яркость 100%" draws on top.
+  Earlier attempts tonight to photograph this OSD produced nothing at all, twice,
+  both times with a fullscreen window up — which was the bug, not the trigger.
+
+  `MediaOsd` stays on `Top` deliberately, and now says so. It answers nothing: it
+  announces a track change nobody asked about, and B33 already holds it back
+  during fullscreen. The layer and the guard agree.
+
+  Layers audited while there: wallpaper Background, desktop widgets Bottom, bar
+  and both OSDs Top, everything the user summons Overlay. The bar being hidden by
+  a fullscreen window is correct and stays.

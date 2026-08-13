@@ -105,6 +105,17 @@ Item {
 
     PanelWindow {
         id: win
+        // Overlay, not the default Top, for the reason `Launcher` gives: niri
+        // draws a fullscreen window above the Top layer. This is the surface
+        // that answers a key the user just pressed — turn the volume down inside
+        // a fullscreen video or a game and the confirmation was drawn behind it,
+        // so the key read as dead. Of every surface in this shell it is the one
+        // that least tolerates being invisible.
+        //
+        // The media OSD stays on Top on purpose. It answers nothing: it
+        // announces a track change nobody asked about, and it is now held back
+        // during fullscreen anyway. The layer and the guard agree.
+        WlrLayershell.layer: WlrLayer.Overlay
         // Explicit mapping bool — see ControlCenter.qml. Stays mapped through
         // the whole exit so the fade+scale can play instead of the window
         // unmapping the instant root.shown flips false.
