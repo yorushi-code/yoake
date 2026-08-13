@@ -1236,3 +1236,16 @@ the empty-tray gap, the stale header — is done and on screen.
   Verified on the event stream — zero focus changes — and on camera: a critical
   toast renders normally, and an ordinary one during a fullscreen game is
   suppressed by B33 as intended.
+
+  **A/B on the cost, because the fix looked expensive at first.** Samples right
+  after the change read 40–59% of a core, which would have been a bad trade for
+  a mapped empty surface. Reverted the visibility condition and measured again:
+  the same 38–78%. So it was not the change. `top` across the whole system showed
+  why — DDNet at 41%, a chat client at 37% and 18%, and **two of my own agent
+  processes at 27% each**; `qs` was not in the top nine. Clean sample with the fix
+  in place, a fullscreen game running at ~900 fps and music playing: **13–16%**,
+  inside the contract.
+
+  Third time a spot reading has pointed at the wrong culprit tonight (M2, M4).
+  The rule that keeps working: A/B the change itself, then look at the whole
+  machine before believing a number about one process.
