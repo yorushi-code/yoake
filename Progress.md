@@ -1950,3 +1950,21 @@ argued about correctly and fixed in the wrong place.
   The desk number is held back and fades in after the pill has arrived, as its
   comment says it should. Nothing to fix here; recorded because "the most-seen
   motion in the shell is good" is worth knowing as firmly as the opposite.
+
+- **V — The toast arrives properly too.** `NotificationCenter` was on B51's list
+  of surfaces that map their own window, and the toast is the other animation
+  that happens without being asked for, so it was filmed as well. Triggered with
+  `notify-send`, which is a D-Bus call rather than synthetic input and therefore
+  allowed under E1.
+
+  Seven frames of continuous arrival: the card fades in *and* grows from
+  `revealScale`, settling at full size — `CascadeEntry` doing what it says.
+  Nothing to fix.
+
+  One measurement note, since it wasted a take. The first recording covered a
+  620×400 region and reported no toast at all: the card is dark, the region
+  behind it is dark wallpaper, and 330×55 of very slightly different dark inside
+  400 lines of it moves a mean brightness by less than the threshold. The toast
+  was there the whole time — a full-screen grab found it immediately. Frame the
+  region to the thing being measured, or the instrument answers about the
+  wallpaper.
