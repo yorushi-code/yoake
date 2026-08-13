@@ -182,8 +182,13 @@ Item {
                 }
             }
 
+            // The page this actually opens. It said «Система», which is not a
+            // page this dashboard has and never was — the three are Обзор,
+            // Управление and Столы. A hint printed in the interface is a promise
+            // to the person reading it, and this one named a place they could
+            // not go.
             Text {
-                text: "ЛКМ — страница «Система»"
+                text: "ЛКМ — страница «Обзор»"
                 color: Theme.subtext0
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontMicro

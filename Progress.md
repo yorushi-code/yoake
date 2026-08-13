@@ -1029,3 +1029,59 @@ the OSD it was written for cannot be wrapped without moving the rectangle
   recorded gap. Workspaces, layout and load are left as they are on purpose —
   there is no obvious menu for a desk, and left-click already does the useful
   thing on the other two.
+
+- **B28 — A card named a page the dashboard does not have.** `BarLoad`'s popover
+  ended with "ЛКМ — страница «Система»". The click calls `Toggles.dash("overview")`
+  and the three pages are Обзор, Управление and Столы; there has never been a
+  «Система». A hint printed in the interface is a promise to the person reading
+  it, and this one named a place they could not go. It says «Обзор» now.
+
+  Swept the other seven in-UI gesture hints against what their handlers do —
+  media, clock, recorder, network, VPN, notifications, palette — and the rest are
+  accurate.
+
+- **B29 — An empty tray cost a gap.** `BarTray` is a `Row`, so with no items it
+  is zero wide but still a visible child of the row above, and a positioner puts
+  its spacing around a zero-width visible child. The result reads as a missing
+  widget rather than as no widget. `visible: width > 0`, the same guard
+  `BarMedia` already uses.
+
+- **F5 — confirmed, with a control, and the suspect is back.** A fullscreen
+  window was up (DDNet at 1920×1080, and a fullscreen AyuGram) and the test from
+  the recorded next action finally ran:
+
+  | surface | over a fullscreen window |
+  |---|---|
+  | launcher (control) | **visible**, drawn over the game's own menu |
+  | audio sheet | **not visible** |
+
+  So it is not the compositor refusing to draw overlay surfaces — the launcher is
+  on the same layer and draws fine. Something is different about the sheets.
+
+  The theory that fits every observation, including B19's: `Toggles.holdsFocus`
+  names `dashboardOpen` and `launcherOpen` and nothing else. Those two are exempt
+  from `closeTransient()`, which runs on the compositor's `attentionMoved`. The
+  seven sheets take `WlrKeyboardFocus.Exclusive` exactly like the launcher does,
+  so opening one over a focused fullscreen window makes niri report a window
+  focus change — and unlike the null focus a layer surface normally produces,
+  that one has a real id, so `attentionMoved` fires and the sheet closes itself
+  on the frame it opened.
+
+  This also corrects B19's "holdsFocus is exonerated". The measurement there was
+  of the *dashboard*, which is in `holdsFocus` — so it staying open at 30% of a
+  core is exactly what the theory predicts, not evidence against it.
+
+  **The discriminating experiment**, when the machine is free: with a fullscreen
+  window focused, open a sheet and measure. Idle CPU means it closed itself;
+  raised CPU means it is open and covered. Not run tonight — the user was in a
+  live DDNet run and a surface taking exclusive keyboard focus would have taken
+  the run with it.
+
+  **The fix, and why it is not applied blind.** By the comment's own logic the
+  sheets belong in `holdsFocus`: it exists because a surface that takes keyboard
+  focus for itself must not be dismissed by the focus change it causes. But
+  adding them costs the behaviour `attentionMoved` was written for — a panel left
+  up after the user has alt-tabbed away reads as the shell being stuck. The
+  sheets would still close on Escape, on a click outside and on another panel
+  opening, which is exactly what the dashboard and launcher do today. That is a
+  trade to make with the bug reproduced in front of you, not from a theory.

@@ -24,6 +24,11 @@ Row {
 
     spacing: 4
     anchors.verticalCenter: parent ? parent.verticalCenter : undefined
+    // A Row with no visible children is zero wide but still a visible child of
+    // the row above, and a positioner puts its spacing around one of those. So
+    // an empty tray cost a gap that looked like a missing widget. The same
+    // guard `BarMedia` uses, for the same reason.
+    visible: width > 0
 
     // Tray icons used to blink in and out with no transition at all, and the
     // neighbours teleported into the gap — one of the places the shell simply
