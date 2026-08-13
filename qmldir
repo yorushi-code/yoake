@@ -83,6 +83,7 @@ CcStats 1.0 CcStats.qml
 CcQuickLaunch 1.0 CcQuickLaunch.qml
 SliderRow 1.0 SliderRow.qml
 ToggleRow 1.0 ToggleRow.qml
+PanelArm 1.0 PanelArm.qml
 PanelChrome 1.0 PanelChrome.qml
 DesktopSurface 1.0 DesktopSurface.qml
 DesktopWidget 1.0 DesktopWidget.qml

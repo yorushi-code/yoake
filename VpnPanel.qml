@@ -18,13 +18,8 @@ PanelWindow {
 
     WlrLayershell.layer: WlrLayer.Overlay
 
-    readonly property bool open: Toggles.vpnPanelOpen && win.armed
-    property bool armed: false
-    property Timer _armTick: Timer {
-        interval: 16
-        running: true
-        onTriggered: win.armed = true
-    }
+    readonly property bool open: arm.open
+    property PanelArm _arm: PanelArm { id: arm; requested: Toggles.vpnPanelOpen }
 
     property bool mapped: false
     visible: mapped

@@ -18,25 +18,12 @@ Item {
     // born with the toggle already true and an entry animation bound straight
     // to the toggle has nothing to animate from.
     //
-    // It has to be re-armed on *every* open, and that is the correction. It
-    // fired once at construction and stayed true for the life of the object, so
-    // the second time a panel was opened — the loader lingers, so most opens are
-    // the second one — `open` went true on the same frame the window was asked
-    // to map, and the whole entrance played into a surface the compositor had
-    // not put on screen yet. Measured at 60fps: a cold open showed four frames
-    // of fade, a warm reopen showed **none**, a single frame from desktop to
-    // fully-painted panel. Same curves, same durations, and one of them was a
-    // hard cut.
-    //
-    // `Theme.animMap` is how long the surface is given to appear before the
-    // arrival starts. See Theme for why it is a token and not a guess.
-    readonly property bool open: Toggles.dashboardOpen && root.armed
-    property bool armed: false
-    property Timer _armTick: Timer {
-        id: armTick
-        interval: Theme.animMap
-        onTriggered: root.armed = true
-    }
+    // `PanelArm` carries the rest of it, and the bug it was written for: this
+    // used to be set once at construction and never cleared, so every open
+    // after the first played its entrance into a surface the compositor had not
+    // put on screen yet.
+    readonly property bool open: arm.open
+    property PanelArm _arm: PanelArm { id: arm; requested: Toggles.dashboardOpen }
 
     // Three, where there were five.
     //
@@ -93,22 +80,13 @@ Item {
         function opened() {
             hideDelay.stop();
             win.mapped = true;
-            // Map first, arrive second. The surface has to exist before the
-            // entrance means anything.
-            root.armed = false;
-            armTick.restart();
         }
 
         Connections {
             target: Toggles
             function onDashboardOpenChanged() {
                 if (Toggles.dashboardOpen) win.opened();
-                else {
-                    hideDelay.restart();
-                    // The exit plays from `open` going false, and it must not
-                    // also be disarmed underneath itself.
-                    armTick.stop();
-                }
+                else hideDelay.restart();
             }
         }
         Component.onCompleted: if (Toggles.dashboardOpen) win.opened()

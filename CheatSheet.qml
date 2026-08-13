@@ -13,16 +13,10 @@ Item {
     // bound straight to the toggle has nothing to animate from and the panel
     // simply appears at its final size. `armed` turns on a frame later, so the
     // open state is always a transition.
-    readonly property bool open: Toggles.cheatSheetOpen && root.armed
-    property bool armed: false
+    readonly property bool open: arm.open
+    property PanelArm _arm: PanelArm { id: arm; requested: Toggles.cheatSheetOpen }
     Component.onCompleted: {
-        armTick.start();
         reader.running = true;
-    }
-    property Timer _armTick: Timer {
-        id: armTick
-        interval: 16
-        onTriggered: root.armed = true
     }
 
     property var categories: []

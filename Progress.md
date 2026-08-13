@@ -1597,3 +1597,25 @@ argued about correctly and fixed in the wrong place.
   five frames in which the panel is visibly translucent and undersized before it
   solidifies. Probes removed afterwards, including a `YOAKE-FOCUS` timer an
   earlier session left running in `AudioPanel` and recorded as deleted.
+
+- **B47 — Thirteen copies of the same bug, so it became an object.** B46 fixed
+  the entrance on the dashboard. The pattern it fixed was written out by hand in
+  **thirteen** panels — every popup in the shell — and all thirteen had it
+  identically wrong, because the wrong version is what gets copied.
+
+  `PanelArm.qml` is the flag with its argument attached: a panel is *asked for*,
+  and separately it is *on screen*, and an entrance may only begin once both are
+  true. It re-arms on every request, which is the whole correction, and a caller
+  now writes two lines instead of eight:
+
+      PanelArm { id: arm; requested: Toggles.audioPanelOpen }
+      readonly property bool open: arm.open
+
+  Converted: the launcher, the dashboard, the notification centre, the calendar,
+  the cheat sheet, the wallpaper picker, the VPN panel and all six bar sheets.
+  `Osd` and `Sfx` keep their own `armed` — those suppress a *trigger* at startup
+  rather than gate an entrance, which is a different question wearing the same
+  word.
+
+  Verified: the shell loads clean, lint is at zero, and all thirteen panels were
+  opened over IPC and screenshotted — every one renders.

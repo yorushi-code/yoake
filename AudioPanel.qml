@@ -25,13 +25,8 @@ PanelWindow {
     // Animations bind to this rather than to the toggle. The panel is created
     // lazily, so it is born with its toggle already true, and an entrance bound
     // straight to the toggle has nothing to animate from.
-    readonly property bool open: Toggles.audioPanelOpen && win.armed
-    property bool armed: false
-    property Timer _armTick: Timer {
-        interval: 16
-        running: true
-        onTriggered: win.armed = true
-    }
+    readonly property bool open: arm.open
+    property PanelArm _arm: PanelArm { id: arm; requested: Toggles.audioPanelOpen }
 
     property bool mapped: false
     visible: mapped

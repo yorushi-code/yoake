@@ -31,17 +31,11 @@ PanelWindow {
     // Animations bind to this, not the toggle: created lazily, the picker is
     // born with the toggle already true and an entry animation would have
     // nothing to animate from.
-    readonly property bool open: Toggles.wallpaperPickerOpen && win.armed
-    property bool armed: false
+    readonly property bool open: arm.open
+    property PanelArm _arm: PanelArm { id: arm; requested: Toggles.wallpaperPickerOpen }
     Component.onCompleted: {
-        armTick.start();
         win.mapped = Toggles.wallpaperPickerOpen;
         win.syncToApplied();
-    }
-    property Timer _armTick: Timer {
-        id: armTick
-        interval: 16
-        onTriggered: win.armed = true
     }
 
     anchors { top: true; bottom: true; left: true; right: true }

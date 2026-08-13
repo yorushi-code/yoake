@@ -16,14 +16,8 @@ import Quickshell.Wayland
 Item {
     id: root
 
-    readonly property bool open: Toggles.launcherOpen && root.armed
-    property bool armed: false
-    Component.onCompleted: armTick.start()
-    property Timer _armTick: Timer {
-        id: armTick
-        interval: 16
-        onTriggered: root.armed = true
-    }
+    readonly property bool open: arm.open
+    property PanelArm _arm: PanelArm { id: arm; requested: Toggles.launcherOpen }
 
     property string query: ""
     property int selected: 0

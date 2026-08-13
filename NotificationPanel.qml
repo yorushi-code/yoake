@@ -15,14 +15,8 @@ PanelWindow {
     // straight to the toggle has nothing to animate from and the panel simply
     // appears at its final size. `armed` turns on a frame later, so opening is
     // always a transition.
-    readonly property bool open: Toggles.notifCenterOpen && win.armed
-    property bool armed: false
-    property Timer _armTick: Timer {
-        id: armTick
-        interval: 16
-        running: true
-        onTriggered: win.armed = true
-    }
+    readonly property bool open: arm.open
+    property PanelArm _arm: PanelArm { id: arm; requested: Toggles.notifCenterOpen }
     // See ControlCenter.qml: mapping is an explicit bool so the exit
     // animation isn't cut off by a visible-binding race.
     property bool mapped: false
