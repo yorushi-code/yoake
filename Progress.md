@@ -1794,3 +1794,33 @@ argued about correctly and fixed in the wrong place.
 
   Verified on camera, both shapes: the notification card and the battery card,
   each opening under a parked pointer where a moment before there was nothing.
+
+- **M — The exit is fine, and the first probe said it was not.** Worth recording
+  because the probe was mine and it nearly bought a fix for a bug that does not
+  exist.
+
+  Entrances were measured by thresholding each frame and taking the mean — a
+  count of pixels brighter than 22%. That works for an arrival, where a dark
+  panel covers a bright desktop and the pixel count genuinely steps. Applied to
+  a **fade** it is nearly useless: a binarised frame does not change until the
+  panel's opacity drops far enough for what is behind it to cross the threshold,
+  so a perfectly smooth fade reads as one frame of nothing and then a cliff.
+  Which is exactly what it reported: "intermediate frames = 0", the same
+  signature as the real bug in B47.
+
+  Re-measured as a plain grey mean, the dashboard's exit is **nine frames of
+  continuous change**, evenly spread, ending settled — about 150 ms, which is
+  `animExit` at the 0.8 motion scale the machine was actually running at. There
+  is nothing wrong with it and nothing to fix.
+
+  The entrance findings stand, because they never rested on that number: the
+  warm-reopen cut was confirmed on a filmstrip by eye, and its cause was read
+  off the code — a flag set once at construction — and timed independently with
+  a `FrameAnimation` reporting 54–60 ms between the map request and the first
+  painted frame. **One number is not a measurement**, and a number from the
+  wrong instrument is not one either.
+
+  (Noted for whoever measures next: `Perception` had the shell at motion 0.80
+  and `frost=false` for most of this work, because recording and encoding video
+  on the same machine is enough load for it to start economising. Durations
+  measured tonight are eight tenths of nominal.)
