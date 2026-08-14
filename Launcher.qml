@@ -751,12 +751,27 @@ Item {
                         // Travels with the fill rather than being drawn by the
                         // selected row, so the rail is the same object all the
                         // way down the list.
+                        //
+                        // Nearly the whole row tall, and it was a 24px stub.
+                        // In a launcher the marker is not a *selected* state, it
+                        // is a **cursor** — the thing you are steering with the
+                        // arrow keys — and it has to be findable in the instant
+                        // between a keystroke and the next one. The fill cannot
+                        // do that job: the ladder puts "selected" at
+                        // `tintSubtle`, which is 16% of the accent and correct
+                        // for what it says, and raising it here would be
+                        // borrowing a rung that means something else everywhere
+                        // in the shell.
+                        //
+                        // So the rail carries it. It is the one mark on the row
+                        // that answers to nothing but the cursor, so it is the
+                        // one that may be loud.
                         Rectangle {
                             anchors.left: parent.left
                             anchors.leftMargin: 4
                             anchors.verticalCenter: parent.verticalCenter
                             width: 3
-                            height: 24
+                            height: parent.height - 14
                             radius: width / 2
                             color: Theme.accent
                         }

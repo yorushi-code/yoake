@@ -2809,3 +2809,22 @@ follows is opinion rather than repair, and it is written down as opinion.
   how one product turns into six.
 
   Verified by eye: network and bluetooth side by side, mint against rose.
+
+- **D5 — In a launcher the marker is a cursor, and it was drawn as a state.**
+  The selection was a 16%-accent fill and a 3px stub of rail, 24px tall on a 52px
+  row. At a glance down a list of forty you could not say which row was live —
+  in the one surface where the marker *is* the interface, because it is what the
+  arrow keys are steering.
+
+  The fill cannot be the answer. The ladder puts "selected" at `tintSubtle` and
+  is right about that; borrowing `tintActive` here would be spending a rung that
+  means "pressed, or a warning that must land" everywhere else in the shell, and
+  a launcher row is neither.
+
+  The rail carries it instead, nearly the full height of the row. It is the one
+  mark on that row that answers to nothing except the cursor, so it is the one
+  that is allowed to be loud — and it already travels with `Traveller`, so
+  lengthening it costs nothing and the journey down the list gets more legible
+  rather than less.
+
+  Verified by eye: forty rows, and the live one is obvious from across the panel.
