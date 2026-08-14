@@ -2168,3 +2168,17 @@ argued about correctly and fixed in the wrong place.
   which is the one moment you are certainly looking at it.
 
   Verified by eye: sound card then equalizer, alphabetical, and it stays there.
+
+- **B57 — And the tray was in whatever order the applications woke up in.** The
+  same audit, the same fault, one widget over: bluetooth and the signal meter
+  swapped places between the cold start and the reload.
+
+  `SystemTray.items.values` arrives in the order applications claimed their
+  slots, which is a race between programs starting at login. Tray icons are
+  aimed at with a mouse and are small enough that **position is most of how they
+  are found** — an icon that is third today and second tomorrow defeats the only
+  thing anybody remembers about a tray.
+
+  Sorted by `id`, the application's own name, which does not move about the way a
+  title does; `title` breaks a tie. Verified across a cold start and a reload:
+  the same three icons in the same three places, which is the whole requirement.

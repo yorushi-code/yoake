@@ -39,7 +39,26 @@ Row {
     Repeater {
         // Passive means the application is asking not to be shown right now;
         // drawing it anyway leaves dead icons in the bar.
-        model: SystemTray.items.values.filter(i => i.status !== Status.Passive)
+        //
+        // Sorted, and it was not. The order was whichever order the applications
+        // happened to claim their tray slots in, which is a race between programs
+        // starting at login — caught by photographing the bar on a cold start and
+        // again after a reload in the same session, bluetooth and the signal
+        // meter swapping places between the two.
+        //
+        // These are aimed at with a mouse, and they are small enough that
+        // position is most of how they are found. An icon that is third today and
+        // second tomorrow defeats the only thing anybody remembers about a tray.
+        // By `id`, which is the application's own name and does not move about
+        // the way a title does.
+        model: SystemTray.items.values
+            .filter(i => i.status !== Status.Passive)
+            .sort((a, b) => {
+                const ai = (a.id || "").toLowerCase();
+                const bi = (b.id || "").toLowerCase();
+                if (ai !== bi) return ai < bi ? -1 : 1;
+                return (a.title || "") < (b.title || "") ? -1 : 1;
+            })
 
         delegate: Item {
             id: entry
