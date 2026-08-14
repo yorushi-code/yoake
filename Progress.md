@@ -2717,3 +2717,32 @@ follows is opinion rather than repair, and it is written down as opinion.
   Verified by eye across the bar, the network sheet, the media card and the
   desktop: "RU", "AUTO", "Archer C80" now read as words; "50%", "0:50", "-1:28",
   "79%" keep their column; the 112px clock is drawn by a face made for that size.
+
+- **D2 — The widest thing on the desktop was the one saying least.** Under a
+  112px clock sat a band of twenty-eight round dots, four hundred and forty
+  pixels across, permanently. It read as a loading indicator.
+
+  It was not thoughtless — the dots form an arch, taller in the middle, and the
+  file argues that "at rest the band pulls back rather than leaving: still
+  there, plainly not the thing to look at." The intent is right and the drawing
+  does not carry it. Twenty-eight identical pills is not a band pulling back, it
+  is a row of dots, and it was the widest element in a composition whose hero had
+  earned that width.
+
+  Flattening the pills into a hairline was the obvious fix and it does not work
+  either: twenty-eight rounded rectangles laid edge to edge do not make a line,
+  they make twenty-eight antialiased seams, and the result is a **dashed** rule.
+  Worth recording because it cost a probe to believe — `gap=0 fill=0.00`, so the
+  geometry was already flush and every break was a pill's own rounded end.
+
+  Silence gets an object of its own now: **one rule**, two pixels, fading out at
+  both ends rather than stopping. The arch's idea survives — the band is
+  strongest where the eye already is — without asking a row of dots to be a line.
+  Sound cross-fades to the bars, which are unchanged.
+
+  The band's own opacity used to carry the distinction at 1 and 0.5; it does not
+  any more. Rest and sound are two different objects, which is what they always
+  were.
+
+  Verified by eye at 220%: a clean continuous rule under the clock, and the bars
+  still render when `sounding` is forced true.
