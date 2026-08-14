@@ -15,13 +15,30 @@ CONFIG="$HOME/.config/quickshell/shell.qml"
 GREETER_MARK="/usr/share/yoake/greeter"
 
 others() {
-    local pid
+    local pid args
     for pid in $(pgrep -x qs 2>/dev/null); do
         [ "$pid" = "$$" ] && continue
+        args=$(tr '\0' '\n' < "/proc/$pid/cmdline" 2>/dev/null)
+
         # The login greeter runs the same binary and is none of our business.
-        if tr '\0' '\n' < "/proc/$pid/cmdline" 2>/dev/null | grep -qF "$GREETER_MARK"; then
+        printf '%s\n' "$args" | grep -qF "$GREETER_MARK" && continue
+
+        # Neither is anything else pointed at a different configuration. This
+        # script exists to stop a second copy of *this* shell, and it was
+        # reading "another qs" as "a second copy" -- which is not the same
+        # claim. niri starts a particle overlay beside this shell, its own
+        # process on purpose so that a stall in a per-particle animation cannot
+        # take the bar and the notifications with it (see 30-startup.kdl), and
+        # every restart of the shell killed it. Nothing restarts it, so it
+        # stayed dead until the next login, and nothing anywhere said so.
+        #
+        # A bare `qs` still counts: it loads this same configuration by default,
+        # which is the two-shells case the file opens by describing.
+        if printf '%s\n' "$args" | grep -qx -- '-p' \
+           && ! printf '%s\n' "$args" | grep -qFx "$CONFIG"; then
             continue
         fi
+
         printf '%s\n' "$pid"
     done
 }

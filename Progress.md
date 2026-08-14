@@ -2642,3 +2642,34 @@ says why a fix can sit in this repository for days without being on the machine.
   once, by somebody who can also decide whether `Segmented` should honour a tone
   rather than drop the property. The list is complete now, which is what was
   missing.
+
+- **B63 — Restarting the shell quietly killed the particle overlay, every time.**
+  Found by noticing it was gone: after a night of restarts there was one `qs`
+  running where niri starts two.
+
+  `bin/yoake-shell` exists to stop a second copy of the shell, and its own
+  comment is precise about why — two instances mean two of everything, including
+  a second decoder for a video wallpaper, "36.8% and 18.9% of a core, both
+  drawing the same desktop". What it actually did was kill **every** `qs` process
+  except the greeter, and "another `qs`" is not the same claim as "a second copy
+  of this shell".
+
+  niri starts a second one on purpose. The particle overlay over AyuGram is its
+  own process precisely so that a stall in a per-particle animation cannot take
+  the bar and the notifications down with it — `30-startup.kdl` says so in as
+  many words. Nothing restarts it, so every shell restart took it out until the
+  next login, and nothing anywhere reported it. Two comments, one in each file,
+  each correct, describing a collision neither could see.
+
+  The test is now the configuration rather than the binary: an instance pointed
+  at a *different* `-p` is a different program that happens to share the
+  executable, and is left alone. A bare `qs` still counts, because it loads this
+  same configuration by default, which is the two-shells case the file opens by
+  describing. The greeter's own guard stays — it is a different reason (another
+  user, none of our business) and costs nothing.
+
+  Verified twice. `others()` run in isolation against the live pair selects the
+  shell and spares the overlay; then a real restart, end to end: the shell's pid
+  changed and the overlay's did not. The overlay is running again — it was
+  restarted by hand first, since this fix stops the next one being killed but
+  cannot bring back the one that already was.
