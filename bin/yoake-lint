@@ -487,6 +487,64 @@ def drift():
     return out
 
 
+# Bare `implicitWidth` -- its own. `foo.implicitWidth` is a sibling's and is
+# safe, because the thing being measured is not the thing being sized.
+OWN_IMPLICIT_WIDTH = re.compile(r"(?<![.\w])implicitWidth\b")
+
+
+def _top_level_lines(body):
+    """Lines of a block body that are the block's own, not a nested block's."""
+    depth = 0
+    for n, line in enumerate(body.splitlines(), 1):
+        if depth == 0:
+            yield n, line
+        depth += line.count("{") - line.count("}")
+
+
+def elide_latch():
+    """A Text that measures itself through the elide it is feeding.
+
+    `width: Math.min(implicitWidth, cap)` with `elide` set is the usual QML
+    idiom and it is a one-way door. If the width is ever 0 at the moment the
+    text arrives -- and it is, whenever the string is filled in after the
+    element is built -- Qt elides that string into no pixels, `implicitWidth`
+    reports 0 for a string that is plainly there, and the binding it feeds has
+    no way back to a number. Nothing logs and nothing throws; the element simply
+    never appears.
+
+    This cost the bar its player after every login (B55). It survived for months
+    because editing any file in the tree cures it: a reload builds the element
+    with the text already set, so it is measured once before the width can trap
+    it, and nobody working on the shell ever sees the state a login leaves.
+
+    Reported, not counted, and two instances are left in the tree deliberately.
+    `KeyValue` and the tooltip's subtext both take their text at construction
+    and never have it arrive late, so neither can reach the trap. Removing the
+    shape from them anyway was tried and reverted -- the substitute measurement
+    is not interchangeable with `implicitWidth`, and it cost four panels the
+    ends of their key labels. See F1 and E2: the shape is worth knowing about,
+    and it is not always worth changing.
+    """
+    out = []
+    for path in sorted(list(ROOT.glob("*.qml")) + list((ROOT / "greeter").glob("*.qml"))):
+        name = path.name if path.parent == ROOT else f"greeter/{path.name}"
+        text = path.read_text()
+        for kind, _ident, body, start, _off in blocks(text):
+            if kind != "Text":
+                continue
+            width_line = elide = None
+            for n, line in _top_level_lines(body):
+                bare = line.split("//")[0]
+                if re.match(r"\s*width:", bare) and OWN_IMPLICIT_WIDTH.search(bare):
+                    width_line = n
+                if re.match(r"\s*elide:", bare) and "ElideNone" not in bare:
+                    elide = True
+            if width_line and elide:
+                out.append((name, start + width_line,
+                            "latch on a width measured through its own elide"))
+    return out
+
+
 def summarise(rows):
     """Counts by kind, so the size of each problem is legible without scrolling."""
     kinds = {}
@@ -510,7 +568,7 @@ def main():
         print(f"{name}:{line}: {what}")
     print(f"\n{len(findings)} finding{'' if len(findings) == 1 else 's'}")
 
-    rows = drift()
+    rows = drift() + elide_latch()
     if rows:
         if "--drift" in sys.argv:
             print()

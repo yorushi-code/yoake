@@ -2471,3 +2471,37 @@ argued about correctly and fixed in the wrong place.
 
   Every added line of code in that diff belongs to one of those three, checked by
   stripping the comments and reading what was left. Nothing else rides along.
+
+- **B62 — The lint now knows the latch, because reading for it is cheaper than
+  restarting for it.** `bin/yoake-lint` opens by saying what it is for:
+  "patterns that have already been bugs in this shell, looked for everywhere...
+  each was invisible: nothing was logged, nothing threw, something simply did
+  not appear." That is B55 word for word, and B55 was not in it.
+
+  The shape it now looks for is a `Text` whose `width` is bound to its **own**
+  `implicitWidth` while it elides. A sibling's `implicitWidth` is fine — the
+  thing measured is not the thing being sized — so the match is on a bare
+  identifier, and only on the block's own lines, not a nested `Behavior`'s.
+
+  **Proven against the bug it was written for.** Run over a throwaway copy of
+  the tree with `BarMedia.qml` restored to its state before the fix, it reports
+  `BarMedia.qml:88` — the line that cost the bar its player after every login for
+  months. On the tree as it stands it says nothing about that file.
+
+  It found **four** live instances, and two of them are ones the manual hunt had
+  missed: `MenuItemRow` and `ToggleRow`, alongside the `KeyValue` and tooltip
+  cases already known from F1. That is the check earning its place on the day it
+  was added — a grep written by hand found two, and a scanner that understands
+  block structure found four.
+
+  **Reported, not counted**, in the drift channel this file already has for
+  exactly this tension: "design debt, not bugs... Green still means the shell
+  works." None of the four has been observed failing — each takes its text at
+  construction rather than having it arrive late, and `ToggleRow` additionally
+  gates its visibility on `root.detail !== ""`, which is the *safe* form of the
+  test that deadlocked `BarMedia`. Removing the shape from two of them was tried
+  earlier tonight and reverted at the cost of four panels' key labels (E2). So
+  the knowledge is captured and the code is left alone, which is the whole
+  argument for having an uncounted channel.
+
+  Lint stays at **0 findings**.
