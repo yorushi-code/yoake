@@ -2182,3 +2182,29 @@ argued about correctly and fixed in the wrong place.
   Sorted by `id`, the application's own name, which does not move about the way a
   title does; `title` breaks a tie. Verified across a cold start and a reload:
   the same three icons in the same three places, which is the whole requirement.
+
+- **V — The rest of the cold-start audit.** The method, which is worth keeping:
+  cold restart, photograph the bar and every panel, force a reload, photograph
+  the same set, and treat any difference as a fault until shown otherwise. It
+  found two (B56, B57) out of eight surfaces.
+
+  A whole-image RMSE is only a way of ranking what to look at, not a verdict —
+  every surface differs, because a clock ticks and a CPU meter moves. What
+  separates a fault from live data is looking at the pair. The audio sheet was
+  seven times any other and was real; the network sheet was the next largest and
+  was **clean** — the entire difference was the signal strength reading 79%
+  against 82%. The dashboard likewise: 19% CPU against 22%, and a spectrum caught
+  mid-bar.
+
+  Checked and sound: the network sheet, the dashboard, bluetooth, and — below the
+  network sheet's difference, which is the clean baseline — power, weather and
+  the notification centre.
+
+  **Not tested: the bluetooth device order.** It is the same shape as the audio
+  list, and there are no devices paired on this machine, so the audit could not
+  see it. It is left alone deliberately rather than sorted on suspicion: its list
+  comes from parsing `bluetoothctl devices`, which is one program's output rather
+  than a race between several, so the reasoning that condemned the tray does not
+  transfer. E2 is the standing instruction here — an unobserved fault has to
+  clear a higher bar, not a lower one — and E2 was written the same night, about
+  exactly this temptation.
