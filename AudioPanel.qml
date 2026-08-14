@@ -190,7 +190,7 @@ PanelWindow {
                                 text: Math.round((sheet.subject && sheet.subject.audio
                                     ? sheet.subject.audio.volume : 0) * 100) + "%"
                                 color: Theme.subtext0
-                                font.family: Theme.fontFamily
+                                font.family: Theme.fontMonoFamily
                                 font.pixelSize: Theme.fontLabel
                                 font.features: ({ "tnum": 1 })
                             }

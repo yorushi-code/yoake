@@ -167,7 +167,7 @@ Item {
                             visible: card.windows.length > 6
                             text: "+" + (card.windows.length - 6)
                             color: Theme.subtext0
-                            font.family: Theme.fontFamily
+                            font.family: Theme.fontMonoFamily
                             font.pixelSize: Theme.fontSmall
                             font.features: ({ "tnum": 1 })
                         }

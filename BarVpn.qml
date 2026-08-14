@@ -225,7 +225,7 @@ Item {
                             return bits.join("  ·  ");
                         }
                         color: Mihomo.currentDelay === null ? Theme.red : Theme.subtext0
-                        font.family: Theme.fontFamily
+                        font.family: Theme.fontMonoFamily
                         font.pixelSize: Theme.fontLabel
                         font.features: ({ "tnum": 1 })
                         elide: Text.ElideRight
@@ -263,7 +263,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             text: flow.modelData.value
                             color: Theme.subtext1
-                            font.family: Theme.fontFamily
+                            font.family: Theme.fontMonoFamily
                             font.pixelSize: Theme.fontLabel
                             font.features: ({ "tnum": 1 })
                         }

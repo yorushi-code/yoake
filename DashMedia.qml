@@ -120,7 +120,7 @@ Item {
                         anchors.left: parent.left
                         text: root.clock(Media.position)
                         color: Theme.subtext0
-                        font.family: Theme.fontFamily
+                        font.family: Theme.fontMonoFamily
                         font.pixelSize: Theme.fontMicro
                         font.features: ({ "tnum": 1 })
                     }
@@ -163,7 +163,7 @@ Item {
                         visible: Media.length > 0
                         text: root.clock(Media.length)
                         color: Theme.subtext0
-                        font.family: Theme.fontFamily
+                        font.family: Theme.fontMonoFamily
                         font.pixelSize: Theme.fontMicro
                         font.features: ({ "tnum": 1 })
                     }

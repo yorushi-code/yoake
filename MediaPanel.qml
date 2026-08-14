@@ -184,7 +184,7 @@ PanelWindow {
                                 anchors.left: parent.left
                                 text: win.clock(Media.position)
                                 color: Theme.subtext0
-                                font.family: Theme.fontFamily
+                                font.family: Theme.fontMonoFamily
                                 font.pixelSize: Theme.fontMicro
                                 font.features: ({ "tnum": 1 })
                             }
@@ -193,7 +193,7 @@ PanelWindow {
                                 anchors.right: parent.right
                                 text: win.clock(Media.length)
                                 color: Theme.subtext0
-                                font.family: Theme.fontFamily
+                                font.family: Theme.fontMonoFamily
                                 font.pixelSize: Theme.fontMicro
                                 font.features: ({ "tnum": 1 })
                             }

@@ -208,7 +208,7 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: Weather.summary
                 color: Theme.subtext1
-                font.family: Theme.fontFamily
+                font.family: Theme.fontMonoFamily
                 font.pixelSize: Theme.fontSmall
                 font.weight: Font.Medium
             }
@@ -250,7 +250,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             text: detail.modelData.value
                             color: Theme.subtext0
-                            font.family: Theme.fontFamily
+                            font.family: Theme.fontMonoFamily
                             font.pixelSize: Theme.fontMicro
                             font.features: ({ "tnum": 1 })
                         }
@@ -464,7 +464,7 @@ Item {
                             anchors.right: parent.right
                             text: meter.modelData.text
                             color: Theme.subtext0
-                            font.family: Theme.fontFamily
+                            font.family: Theme.fontMonoFamily
                             font.pixelSize: Theme.fontLabel
                             font.features: ({ "tnum": 1 })
                         }

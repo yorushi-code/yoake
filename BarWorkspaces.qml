@@ -187,7 +187,7 @@ Item {
                     anchors.centerIn: parent
                     text: cell.modelData.idx
                     color: Theme.crust
-                    font.family: Theme.fontFamily
+                    font.family: Theme.fontMonoFamily
                     font.pixelSize: Theme.fontMicro
                     font.weight: Font.Bold
                     font.features: ({ "tnum": 1 })

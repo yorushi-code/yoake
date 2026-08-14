@@ -241,7 +241,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     text: root.clock(Media.position)
                     color: Theme.subtext0
-                    font.family: Theme.fontFamily
+                    font.family: Theme.fontMonoFamily
                     font.pixelSize: Theme.fontMicro
                     font.features: ({ "tnum": 1 })
                 }
@@ -256,7 +256,7 @@ Item {
                         ? "-" + root.clock(Media.length - Media.position)
                         : ""
                     color: Theme.subtext0
-                    font.family: Theme.fontFamily
+                    font.family: Theme.fontMonoFamily
                     font.pixelSize: Theme.fontMicro
                     font.features: ({ "tnum": 1 })
                 }

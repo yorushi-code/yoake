@@ -34,7 +34,7 @@ ClippingRectangle {
         anchors.centerIn: parent
         text: root.caption
         color: Theme.text
-        font.family: Theme.fontFamily
+        font.family: Theme.fontMonoFamily
         font.pixelSize: root.pixelSize
         font.weight: Font.Medium
         font.features: ({ "tnum": 1 })
@@ -57,7 +57,7 @@ ClippingRectangle {
             y: Math.round((root.height - implicitHeight) / 2)
             text: root.caption
             color: Theme.onTone(root.tone)
-            font.family: Theme.fontFamily
+            font.family: Theme.fontMonoFamily
             font.pixelSize: root.pixelSize
             font.weight: Font.Medium
             font.features: ({ "tnum": 1 })

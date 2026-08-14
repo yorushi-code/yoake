@@ -92,7 +92,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             text: Math.round(SysInfo.cpu * 100) + "%"
             color: Theme.text
-            font.family: Theme.fontFamily
+            font.family: Theme.fontMonoFamily
             font.pixelSize: Theme.fontSmall
             font.features: ({ "tnum": 1 })
         }
@@ -102,7 +102,7 @@ Item {
             visible: SysInfo.temperature > 0
             text: SysInfo.temperature + "°"
             color: SysInfo.temperature >= 85 ? Theme.red : Theme.subtext0
-            font.family: Theme.fontFamily
+            font.family: Theme.fontMonoFamily
             font.pixelSize: Theme.fontSmall
             font.features: ({ "tnum": 1 })
         }
@@ -174,7 +174,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             text: procRow.modelData.cpu + "%"
                             color: Theme.subtext0
-                            font.family: Theme.fontFamily
+                            font.family: Theme.fontMonoFamily
                             font.pixelSize: Theme.fontLabel
                             font.features: ({ "tnum": 1 })
                         }

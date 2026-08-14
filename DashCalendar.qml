@@ -98,7 +98,7 @@ Column {
                     text: day.modelData
                     color: day.isToday ? Theme.crust
                         : (day.weekend ? Qt.alpha(Theme.subtext1, Theme.inkSoft) : Theme.subtext1)
-                    font.family: Theme.fontFamily
+                    font.family: Theme.fontMonoFamily
                     font.pixelSize: Theme.fontSmall
                     font.weight: day.isToday ? Font.DemiBold : Font.Normal
                     font.features: ({ "tnum": 1 })

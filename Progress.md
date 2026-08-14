@@ -2673,3 +2673,47 @@ says why a fix can sit in this repository for days without being on the machine.
   changed and the overlay's did not. The overlay is running again — it was
   restarted by hand first, since this fix stops the next one being killed but
   cannot bring back the one that already was.
+
+## The redesign, night two
+
+Asked for outright: rework the design, my own way, no advice to follow. What
+follows is opinion rather than repair, and it is written down as opinion.
+
+- **D1 — The shell was built like an instrument and dressed like a terminal.**
+  The engineering underneath is good: token ladders with stated roles, a domain
+  vocabulary, a motion system that is now measured rather than asserted. What it
+  had no answer for is **voice**. Every word on screen — every heading, every
+  sentence, every button, every device name — was set in JetBrains Mono, and 26
+  of the 34 weight declarations in the tree were the same weight. Panel after
+  panel of well-organised console.
+
+  The old argument for one face is quoted in `Theme` and half of it is right, so
+  half of it is kept: **data wants a column.** A device list, a bitrate, a node
+  id, an SSID, a clock — set proportionally these do not line up, and a panel
+  full of them reads as a heap of words of assorted widths. That is true.
+
+  What it got wrong was the word *everything*. A heading is not tabular. Neither
+  is "Ничего не подключено", or a button, or a track title.
+
+  Three faces by role:
+
+  | | | |
+  |---|---|---|
+  | `fontFamily` | Inter | prose — labels, headings, sentences, names |
+  | `fontDisplayFamily` | Inter Display | the optical cut, for large type |
+  | `fontMonoFamily` | JetBrains Mono | data, and anything that forms a column |
+
+  **The split needed no taste to apply, because the tree already declared it.**
+  Thirty-eight elements carry `font.features: tnum` — a statement that the thing
+  being drawn is a number in a column. The face now follows a marking the code
+  was already making; 35 of those moved to mono automatically, and the ones that
+  did not were where a caller had marked a label by mistake.
+
+  Inter Display is a real optical variant rather than the same drawing enlarged —
+  tighter spacing, smaller apertures, less of the generosity a face needs at 11px
+  and does not want at 112. `RollClock` already defaulted to the display token,
+  so the hero clock and the desktop clock changed face the moment the token did.
+
+  Verified by eye across the bar, the network sheet, the media card and the
+  desktop: "RU", "AUTO", "Archer C80" now read as words; "50%", "0:50", "-1:28",
+  "79%" keep their column; the 112px clock is drawn by a face made for that size.

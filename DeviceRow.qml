@@ -149,7 +149,7 @@ Rectangle {
                 visible: root.trailing !== ""
                 text: root.trailing
                 color: root.subInk
-                font.family: Theme.fontFamily
+                font.family: Theme.fontMonoFamily
                 font.pixelSize: Theme.fontLabel
                 font.features: ({ "tnum": 1 })
             }
@@ -203,7 +203,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 text: Math.round(root.value * 100) + "%"
                 color: Theme.subtext0
-                font.family: Theme.fontFamily
+                font.family: Theme.fontMonoFamily
                 font.pixelSize: Theme.fontLabel
                 font.features: ({ "tnum": 1 })
             }

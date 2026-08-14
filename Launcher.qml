@@ -663,7 +663,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         text: root.results.length
                         color: Theme.subtext0
-                        font.family: Theme.fontFamily
+                        font.family: Theme.fontMonoFamily
                         font.pixelSize: Theme.fontLabel
                         font.features: ({ "tnum": 1 })
                     }

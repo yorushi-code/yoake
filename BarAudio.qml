@@ -170,7 +170,7 @@ Item {
                         text: root.muted ? "Звук выключен"
                                          : Math.round(root.volume * 100) + "%"
                         color: Theme.text
-                        font.family: Theme.fontFamily
+                        font.family: Theme.fontMonoFamily
                         font.pixelSize: Theme.fontSmall
                         font.weight: Font.Medium
                         font.features: ({ "tnum": 1 })

@@ -100,7 +100,7 @@ Item {
                 anchors.baseline: hhmm.baseline
                 text: Qt.formatDateTime(clock.date, ":ss")
                 color: Qt.alpha(Theme.text, Theme.inkFaint)
-                font.family: Theme.fontFamily
+                font.family: Theme.fontMonoFamily
                 font.pixelSize: Theme.fontMicro
                 font.features: ({ "tnum": 1 })
             }

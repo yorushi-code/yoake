@@ -122,7 +122,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         text: fact.modelData.value
                         color: Theme.subtext1
-                        font.family: Theme.fontFamily
+                        font.family: Theme.fontMonoFamily
                         font.pixelSize: Theme.fontSmall
                         font.weight: Font.Medium
                         font.features: ({ "tnum": 1 })

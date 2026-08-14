@@ -33,7 +33,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         text: root.value
         color: root.valueColor
-        font.family: Theme.fontFamily
+        font.family: Theme.fontMonoFamily
         font.pixelSize: root.pixelSize
         font.weight: Font.Medium
         font.features: ({ "tnum": 1 })

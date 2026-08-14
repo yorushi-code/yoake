@@ -184,21 +184,37 @@ QtObject {
     // be a literal: 12 and 11 appeared 78 times between them, 9/13/14/15/17/19
     // once or twice each, which is what a scale looks like when there isn't one.
     //
-    // One monospaced face for the whole shell, where there used to be a
-    // proportional one with mono kept aside "for genuinely tabular material".
+    // Three faces, by role, because the shell already sorts its own text into
+    // exactly these piles and was setting all of them in one face.
     //
-    // Almost everything here turns out to be tabular material. A device list, a
-    // volume, a bitrate, a node id, a clock, an SSID, a temperature: these are
-    // data, and data set proportionally does not line up into columns, so a
-    // panel full of it reads as a heap of words of assorted widths. The moment
-    // the shell started listing real things -- sinks, streams, networks, paired
-    // devices -- the face that could not make a column became the wrong face.
+    // This block used to argue for one monospaced face everywhere, and half of
+    // that argument was right and is kept: **data wants a column.** A device
+    // list, a volume, a bitrate, a node id, a clock, an SSID, a temperature —
+    // set proportionally these do not line up, and a panel full of them reads
+    // as a heap of words of assorted widths. That is true and it is why mono
+    // stays.
     //
-    // It also does something the type scale alone cannot: a monospaced grid is
-    // *visible*, and a visible grid is most of what makes an interface read as
-    // built rather than arranged.
-    readonly property string fontFamily: "JetBrains Mono"
-    readonly property string fontDisplayFamily: "JetBrains Mono"
+    // What the argument got wrong was the word *everything*. A heading is not
+    // tabular. Neither is "Ничего не подключено", or a button, or a device's
+    // name, or any sentence this shell says to a person. Prose set in a
+    // typewriter face reads as terminal output — which is what the whole shell
+    // looked like, panel after panel of well-organised console.
+    //
+    // The split needs no taste to apply, because the tree already declares it:
+    // thirty-eight `Text` elements carry `font.features: tnum`, which is a
+    // statement that the thing being drawn is a number in a column. The face
+    // now follows the marking the code was already making.
+    //
+    //   fontFamily         Inter          — prose: labels, headings, sentences
+    //   fontDisplayFamily  Inter Display  — the optical size cut for large type
+    //   fontMonoFamily     JetBrains Mono — data, and anything in a column
+    //
+    // Inter Display is a genuine optical variant rather than the same drawing
+    // scaled up: tighter spacing, smaller apertures, less of the generosity a
+    // face needs at 11px and does not want at 40. The clock is the reason it is
+    // worth naming separately.
+    readonly property string fontFamily: "Inter"
+    readonly property string fontDisplayFamily: "Inter Display"
     readonly property string fontMonoFamily: "JetBrains Mono"
     // Material Symbols Rounded, variable. Rounded rather than Outlined
     // because Inter is a humanist face with open, rounded terminals, and

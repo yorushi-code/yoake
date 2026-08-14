@@ -28,7 +28,7 @@ Item {
             width: parent.width
             text: root.title
             color: root.ink
-            font.family: Theme.fontFamily
+            font.family: Theme.fontDisplayFamily
             font.pixelSize: Theme.fontDisplay
             font.weight: Font.Medium
             elide: Text.ElideRight

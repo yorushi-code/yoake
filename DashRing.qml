@@ -87,7 +87,7 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             text: root.label
             color: Theme.subtext0
-            font.family: Theme.fontFamily
+            font.family: Theme.fontMonoFamily
             font.pixelSize: Theme.fontSmall
         }
 
@@ -96,7 +96,7 @@ Item {
             visible: root.secondary !== ""
             text: root.secondary
             color: Qt.alpha(Theme.subtext0, Theme.inkStrong)
-            font.family: Theme.fontFamily
+            font.family: Theme.fontMonoFamily
             font.pixelSize: Theme.fontMicro
             font.features: ({ "tnum": 1 })
         }

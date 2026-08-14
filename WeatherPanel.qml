@@ -105,7 +105,7 @@ PanelWindow {
                         Text {
                             text: Math.round(Weather.temperature) + "°"
                             color: Theme.text
-                            font.family: Theme.fontFamily
+                            font.family: Theme.fontMonoFamily
                             font.pixelSize: Theme.fontHero
                             font.weight: Font.DemiBold
                             font.features: ({ "tnum": 1 })
@@ -170,7 +170,7 @@ PanelWindow {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: hourCell.modelData.hour
                                 color: Theme.subtext0
-                                font.family: Theme.fontFamily
+                                font.family: Theme.fontMonoFamily
                                 font.pixelSize: Theme.fontMicro
                                 font.features: ({ "tnum": 1 })
                             }
@@ -186,7 +186,7 @@ PanelWindow {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: Math.round(hourCell.modelData.temp) + "°"
                                 color: Theme.text
-                                font.family: Theme.fontFamily
+                                font.family: Theme.fontMonoFamily
                                 font.pixelSize: Theme.fontLabel
                                 font.features: ({ "tnum": 1 })
                             }

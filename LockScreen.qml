@@ -486,7 +486,7 @@ WlSessionLock {
                         anchors.verticalCenter: parent.verticalCenter
                         text: chip.modelData.text
                         color: Theme.subtext1
-                        font.family: Theme.fontFamily
+                        font.family: Theme.fontMonoFamily
                         font.pixelSize: Theme.fontSmall
                         font.features: ({ "tnum": 1 })
                     }

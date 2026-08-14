@@ -155,7 +155,7 @@ Item {
             visible: root.value !== ""
             text: root.value
             color: root.labelInk
-            font.family: Theme.fontFamily
+            font.family: Theme.fontMonoFamily
             font.pixelSize: Theme.fontLabel
             // A number is the thing being reported, so it outranks the noun in
             // front of it. This is the only weight step in the mark.
