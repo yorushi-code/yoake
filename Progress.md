@@ -2776,3 +2776,36 @@ follows is opinion rather than repair, and it is written down as opinion.
   labelled groups rather than boxes.
 
   Verified by eye on both pages.
+
+- **D4 — Six panels computed their own colour and handed it to something that
+  threw it away.** Recorded last night as F1, with the conclusion that deleting
+  the dead property was the wrong repair. This is the right one: **use it.**
+
+  `Theme` states what the domain ladder is for, in as many words — a fixed hue
+  per domain means "a chip in the bar and the panel it opens are visibly the same
+  subject". That was true of the chip and had never once been true of the panel.
+  `Sheet.accent` had been on the component from the beginning, was set by all six
+  system panels — `Theme.tone("net")`, `"bt"`, `"audio"`, `"power"`, `"vpn"`, and
+  the album's own colour for the player — and was read by nothing.
+
+  It is a hairline along the top edge now, because that is the vocabulary the bar
+  already speaks: `Chip` carries the domain as a rule *under* the mark, on a
+  shared baseline. The panel hangs off the bar it came from, so the rule
+  continues at the join. Inset past the corner radius so it reads as a rule and
+  not a bezel, and riding `_drive` so it arrives with the sheet rather than
+  landing on it.
+
+  **A wash was tried and rejected.** Carrying the domain further in — a gradient
+  from the hue down through the header — sounded better than the rule and
+  photographs worse: at one opacity it is clearly warm on bluetooth's rose and
+  very nearly invisible on network's mint, because the hues do not share a
+  luminance. An effect that lands differently on each of the six things it exists
+  to tell apart is the wrong effect. The rule is identical in weight for every
+  domain, which is what a vocabulary needs.
+
+  Selected states stay the accent, deliberately. `Segmented` already settled
+  that one — accent means chosen, domain means what the panel is about, and a
+  control cannot hold both jobs — and colouring six panels' controls six ways is
+  how one product turns into six.
+
+  Verified by eye: network and bluetooth side by side, mint against rose.

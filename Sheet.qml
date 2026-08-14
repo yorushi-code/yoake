@@ -137,4 +137,33 @@ Item {
         border.width: 1
         border.color: Qt.alpha(Theme.text, Theme.strokeSoft)
     }
+
+    // ── The rule the chip was wearing, continued ──
+    //
+    // `accent` has been on this component from the beginning and was read by
+    // nothing: six panels compute their domain — `Theme.tone("net")`, `"bt"`,
+    // `"audio"`, `"power"`, `"vpn"`, and the album's own colour for the player —
+    // hand it over, and it was dropped on the floor. Recorded as F1 with the
+    // conclusion that deleting the property was the wrong repair, and this is
+    // the right one: **use it.**
+    //
+    // `Theme` says what it is for, in as many words: a fixed hue per domain
+    // means "a chip in the bar and the panel it opens are visibly the same
+    // subject". That was true of the chip and had never been true of the panel.
+    //
+    // A hairline, because that is the vocabulary the bar already speaks — `Chip`
+    // carries the domain as a rule *under* the mark, on a shared baseline, and
+    // this is that rule continued along the top edge of what the mark opened.
+    // The panel hangs from the bar it came out of, so the join is where they
+    // meet. Inset past the corner radius so it is a rule and not a bezel, and
+    // riding the entrance so it arrives with the sheet rather than on it.
+    Rectangle {
+        anchors.top: parent.top
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width - Theme.radiusSheet * 2
+        height: 2
+        radius: height / 2
+        color: root.accent
+        opacity: root._drive
+    }
 }
