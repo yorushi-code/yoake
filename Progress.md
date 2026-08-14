@@ -2584,3 +2584,27 @@ of them after it had already taken the ends off four panels' labels.
 **What is left for a person** — `sudo bin/yoake-greeter-install`. Everything else
 is on the machine and verified; that one needs a password, and the README now
 says why a fix can sit in this repository for days without being on the machine.
+
+- **V — Memory, measured at idle only, and the rest left undone.** Tonight added
+  objects that live per panel — a `PanelArm` in thirteen of them plus the OSD,
+  the menus, the popover and the tooltip; `HoverHandler`s in five bar widgets; a
+  `TextMetrics` in `BarMedia`. `LazyPanel` builds and destroys a panel on every
+  open, so anything retained there compounds with use, and the performance
+  contract governs CPU and says nothing about memory.
+
+  What was measured: the current instance sits at **636 MiB** and does not move
+  at idle — 636.4, 636.1, 636.1 across thirty seconds. No drift with nothing
+  happening.
+
+  What was **not** measured: the case that would actually show a leak, which is
+  building and destroying all thirteen panels repeatedly and watching the number
+  after each round. That sweep flashes every panel on screen for several minutes,
+  and it was stopped rather than run. It is the right test and it wants doing
+  when somebody is at the machine to watch it.
+
+  One number worth carrying to whoever does: the instance that had been up since
+  10 August was at **1.19 GB**. Three days against three hours is not a
+  comparison — different uptimes, a video wallpaper decoding for some of it, and
+  no idea how many panel cycles in between — but it is the only other data point
+  that exists, and a fourfold gap is worth confirming or dismissing deliberately
+  rather than noticing later.
