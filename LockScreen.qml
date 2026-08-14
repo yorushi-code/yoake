@@ -20,11 +20,23 @@ WlSessionLock {
         // Entrance is bound to this rather than to `locked`, because the
         // surface is created with the lock already engaged and an animation
         // bound to the toggle would have nothing to animate from.
+        //
+        // The wait is `Theme.animMap` and not the single frame it used to be.
+        // B47 is the long version: a surface is not on screen at the moment it
+        // is asked for, and an arrival that begins before it arrives is played
+        // to nobody. Measured on this machine with a `FrameAnimation` inside a
+        // panel window — 54 to 60 ms between the map request and the first
+        // painted frame, against the 16 ms this waited.
+        //
+        // Unlike the panels, the object here is genuinely rebuilt each time:
+        // `WlSessionLockSurface` is a delegate the lock creates per output when
+        // it engages, so `Component.onCompleted` really does fire on every lock
+        // and the flag cannot go stale. Only the wait was wrong.
         property bool entered: false
         Component.onCompleted: enterTick.start()
         Timer {
             id: enterTick
-            interval: 16
+            interval: Theme.animMap
             onTriggered: surface.entered = true
         }
 

@@ -2237,3 +2237,49 @@ argued about correctly and fixed in the wrong place.
   two lines keep their air at `gapWide 9`.
 
   Released afterwards; `perception auto` confirmed back on observation.
+
+- **B58 — The lock screen began its entrance a frame after being asked for, and
+  arrives about fifty milliseconds later than that.** The one surface never
+  examined tonight, because it is the one that cannot be examined: the README is
+  explicit that there is deliberately no unlock over IPC, so locking it to look
+  at it would leave the session locked until its owner came back and typed a
+  password. Audited by reading instead, against the three faults found tonight.
+
+  Two of the three do not apply, and it is worth saying why rather than leaving
+  it silent. There is no `implicitWidth` latch — its two elided labels take their
+  width from anchors, not from measuring themselves (B55). Its lists are a static
+  array and a count of password dots, so there is nothing to sort (B56, B57).
+
+  The third does, in a milder form. It waits **16 ms** — one frame — between the
+  surface being constructed and its arrival starting, and the map takes 54 to
+  60 ms on this machine, measured directly with a `FrameAnimation` while chasing
+  B47. So the fade, the drop and the wallpaper's scale all begin before there is
+  anything on screen to see them on. It is `Theme.animMap` now, which is the
+  number that measurement produced and which thirteen panels and the OSD already
+  use.
+
+  Not the full B47 fault, and the difference matters: `WlSessionLockSurface` is a
+  delegate the lock creates per output *when it engages*, so the object really is
+  rebuilt on every lock and the flag cannot go stale the way the panels' did.
+  Only the wait was wrong.
+
+  **Not verified by eye, and it cannot be** — that is the whole reason this
+  surface was still unexamined at the end of the night. What is verified: the
+  shell loads clean with the change, lint is at zero, and `entered` gates nothing
+  but opacity, scale and y, so the edit cannot affect whether the screen locks,
+  takes a password or unlocks. The measurement it rests on was taken on this
+  machine, not assumed.
+
+- **V — The machine has not locked itself since 8 August, and that is the user's
+  own doing.** Noticed while looking at the idle chain: no input for two and a
+  half hours, and the session unlocked, undimmed, screen on.
+
+  Not a fault. `/run/user/1000/yoake/keep-awake` is present, dated 8 August, and
+  `yoake-idle.sh` exits early on `dim|lock|screen-off|suspend` while it exists.
+  The control centre says so plainly — the "Не засыпать" tile is in its active
+  colour reading "экран не гаснет" — and `qs ipc call idle state` agrees. Every
+  layer is telling the truth and they all agree with each other.
+
+  Recorded because the next person to notice a machine that never locks will
+  reach for the idle chain, and the answer is a toggle somebody left on five days
+  ago. Worth the user knowing; not worth anything changing.
