@@ -61,15 +61,38 @@ Item {
         // already carries the depth, and repeating it per card is what turns a
         // dashboard into a pile of boxes. What the cards do gain is the lit top
         // edge, so they belong to the same family as the islands and the panels.
+        // ── A ground means you can press it ──
+        //
+        // Every block on the dashboard used to sit on the same faint fill, so
+        // five cards of one weight sat on one sheet and nothing ranked anything
+        // — which is the argument `Chip` already makes about colour one floor
+        // down: when everything is a sticker, the sticker has stopped saying
+        // anything.
+        //
+        // The distinction was already declared and only spent on hover:
+        // `interactive` is true on the notification card and the player, false
+        // on the calendar, the weather and the load. That is the real line. A
+        // card is an object you can push; a readout is not an object at all, it
+        // is information, and giving information a pressable-looking ground is
+        // the interface telling a small lie about itself all day.
+        //
+        // So the material carries the affordance. Things you can touch keep the
+        // fill and the lit edge; things you only read sit straight on the sheet
+        // and are held together by their spacing, which is what actually groups
+        // them. Tried the other way first — every ground removed — and the
+        // readouts improved while the two controls plainly wanted theirs back.
         Surface {
             id: card
             anchors.fill: parent
             radius: Theme.radiusCard
             elevation: "flat"
             glass: false
-            fill: root.interactive && area.containsMouse
-                ? Qt.alpha(Theme.text, Theme.fillHover)
-                : Qt.alpha(Theme.text, Theme.fillSubtle)
+            stroke: root.interactive
+            fill: root.interactive
+                ? (area.containsMouse
+                    ? Qt.alpha(Theme.text, Theme.fillHover)
+                    : Qt.alpha(Theme.text, Theme.fillSubtle))
+                : "transparent"
             Behavior on fill { ColorAnimation { duration: Theme.animFast } }
 
             Text {

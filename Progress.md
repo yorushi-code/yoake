@@ -2746,3 +2746,33 @@ follows is opinion rather than repair, and it is written down as opinion.
 
   Verified by eye at 220%: a clean continuous rule under the clock, and the bars
   still render when `sounding` is forced true.
+
+- **D3 — Everything was a card, so the card had stopped saying anything.** Five
+  blocks on the overview sat on one faint fill, at one weight, on one sheet. It
+  was orderly and it ranked nothing — which is the argument `Chip` already makes
+  one floor down about colour: when ten things are each a coloured sticker,
+  colour has stopped ranking them.
+
+  The line was already drawn in the component and was only being spent on hover.
+  `DashCard.interactive` is true on the notification card and the player and
+  false on the calendar, the weather and the load. That is the real distinction:
+  **a card is an object you can push; a readout is not an object at all.** Giving
+  information a pressable-looking ground is the interface telling a small lie
+  about itself, all day.
+
+  So the material carries the affordance now. What you can touch keeps the fill
+  and the lit edge; what you only read sits straight on the sheet, held together
+  by its spacing — which is what was grouping it anyway.
+
+  Tried the other way first, which is why this is the answer and not a guess:
+  every ground removed. The readouts improved and the two controls plainly wanted
+  theirs back, so the experiment drew the line rather than a preference.
+
+  It is worth more on the **control** page than on the overview, and that was not
+  expected. Those three cards are all static, and each was a card full of cards —
+  tiles are themselves pressable objects, so the outer ground was a second level
+  of "object" wrapped around the real one. Removing it leaves one level: the
+  tiles are the things, and "Быстрые действия", "Уровни" and "Приложения" are
+  labelled groups rather than boxes.
+
+  Verified by eye on both pages.
