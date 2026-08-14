@@ -2400,3 +2400,49 @@ argued about correctly and fixed in the wrong place.
   as the subtitle so the arithmetic can be checked by eye. A render test only —
   it says nothing about ranking — but three of the four modes had never been on
   screen in front of anybody, and now they have.
+
+- **F1 — Six panels compute a colour and hand it to something that throws it
+  away.** A finding, recorded without a fix, for the reason under it.
+
+  `Sheet` declares `property color accent` and never reads it. Six panels set it:
+  `Theme.tone("audio")`, `"bt"`, `"net"`, `"power"`, `"vpn"` and `Theme.accent`
+  for the player. `Segmented` is the same story and worse — it takes a `tone`
+  that four panels supply and that nothing reads, twenty-five lines above a
+  comment explaining exactly why it cannot be used: *"accent means chosen, domain
+  means what the panel is about, and a control cannot hold both jobs."*
+
+  Both are leftovers from before that decision. The discard is correct; the
+  passing is the mistake, and from a call site `tone: "vpn"` reads exactly like a
+  strip that is violet.
+
+- **E2 (again) — and this time it drew blood twice in one attempt.** E2 was
+  written earlier tonight after a prophylactic `TextMetrics` fix cost "Сигнал"
+  two letters. The rule it left was: *a fix for a fault nobody has observed has
+  to clear a higher bar, not a lower one.* Removing the dead properties above is
+  cleanup with **no user-visible benefit at all**, which is a lower bar than
+  that, and it went exactly as E2 predicts.
+
+  Three rounds of correction, each caused by a search that was narrower than the
+  thing it was searching for:
+
+  - `grep -A6` after `Sheet {` found no `accent:` callers. There were six; the
+    assignment sits below the window it looked at. Removing the property broke
+    the config load.
+  - `grep -A4` after `Segmented {` found four `tone:` callers. There were ten,
+    across seven files, and `PowerPanel` was never in the list.
+  - deleting the stragglers **by line number** hit a line that had shifted under
+    an earlier edit, and took `tone: "audio"` off a `LevelTile` — a live property
+    on a different component, which would have silently drained the volume tile
+    of its domain colour. Caught only by reading the whole diff rather than the
+    tool's summary.
+
+  All of it reverted; the tree is back at HEAD and the panels were reopened and
+  photographed to prove it. **No code changed this cycle, which is the correct
+  outcome.**
+
+  What generalises, beyond E2: an `awk` that sets a flag on `Segmented {` and
+  never clears it will report every `tone:` in the rest of the file as belonging
+  to it. Three of tonight's near-misses were a matcher that could not see the end
+  of the thing it was matching, and a cleanup pass is exactly where that is most
+  dangerous — the edits are mechanical, they look alike, and nothing on screen
+  changes when one lands in the wrong place.
