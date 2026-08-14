@@ -2446,3 +2446,28 @@ argued about correctly and fixed in the wrong place.
   of the thing it was matching, and a cleanup pass is exactly where that is most
   dangerous — the edits are mechanical, they look alike, and nothing on screen
   changes when one lands in the wrong place.
+
+- **V — The one command the night ends on, checked before it is handed over.**
+  Everything else here is verified; the greeter fixes are the exception, because
+  `greeter/` is source for a package and nothing lands until
+  `sudo bin/yoake-greeter-install` is run. Handing somebody a command that fails
+  on a missing precondition is handing them nothing, so the script was read and
+  every condition it can exit on was checked without running it.
+
+  It is `set -euo pipefail` and has two hard exits: a `find` for
+  `MaterialSymbolsRounded*.ttf` across three roots, and `getent passwd greeter`.
+  Both pass — the font resolves to `~/.local/share/fonts/MaterialSymbolsRounded.ttf`,
+  the account exists. All eight files it copies are present.
+
+  And what it would actually change is small, which is worth knowing before
+  running anything as root against a login screen. Of the eight, six are already
+  identical on disk — `qmldir`, both clock files, both `bin` scripts and the cat.
+  Two differ:
+
+  - `greeter/Theme.qml`, by exactly one line of code: `animMap: 90`
+  - `greeter/shell.qml`, by the `creating` flag and its guard timer (B41), the
+    `launching` latch and its six guard sites (B49), and `interval: 16` becoming
+    `Theme.animMap` (B59)
+
+  Every added line of code in that diff belongs to one of those three, checked by
+  stripping the comments and reading what was left. Nothing else rides along.
