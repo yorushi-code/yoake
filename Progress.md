@@ -2538,3 +2538,49 @@ argued about correctly and fixed in the wrong place.
   every one of those is a judgement about how much of a failure a person wants
   in their face, which is the owner's call and not mine to guess at while he is
   asleep. Recorded so it can be decided rather than discovered.
+
+## The night, indexed
+
+Twenty entries and a dozen verifications is more than anybody wants to read
+front to back to find one thing. What was actually wrong, in the order it was
+found:
+
+**What was reported**
+
+| | |
+|---|---|
+| B43 | the launcher's selection belonged to the mouse, not the keyboard |
+| B44 | the dashboard peek could not be told to go away, and never could have been |
+| B45 | the bar drew nine hundred pixels of nothing as carefully as the rest |
+| B46 | every curve spent its whole duration in the first tenth of it |
+| B47 | thirteen panels played their entrance before the surface existed |
+| B48 | hover was painted in the token that means *no* response |
+| B49 | the greeter fix was never installed, and was half a fix besides |
+| B58, B59 | the lock screen and the greeter began arriving a frame in |
+
+**What was not reported, and was worse**
+
+| | |
+|---|---|
+| B52 | six popover cards that had never once opened, because `z` is not hover order |
+| B53 | every control-centre tile had its two lines of type through each other |
+| B55 | the bar lost its player after **every login** — a width measured through its own elide |
+| B56, B57 | the audio list and the tray were in whatever order the machine woke up in |
+| B61 | the shell menu resolved each icon and then drew a generic grid |
+| B60, B54 | two documents and a file header describing a shell that had moved on |
+
+**What was checked and found sound** — so nobody re-searches it: the panel exit,
+the workspace pill, the toast, all four launcher modes, the islands in every
+content state, both ends of every `Perception` axis, the desktop widgets, and the
+glass cost of three islands against one strip (it went *down*).
+
+**What was found and deliberately left** — F1, six panels tinting a sheet that
+ignores them; F2, the core's raw log under the VPN panel.
+
+**What it cost to learn that** — E2, twice. A fix for a fault nobody has observed
+clears a *higher* bar, not a lower one. Both attempts at one were reverted, one
+of them after it had already taken the ends off four panels' labels.
+
+**What is left for a person** — `sudo bin/yoake-greeter-install`. Everything else
+is on the machine and verified; that one needs a password, and the README now
+says why a fix can sit in this repository for days without being on the machine.
