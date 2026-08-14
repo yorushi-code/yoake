@@ -2341,3 +2341,27 @@ argued about correctly and fixed in the wrong place.
   no width measured through an elide, no entrance gated on a flag that cannot
   reset, nothing unsorted. The media card's dimmed "next" is `MediaButton`'s
   disabled state, which is correct for a track with no successor.
+
+- **V — All of it, at once, from a cold start.** Thirty commits touched the bar,
+  the motion vocabulary, thirteen panels, the OSD, menus, popovers, tooltips, two
+  orderings and the media chip. Each was verified when it was made; none had been
+  verified against all the others, and a night of individually-correct changes is
+  not the same claim as a shell that works.
+
+  Cold-started from committed code with a clean tree, then checked in one sweep,
+  pointer parked away from everything:
+
+  | | |
+  |---|---|
+  | B43 launcher | *Firefox* — the top match — holds the selection |
+  | B45 bar | three islands, wallpaper between them, no dead strip |
+  | B48 hover | the bell chip lights and its glyph goes to full ink |
+  | B52 popover | the notification card opens under the pointer |
+  | B53 tiles | "Питание" and "Сбалансированный" with air between them |
+  | B55 media | the title is in the bar at login, elided at the cap |
+  | B56 audio | sound card then equalizer, alphabetical |
+  | B57 tray | the same three icons in the same three places |
+
+  Zero load failures, lint at zero. The state a login leaves this shell in is now
+  a state somebody has looked at — which, at the start of the night, was the one
+  thing nobody had ever done.
