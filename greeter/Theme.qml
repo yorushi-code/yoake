@@ -83,6 +83,17 @@ Singleton {
     // The session's vocabulary, minus the scaling. Perception does not run
     // here and must not: a login screen that is slower at three in the morning
     // is a login screen that looks broken to somebody who has just woken up.
+    // How long a surface is given to reach the screen before its arrival starts.
+    // Not a motion length — the one number here about the compositor rather than
+    // about the eye, which is also why the paragraph above does not apply to it:
+    // a map takes as long at three in the morning as it does at noon.
+    //
+    // Measured in the session with a `FrameAnimation` inside a panel window: 54
+    // to 60 ms between the map request and the first painted frame. This screen
+    // waited a single frame, so its entrance began about fifty milliseconds
+    // before there was anything on screen to play it on.
+    readonly property int animMap: 90
+
     readonly property int animFlick: 90
     readonly property int animFast: 120
     readonly property int animNormal: 220

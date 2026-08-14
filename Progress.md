@@ -2283,3 +2283,28 @@ argued about correctly and fixed in the wrong place.
   Recorded because the next person to notice a machine that never locks will
   reach for the idle chain, and the answer is a toggle somebody left on five days
   ago. Worth the user knowing; not worth anything changing.
+
+- **B59 — And the greeter had the same line, because it is the lock screen's
+  twin.** The installer says so out loud — "the greeter is meant to be the lock
+  screen's twin, and two copies of the clock is exactly how twins stop matching"
+  — and the resemblance held for the fault as well: an identical single-frame
+  wait before an entrance that drives the same scale, opacity and travel.
+
+  `Theme.animMap` there too, which meant adding the token to the greeter's own
+  `Theme.qml`. It has its own copy of the vocabulary on purpose — the greeter
+  runs as its own user and cannot read this directory — and that copy carries a
+  paragraph about why `Perception` deliberately does not run on a login screen.
+  The new token is exempt from it for the same reason it does not scale in the
+  session: a map takes as long at three in the morning as it does at noon.
+
+  Audited for the other two faults while there, and neither applies: no width
+  bound to its own `implicitWidth`, and its only lists are the environments file
+  (first line taken), a count of password dots and a static array.
+
+  **Verified**, unlike its twin — this is the one of the pair that can be looked
+  at. Staged exactly as the installer lays it out and run nested under `cage`:
+  it loads with no new warning, and renders whole — clock, date, avatar, the
+  password field, the session name, the sleeping cat and the power row.
+
+  It is still not on the machine. `greeter/` is source for a package (see the
+  README), so this rides along with B49 whenever the installer is next run.

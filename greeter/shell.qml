@@ -248,11 +248,17 @@ ShellRoot {
         // Entrance is bound to this rather than to visibility, because the
         // window is created already shown and an animation bound to that would
         // have nothing to animate from.
+        //
+        // `Theme.animMap` rather than the single frame this waited. The lock
+        // screen is this screen's twin and had the identical line; the session's
+        // B47 is the long version of why it is wrong. A surface is not on screen
+        // at the moment it is asked for, so an arrival timed from the asking is
+        // played to nobody.
         property bool entered: false
         Component.onCompleted: enterTick.start()
         Timer {
             id: enterTick
-            interval: 16
+            interval: Theme.animMap
             onTriggered: win.entered = true
         }
 
