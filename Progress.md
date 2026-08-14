@@ -2505,3 +2505,36 @@ argued about correctly and fixed in the wrong place.
   argument for having an uncounted channel.
 
   Lint stays at **0 findings**.
+
+- **F2 — The one undesigned surface in the shell, recorded rather than
+  redecorated.** The VPN panel was the last large surface nobody had opened at
+  full size tonight. It is good — until the bottom, where the core's error is
+  printed raw:
+
+      -0400 2026-08-14 04:10:11 ERROR [386494647 6m40s] connection: connection
+      upload closed: read tcp 160.79.104.10:443: software caused connection abort
+
+  Three things are true about it and only one of them is this repository's
+  business.
+
+  **It begins mid-line.** `-0400` is the tail of a timezone offset, not the
+  start of anything, and the `Text` renders with `wrapMode` and no elide — so
+  that really is where the string starts, not where a wrap put it. The beginning
+  was already gone before the shell saw it. `lastError` is `j.error` from the
+  yworld CLI's JSON, so whatever cuts it cuts it there. **Out of scope**: that is
+  a different project, and reaching into it at two in the morning to fix a
+  truncation I cannot test is exactly the move E2 exists to refuse.
+
+  **It can be clipped away entirely.** The sheet is `Math.min(740, ...)` and the
+  error is the last thing in the column, so a long enough one is simply cut off
+  at the panel's edge — silently, with no sign that there was more. The buttons
+  above it are safe; the diagnostic is the thing that disappears.
+
+  **And it is the least designed thing in the shell** — a raw multi-line log dump
+  in red micro type under a panel that is otherwise carefully composed.
+
+  Left alone. Improving it means deciding what should be shown instead — first
+  line only, a capped line count with an elide, a "details" affordance — and
+  every one of those is a judgement about how much of a failure a person wants
+  in their face, which is the owner's call and not mine to guess at while he is
+  asleep. Recorded so it can be decided rather than discovered.
