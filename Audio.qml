@@ -25,9 +25,35 @@ Singleton {
 
     readonly property var nodes: Pipewire.nodes ? Pipewire.nodes.values : []
 
-    readonly property var sinks: root.nodes.filter(n => n.isSink && !n.isStream)
-    readonly property var sources: root.nodes.filter(n => !n.isSink && !n.isStream && n.audio)
-    readonly property var streams: root.nodes.filter(n => n.isStream && n.isSink)
+    // Ordered, and it was not.
+    //
+    // These were three plain filters, so the order on screen was whatever order
+    // PipeWire happened to enumerate its nodes in. That is not stable: caught by
+    // photographing the audio sheet on a cold start and again after a reload
+    // *in the same session* — the equalizer above the sound card in one and
+    // below it in the other, with nothing having changed but when the list was
+    // built.
+    //
+    // A list you pick from by position must not shuffle between logins. Sorted
+    // by the name the person actually reads, with the node id as the tiebreak so
+    // two devices sharing a description still have a fixed order.
+    //
+    // Deliberately *not* hoisting the default device to the top: it is already
+    // marked, and sorting by it would make the list rearrange itself under the
+    // pointer at the moment you switch — which is the one moment you are
+    // certainly looking at it.
+    function _ordered(list) {
+        return list.slice().sort((a, b) => {
+            const an = root.label(a).toLowerCase();
+            const bn = root.label(b).toLowerCase();
+            if (an !== bn) return an < bn ? -1 : 1;
+            return (a.id || 0) - (b.id || 0);
+        });
+    }
+
+    readonly property var sinks: root._ordered(root.nodes.filter(n => n.isSink && !n.isStream))
+    readonly property var sources: root._ordered(root.nodes.filter(n => !n.isSink && !n.isStream && n.audio))
+    readonly property var streams: root._ordered(root.nodes.filter(n => n.isStream && n.isSink))
 
     readonly property var defaultSink: Pipewire.defaultAudioSink
     readonly property var defaultSource: Pipewire.defaultAudioSource

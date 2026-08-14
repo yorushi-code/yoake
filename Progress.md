@@ -2145,3 +2145,26 @@ argued about correctly and fixed in the wrong place.
   a change to the mechanism; the unproven ones justified nothing, and "same shape,
   same line, why not" is how a night of careful work ships a typographic
   regression into four panels.
+
+- **B56 — The audio device list had no order at all.** Found by the cold-start
+  audit B55's method suggested: photograph every surface as a login leaves it,
+  reload, photograph again, and treat any difference as a fault.
+
+  The audio sheet differed by seven times as much as anything else. Not a
+  rendering fault — the **rows had swapped places.** The equalizer above the
+  sound card on the cold start, below it after the reload, in the same session,
+  with nothing changed but when the list happened to be built.
+
+  `sinks`, `sources` and `streams` were three plain `filter` calls, so the order
+  on screen was whatever order PipeWire enumerated its nodes in. That is not a
+  stable thing to lean on, and a list you pick from **by position** must not
+  shuffle between logins — the position is the only thing you remember about a
+  device you switch to twice a week.
+
+  Sorted by the name the person actually reads, with the node id as a tiebreak so
+  two devices with the same description still have a fixed order. Deliberately
+  *not* hoisting the default to the top: it is already marked, and sorting on it
+  would rearrange the list under the pointer at the exact moment you switch,
+  which is the one moment you are certainly looking at it.
+
+  Verified by eye: sound card then equalizer, alphabetical, and it stays there.
