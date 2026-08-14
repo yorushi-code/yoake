@@ -2365,3 +2365,38 @@ argued about correctly and fixed in the wrong place.
   Zero load failures, lint at zero. The state a login leaves this shell in is now
   a state somebody has looked at — which, at the start of the night, was the one
   thing nobody had ever done.
+
+- **B61 — The shell menu resolved each favourite's icon and then drew a grid
+  instead.** Found by rendering the three launcher modes nobody had looked at.
+
+  `ShellActions` builds its favourites through `DesktopEntries`, and says why in
+  a comment directly above: "Resolved through DesktopEntries so the real Exec
+  line **and icon** are used rather than a guessed command". It takes
+  `entry.name` and `entry.command` and then hardcodes `glyph: Glyphs.apps`. So
+  pavucontrol, Nautilus and kitty appeared as three identical generic grids —
+  in the shell menu on every right-click, and in the launcher's `>` list.
+
+  Every piece needed was already in the tree and none of them were wired
+  together: `DesktopEntry.icon` is what three other files already read,
+  `LauncherRow` has an `iconName` that resolves through `Icons.forName`, and
+  `MenuItemRow` has an `iconSource` written for tray entries. The icon is carried
+  now, documented in `ActionMenu`'s model shape, and wins over `glyph` where both
+  are given — an application in a menu should look like itself rather than like
+  the idea of an application.
+
+  Verified by eye in the launcher's action list: pavucontrol's dial, Nautilus's
+  folder and kitty's cat, with the three real shell actions keeping their glyphs.
+  **The right-click menu is not verified** — opening it needs a click, and no
+  synthetic click has been used tonight — but it reads the same field through the
+  same row component.
+
+- **V — All four launcher modes render.** Only the application list had ever been
+  seen. Typing is banned, so each mode was reached the way `BarRecorder` and
+  `BarMedia` were driven earlier: seed `input.text` in `opened()`, photograph,
+  revert.
+
+  `/` lists the three open windows with their real icons, titles and app ids.
+  `>` is above. `=` takes `12*8+5` and answers **101**, with the expression kept
+  as the subtitle so the arithmetic can be checked by eye. A render test only —
+  it says nothing about ranking — but three of the four modes had never been on
+  screen in front of anybody, and now they have.

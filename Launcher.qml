@@ -275,7 +275,7 @@ Item {
             out.push({
                 kind: "action", label: "действие", act: item.action,
                 name: item.text || "", subtitle: "",
-                iconName: "", glyph: item.glyph || Glyphs.tune,
+                iconName: item.icon || "", glyph: item.glyph || Glyphs.tune,
                 score: s
             });
         }

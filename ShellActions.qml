@@ -48,6 +48,12 @@ Singleton {
             if (!entry) continue;
             apps.push({
                 text: entry.name,
+                // The entry's own icon, which the paragraph above has always
+                // claimed was being used and which this line used to throw
+                // away: it resolved the entry, took the name and the Exec, and
+                // then drew a generic grid glyph. Three favourites, identical
+                // icon, in the shell menu and in the launcher's action list.
+                icon: entry.icon || "",
                 glyph: Glyphs.apps,
                 action: () => Quickshell.execDetached(entry.command)
             });

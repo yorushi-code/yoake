@@ -4,8 +4,11 @@ import Quickshell
 // Menu built from a plain JS model, used by every right-click in the bar.
 //
 // Model entries are objects:
-//   { text, glyph, checkable, checked, enabled, separator, destructive,
+//   { text, glyph, icon, checkable, checked, enabled, separator, destructive,
 //     action: function() {...} }
+// `icon` is a freedesktop icon name and wins over `glyph` when both are given —
+// an application in this menu should look like itself, not like the idea of an
+// application.
 // A `separator: true` entry needs nothing else. Entries are rebuilt by the
 // owner each time the menu opens, which is what keeps live lists (audio sinks,
 // wifi networks, MPRIS players) from going stale between openings.
@@ -99,6 +102,7 @@ MenuSurface {
                 width: column.width
                 text: modelData.text || ""
                 glyph: modelData.glyph || ""
+                iconSource: modelData.icon || ""
                 checkable: modelData.checkable === true
                 checked: modelData.checked === true
                 separator: modelData.separator === true
