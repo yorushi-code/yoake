@@ -2592,9 +2592,10 @@ says why a fix can sit in this repository for days without being on the machine.
   open, so anything retained there compounds with use, and the performance
   contract governs CPU and says nothing about memory.
 
-  What was measured: the current instance sits at **636 MiB** and does not move
-  at idle — 636.4, 636.1, 636.1 across thirty seconds. No drift with nothing
-  happening.
+  What was measured, on an instance seven hours old: **636.4, 636.1, 636.1 MiB**
+  across thirty seconds of idle, and **625.3** a few minutes later — it went
+  *down*. That is the useful shape of the answer. A leak does not give memory
+  back, so whatever this is, it is not a simple one.
 
   What was **not** measured: the case that would actually show a leak, which is
   building and destroying all thirteen panels repeatedly and watching the number
@@ -2603,7 +2604,7 @@ says why a fix can sit in this repository for days without being on the machine.
   when somebody is at the machine to watch it.
 
   One number worth carrying to whoever does: the instance that had been up since
-  10 August was at **1.19 GB**. Three days against three hours is not a
+  10 August was at **1.19 GB**. Three days against seven hours is not a
   comparison — different uptimes, a video wallpaper decoding for some of it, and
   no idea how many panel cycles in between — but it is the only other data point
   that exists, and a fourfold gap is worth confirming or dismissing deliberately
