@@ -2208,3 +2208,32 @@ argued about correctly and fixed in the wrong place.
   transfer. E2 is the standing instruction here — an unobserved fault has to
   clear a higher bar, not a lower one — and E2 was written the same night, about
   exactly this temptation.
+
+- **V — The shell at the ends of its own ranges, which nobody had rendered.**
+  `Perception` moves density, ink and emphasis continuously from CPU, daylight
+  and dwell, and the shell is only ever *seen* somewhere in the middle of those
+  ranges — the extremes are reachable in ordinary use (3am, heavy load, a long
+  dwell) and had never been put on screen deliberately. This is the most concrete
+  corner of "требует глобальной доработки", so it was swept.
+
+  Forced each axis to both ends over IPC and photographed the bar and the control
+  page at each:
+
+  | axis | range | rendered |
+  |---|---|---|
+  | density | 0.76 – 1.36 (gapWide 9 – 16) | clean at both |
+  | ink | 0.72 – 1.00 | legible at 0.72, titles and subtitles both |
+  | emphasis | 0.70 – 1.15 (chrome 1.00 – 0.55) | clean |
+
+  Nothing broke. No clipped type, no collisions, no tile that stopped fitting
+  what is in it, and the faintest ink is still comfortably readable — including
+  the section headers, which are the dimmest thing in the shell and were the
+  likeliest casualty.
+
+  Worth one specific note: **B53's tile fix holds at the tightest density.** That
+  was the failure mode to fear here — the control-centre tile now takes its
+  height from its content, and the tightest gap ladder is exactly where a
+  content-derived height could have gone back to overlapping. It does not; the
+  two lines keep their air at `gapWide 9`.
+
+  Released afterwards; `perception auto` confirmed back on observation.
