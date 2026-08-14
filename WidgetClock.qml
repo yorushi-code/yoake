@@ -13,8 +13,21 @@ import Quickshell
 //
 // The seconds are gone. They were the largest continuously moving thing on the
 // desktop and the least informative thing on it, which is the exact trade
-// Direction's rule 6 exists to refuse — and the separator already pulses on the
-// second, so the beat they were there for was never theirs to carry.
+// Direction's rule 6 exists to refuse.
+//
+// This used to end "and the separator already pulses on the second, so the beat
+// they were there for was never theirs to carry", which stopped being true and
+// was still the stated reason. `RollClock.blink` is off — off by default and set
+// nowhere — because two three-pixel dots breathing cost twenty points of a core:
+// any running animation holds its window's render loop at the refresh rate, and
+// this window is the size of the screen. `RollClock` carries the measurement.
+//
+// So nothing on this clock moves below the minute, and the argument is better
+// for it rather than weaker. Rule 6 says only what is in focus may move, and a
+// clock on the wallpaper is never what anybody is looking at. Caught by
+// photographing the colon four times a third of a second apart and finding all
+// four identical: the file was describing a pulse that had been deliberately
+// removed, and using it to justify the removal of something else.
 Item {
     id: root
 

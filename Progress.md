@@ -2308,3 +2308,36 @@ argued about correctly and fixed in the wrong place.
 
   It is still not on the machine. `greeter/` is source for a package (see the
   README), so this rides along with B49 whenever the installer is next run.
+
+- **B60 — The desktop clock justified itself with a behaviour that had been
+  deliberately removed.** Not a functional fault; a claim the source makes about
+  itself that stopped being true, in the file explaining the biggest design
+  decision on the desktop.
+
+  `WidgetClock` opens by saying the seconds are gone, which is right, and gives
+  two reasons. The second was "the separator already pulses on the second, so the
+  beat they were there for was never theirs to carry."
+
+  It does not pulse. `RollClock.blink` is off, off *by default*, and set nowhere
+  in the tree — because two three-pixel dots breathing cost **twenty points of a
+  core**: any running animation holds its window's render loop at the refresh
+  rate and this window is the size of the screen. `RollClock` carries that
+  measurement, and switching it off along with the sleeping cat's floating "z"
+  took the shell from 48% of a core to 27% with nothing playing and nothing
+  moving. The change was correct and the file that depended on it was never
+  updated.
+
+  Caught by photographing the colon four times a third of a second apart while
+  auditing the desktop widgets, and finding all four **identical to six decimal
+  places**. Then reading why.
+
+  The comment is fixed, not the code. The argument is *better* without the
+  pulse, not weaker: rule 6 says only what is in focus may move, and a clock on
+  the wallpaper is never what anybody is looking at. Restoring a pulse to make
+  the old sentence true would have been paying twenty points of a core for a
+  footnote.
+
+  The rest of the desktop widgets were audited at the same time and are sound —
+  no width measured through an elide, no entrance gated on a flag that cannot
+  reset, nothing unsorted. The media card's dimmed "next" is `MediaButton`'s
+  disabled state, which is correct for a track with no successor.
