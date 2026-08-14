@@ -2609,3 +2609,36 @@ says why a fix can sit in this repository for days without being on the machine.
   no idea how many panel cycles in between — but it is the only other data point
   that exists, and a fourfold gap is worth confirming or dismissing deliberately
   rather than noticing later.
+
+- **F1, two more instances — and the scan that should have found them all along.**
+  F1 was found by eye, which is the wrong way to find the fifth instance of
+  anything. The scan that was supposed to find it reported **279 rows** and was
+  therefore ignored, and it was wrong: it excluded any line matching the
+  declaration pattern, so a property used inside *another* property's binding
+  counted as unused. That is why it accused `Tooltip.active`, which the line
+  directly below its declaration reads.
+
+  Counting every mention in the file and subtracting the declaration's own gives
+  **18 rows**, and eighteen is a list somebody reads. Most are legitimate: the
+  three `BarStrip` item aliases, five `default property alias content` targets,
+  `ManagedProcess`'s three passthroughs, and two real outputs that callers read
+  through an id — `BarClock.anchorX`, which `Bar` centres the strip on, and
+  `WidgetRail.cardItem`, which `DesktopSurface` masks against.
+
+  Two are the F1 shape, and neither had been noticed:
+
+  - **`BarLoad.barWindow`** — `Bar.qml` passes `barWindow: bar` to it, as it does
+    to every other bar widget, and `BarLoad` never mentions it again. The others
+    use it for `Menus.idFor`, scoping a menu to the output. `BarLoad` has no
+    menu. From the call site it reads exactly like a widget that does.
+  - **`Sheet.progress`** — `readonly property real progress: root._drive`,
+    computed on every frame of every sheet's entrance and exit, exposed, and read
+    by nobody.
+
+  **Left alone, with the other two.** Not because they are risky — these are two
+  single-line removals, unlike the ten call sites that went wrong earlier — but
+  because fixing two of five instances of one class leaves the tree *less*
+  coherent than fixing none. F1 is a decision about a shape, and it wants making
+  once, by somebody who can also decide whether `Segmented` should honour a tone
+  rather than drop the property. The list is complete now, which is what was
+  missing.
