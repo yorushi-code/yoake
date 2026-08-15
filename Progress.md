@@ -2858,3 +2858,24 @@ follows is opinion rather than repair, and it is written down as opinion.
   Verified by eye, before and after, on a notification carrying two actions:
   a grey stub becomes "Ответить" and "Открыть", whole, with the card grown to
   hold them.
+
+- **D6 — The dashboard claimed to assemble and was really just fading.**
+  `DashCard` argues for its own cascade: "a dashboard whose cards all appear on
+  the same frame reads as a screenshot being shown; one that builds itself in
+  order reads as a thing assembling, and the eye follows the order it is given."
+  Filmed at 60fps, the cards were arriving 34 ms apart with 18px of travel, and
+  what you saw was five rectangles fading up in almost the same instant.
+
+  Thirty-four milliseconds is inside the range `Direction` itself dismisses —
+  "the beats fall 15 to 42 ms apart, under the threshold at which a sequence
+  reads as a sequence" — written about list rows and true of these too.
+
+  The fix is not more time. A dashboard is a thing you glance at, and half a
+  second of assembly on every open is a tax you pay all day; `Theme` already has
+  the better lever written down, in the note on why the springs were tuned by
+  amplitude rather than duration: **travel is what carries "animated"**. So the
+  timing is untouched and the distance is not — 18px to 30px.
+
+  Filmed before and after. Before, the cards are present and merely resolving;
+  after, they are visibly below where they belong and rising into it, and the
+  panel builds in the order the file always said it did.

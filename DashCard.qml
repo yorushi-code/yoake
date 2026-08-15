@@ -54,7 +54,7 @@ Item {
         shown: root.revealed
         surfaceType: "narrative"
         delay: Direction.stagger(root.order)
-        slideY: 18
+        slideY: 30
 
         // The same object every raised thing in the shell is made of, at the
         // one elevation that does not cast a shadow: the sheet these sit on
