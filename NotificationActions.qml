@@ -24,8 +24,26 @@ Flow {
         }
     }
 
+    Component.onCompleted: {
+        console.warn("YOAKE-ACT n=" + root.entries.length
+            + " app=" + (root.notification ? root.notification.appName : "?"));
+        for (const e of root.entries)
+            console.warn("YOAKE-ACT   id=[" + e.identifier + "] textLen=" + (e.text || "").length);
+    }
+
     visible: root.entries.length > 0
-    height: visible ? implicitHeight : 0
+    // No explicit `height`. It used to read `visible ? implicitHeight : 0`,
+    // which looks like a collapse-when-empty guard and is really the thing that
+    // broke the layout: assigning `height` on a positioner takes its sizing off
+    // it, and the `implicitHeight` the binding then reads came back as **6** —
+    // the top padding alone, with two 24px buttons sitting in it unaccounted
+    // for. The card is `histContent.height + 18`, so the card came out 30px
+    // short and cut its own actions in half. That is where the grey stub under
+    // every notification with actions came from: a button clipped to a sliver.
+    //
+    // The guard was not needed either. A `Column` skips invisible children, so
+    // `visible` already collapses this to nothing; the height line was doing no
+    // work except the damage.
 
     Repeater {
         model: root.entries

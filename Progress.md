@@ -2828,3 +2828,33 @@ follows is opinion rather than repair, and it is written down as opinion.
   rather than less.
 
   Verified by eye: forty rows, and the live one is obvious from across the panel.
+
+- **B64 — Every notification with actions cut its own buttons in half.** Found
+  while redesigning the notification centre, by noticing a grey stub under each
+  entry that looked like a rendering fault. It was one: a button clipped to a
+  sliver.
+
+  `NotificationActions` is a `Flow`, and carried this:
+
+      visible: root.entries.length > 0
+      height: visible ? implicitHeight : 0
+
+  which reads as a collapse-when-empty guard and is the thing that broke the
+  layout. **Assigning `height` to a positioner takes the sizing off it**, and the
+  `implicitHeight` the binding then read came back as **6** — the top padding
+  alone, with two 24px buttons standing in it, uncounted. Measured rather than
+  guessed: `card=57 content=39 col=39 actH=6 actImpl=6 vis=true`.
+
+  The card is `histContent.height + 18`, so it came out thirty pixels short of
+  its own contents and clipped them. The toast does the same. Any application
+  that attaches an action — a reply, an open, a dismiss — has been getting its
+  buttons sliced since the feature was added, and the server has advertised
+  `actionsSupported` the whole time.
+
+  The guard was not needed either, which is the part worth remembering: a
+  `Column` already skips invisible children, so `visible` collapses this on its
+  own. The height line was doing no work except the damage.
+
+  Verified by eye, before and after, on a notification carrying two actions:
+  a grey stub becomes "Ответить" and "Открыть", whole, with the card grown to
+  hold them.
