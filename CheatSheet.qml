@@ -524,7 +524,19 @@ Item {
                                                 text: bindRow.modelData.key
                                                 color: Theme.subtext1
                                                 font.pixelSize: Theme.fontSmall
-                                                font.family: "monospace"
+                                                // The shell's mono, not the
+                                                // system's. This was the string
+                                                // `"monospace"` — the only
+                                                // hardcoded family anywhere in
+                                                // the tree, and fontconfig
+                                                // resolves it here to Fira Code.
+                                                // So the one surface that is
+                                                // nothing but keycaps was set in
+                                                // a different typeface from
+                                                // every other piece of data in
+                                                // the shell, and a keybind is as
+                                                // literal as data gets.
+                                                font.family: Theme.fontMonoFamily
                                             }
                                         }
                                         Text {

@@ -2879,3 +2879,23 @@ follows is opinion rather than repair, and it is written down as opinion.
   Filmed before and after. Before, the cards are present and merely resolving;
   after, they are visibly below where they belong and rising into it, and the
   panel builds in the order the file always said it did.
+
+- **D7 — The one surface made entirely of keycaps was set in a different
+  typeface from the rest of the shell.** `CheatSheet` carried
+  `font.family: "monospace"` — the **only** hardcoded family anywhere in the
+  tree, checked across every `.qml` including the greeter's.
+
+  `"monospace"` is a fontconfig alias, not a face. On this machine it resolves to
+  **Fira Code**, so a panel that is nothing but keybinds was drawn in a
+  typeface the shell does not otherwise use, next to descriptions in Inter and
+  two feet from a bar full of JetBrains Mono. Two monospaces in one product, and
+  the escape hatch was a string literal.
+
+  D1 said data gets the mono face and a keybind is as literal as data gets;
+  `Theme.fontMonoFamily` is what says which mono. It says it here now.
+
+  Worth noting for whoever adds the next one: this is exactly the failure a token
+  system is for, and it survived because a hardcoded *plausible* value looks
+  right in a diff. `"monospace"` reads as a decision. It is the absence of one.
+
+  Verified by eye at 220%: the caps are JetBrains Mono, matching the bar.
