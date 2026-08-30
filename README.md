@@ -1,3 +1,11 @@
+> [!NOTE]
+> **This is a personal fork.** Upstream is [ilyamiro/serpantinum](https://github.com/ilyamiro/serpantinum)
+> by Illia Miroshnichenko; everything below this notice is upstream's own documentation and
+> describes upstream's installer, paths and package name. This fork is renamed to `yoake`,
+> targets Fedora + niri (upstream's installer supports Arch only), carries a customization
+> layer under `src/quickshell/yoake/`, and has the installer's telemetry removed.
+> Licensed under AGPL-3.0-or-later, same as upstream.
+
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/ilyamiro)
 
 <div align="center">
@@ -148,5 +156,7 @@ serpantinumd start
 ## License
 
 Copyright (C) 2026 Illia Miroshnichenko
+
+Copyright (C) 2026 yorushi, for modifications made in this fork.
 
 This project is licensed under the GNU Affero General Public License version 3, or (at your option) any later version. See the [LICENSE.md](LICENSE.md) file for the full license text.

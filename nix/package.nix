@@ -151,7 +151,7 @@ stdenv.mkDerivation (finalAttrs: {
   meta = with lib; {
     description = "A desktop shell built for YOU";
     homepage = "https://github.com/ilyamiro/serpantinum";
-    license = licenses.mit;
+    license = licenses.agpl3Plus;
     platforms = platforms.linux;
     mainProgram = "serpantinum";
   };
