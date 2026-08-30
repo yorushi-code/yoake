@@ -119,16 +119,22 @@ Singleton {
             "subtext1": root.subtext1,
             "subtext0": root.subtext0,
 
+            // The shifts are measured off the palette these slots are named
+            // after, not guessed: hue of each rare slot minus hue of the
+            // common one it is a shade of. Guessing put teal 12 degrees off
+            // green instead of 55, which made the VPN chip and the battery
+            // chip the same colour on the bar, and had sapphire and maroon
+            // rotating the wrong way entirely.
             "mauve":    root.accent,
-            "pink":     _shift(root.accent, 20),
+            "pink":     _shift(root.accent, 49),
             "blue":     root.blue,
-            "sapphire": _shift(root.blue, 18),
-            "teal":     _shift(root.green, 12),
+            "sapphire": _shift(root.blue, -19),
+            "teal":     _shift(root.green, 55),
             "green":    root.green,
             "yellow":   root.yellow,
-            "peach":    _shift(root.yellow, -14),
+            "peach":    _shift(root.yellow, -18),
             "red":      root.red,
-            "maroon":   _shift(root.red, -10)
+            "maroon":   _shift(root.red, 7)
         };
     }
 

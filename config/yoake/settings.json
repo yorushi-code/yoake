@@ -15,7 +15,7 @@
     "position": "top",
     "width": 100,
     "opacity": 100,
-    "style": "fill", 
+    "style": "fill",
     "time": {
       "format": "HH:mm:ss"
     },
@@ -37,6 +37,7 @@
         "tray",
         [
           "kb",
+          "vpn",
           "wifi",
           "bt",
           "vol",
