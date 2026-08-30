@@ -11,6 +11,11 @@ ShellRoot {
         function onReloadFailed(errorString) { Quickshell.inhibitReloadPopup() }
     }
 
+    // A QML singleton is constructed on first reference, and nothing
+    // references this one: it writes into ThemeBackend instead of being read.
+    // Without this line the layer is not late, it is absent.
+    readonly property var _yoakeLayer: [YoakePalette]
+
     ScreenshotOverlay {}
     Main {}
     Bar {}

@@ -40,6 +40,34 @@ Item {
     property color maroon: "#eba0ac"
     property color teal: "#94e2d5"
 
+    // The palette is assigned, not bound, so a change lands in one frame and
+    // reads as a flicker across every surface at once. Fading it makes a
+    // wallpaper change a transition rather than a cut. 500ms, and only while
+    // the colour is actually moving -- this is not a steady-state animation.
+    readonly property int paletteFade: 500
+    Behavior on base { ColorAnimation { duration: root.paletteFade } }
+    Behavior on mantle { ColorAnimation { duration: root.paletteFade } }
+    Behavior on crust { ColorAnimation { duration: root.paletteFade } }
+    Behavior on text { ColorAnimation { duration: root.paletteFade } }
+    Behavior on subtext0 { ColorAnimation { duration: root.paletteFade } }
+    Behavior on subtext1 { ColorAnimation { duration: root.paletteFade } }
+    Behavior on surface0 { ColorAnimation { duration: root.paletteFade } }
+    Behavior on surface1 { ColorAnimation { duration: root.paletteFade } }
+    Behavior on surface2 { ColorAnimation { duration: root.paletteFade } }
+    Behavior on overlay0 { ColorAnimation { duration: root.paletteFade } }
+    Behavior on overlay1 { ColorAnimation { duration: root.paletteFade } }
+    Behavior on overlay2 { ColorAnimation { duration: root.paletteFade } }
+    Behavior on blue { ColorAnimation { duration: root.paletteFade } }
+    Behavior on sapphire { ColorAnimation { duration: root.paletteFade } }
+    Behavior on peach { ColorAnimation { duration: root.paletteFade } }
+    Behavior on green { ColorAnimation { duration: root.paletteFade } }
+    Behavior on red { ColorAnimation { duration: root.paletteFade } }
+    Behavior on mauve { ColorAnimation { duration: root.paletteFade } }
+    Behavior on pink { ColorAnimation { duration: root.paletteFade } }
+    Behavior on yellow { ColorAnimation { duration: root.paletteFade } }
+    Behavior on maroon { ColorAnimation { duration: root.paletteFade } }
+    Behavior on teal { ColorAnimation { duration: root.paletteFade } }
+
     property string configPath: Quickshell.env("QS_COLORS_JSON") ?? "~/.local/state/yoake/qs_colors.json"
     property string matugenConfigPath: (typeof Caching !== "undefined" && Caching.stateDir ? Caching.stateDir : ((Quickshell.env("HOME") ?? "") + "/.local/state/yoake")) + "/qs_matugen_colors.json"
 

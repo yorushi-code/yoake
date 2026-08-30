@@ -16,6 +16,7 @@ singleton I18n 1.0 singletons/I18n.qml
 singleton Scaler 1.0 singletons/Scaler.qml
 singleton Sounds 1.0 singletons/Sounds.qml
 singleton ThemeBackend 1.0 singletons/ThemeBackend.qml
+singleton YoakePalette 1.0 yoake/Palette.qml
 singleton MprisController 1.0 singletons/MprisController.qml
 singleton CurrentFocus 1.0 singletons/CurrentFocus.qml
 singleton Location 1.0 singletons/Location.qml
