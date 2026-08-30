@@ -1,10 +1,53 @@
+# yoake
+
+A Wayland shell, forked from [ilyamiro/serpantinum](https://github.com/ilyamiro/serpantinum)
+and renamed. Fedora and niri, where upstream targets Arch and leads with Hyprland.
+
+It is a fork rather than a configuration because the parts being added do not
+fit through a config file: upstream has no plugin system, so a new bar module,
+widget or panel means editing `bar/TopBar.qml`, `widgets/WidgetRegistry.qml` or
+`WindowRegistry.js`. Changes here are therefore kept narrow and separable —
+everything of ours that can live in `src/quickshell/yoake/` does — so this can
+be rebased onto an upstream that has already rewritten its history once.
+
+**Running it on Fedora: [docs/fedora.md](docs/fedora.md).** Upstream's installer
+refuses to run on anything outside the Arch family, by design and on purpose.
+
+## What is ours
+
+| | |
+|---|---|
+| `src/quickshell/yoake/` | the layer: everything added rather than modified |
+| `src/scripts/wallpaper-palette.py` | the palette, measured off the wallpaper in OKLCh |
+| `docs/fedora.md` | how this actually gets installed and run here |
+
+Colours are not a preset. The wallpaper's dominant hue is measured as a
+chroma-weighted circular mean in OKLCh and the accent is synthesized on it,
+with the measured chroma carried along as a confidence value — so a
+near-monochrome image yields a genuinely muted accent instead of an invented
+one. `YoakePalette` derives upstream's twenty-two named colours from that and
+hands them to `ThemeBackend`, which every widget already reads, so the whole
+shell re-themes with the wallpaper and fades rather than snaps.
+
+Set `theme.yoake` to `false` in `~/.config/yoake/settings.json` to stand the
+layer down and see the base shell unaltered.
+
+## License
+
+AGPL-3.0-or-later, as upstream.
+
+Copyright (C) 2026 Illia Miroshnichenko, for serpantinum, which this is derived from.
+
+Copyright (C) 2026 yorushi, for modifications made in this fork.
+
+---
+
 > [!NOTE]
-> **This is a personal fork.** Upstream is [ilyamiro/serpantinum](https://github.com/ilyamiro/serpantinum)
-> by Illia Miroshnichenko; everything below this notice is upstream's own documentation and
-> describes upstream's installer, paths and package name. This fork is renamed to `yoake`,
-> targets Fedora + niri (upstream's installer supports Arch only), carries a customization
-> layer under `src/quickshell/yoake/`, and has the installer's telemetry removed.
-> Licensed under AGPL-3.0-or-later, same as upstream.
+> **Everything below is upstream's own documentation**, kept as it was. It
+> describes upstream's installer, upstream's package name and upstream's paths,
+> none of which apply to this fork — see [docs/fedora.md](docs/fedora.md)
+> instead. It is left here because it still documents the shell's own settings
+> and Nix modules accurately.
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/ilyamiro)
 
@@ -156,7 +199,5 @@ serpantinumd start
 ## License
 
 Copyright (C) 2026 Illia Miroshnichenko
-
-Copyright (C) 2026 yorushi, for modifications made in this fork.
 
 This project is licensed under the GNU Affero General Public License version 3, or (at your option) any later version. See the [LICENSE.md](LICENSE.md) file for the full license text.
