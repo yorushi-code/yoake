@@ -6,7 +6,7 @@ setterm -blank 0 -powerdown 0 2>/dev/null || true
 printf '\033[9;0]' 2>/dev/null || true
 
 REPO_SLUG="${REPO_SLUG:-"ilyamiro/serpantinum"}"
-CACHE_BASE="${XDG_CACHE_HOME:-"$HOME/.cache"}/serpantinum-installer"
+CACHE_BASE="${XDG_CACHE_HOME:-"$HOME/.cache"}/yoake-installer"
 export REPO_SLUG
 
 if [ -n "${BASH_SOURCE[0]}" ] && [ -f "${BASH_SOURCE[0]}" ]; then
@@ -28,7 +28,7 @@ if [[ -z "$PROJECT_ROOT" || ! -f "$PROJECT_ROOT/install/modules/deps.sh" || ! -d
     PROJECT_ROOT="$CACHE_BASE"
 fi
 
-export SERPANTINUM_DIR="$PROJECT_ROOT/src"
+export YOAKE_DIR="$PROJECT_ROOT/src"
 export I18N_DIR="$PROJECT_ROOT/src/assets/languages"
 
 MODULES_DIR="$INSTALL_DIR/modules"
@@ -44,8 +44,8 @@ source "$MODULES_DIR/service.sh"
 source "$MODULES_DIR/ui.sh"
 
 get_user_uuid() {
-    local state_file="$HOME/.local/state/serpantinum/telemetry_id"
-    local version_file="$HOME/.local/state/serpantinum/version"
+    local state_file="$HOME/.local/state/yoake/telemetry_id"
+    local version_file="$HOME/.local/state/yoake/version"
 
     if [ -f "$version_file" ]; then
         local id
@@ -127,13 +127,13 @@ setup_sddm "$PROJECT_ROOT"
 install_wallpapers "$INSTALL_FULL_WALLPAPERS"
 
 WALLPAPER_DIR=$(get_wallpaper_dir)
-init_serpantinum_config "$PROJECT_ROOT" "$WALLPAPER_DIR"
+init_yoake_config "$PROJECT_ROOT" "$WALLPAPER_DIR"
 
 setup_services
 write_version_state "$TARGET_VERSION" "$TARGET_COMMIT" "$TELEMETRY_ID" "$ENABLE_TELEMETRY" "${SELECTED_COMPOSITORS[*]}"
 
 if [[ "$INSTALL_STATE" == "legacy" || "$INSTALL_STATE" == "fresh" || "$IS_REINSTALL" == true ]]; then
-    rm -f "$HOME/.local/state/serpantinum/first_launch.done" "$HOME/.local/state/quickshell/first_launch.done"
+    rm -f "$HOME/.local/state/yoake/first_launch.done" "$HOME/.local/state/quickshell/first_launch.done"
 fi
 
 draw_completion_screen "$TARGET_VERSION" "$TARGET_COMMIT"

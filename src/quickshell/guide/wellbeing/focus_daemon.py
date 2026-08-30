@@ -35,7 +35,7 @@ if not os.path.exists(DB_PATH) and os.path.exists(OLD_DB_BASE):
 RUN_DIR = os.environ.get("QS_RUN_FOCUSTIME", "/tmp/quickshell/focustime")
 os.makedirs(RUN_DIR, exist_ok=True)
 STATE_FILE = os.path.join(RUN_DIR, "focustime_state.json")
-CONFIG_PATH = os.environ.get("QS_SETTINGS", os.path.expanduser("~/.config/serpantinum/settings.json"))
+CONFIG_PATH = os.environ.get("QS_SETTINGS", os.path.expanduser("~/.config/yoake/settings.json"))
 
 SYSTEM_STATES = {"Desktop", "Locked", "Quickshell", "Unknown"}
 

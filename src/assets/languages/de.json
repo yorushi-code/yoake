@@ -1,7 +1,7 @@
 {
   "guide": {
     "about": {
-      "title": "Serpantinum",
+      "title": "Yoake",
       "loading": "Laden...",
       "unknown": "Unbekannt",
       "version_by": "v{version} • von {author}",
@@ -315,7 +315,7 @@
     "theme": {
       "font": {
         "title": "Schriftart",
-        "desc": "Standard-Schriftart für Serpantinum wählen",
+        "desc": "Standard-Schriftart für Yoake wählen",
         "select": "Auswählen..."
       },
       "radius": {
@@ -662,7 +662,7 @@
     }
   },
   "start": {
-    "title": "Serpantinum",
+    "title": "Yoake",
     "made_by": "Erstellt von @{author}",
     "welcome": "Willkommen",
     "tagline": "Eine Desktop-Shell, gemacht für",
@@ -797,7 +797,7 @@
     },
     "guide": {
       "name": "Einstellungen",
-      "desc": "Serpantinum-Einstellungen"
+      "desc": "Yoake-Einstellungen"
     },
     "calendar": {
       "name": "Kalender & Uhr",
@@ -838,7 +838,7 @@
     }
   },
   "cli": {
-    "usage": "Verwendung: serpantinum [Befehl] [Optionen...]",
+    "usage": "Verwendung: yoake [Befehl] [Optionen...]",
     "description": "Eine Desktop-Shell für Wayland-Compositor.",
     "commands": "Befehle:",
     "script_commands": "Skript-Befehle:",
@@ -851,23 +851,23 @@
     "version_desc": "Versionsinformationen anzeigen und beenden",
     "help_desc": "Diese Hilfemeldung anzeigen und beenden",
     "examples": "Beispiele:",
-    "daemon_stopped": "Serpantinum-Daemon beendet.",
-    "starting_daemon": "Daemon läuft nicht. serpantinumd wird im Hintergrund gestartet...",
+    "daemon_stopped": "Yoake-Daemon beendet.",
+    "starting_daemon": "Daemon läuft nicht. yoaked wird im Hintergrund gestartet...",
     "error_missing_qml": "Fehler: Fehlendes Startziel.",
-    "launch_usage": "Verwendung: serpantinum launch <start|widgetredactor> [Argumente...]",
+    "launch_usage": "Verwendung: yoake launch <start|widgetredactor> [Argumente...]",
     "error_qml_not_found": "Fehler: {NAME}.qml in {DIR} konnte nicht aufgelöst werden",
     "error_shell_qml_not_found": "Fehler: Pfad zu shell.qml in {DIR} konnte nicht aufgelöst werden",
     "error_unknown_command": "Fehler: Unbekannter Befehl '{CMD}'.",
     "error_unknown_target": "Fehler: Unbekanntes Ziel '{TARGET}'.",
     "launch_help": {
-      "usage": "Verwendung: serpantinum launch <start|widgetredactor> [Argumente...]",
+      "usage": "Verwendung: yoake launch <start|widgetredactor> [Argumente...]",
       "description": "Eigenständige Komponenten direkt im Runner-Modus ausführen.",
       "available_targets": "Verfügbare Ziele:",
       "target_start": "Start-Einrichtungsoberfläche öffnen",
       "target_widgetredactor": "Desktop-Widget-Editor öffnen"
     },
     "msg_help": {
-      "usage": "Verwendung: serpantinum msg <Befehl|Arbeitsfläche> [Argumente...]",
+      "usage": "Verwendung: yoake msg <Befehl|Arbeitsfläche> [Argumente...]",
       "description": "Layout-, Arbeitsflächen- und Fenstermanagement-Nachrichten direkt senden.",
       "available_commands": "Verfügbare Befehle:",
       "cmd_workspace": "Zu Arbeitsfläche <num> wechseln ('move' anhängen, um aktives Fenster zu verschieben)",
@@ -876,7 +876,7 @@
       "cmd_close": "Aktives Shell-Overlay schließen"
     },
     "ipc_help": {
-      "usage": "Verwendung: serpantinum ipc call <Ziel> <Methode> [Argumente...]",
+      "usage": "Verwendung: yoake ipc call <Ziel> <Methode> [Argumente...]",
       "description": "IPC-Aufruf direkt an die laufende Quickshell-Instanz senden."
     },
     "scripts": {
@@ -896,11 +896,11 @@
   },
   "daemon": {
     "already_running": "Daemon läuft bereits. Beenden...",
-    "shutting_down": "Serpantinum-Daemon wird heruntergefahren...",
-    "launching": "Serpantinum-Daemon wird gestartet...",
+    "shutting_down": "Yoake-Daemon wird heruntergefahren...",
+    "launching": "Yoake-Daemon wird gestartet...",
     "cli": {
-      "usage": "Verwendung: serpantinumd <Befehl> [Optionen...]",
-      "description": "Hintergrund-Daemon für die Serpantinum Desktop-Shell.",
+      "usage": "Verwendung: yoaked <Befehl> [Optionen...]",
+      "description": "Hintergrund-Daemon für die Yoake Desktop-Shell.",
       "commands": "Befehle:",
       "cmd_start": "Daemon-Dienst starten und Hintergrundprozesse ausführen",
       "cmd_stop": "Laufenden Daemon-Dienst stoppen",
@@ -909,9 +909,9 @@
       "opt_verbose": "Ausführliche Protokollausgabe aktivieren",
       "opt_version": "Versionsinformationen anzeigen und beenden",
       "opt_help": "Diese Hilfemeldung anzeigen und beenden",
-      "stopped": "Serpantinum-Daemon beendet.",
-      "status_running": "Serpantinum-Daemon läuft (PID: {PID}).",
-      "status_stopped": "Serpantinum-Daemon läuft nicht.",
+      "stopped": "Yoake-Daemon beendet.",
+      "status_running": "Yoake-Daemon läuft (PID: {PID}).",
+      "status_stopped": "Yoake-Daemon läuft nicht.",
       "unknown_arg": "Unbekanntes Argument: {ARG}"
     }
   },
@@ -926,7 +926,7 @@
     },
     "os": {
       "error_root": "Fehler: Dieses Skript nicht direkt als root/sudo ausführen. Als normaler Benutzer starten.",
-      "error_unsupported": "Nicht unterstütztes Betriebssystem ({os}). Serpantinum unterstützt ausschließlich Arch Linux und Derivate.",
+      "error_unsupported": "Nicht unterstütztes Betriebssystem ({os}). Yoake unterstützt ausschließlich Arch Linux und Derivate.",
       "error_not_found": "Betriebssystem konnte nicht erkannt werden. /etc/os-release nicht gefunden.",
       "unknown_cpu": "Unbekannte CPU",
       "unknown_gpu": "Unbekannt / Virtuelle Maschine",
@@ -982,9 +982,9 @@
       "tagline": "Eine Desktop-Shell, gemacht für dich",
       "support_creator": "Entwickler unterstützen:",
       "buy_coffee": "Wenn dir dieses Projekt gefällt, spendiere mir gerne einen Kaffee!",
-      "installed_success": "✔ Serpantinum {ver} ({commit}) erfolgreich installiert.",
+      "installed_success": "✔ Yoake {ver} ({commit}) erfolgreich installiert.",
       "failed_packages": "Bei den folgenden Paketen sind während der Installation Fehler aufgetreten:",
-      "restart_prompt": "Compositor neu starten oder 'serpantinumd start' ausführen, um zu beginnen.",
+      "restart_prompt": "Compositor neu starten oder 'yoaked start' ausführen, um zu beginnen.",
       "ask_reboot": "Möchten Sie jetzt neu starten? [y/N] "
     },
     "deps": {

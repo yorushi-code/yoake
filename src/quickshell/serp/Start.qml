@@ -405,7 +405,7 @@ PanelWindow {
                             anchors.centerIn: parent
                             width: window.s(360)
                             height: window.s(360)
-                            source: "file://" + Caching.serpantinumDir + "/assets/logo.svg"
+                            source: "file://" + Caching.yoakeDir + "/assets/logo.svg"
                             sourceSize: Qt.size(width, height)
                             fillMode: Image.PreserveAspectFit
                             smooth: true

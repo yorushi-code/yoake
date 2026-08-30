@@ -68,7 +68,7 @@ bootstrap_installer_deps() {
     fi
 
     if ! command -v yay &>/dev/null && ! command -v paru &>/dev/null; then
-        local cache_build="${XDG_CACHE_HOME:-"$HOME/.cache"}/serpantinum-yay-bin"
+        local cache_build="${XDG_CACHE_HOME:-"$HOME/.cache"}/yoake-yay-bin"
         rm -rf "$cache_build"
         mkdir -p "$cache_build"
         git clone https://aur.archlinux.org/yay-bin.git "$cache_build"
@@ -95,7 +95,7 @@ install_pkg() {
 install_fonts() {
     local target_fonts_dir="$HOME/.local/share/fonts/IosevkaNerdFont"
     if [ ! -d "$target_fonts_dir" ] || [ -z "$(ls -A "$target_fonts_dir" 2>/dev/null | grep -i "\.ttf")" ]; then
-        local font_cache="${XDG_CACHE_HOME:-"$HOME/.cache"}/serpantinum-fonts"
+        local font_cache="${XDG_CACHE_HOME:-"$HOME/.cache"}/yoake-fonts"
         mkdir -p "$font_cache" "$target_fonts_dir"
         curl -sLo "$font_cache/Iosevka.zip" https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Iosevka.zip 2>/dev/null || true
         if [ -f "$font_cache/Iosevka.zip" ]; then

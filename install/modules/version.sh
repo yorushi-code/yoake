@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-STATE_DIR="$HOME/.local/state/serpantinum"
+STATE_DIR="$HOME/.local/state/yoake"
 VERSION_FILE="$STATE_DIR/version"
 DEFAULT_FALLBACK_VERSION="2.0.0"
 
@@ -23,7 +23,7 @@ get_telemetry_id() {
 
 get_installed_commit() {
     if [ -f "$VERSION_FILE" ]; then
-        awk -F= '/^SERPANTINUM_COMMIT=/{gsub(/"/, "", $2); print $2}' "$VERSION_FILE"
+        awk -F= '/^YOAKE_COMMIT=/{gsub(/"/, "", $2); print $2}' "$VERSION_FILE"
     fi
 }
 
@@ -89,8 +89,8 @@ write_version_state() {
     mkdir -p "$STATE_DIR"
     local tmp_file="${VERSION_FILE}.tmp.$$"
     cat <<EOF > "$tmp_file"
-SERPANTINUM_VERSION="$version"
-SERPANTINUM_COMMIT="$commit"
+YOAKE_VERSION="$version"
+YOAKE_COMMIT="$commit"
 TELEMETRY_ID="$tel_id"
 ENABLE_TELEMETRY="$tel_enabled"
 SELECTED_COMPOSITORS="$compositors"

@@ -63,7 +63,7 @@ Item {
                 }
             }
         }
-        Quickshell.execDetached(["serpantinum", "ipc", "call", "main", "clearNotifications"]);
+        Quickshell.execDetached(["yoake", "ipc", "call", "main", "clearNotifications"]);
     }
 
     Timer {
@@ -220,7 +220,7 @@ Item {
                     size: root.emptyGraphicSize
                     cornerRadius: root.s(0)
                     imageRadius: root.s(0)
-                    source: Caching.serpantinumDir ? ("file://" + Caching.serpantinumDir + "/assets/pushy.gif") : Qt.resolvedUrl("../../assets/pushy.gif")
+                    source: Caching.yoakeDir ? ("file://" + Caching.yoakeDir + "/assets/pushy.gif") : Qt.resolvedUrl("../../assets/pushy.gif")
                     isGif: true
                     playing: true
                     fillMode: Image.PreserveAspectFit

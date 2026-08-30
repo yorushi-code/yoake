@@ -10,7 +10,7 @@ Notification {
     id: faceRoot
 
     fullSummary: model ? (model.summary || "Update Available") : "Update Available"
-    fullBody: model && model.body !== "" ? model.body : "A new version of Serpantinum is available."
+    fullBody: model && model.body !== "" ? model.body : "A new version of Yoake is available."
     accentColor: ThemeBackend.green
     overrideClick: true
 
@@ -25,7 +25,7 @@ Notification {
             }
         }
         Quickshell.execDetached(["bash", "-c", "echo 'about' > '" + Caching.getCacheDir("guide") + "/last_tab.txt'"]);
-        Quickshell.execDetached(["bash", Caching.serpantinumDir + "/scripts/qs_manager.sh", "guide"]);
+        Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/qs_manager.sh", "guide"]);
         doClose();
     }
 
@@ -52,7 +52,7 @@ Notification {
     headerArea: [
         Text {
             Layout.fillWidth: true
-            text: model ? (model.displayName || model.appName || "Serpantinum Updater") : "Serpantinum Updater"
+            text: model ? (model.displayName || model.appName || "Yoake Updater") : "Yoake Updater"
             font.family: ThemeBackend.fontFamily
             font.weight: Font.Bold
             font.pixelSize: s(11)

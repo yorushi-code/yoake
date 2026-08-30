@@ -53,7 +53,7 @@
 , rev ? "dirty"
 }:
 let
-  pname = "serpantinum";
+  pname = "yoake";
   version = lib.strings.trim (builtins.readFile ../version.txt);
   pythonEnv = python3.withPackages (ps: [ ps.websockets ]);
   pathDeps = [
@@ -131,19 +131,19 @@ stdenv.mkDerivation (finalAttrs: {
     cp -r src/. "$out/share/${finalAttrs.pname}/"
     cp -r config "$out/share/${finalAttrs.pname}/config"
     find "$out/share/${finalAttrs.pname}" -type f \( -name "*.sh" -o -name "*.py" \) -exec chmod +x {} +
-    install -Dm755 bin/serpantinum  "$out/bin/.serpantinum-wrapped"
-    install -Dm755 bin/serpantinumd "$out/bin/.serpantinumd-wrapped"
+    install -Dm755 bin/yoake  "$out/bin/.yoake-wrapped"
+    install -Dm755 bin/yoaked "$out/bin/.yoaked-wrapped"
     runHook postInstall
   '';
   postFixup = ''
-    for bin in serpantinum serpantinumd; do
+    for bin in yoake yoaked; do
       makeWrapper "$out/bin/.$bin-wrapped" "$out/bin/$bin" \
         "''${qtWrapperArgs[@]}" \
         --prefix QML2_IMPORT_PATH : "${qmlImportPath}" \
         --prefix QT_PLUGIN_PATH : "${qtPluginPath}" \
-        --set SERPANTINUM_DIR "$out/share/${finalAttrs.pname}" \
-        --set SERPANTINUM_VERSION "${finalAttrs.version}" \
-        --set SERPANTINUM_REV "${rev}" \
+        --set YOAKE_DIR "$out/share/${finalAttrs.pname}" \
+        --set YOAKE_VERSION "${finalAttrs.version}" \
+        --set YOAKE_REV "${rev}" \
         --prefix PATH : "${lib.makeBinPath pathDeps}"
     done
   '';
@@ -153,6 +153,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/ilyamiro/serpantinum";
     license = licenses.agpl3Plus;
     platforms = platforms.linux;
-    mainProgram = "serpantinum";
+    mainProgram = "yoake";
   };
 })

@@ -6,7 +6,7 @@ import Quickshell.Io
 Item {
     id: root
 
-    readonly property string i18nDir: Caching.serpantinumDir + "/assets/languages"
+    readonly property string i18nDir: Caching.yoakeDir + "/assets/languages"
     property string currentLang: "en"
     property var translations: ({})
     property bool isReady: false

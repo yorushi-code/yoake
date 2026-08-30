@@ -3,11 +3,11 @@
 with lib;
 
 let
-  cfg = config.programs.serpantinum;
+  cfg = config.programs.yoake;
 in
 {
-  options.programs.serpantinum = {
-    enable = mkEnableOption "system-level support for the Serpantinum desktop shell";
+  options.programs.yoake = {
+    enable = mkEnableOption "system-level support for the Yoake desktop shell";
   };
 
   config = mkIf cfg.enable {

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-CONFIG_DIR="$HOME/.config/serpantinum"
+CONFIG_DIR="$HOME/.config/yoake"
 CONFIG_FILE="$CONFIG_DIR/settings.json"
 
-init_serpantinum_config() {
+init_yoake_config() {
     local project_root="$1"
     local wallpaper_dir="$2"
-    local template_json="$project_root/config/serpantinum/settings.json"
+    local template_json="$project_root/config/yoake/settings.json"
     local script_path="$project_root/src/scripts/location.sh"
 
     mkdir -p "$CONFIG_DIR"
@@ -37,7 +37,7 @@ init_serpantinum_config() {
 
     if [ -f "$script_path" ]; then
         bash "$script_path" --refresh >/dev/null 2>&1 || true
-    elif [ -f "$HOME/.local/share/serpantinum/src/scripts/location.sh" ]; then
-        bash "$HOME/.local/share/serpantinum/src/scripts/location.sh" --refresh >/dev/null 2>&1 || true
+    elif [ -f "$HOME/.local/share/yoake/src/scripts/location.sh" ]; then
+        bash "$HOME/.local/share/yoake/src/scripts/location.sh" --refresh >/dev/null 2>&1 || true
     fi
 }

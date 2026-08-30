@@ -109,7 +109,7 @@ Item {
 
                                 Image {
                                     anchors.fill: parent
-                                    source: "file://" + rootObj.appPaths.serpantinumDir + "/assets/logo.svg"
+                                    source: "file://" + rootObj.appPaths.yoakeDir + "/assets/logo.svg"
                                     sourceSize: Qt.size(512, 512)
                                     fillMode: Image.PreserveAspectFit
                                     smooth: true
@@ -225,7 +225,7 @@ Item {
                             onTriggered: {
                                 let cmd = "if command -v kitty >/dev/null 2>&1; then kitty --hold bash -c 'eval \"$(curl -fsSL https://raw.githubusercontent.com/ilyamiro/serpantinum/master/install/install.sh)\"'; else ${TERM:-xterm} -hold -e bash -c 'eval \"$(curl -fsSL https://raw.githubusercontent.com/ilyamiro/serpantinum/master/install/install.sh)\"'; fi";
                                 Quickshell.execDetached(["bash", "-c", cmd]);
-                                Quickshell.execDetached(["bash", rootObj.appPaths.serpantinumDir + "/scripts/qs_manager.sh", "close"]);
+                                Quickshell.execDetached(["bash", rootObj.appPaths.yoakeDir + "/scripts/qs_manager.sh", "close"]);
                             }
                         }
                     }

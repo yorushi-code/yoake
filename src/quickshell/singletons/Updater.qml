@@ -42,11 +42,11 @@ Item {
     }
 
     function saveNotifiedVersion(ver) {
-        if (typeof Caching === "undefined" || !Caching.serpantinumDir) return;
+        if (typeof Caching === "undefined" || !Caching.yoakeDir) return;
         let stateDir = Caching.getStateDir();
         Quickshell.execDetached([
             "python3",
-            Caching.serpantinumDir + "/scripts/updater.py",
+            Caching.yoakeDir + "/scripts/updater.py",
             "--state-dir",
             stateDir,
             "--save-notified",
@@ -55,7 +55,7 @@ Item {
     }
 
     function sendNotification() {
-        let serpDir = (typeof Caching !== "undefined" && Caching.serpantinumDir) ? Caching.serpantinumDir : "";
+        let serpDir = (typeof Caching !== "undefined" && Caching.yoakeDir) ? Caching.yoakeDir : "";
         let guideDir = (typeof Caching !== "undefined") ? Caching.getCacheDir("guide") : "";
         let appName = I18n.t("updater.notification.app_name");
         let actionText = I18n.t("updater.notification.action_open_guide");
@@ -79,14 +79,14 @@ Item {
     }
 
     function checkUpdate() {
-        if (typeof Caching === "undefined" || !Caching.serpantinumDir) return;
+        if (typeof Caching === "undefined" || !Caching.yoakeDir) return;
         if (updateProc.running) return;
         root.isChecking = true;
         updateProc.running = true;
     }
 
     function scheduleInitialCheck() {
-        if (typeof Caching === "undefined" || !Caching.serpantinumDir) return;
+        if (typeof Caching === "undefined" || !Caching.yoakeDir) return;
         if (checkDelayProc.running) return;
         checkDelayProc.running = true;
     }
@@ -103,8 +103,8 @@ Item {
             let lines = content.split("\n");
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i].trim();
-                if (line.indexOf("SERPANTINUM_VERSION=") === 0) {
-                    let v = line.substring("SERPANTINUM_VERSION=".length).replace(/["']/g, "").trim();
+                if (line.indexOf("YOAKE_VERSION=") === 0) {
+                    let v = line.substring("YOAKE_VERSION=".length).replace(/["']/g, "").trim();
                     if (v) {
                         root.localVersion = v;
                         root.reevaluateUpdate();
@@ -147,7 +147,7 @@ Item {
         running: false
         command: [
             "python3",
-            (typeof Caching !== "undefined" ? Caching.serpantinumDir : "") + "/scripts/updater.py",
+            (typeof Caching !== "undefined" ? Caching.yoakeDir : "") + "/scripts/updater.py",
             "--state-dir",
             (typeof Caching !== "undefined" ? Caching.getStateDir() : ""),
             "--delay"
@@ -171,7 +171,7 @@ Item {
         running: false
         command: [
             "python3",
-            (typeof Caching !== "undefined" ? Caching.serpantinumDir : "") + "/scripts/updater.py",
+            (typeof Caching !== "undefined" ? Caching.yoakeDir : "") + "/scripts/updater.py",
             "--state-dir",
             (typeof Caching !== "undefined" ? Caching.getStateDir() : "")
         ]

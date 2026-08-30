@@ -286,7 +286,7 @@ Item {
         }
         ScriptAction {
             script: {
-                Quickshell.execDetached(["bash", Caching.serpantinumDir + "/scripts/qs_manager.sh", "close"]);
+                Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/qs_manager.sh", "close"]);
             }
         }
     }
@@ -505,7 +505,7 @@ Item {
                                 interval: 150
                                 onTriggered: {
                                     closeSequence.start();
-                                    Quickshell.execDetached(["bash", Caching.serpantinumDir + "/scripts/exit.sh"]);
+                                    Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/exit.sh"]);
                                     Quickshell.execDetached(["sh", "-c", "echo 'close' > " + Caching.runDir + "/widget_state"]);
                                 }
                             }
@@ -764,9 +764,9 @@ Item {
                                     let kelvin = Math.round(6500 - (temp / 100) * (6500 - 2500));
 
                                     if (isActive) {
-                                        Quickshell.execDetached(["bash", Caching.serpantinumDir + "/scripts/blue_light_filter.sh", "set", kelvin.toString(), mName]);
+                                        Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/blue_light_filter.sh", "set", kelvin.toString(), mName]);
                                     } else {
-                                        Quickshell.execDetached(["bash", Caching.serpantinumDir + "/scripts/blue_light_filter.sh", "reset", mName]);
+                                        Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/blue_light_filter.sh", "reset", mName]);
                                     }
                                     mSet.enabled = isActive;
                                     mons[mName] = mSet;
@@ -777,7 +777,7 @@ Item {
 
                             onRightClicked: {
                                 closeSequence.start();
-                                Quickshell.execDetached(["bash", Caching.serpantinumDir + "/scripts/qs_manager.sh", "toggle", "guide", "display"]);
+                                Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/qs_manager.sh", "toggle", "guide", "display"]);
                             }
                         }
 
@@ -810,7 +810,7 @@ Item {
 
                             onRightClicked: {
                                 closeSequence.start();
-                                Quickshell.execDetached(["bash", Caching.serpantinumDir + "/scripts/qs_manager.sh", "toggle", "guide", "idle"]);
+                                Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/qs_manager.sh", "toggle", "guide", "idle"]);
                             }
                         }
 
@@ -824,7 +824,7 @@ Item {
                             }
                             onRightClicked: {
                                 closeSequence.start();
-                                Quickshell.execDetached(["bash", Caching.serpantinumDir + "/scripts/qs_manager.sh", "toggle", "network", "wifi"]);
+                                Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/qs_manager.sh", "toggle", "network", "wifi"]);
                             }
                         }
 
@@ -840,7 +840,7 @@ Item {
                             }
                             onRightClicked: {
                                 closeSequence.start();
-                                Quickshell.execDetached(["bash", Caching.serpantinumDir + "/scripts/qs_manager.sh", "toggle", "network", "bt"]);
+                                Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/qs_manager.sh", "toggle", "network", "bt"]);
                             }
                         }
 
@@ -1145,8 +1145,8 @@ Item {
                                         actionCapsule.chargingSoundHandle = -1;
                                     }
                                     let finalCmd = cmd;
-                                    if (cmd === "lock") finalCmd = "bash " + Caching.serpantinumDir + "/scripts/lock.sh";
-                                    else if (cmd === "sleep") finalCmd = "bash " + Caching.serpantinumDir + "/scripts/lock.sh & systemctl suspend";
+                                    if (cmd === "lock") finalCmd = "bash " + Caching.yoakeDir + "/scripts/lock.sh";
+                                    else if (cmd === "sleep") finalCmd = "bash " + Caching.yoakeDir + "/scripts/lock.sh & systemctl suspend";
                                     else if (cmd === "hibernate") finalCmd = "dbus-send --system --print-reply --dest=org.freedesktop.login1 /org/freedesktop/login1 org.freedesktop.login1.Manager.Hibernate boolean:true";
                                     else if (cmd === "reboot") finalCmd = "systemctl reboot";
                                     else if (cmd === "poweroff") finalCmd = "systemctl poweroff -i";

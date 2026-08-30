@@ -153,7 +153,7 @@ deploy_package() {
     shift 5
     local COMPOSITORS=("$@")
 
-    local TARGET_BASE="$HOME/.local/share/serpantinum"
+    local TARGET_BASE="$HOME/.local/share/yoake"
     local BIN_DIR="$HOME/.local/bin"
 
     local is_update=false
@@ -330,13 +330,13 @@ deploy_package() {
         fi
     fi
 
-    if [ -f "$TARGET_BASE/bin/serpantinum" ]; then
-        ln -sf "$TARGET_BASE/bin/serpantinum" "$BIN_DIR/serpantinum"
-        sudo ln -sf "$TARGET_BASE/bin/serpantinum" /usr/local/bin/serpantinum 2>/dev/null || true
+    if [ -f "$TARGET_BASE/bin/yoake" ]; then
+        ln -sf "$TARGET_BASE/bin/yoake" "$BIN_DIR/yoake"
+        sudo ln -sf "$TARGET_BASE/bin/yoake" /usr/local/bin/yoake 2>/dev/null || true
     fi
 
-    if [ -f "$TARGET_BASE/bin/serpantinumd" ]; then
-        ln -sf "$TARGET_BASE/bin/serpantinumd" "$BIN_DIR/serpantinumd"
-        sudo ln -sf "$TARGET_BASE/bin/serpantinumd" /usr/local/bin/serpantinumd 2>/dev/null || true
+    if [ -f "$TARGET_BASE/bin/yoaked" ]; then
+        ln -sf "$TARGET_BASE/bin/yoaked" "$BIN_DIR/yoaked"
+        sudo ln -sf "$TARGET_BASE/bin/yoaked" /usr/local/bin/yoaked 2>/dev/null || true
     fi
 }

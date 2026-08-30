@@ -1,7 +1,7 @@
 {
   "guide": {
     "about": {
-      "title": "Serpantinum",
+      "title": "Yoake",
       "loading": "Загрузка...",
       "unknown": "Неизвестно",
       "version_by": "v{version} • от {author}",
@@ -315,7 +315,7 @@
     "theme": {
       "font": {
         "title": "Шрифт",
-        "desc": "Выберите шрифт по умолчанию для Serpantinum",
+        "desc": "Выберите шрифт по умолчанию для Yoake",
         "select": "Выбрать..."
       },
       "radius": {
@@ -662,7 +662,7 @@
     }
   },
   "start": {
-    "title": "Serpantinum",
+    "title": "Yoake",
     "made_by": "Создано @{author}",
     "welcome": "Добро пожаловать",
     "tagline": "Оболочка рабочего стола, созданная для",
@@ -797,7 +797,7 @@
     },
     "guide": {
       "name": "Настройки",
-      "desc": "Настройки Serpantinum"
+      "desc": "Настройки Yoake"
     },
     "calendar": {
       "name": "Календарь и часы",
@@ -838,7 +838,7 @@
     }
   },
   "cli": {
-    "usage": "Использование: serpantinum [команда] [опции...]",
+    "usage": "Использование: yoake [команда] [опции...]",
     "description": "Оболочка рабочего стола для композиторов Wayland.",
     "commands": "Команды:",
     "script_commands": "Команды скриптов:",
@@ -851,23 +851,23 @@
     "version_desc": "Показать информацию о версии и выйти",
     "help_desc": "Показать эту справку и выйти",
     "examples": "Примеры:",
-    "daemon_stopped": "Служба Serpantinum остановлена.",
-    "starting_daemon": "Служба не запущена. Запуск serpantinumd в фоновом режиме...",
+    "daemon_stopped": "Служба Yoake остановлена.",
+    "starting_daemon": "Служба не запущена. Запуск yoaked в фоновом режиме...",
     "error_missing_qml": "Ошибка: не указана цель для запуска.",
-    "launch_usage": "Использование: serpantinum launch <start|widgetredactor> [аргументы...]",
+    "launch_usage": "Использование: yoake launch <start|widgetredactor> [аргументы...]",
     "error_qml_not_found": "Ошибка: не удалось найти {NAME}.qml в {DIR}",
     "error_shell_qml_not_found": "Ошибка: не удалось определить путь к shell.qml в {DIR}",
     "error_unknown_command": "Ошибка: неизвестная команда '{CMD}'.",
     "error_unknown_target": "Ошибка: неизвестная цель '{TARGET}'.",
     "launch_help": {
-      "usage": "Использование: serpantinum launch <start|widgetredactor> [аргументы...]",
+      "usage": "Использование: yoake launch <start|widgetredactor> [аргументы...]",
       "description": "Запуск автономных компонентов напрямую в режиме runner.",
       "available_targets": "Доступные цели:",
       "target_start": "Запустить интерфейс начальной настройки",
       "target_widgetredactor": "Запустить интерфейс редактора виджетов рабочего стола"
     },
     "msg_help": {
-      "usage": "Использование: serpantinum msg <команда|рабочее_пространство> [аргументы...]",
+      "usage": "Использование: yoake msg <команда|рабочее_пространство> [аргументы...]",
       "description": "Отправка сообщений разметки, рабочих пространств и управления окнами напрямую.",
       "available_commands": "Доступные сообщения:",
       "cmd_workspace": "Переключиться на рабочее пространство <номер> (добавьте 'move', чтобы переместить активное окно)",
@@ -876,7 +876,7 @@
       "cmd_close": "Закрыть любой активный оверлей оболочки"
     },
     "ipc_help": {
-      "usage": "Использование: serpantinum ipc call <цель> <метод> [аргументы...]",
+      "usage": "Использование: yoake ipc call <цель> <метод> [аргументы...]",
       "description": "Отправить вызов IPC напрямую запущенному экземпляру quickshell."
     },
     "scripts": {
@@ -896,11 +896,11 @@
   },
   "daemon": {
     "already_running": "Служба уже запущена. Выход...",
-    "shutting_down": "Завершение работы службы serpantinum...",
-    "launching": "Запуск службы serpantinum...",
+    "shutting_down": "Завершение работы службы yoake...",
+    "launching": "Запуск службы yoake...",
     "cli": {
-      "usage": "Использование: serpantinumd <команда> [опции...]",
-      "description": "Фоновая служба для оболочки рабочего стола Serpantinum.",
+      "usage": "Использование: yoaked <команда> [опции...]",
+      "description": "Фоновая служба для оболочки рабочего стола Yoake.",
       "commands": "Команды:",
       "cmd_start": "Запустить службу и фоновые процессы",
       "cmd_stop": "Остановить работающую службу",
@@ -909,9 +909,9 @@
       "opt_verbose": "Включить подробный вывод логов",
       "opt_version": "Показать информацию о версии и выйти",
       "opt_help": "Показать эту справку и выйти",
-      "stopped": "Служба Serpantinum остановлена.",
-      "status_running": "Служба Serpantinum запущена (PID: {PID}).",
-      "status_stopped": "Служба Serpantinum не запущена.",
+      "stopped": "Служба Yoake остановлена.",
+      "status_running": "Служба Yoake запущена (PID: {PID}).",
+      "status_stopped": "Служба Yoake не запущена.",
       "unknown_arg": "Неизвестный аргумент: {ARG}"
     }
   },
@@ -926,7 +926,7 @@
     },
     "os": {
       "error_root": "Ошибка: не запускайте этот скрипт от root/sudo. Запустите от обычного пользователя.",
-      "error_unsupported": "Неподдерживаемая ОС ({os}). Serpantinum поддерживает только Arch Linux и его производные.",
+      "error_unsupported": "Неподдерживаемая ОС ({os}). Yoake поддерживает только Arch Linux и его производные.",
       "error_not_found": "Не удалось определить ОС. /etc/os-release не найден.",
       "unknown_cpu": "Неизвестный процессор",
       "unknown_gpu": "Неизвестно / виртуальная машина",
@@ -982,9 +982,9 @@
       "tagline": "Оболочка рабочего стола, созданная для вас",
       "support_creator": "Поддержать автора:",
       "buy_coffee": "Если вам нравится этот проект, угостите автора кофе!",
-      "installed_success": "✔ Serpantinum {ver} ({commit}) успешно установлен.",
+      "installed_success": "✔ Yoake {ver} ({commit}) успешно установлен.",
       "failed_packages": "При установке следующих пакетов возникли ошибки:",
-      "restart_prompt": "Перезапустите композитор или выполните 'serpantinumd start' для начала работы.",
+      "restart_prompt": "Перезапустите композитор или выполните 'yoaked start' для начала работы.",
       "ask_reboot": "Перезагрузить систему сейчас? [y/N] "
     },
     "deps": {
