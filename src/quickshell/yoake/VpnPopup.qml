@@ -32,6 +32,16 @@ Item {
     }
     readonly property var nodeList: currentGroup ? (currentGroup.nodes || []) : []
 
+    // Measure on arrival rather than on a button. The list is worth nothing
+    // without the numbers, and probeDelaysIfStale only spends a round of
+    // requests when some node in the group has never been measured -- so
+    // reopening the panel, or flipping back to a tab already seen, is free.
+    // Groups land asynchronously, so this hangs off the group becoming known
+    // rather than off Component.onCompleted, which is too early.
+    onCurrentGroupChanged: {
+        if (currentGroup) Mihomo.probeDelaysIfStale(currentGroup.name);
+    }
+
     // Latency is a judgement, not a number: the thresholds are where a tunnel
     // stops being usable for a call, then for a page.
     function delayColor(ms) {
