@@ -140,6 +140,12 @@ Item {
         if (!imagePath || imagePath.trim() === "") {
             return false;
         }
+        // Слой yoake меряет палитру сам, в OKLCh. Все, кто меняет обои, уже
+        // проходят через эту функцию, поэтому перехватывать достаточно здесь:
+        // ни подборщик, ни вкладка темы не должны знать, что извлекатель другой.
+        if (typeof YoakePalette !== "undefined" && YoakePalette.active) {
+            return YoakePalette.regenerate(imagePath);
+        }
         if (!root.isMatugenTheme()) {
             return false;
         }

@@ -20,6 +20,12 @@ ShellRoot {
 
         function setWallpaper(screenName: string, path: string, transition: string): void {
             globalRoot.wallpaperChanged(screenName, path, transition ? transition : "fade");
+            // Перекраску запускал только подборщик, поэтому смена обоев
+            // скриптом через этот же IPC оставляла палитру от прошлой
+            // картинки. Теперь оба пути ведут в одно место.
+            if (typeof Matugen !== "undefined" && typeof Matugen.generate === "function") {
+                Matugen.generate(path);
+            }
         }
 
         function getWallpaper(screenName: string): string {

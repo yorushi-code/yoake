@@ -138,6 +138,23 @@ Singleton {
         };
     }
 
+    readonly property string _scriptsDir: (typeof Caching !== "undefined" && Caching.yoakeDir)
+        ? Caching.yoakeDir + "/scripts" : ""
+
+    property Process _gen: Process {}
+
+    // Перемерить обои. Вызывается из Matugen.generate(), потому что туда уже
+    // приходят все, кто меняет картинку -- и подборщик обоев, и вкладка темы.
+    // Результат ложится в generated-colors.json, а его слушает FileView ниже,
+    // так что перекраска случается сама.
+    function regenerate(imagePath) {
+        if (!root.active || root._scriptsDir === "") return false;
+        const clean = imagePath.startsWith("file://") ? imagePath.substring(7) : imagePath;
+        _gen.command = [root._scriptsDir + "/wallpaper-palette.py", clean];
+        _gen.running = true;
+        return true;
+    }
+
     function apply() {
         if (!root.active) return;
         if (typeof ThemeBackend === "undefined") return;
