@@ -22,6 +22,12 @@ Item {
     // Which group's members are listed. PROXY is the one that matters on a
     // normal config; the rest are reachable through the tabs when a config
     // has them.
+    // Подписки живут отдельной секцией и по умолчанию свёрнуты: главное
+    // содержимое панели -- узлы, и отдавать им половину высоты ради списка,
+    // который трогают раз в месяц, неправильно.
+    property bool subsOpen: false
+    property bool addOpen: false
+
     property string viewGroup: ""
     readonly property var currentGroup: {
         if (window.viewGroup !== "") {
@@ -39,7 +45,7 @@ Item {
     // Groups land asynchronously, so this hangs off the group becoming known
     // rather than off Component.onCompleted, which is too early.
     onCurrentGroupChanged: {
-        if (currentGroup) Mihomo.probeDelaysIfStale(currentGroup.name);
+        if (window.visible && currentGroup) Mihomo.probeDelaysIfStale(currentGroup.name);
     }
 
     // Latency is a judgement, not a number: the thresholds are where a tunnel
@@ -60,11 +66,26 @@ Item {
 
     // Asking costs up to twelve seconds and only matters while something is
     // displaying the answer, so the flag is held exactly as long as the panel.
-    Component.onCompleted: {
-        Mihomo.watched = true;
+    // Панель может быть создана заранее и висеть невидимой в
+    // preloaderContainer -- тогда будить VPN нельзя. Раньше здесь стоял
+    // Component.onCompleted, и из-за этого проверка выхода (до двенадцати
+    // секунд сетевых запросов) уходила при каждом входе в систему, ради
+    // ответа, на который никто не смотрел. Признак -- видимость, а не
+    // создание.
+    function _wake() {
+        if (!window.visible) return;
         Mihomo.refresh();
+        Mihomo.checkTunDns();
+        if (window.currentGroup) Mihomo.probeDelaysIfStale(window.currentGroup.name);
     }
-    Component.onDestruction: Mihomo.watched = false;
+
+    onVisibleChanged: {
+        Mihomo.watched = window.visible;
+        if (window.visible) window._wake();
+    }
+
+    Component.onCompleted: if (window.visible) { Mihomo.watched = true; window._wake(); }
+    Component.onDestruction: Mihomo.watched = false
 
     ColumnLayout {
         anchors.fill: parent
@@ -190,6 +211,31 @@ Item {
                     textColor: ThemeBackend.base
                     onClicked: Mihomo.stopRival()
                 }
+            }
+        }
+
+        // Туннель поднят, но резолвер перенаправлен. Отдельная полоса, а не
+        // строка в подвале: без неё панель выглядела исправной ровно тогда,
+        // когда интернета не было.
+        Rectangle {
+            visible: Mihomo.running && Mihomo.resolvedHijacked
+            Layout.fillWidth: true
+            Layout.preferredHeight: window.s(52)
+            radius: ThemeBackend.borderRadius
+            color: Qt.rgba(ThemeBackend.peach.r, ThemeBackend.peach.g, ThemeBackend.peach.b, 0.14)
+            border.width: 1
+            border.color: ThemeBackend.peach
+
+            Text {
+                anchors.fill: parent
+                anchors.leftMargin: window.s(14)
+                anchors.rightMargin: window.s(14)
+                verticalAlignment: Text.AlignVCenter
+                wrapMode: Text.WordWrap
+                text: "systemd-resolved перехвачен туннелем — имена могут не разрешаться"
+                font.family: ThemeBackend.fontFamily
+                font.pixelSize: window.s(12)
+                color: ThemeBackend.text
             }
         }
 
@@ -339,6 +385,182 @@ Item {
                         onClicked: {
                             if (window.currentGroup)
                                 Mihomo.select(window.currentGroup.name, modelData);
+                        }
+                    }
+                }
+            }
+        }
+
+        // ── подписки ──
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: subsCol.implicitHeight + window.s(16)
+            radius: ThemeBackend.borderRadius
+            color: ThemeBackend.surface0
+            clip: true
+            Behavior on Layout.preferredHeight { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+
+            ColumnLayout {
+                id: subsCol
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.margins: window.s(8)
+                spacing: window.s(6)
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: window.s(8)
+
+                    Text {
+                        Layout.fillWidth: true
+                        Layout.leftMargin: window.s(6)
+                        text: "Подписки · " + Mihomo.subscriptions.length
+                        font.family: ThemeBackend.fontFamily
+                        font.pixelSize: window.s(12)
+                        color: ThemeBackend.subtext1
+                    }
+                    ClickButton {
+                        height: window.s(26)
+                        cornerRadius: Math.max(0, ThemeBackend.borderRadius - 2)
+                        horizontalPadding: window.s(10)
+                        buttonIcon: "\uf0415"
+                        iconFontSize: window.s(13)
+                        accentColor: window.addOpen ? ThemeBackend.mauve : ThemeBackend.surface1
+                        textColor: window.addOpen ? ThemeBackend.base : ThemeBackend.text
+                        onClicked: { window.addOpen = !window.addOpen; if (window.addOpen) window.subsOpen = true; }
+                    }
+                    ClickButton {
+                        height: window.s(26)
+                        cornerRadius: Math.max(0, ThemeBackend.borderRadius - 2)
+                        horizontalPadding: window.s(10)
+                        buttonIcon: window.subsOpen ? "\uf0143" : "\uf0140"
+                        iconFontSize: window.s(13)
+                        accentColor: ThemeBackend.surface1
+                        textColor: ThemeBackend.text
+                        onClicked: window.subsOpen = !window.subsOpen
+                    }
+                }
+
+                // добавление: имя и ссылка, разворачивается по кнопке
+                ColumnLayout {
+                    visible: window.addOpen
+                    Layout.fillWidth: true
+                    spacing: window.s(6)
+
+                    Input {
+                        id: subName
+                        Layout.fillWidth: true
+                        placeholderText: "Имя подписки"
+                        fontPixelSize: window.s(12)
+                        baseColor: ThemeBackend.surface1
+                        accentColor: ThemeBackend.mauve
+                        textColor: ThemeBackend.text
+                        borderColor: ThemeBackend.surface2
+                    }
+                    Input {
+                        id: subUrl
+                        Layout.fillWidth: true
+                        placeholderText: "Ссылка на подписку"
+                        fontPixelSize: window.s(12)
+                        baseColor: ThemeBackend.surface1
+                        accentColor: ThemeBackend.mauve
+                        textColor: ThemeBackend.text
+                        borderColor: ThemeBackend.surface2
+                    }
+                    ClickButton {
+                        Layout.fillWidth: true
+                        height: window.s(32)
+                        cornerRadius: Math.max(0, ThemeBackend.borderRadius - 2)
+                        buttonText: Mihomo.busy ? "..." : "Добавить"
+                        textFontSize: window.s(12)
+                        accentColor: ThemeBackend.mauve
+                        textColor: ThemeBackend.base
+                        onClicked: {
+                            if (subName.text.trim() === "" || subUrl.text.trim() === "") return;
+                            Mihomo.addSubscription(subName.text.trim(), subUrl.text.trim(), "");
+                            subName.text = ""; subUrl.text = ""; window.addOpen = false;
+                        }
+                    }
+                }
+
+                Repeater {
+                    model: window.subsOpen ? Mihomo.subscriptions : []
+
+                    delegate: Rectangle {
+                        required property var modelData
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: window.s(38)
+                        radius: Math.max(0, ThemeBackend.borderRadius - 2)
+                        readonly property bool isActive: modelData.name === Mihomo.active
+                        color: isActive ? ThemeBackend.surface2 : "transparent"
+
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: window.s(10)
+                            anchors.rightMargin: window.s(6)
+                            spacing: window.s(6)
+
+                            Text {
+                                Layout.fillWidth: true
+                                text: modelData.name || ""
+                                elide: Text.ElideRight
+                                font.family: ThemeBackend.fontFamily
+                                font.pixelSize: window.s(12)
+                                color: ThemeBackend.text
+                            }
+                            Text {
+                                text: modelData.core || Mihomo.core
+                                font.family: ThemeBackend.fontFamily
+                                font.pixelSize: window.s(10)
+                                color: ThemeBackend.subtext0
+                            }
+                            // Переключить ядро -- три состояния подряд: выпадающий
+                            // список на каждую строку съедал бы всю ширину.
+                            ClickButton {
+                                height: window.s(26)
+                                cornerRadius: Math.max(0, ThemeBackend.borderRadius - 3)
+                                horizontalPadding: window.s(8)
+                                buttonIcon: "\uf035c"
+                                iconFontSize: window.s(12)
+                                accentColor: ThemeBackend.surface1
+                                textColor: ThemeBackend.subtext1
+                                onClicked: {
+                                    const order = ["mihomo", "sing-box", "xray"];
+                                    const cur = modelData.core || Mihomo.core;
+                                    const next = order[(order.indexOf(cur) + 1) % order.length];
+                                    Mihomo.setCore(modelData.name, next);
+                                }
+                            }
+                            ClickButton {
+                                height: window.s(26)
+                                cornerRadius: Math.max(0, ThemeBackend.borderRadius - 3)
+                                horizontalPadding: window.s(8)
+                                buttonIcon: "\uf0450"
+                                iconFontSize: window.s(12)
+                                accentColor: ThemeBackend.surface1
+                                textColor: ThemeBackend.subtext1
+                                onClicked: Mihomo.refreshSubscription(modelData.name)
+                            }
+                            ClickButton {
+                                height: window.s(26)
+                                cornerRadius: Math.max(0, ThemeBackend.borderRadius - 3)
+                                horizontalPadding: window.s(8)
+                                buttonIcon: "\uf0156"
+                                iconFontSize: window.s(12)
+                                accentColor: ThemeBackend.surface1
+                                textColor: ThemeBackend.red
+                                onClicked: Mihomo.removeSubscription(modelData.name)
+                            }
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            anchors.rightMargin: window.s(110)
+                            cursorShape: Qt.PointingHandCursor
+                            // Запустить подписку -- значит поднять на ней туннель;
+                            // здесь это и означает «переключиться на неё».
+                            onClicked: if (!Mihomo.busy) Mihomo.start(modelData.name)
                         }
                     }
                 }

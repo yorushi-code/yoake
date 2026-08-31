@@ -92,6 +92,40 @@ Note the state path. The shell this was ported from is still installed and
 still reads its own palette out of `~/.config/quickshell/generated-colors.json`;
 these two must not be pointed at the same file while both are installed.
 
+## VPN: почему правило polkit запрещающее
+
+Ставится один раз, руками:
+
+```bash
+sudo install -m 0644 install/polkit/49-mihomo-no-resolved.rules /etc/polkit-1/rules.d/
+```
+
+Оно **запрещает**, и это не опечатка.
+
+DNS в туннеле держится на `dns-hijack: ["any:53"]` — mihomo перехватывает
+запросы прямо в TUN, и systemd-resolved для этого не нужен. Но при
+`tun.auto-route` mihomo вдобавок пытается зарегистрировать туннель в resolved и
+прописывает туда `198.18.0.2` — адрес из собственного fake-ip диапазона, плюс
+домен `~.` и default-route. Если это удаётся, резолвер начинает слать все
+запросы на фиктивный адрес, и имена перестают разрешаться: туннель поднят,
+панель выглядит исправной, интернета нет.
+
+Регистрация состоит из четырёх отдельных действий polkit
+(`set-domains`, `set-default-route`, `set-dns-servers`, `revert`) — отсюда
+четыре запроса пароля подряд при каждом перезапуске туннеля.
+
+Раньше этого не было видно по случайности: в сессии не было агента polkit,
+запросы проваливались молча, и туннель оставался на рабочем перехвате. Оболочка
+на serpantinum агент запускает — появились диалоги, а с ними и возможность
+выдать разрешение, которое ломает DNS. Правило воспроизводит прежнее поведение:
+отказ без диалога.
+
+Побочный эффект: ручной `resolvectl dns ...` от этого пользователя тоже
+перестанет работать. Откат — удалить файл, перезапускать polkitd не нужно.
+
+Панель, со своей стороны, теперь проверяет `resolvectl status mihomo-tun` при
+открытии и прямо говорит, если резолвер всё-таки перехвачен.
+
 ## Known, and upstream's
 
 Present before any change here, left alone deliberately:

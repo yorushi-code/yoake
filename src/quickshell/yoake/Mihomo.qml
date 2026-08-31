@@ -87,6 +87,36 @@ Singleton {
     // this came from read the same intent off its Toggles singleton.
     property bool watched: false
 
+    // Туннель может быть поднят, а имена не разрешаться, и снаружи это
+    // выглядит как исправный VPN без интернета.
+    //
+    // DNS в туннеле держится на `dns-hijack: any:53` -- mihomo перехватывает
+    // запросы прямо в TUN, и systemd-resolved для этого не нужен. Но при
+    // auto-route mihomo вдобавок пытается прописать себя в resolved, и туда
+    // уходит адрес из его же fake-ip диапазона. Если это удалось, резолвер
+    // шлёт запросы в никуда. Поэтому наличие DNS-сервера на интерфейсе
+    // туннеля -- признак поломки, а не здоровья.
+    property string tunDevice: "mihomo-tun"
+    property bool resolvedHijacked: false
+
+    function checkTunDns() {
+        if (!root.running) {
+            root.resolvedHijacked = false;
+            return;
+        }
+        dnsProc.command = ["sh", "-c",
+            "resolvectl status " + root.tunDevice + " 2>/dev/null | grep -c 'DNS Servers'"];
+        dnsProc.running = true;
+    }
+
+    property Process dnsProc: Process {
+        stdout: StdioCollector {
+            onStreamFinished: {
+                root.resolvedHijacked = (parseInt(text.trim(), 10) || 0) > 0;
+            }
+        }
+    }
+
     // Switching node without this leaves every established connection on the
     // old one, which reads as the switch not having worked.
     property bool resetOnSwitch: true
