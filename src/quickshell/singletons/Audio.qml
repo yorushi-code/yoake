@@ -10,36 +10,86 @@ Singleton {
         objects: Pipewire.nodes.values
     }
 
-    readonly property var outputs: {
-        let arr = [];
+    // Списки собираются императивно, а не биндингом, и это здесь главное.
+    //
+    // Биндинг читал свойства узлов внутри себя (application.id, device.class),
+    // а чтение свойства в биндинге создаёт на него зависимость. В результате
+    // любое изменение у любого узла -- сдвинутая громкость соседнего потока,
+    // сменившееся название трека -- пересобирало весь массив. Модель получала
+    // новый объект, делегаты уничтожались и создавались заново, и ползунок,
+    // который в этот момент тянули, исчезал из-под курсора.
+    //
+    // Вызов из обработчика сигнала зависимостей не заводит, поэтому список
+    // меняется только когда действительно меняется набор узлов.
+    property var outputs: []
+    property var inputs: []
+    property var apps: []
+
+    // Порядок перечисления в PipeWire ничем не гарантирован: он разный между
+    // сессиями и меняется при появлении узла. Без устойчивого ключа строки
+    // менялись местами на каждом обновлении.
+    function _key(n) {
+        var id = String(n.id !== undefined ? n.id : 0);
+        while (id.length < 10) id = "0" + id;
+        return (root.getNodeName(n) || "").toLowerCase() + " " + id;
+    }
+
+    function _collect(pred) {
+        var arr = [];
         for (const n of Pipewire.nodes.values) {
-            if (!n.isStream && n.isSink && n.audio) arr.push(n);
+            if (pred(n)) arr.push(n);
         }
+        var keys = new Map();
+        for (const n of arr) keys.set(n, root._key(n));
+        arr.sort(function (a, b) {
+            var ka = keys.get(a), kb = keys.get(b);
+            return ka < kb ? -1 : (ka > kb ? 1 : 0);
+        });
         return arr;
     }
 
-    readonly property var inputs: {
-        let arr = [];
-        for (const n of Pipewire.nodes.values) {
-            if (!n.isStream && !n.isSink && n.audio
+    function _same(a, b) {
+        if (!a || !b || a.length !== b.length) return false;
+        for (var i = 0; i < a.length; i++) {
+            if (a[i] !== b[i]) return false;
+        }
+        return true;
+    }
+
+    function rebuild() {
+        var o = root._collect(function (n) { return !n.isStream && n.isSink && n.audio; });
+        var i = root._collect(function (n) {
+            return !n.isStream && !n.isSink && n.audio
                 && n.properties?.["device.class"] !== "monitor"
-                && !n.name?.endsWith(".monitor")) {
-                arr.push(n);
-            }
-        }
-        return arr;
+                && !n.name?.endsWith(".monitor");
+        });
+        var a = root._collect(function (n) {
+            return n.isStream && n.audio
+                && n.properties?.["application.id"] !== "org.PulseAudio.pavucontrol";
+        });
+
+        // Присваиваем только при смене состава: иначе модель сбрасывается
+        // на ровном месте, и мы возвращаемся ровно к той беде, от которой ушли.
+        if (!root._same(o, root.outputs)) root.outputs = o;
+        if (!root._same(i, root.inputs)) root.inputs = i;
+        if (!root._same(a, root.apps)) root.apps = a;
     }
 
-    readonly property var apps: {
-        let arr = [];
-        for (const n of Pipewire.nodes.values) {
-            if (n.isStream && n.audio
-                && n.properties?.["application.id"] !== "org.PulseAudio.pavucontrol") {
-                arr.push(n);
-            }
-        }
-        return arr;
+    // Узлы появляются пачками -- устройство приносит с собой сток, источник и
+    // монитор разом. Короткая задержка склеивает их в одну пересборку.
+    Timer {
+        id: settle
+        interval: 60
+        onTriggered: root.rebuild()
     }
+
+    Connections {
+        target: Pipewire.nodes
+        ignoreUnknownSignals: true
+        function onValuesChanged() { settle.restart(); }
+    }
+
+    Component.onCompleted: root.rebuild()
 
     readonly property PwNode defaultSink: Pipewire.defaultAudioSink
     readonly property PwNode defaultSource: Pipewire.defaultAudioSource

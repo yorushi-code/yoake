@@ -96,7 +96,11 @@ Item {
         if (window.activeTab === "inputs") {
             return Audio.defaultSource || (Audio.inputs.length > 0 ? Audio.inputs[0] : null);
         } else if (window.activeTab === "apps") {
-            return Audio.apps.length > 0 ? Audio.apps[0] : null;
+            // Заголовок здесь подписан «Master output volume», значит и
+            // показывать он должен мастер. Раньше брался Audio.apps[0] --
+            // первый попавшийся поток из неупорядоченного списка, отчего
+            // мастером оказывался, например, speech-dispatcher-dummy.
+            return Audio.defaultSink || (Audio.outputs.length > 0 ? Audio.outputs[0] : null);
         } else {
             return Audio.defaultSink || (Audio.outputs.length > 0 ? Audio.outputs[0] : null);
         }
@@ -104,7 +108,7 @@ Item {
 
     readonly property string activeName: {
         if (!activeNode) return I18n.t("volumepopup.no_device");
-        if (activeTab === "apps") return Audio.getNodeAppName(activeNode);
+        // На вкладке потоков в заголовке теперь устройство, а не приложение.
         return Audio.getNodeName(activeNode);
     }
 
