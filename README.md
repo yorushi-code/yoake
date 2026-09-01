@@ -49,14 +49,16 @@ Copyright (C) 2026 yorushi, for modifications made in this fork.
 > instead. It is left here because it still documents the shell's own settings
 > and Nix modules accurately.
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/ilyamiro)
 
 <div align="center">
-  <img src="docs/assets/banner.png" alt="Serpantinum" width="550" />
+  <a href="https://ko-fi.com/ilyamiro">
+    <img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="ko-fi" />
+  </a>
 </div>
 
-> [!IMPORTANT]
-> **Migrating from v1:** All previous configuration will be backed up and unused. Configuration of compositor settings such as monitors, keybinds, and autostart is now up to you, as the project migrated from being dotfiles to being a shell.
+<div align="center">
+  <img src="docs/assets/banner.png" alt="Yoake" width="850" />
+</div>
 
 ## Previews
 
@@ -68,6 +70,9 @@ Copyright (C) 2026 yorushi, for modifications made in this fork.
 ---
 
 ## Installation
+
+> [!IMPORTANT]
+> **Migrating from v1:** All previous configuration will be backed up and unused. Configuration of compositor settings such as monitors, keybinds, and autostart is now up to you, as the project migrated from being dotfiles to being a shell.
 
 ### Arch Linux and its derivatives
 
@@ -81,26 +86,26 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/ilyamiro/serpantinum/mas
 
 ### NixOS
 
-Serpantinum provides flake outputs, a NixOS module for system dependencies, and a Home Manager module for user configuration and service management.
+Yoake provides flake outputs, a NixOS module for system dependencies, and a Home Manager module for user configuration and service management.
 
 #### 1. Add Flake Input
 
-Add Serpantinum to your `flake.nix`:
+Add Yoake to your `flake.nix`:
 
 ```nix
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    serpantinum.url = "github:ilyamiro/serpantinum";
+    yoake.url = "github:ilyamiro/serpantinum";
   };
 
-  outputs = { self, nixpkgs, serpantinum, ... }: {
+  outputs = { self, nixpkgs, yoake, ... }: {
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
-      specialArgs = { inherit serpantinum; };
+      specialArgs = { inherit yoake; };
       modules = [
         ./configuration.nix
-        serpantinum.nixosModules.default
+        yoake.nixosModules.default
       ];
     };
   };
@@ -114,7 +119,7 @@ Enable the NixOS module to configure system prerequisites:
 
 ```nix
 {
-  programs.serpantinum.enable = true;
+  programs.yoake.enable = true;
 }
 
 ```
@@ -122,11 +127,11 @@ Enable the NixOS module to configure system prerequisites:
 If you prefer installing the package directly without the system module:
 
 ```nix
-{ pkgs, serpantinum, ... }:
+{ pkgs, yoake, ... }:
 
 {
   environment.systemPackages = [
-    serpantinum.packages.${pkgs.stdenv.hostPlatform.system}.default
+    yoake.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 }
 
@@ -135,14 +140,14 @@ If you prefer installing the package directly without the system module:
 #### 3. Home Manager Configuration
 
 ```nix
-{ serpantinum, ... }:
+{ yoake, ... }:
 
 {
   imports = [
-    serpantinum.homeManagerModules.default
+    yoake.homeManagerModules.default
   ];
 
-  programs.serpantinum = {
+  programs.yoake = {
     enable = true;
     systemd.enable = true;
 
@@ -157,7 +162,7 @@ If you prefer installing the package directly without the system module:
 
       bar = {
         position = "top";
-        style = "islands";
+        style = "solid";
         width = 40;
         workspaceCount = 10;
         modules = {
@@ -190,9 +195,13 @@ If you prefer installing the package directly without the system module:
 Ensure your compositor config launches the daemon or shell binary on startup:
 
 ```bash
-serpantinumd start
+yoaked start
 
 ```
+
+## Credits
+
+- Special thanks to Darkall44/Qylock for providing a gorgeous material SDDM theme!
 
 ---
 

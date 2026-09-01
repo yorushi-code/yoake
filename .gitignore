@@ -1,3 +1,5 @@
+src/assets/languages/add.py
+changelog.py
 
 # артефакты интерпретатора, не конфиг
 __pycache__/

@@ -80,7 +80,9 @@ in
 
     home.activation.yoakeSettings = hm.dag.entryAfter [ "writeBoundary" ] ''
       run mkdir -p ${escapeShellArg (builtins.dirOf settingsTarget)}
-      run install -m 0644 ${settingsFile} ${escapeShellArg settingsTarget}
+      if [ ! -e ${escapeShellArg settingsTarget} ]; then
+        run install -m 0644 ${settingsFile} ${escapeShellArg settingsTarget}
+      fi
     '';
 
     systemd.user.services.yoake = mkIf cfg.systemd.enable {
@@ -92,8 +94,10 @@ in
       };
 
       Service = {
-        ExecStart = "${cfg.package}/bin/yoaked";
+        ExecStart = "${cfg.package}/bin/yoaked start";
         Restart = "on-failure";
+        KillMode = "mixed";
+        TimeoutStopSec = "5s";
         Environment = mapAttrsToList (n: v: "${n}=${v}") cfg.systemd.environment;
       };
 

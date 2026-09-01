@@ -5,6 +5,7 @@ import QtQuick.Controls
 import QtQuick.Shapes
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import Quickshell.Io
 import "../"
 import "../reusables"
@@ -21,9 +22,7 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
     color: "transparent"
 
-    mask: Region {
-        item: (launcherWindow.isVisible || container.animProgress > 0.001) ? maskBoundary : null
-    }
+    mask: Region { item: topBarHole; intersection: Intersection.Xor }
 
     anchors {
         top: true
@@ -106,6 +105,11 @@ PanelWindow {
         executeFilter(searchInput.text);
     }
 
+    property var rawBarSettings: {
+        let dummy = configRevision;
+        return (typeof Config !== "undefined" && Config.rawSettings && Config.rawSettings.bar) ? Config.rawSettings.bar : ({});
+    }
+
     property string barStyle: {
         let dummy = configRevision;
         if (typeof Config === "undefined" || !Config.rawSettings || !Config.rawSettings.bar) return "modular";
@@ -123,6 +127,19 @@ PanelWindow {
         if (typeof Config === "undefined" || !Config.rawSettings || !Config.rawSettings.bar) return "top";
         return Config.rawSettings.bar.position || "top";
     }
+
+    property bool barAutohide: (rawBarSettings && rawBarSettings.autohide !== undefined) ? Boolean(rawBarSettings.autohide) : false
+
+    readonly property bool isFullscreenActive: {
+        try {
+            if (typeof Hyprland !== "undefined" && Hyprland.focusedWorkspace) {
+                return Boolean(Hyprland.focusedWorkspace.hasFullscreen || (Hyprland.activeToplevel && Hyprland.activeToplevel.fullscreen));
+            }
+        } catch (e) {}
+        return false;
+    }
+
+    readonly property bool isBarEffectivelyHidden: barAutohide || isFullscreenActive
 
     property real barHeight: {
         let dummy = configRevision;
@@ -152,7 +169,22 @@ PanelWindow {
     property real outerCornerRadius: cornerRadius
 
     property real baseLauncherWidth: s(customWidth)
-    property real baseLauncherHeight: s(70) + (customItemCount * s(48))
+
+    property real targetLauncherHeight: {
+        let count = Math.min(appModel.count, customItemCount);
+        if (count <= 0) {
+            return s(64);
+        }
+        return s(70) + (count * s(48));
+    }
+
+    property real animatedLauncherHeight: targetLauncherHeight
+    Behavior on animatedLauncherHeight {
+        NumberAnimation {
+            duration: 260
+            easing.type: Easing.OutCubic
+        }
+    }
 
     visible: isVisible || container.animProgress > 0.001
 
@@ -583,28 +615,58 @@ PanelWindow {
         closeLauncher();
     }
 
-    MouseArea {
-        anchors.fill: parent
-        onClicked: closeLauncher()
+    Item {
+        id: topBarHole
+
+        property int barThickness: 48
+        property string bp: launcherWindow.barPosition
+        property bool activeBar: !launcherWindow.isBarEffectivelyHidden
+
+        x: {
+            if (!activeBar) return 0;
+            if (bp === "left") return 0;
+            if (bp === "right") return launcherWindow.width - barThickness;
+            return 0;
+        }
+
+        y: {
+            if (!activeBar) return 0;
+            if (bp === "top") return 0;
+            if (bp === "bottom") return launcherWindow.height - barThickness;
+            return 0;
+        }
+
+        width: {
+            if (!activeBar) return 0;
+            if (bp === "left" || bp === "right") return barThickness;
+            return launcherWindow.width;
+        }
+
+        height: {
+            if (!activeBar) return 0;
+            if (bp === "top" || bp === "bottom") return barThickness;
+            return launcherWindow.height;
+        }
     }
 
-    Item {
-        id: maskBoundary
-        x: container.x - launcherWindow.outerCornerRadius
-        y: container.y - launcherWindow.outerCornerRadius
-        width: container.width + (launcherWindow.outerCornerRadius * 2)
-        height: container.height + (launcherWindow.outerCornerRadius * 2)
+    MouseArea {
+        anchors.fill: parent
+        enabled: launcherWindow.isVisible
+        onClicked: closeLauncher()
     }
 
     Item {
         id: container
 
+        MouseArea {
+            anchors.fill: parent
+        }
+
         property real animProgress: launcherWindow.isVisible ? 1.0 : 0.0
         Behavior on animProgress {
             NumberAnimation {
-                duration: launcherWindow.isVisible ? 360 : 220
-                easing.type: launcherWindow.isVisible ? Easing.OutBack : Easing.OutCubic
-                easing.overshoot: 1.08
+                duration: launcherWindow.isVisible ? 300 : 200
+                easing.type: Easing.OutCubic
             }
         }
 
@@ -618,7 +680,7 @@ PanelWindow {
                 let offset = launcherWindow.barMatchesLauncher ? launcherWindow.barHeight : 0;
                 return (launcherWindow.width - offset) - width;
             }
-            return Math.floor((launcherWindow.width - launcherWindow.baseLauncherWidth) / 2);
+            return Math.floor((launcherWindow.width - width) / 2);
         }
         y: {
             if (launcherWindow.attachEdge === "top") {
@@ -628,14 +690,14 @@ PanelWindow {
                 let offset = launcherWindow.barMatchesLauncher ? launcherWindow.barHeight : 0;
                 return (launcherWindow.height - offset) - height;
             }
-            return Math.floor((launcherWindow.height - launcherWindow.baseLauncherHeight) / 2);
+            return Math.floor((launcherWindow.height - height) / 2);
         }
         width: launcherWindow.isSideAttached
                ? (launcherWindow.baseLauncherWidth * animProgress)
                : launcherWindow.baseLauncherWidth
         height: !launcherWindow.isSideAttached
-                ? (launcherWindow.baseLauncherHeight * animProgress)
-                : launcherWindow.baseLauncherHeight
+                ? (launcherWindow.animatedLauncherHeight * animProgress)
+                : launcherWindow.animatedLauncherHeight
 
         opacity: (launcherWindow.isVisible || animProgress > 0.001) ? 1.0 : 0.0
 
@@ -912,16 +974,19 @@ PanelWindow {
                 color: ThemeBackend.base
             }
 
-            ColumnLayout {
+            Item {
+                id: contentContainer
                 anchors.fill: parent
                 anchors.margins: launcherWindow.s(14)
-                spacing: launcherWindow.s(10)
 
                 Input {
                     id: searchInput
                     focus: true
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: launcherWindow.s(36)
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: launcherWindow.attachEdge === "bottom" ? undefined : parent.top
+                    anchors.bottom: launcherWindow.attachEdge === "bottom" ? parent.bottom : undefined
+                    height: launcherWindow.s(36)
 
                     baseColor: ThemeBackend.surface0
                     accentColor: ThemeBackend.mauve
@@ -967,8 +1032,14 @@ PanelWindow {
                 }
 
                 Item {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
+                    id: listContainer
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: launcherWindow.attachEdge === "bottom" ? parent.top : searchInput.bottom
+                    anchors.bottom: launcherWindow.attachEdge === "bottom" ? searchInput.top : parent.bottom
+                    anchors.topMargin: launcherWindow.attachEdge === "bottom" ? 0 : launcherWindow.s(10)
+                    anchors.bottomMargin: launcherWindow.attachEdge === "bottom" ? launcherWindow.s(10) : 0
+                    clip: true
 
                     ListView {
                         id: appList
