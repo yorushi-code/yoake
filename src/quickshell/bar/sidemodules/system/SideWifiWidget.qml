@@ -3,7 +3,6 @@ import QtQuick.Layouts
 import QtQuick.Window
 import QtQuick.Controls
 import Quickshell
-import Quickshell.Networking
 import "../../../reusables"
 import "../../../"
 
@@ -44,10 +43,10 @@ Rectangle {
         width: barWindow ? barWindow.s(30) : 30
         height: barWindow ? barWindow.s(30) : 30
         cornerRadius: Math.max(0, ThemeBackend.borderRadius - 2)
-        buttonIcon: Networking.wifiEnabled ? "󰤨" : "󰤮"
+        buttonIcon: YoakeNet.wifiEnabled ? "󰤨" : "󰤮"
         iconFontSize: barWindow ? barWindow.s(15) : 15
-        accentColor: Networking.wifiEnabled ? ThemeBackend.blue : ThemeBackend.surface0
-        textColor: Networking.wifiEnabled ? ThemeBackend.base : ThemeBackend.text
+        accentColor: YoakeNet.wifiEnabled ? ThemeBackend.blue : ThemeBackend.surface0
+        textColor: YoakeNet.wifiEnabled ? ThemeBackend.base : ThemeBackend.text
         iconOffsetX: -3
         onClicked: Quickshell.execDetached(["bash", "-c", Caching.yoakeDir + "/scripts/qs_manager.sh toggle network wifi"])
     }

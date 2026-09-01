@@ -6,7 +6,6 @@ import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
 import Quickshell.Bluetooth
-import Quickshell.Networking
 import Quickshell.Services.UPower
 import Quickshell.Services.Pipewire
 import "../"
@@ -84,7 +83,7 @@ Item {
 
     property real sysBrightness: 0
 
-    property bool wifiRadioEnabled: Networking.wifiEnabled
+    property bool wifiRadioEnabled: YoakeNet.wifiEnabled
     property bool btRadioEnabled: Boolean(Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled)
 
     property bool isDraggingVol: false
@@ -820,7 +819,7 @@ Item {
                             isActive: root.wifiRadioEnabled
                             onLeftClicked: {
                                 Sounds.playSfx("system/quick_click.wav");
-                                Networking.wifiEnabled = !Networking.wifiEnabled;
+                                Quickshell.execDetached(["nmcli","radio","wifi", YoakeNet.wifiEnabled ? "off" : "on"]);
                             }
                             onRightClicked: {
                                 closeSequence.start();
@@ -854,7 +853,7 @@ Item {
                                 if (enableAirplane) {
                                     root.btStateBeforeAirplane = root.btRadioEnabled;
                                     root.wifiStateBeforeAirplane = root.wifiRadioEnabled;
-                                    Networking.wifiEnabled = false;
+                                    Quickshell.execDetached(["nmcli","radio","wifi","off"]);
                                     if (Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = false;
                                 } else {
                                     let restoreWifi = root.wifiStateBeforeAirplane;
@@ -862,7 +861,7 @@ Item {
                                     if (!restoreWifi && !restoreBt) {
                                         restoreWifi = true;
                                     }
-                                    Networking.wifiEnabled = restoreWifi;
+                                    Quickshell.execDetached(["nmcli","radio","wifi", restoreWifi ? "on" : "off"]);
                                     if (Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = restoreBt;
                                 }
                             }

@@ -6,7 +6,6 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Services.SystemTray
-import Quickshell.Networking
 import "../../../reusables"
 import "../../../"
 
@@ -17,11 +16,6 @@ Rectangle {
     property bool moduleActive: true
     property bool isGrouped: false
     property bool isDesktop: false
-    property string ethStatus: "Ethernet"
-    property string wifiStatus: "Off"
-    property string wifiIcon: "󰤮"
-    property string wifiSsid: ""
-    property bool isWifiOn: Networking.wifiEnabled
     property bool showEthernet: ethStatus === "Connected" || (isDesktop && !isWifiOn)
     property real targetX: 0
     property bool showLayout: false
@@ -35,105 +29,18 @@ Rectangle {
             chassisDetector.running = false;
         } else {
             chassisDetector.running = true;
-            updateNetworkData();
         }
     }
 
-    Item {
-        visible: false
-        Connections {
-            target: Networking
-            ignoreUnknownSignals: true
-            function onWifiEnabledChanged() { updateNetworkData(); }
-        }
-        Repeater {
-            id: netDeviceRepeater
-            model: Networking.devices
-            Item {
-                property var device: modelData
-                Component.onCompleted: {
-                    if (device.type === DeviceType.Wired) {
-                        wifiWidgetRoot.ethDevice = device;
-                    } else if (device.type === DeviceType.Wifi) {
-                        wifiWidgetRoot.wifiDevice = device;
-                    }
-                    wifiWidgetRoot.updateNetworkData();
-                }
-                Connections {
-                    target: device || null
-                    ignoreUnknownSignals: true
-                    function onStateChanged() { wifiWidgetRoot.updateNetworkData(); }
-                    function onConnectedChanged() { wifiWidgetRoot.updateNetworkData(); }
-                }
-                Connections {
-                    target: (device && device.type === DeviceType.Wired) ? device : null
-                    ignoreUnknownSignals: true
-                    function onHasLinkChanged() { wifiWidgetRoot.updateNetworkData(); }
-                }
-            }
-        }
-        Repeater {
-            id: wifiNetworkRepeater
-            model: wifiWidgetRoot.wifiDevice ? wifiWidgetRoot.wifiDevice.networks : null
-            Item {
-                property var network: modelData
-                Connections {
-                    target: network || null
-                    ignoreUnknownSignals: true
-                    function onSignalStrengthChanged() { wifiWidgetRoot.updateNetworkData(); }
-                    function onStateChanged() { wifiWidgetRoot.updateNetworkData(); }
-                    function onConnectedChanged() { wifiWidgetRoot.updateNetworkData(); }
-                }
-            }
-        }
-    }
-
-    function updateNetworkData() {
-        let isWifiEnabled = Networking.wifiEnabled;
-        wifiStatus = isWifiEnabled ? "Enabled" : "Off";
-
-        if (ethDevice) {
-            if (ethDevice.connected) {
-                ethStatus = "Connected";
-            } else if (ethDevice.hasLink) {
-                ethStatus = "Disconnected";
-            } else {
-                ethStatus = "Ethernet";
-            }
-        } else {
-            ethStatus = "Ethernet";
-        }
-
-        if (!isWifiEnabled) {
-            wifiSsid = "";
-            wifiIcon = "󰤮";
-            return;
-        }
-
-        let connectedNet = null;
-        if (wifiDevice && wifiDevice.networks) {
-            for (let i = 0; i < wifiNetworkRepeater.count; i++) {
-                let item = wifiNetworkRepeater.itemAt(i);
-                if (item && item.network && item.network.connected) {
-                    connectedNet = item.network;
-                    break;
-                }
-            }
-        }
-
-        if (connectedNet) {
-            wifiSsid = connectedNet.name || connectedNet.ssid || "";
-            let sig = connectedNet.signalStrength !== undefined ? Math.round(connectedNet.signalStrength * (connectedNet.signalStrength <= 1 ? 100 : 1)) : 100;
-            if (sig >= 80) wifiIcon = "󰤨";
-            else if (sig >= 60) wifiIcon = "󰤥";
-            else if (sig >= 40) wifiIcon = "󰤢";
-            else if (sig >= 20) wifiIcon = "󰤟";
-            else wifiIcon = "󰤯";
-        } else {
-            wifiSsid = "";
-            wifiIcon = "󰤯";
-        }
-    }
+    // Данные берёт общий синглтон YoakeNet -- он же кормит боковой виджет,
+    // так что опросчик в системе один. Подробности, почему не служба
+    // Quickshell.Networking, -- в самом Net.qml.
+    readonly property bool isWifiOn: YoakeNet.wifiEnabled
+    readonly property string wifiSsid: YoakeNet.ssid
+    readonly property string wifiIcon: YoakeNet.wifiIcon
+    readonly property string ethStatus: YoakeNet.ethConnected ? "Connected"
+        : (YoakeNet.ethPresent ? "Disconnected" : "Ethernet")
+    readonly property string wifiStatus: YoakeNet.wifiEnabled ? "Enabled" : "Off"
 
     x: targetX
     Behavior on x {

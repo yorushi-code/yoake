@@ -17,6 +17,7 @@ singleton Scaler 1.0 singletons/Scaler.qml
 singleton Sounds 1.0 singletons/Sounds.qml
 singleton ThemeBackend 1.0 singletons/ThemeBackend.qml
 singleton YoakePalette 1.0 yoake/Palette.qml
+singleton YoakeNet 1.0 yoake/Net.qml
 singleton Mihomo 1.0 yoake/Mihomo.qml
 singleton MihomoApi 1.0 yoake/MihomoApi.qml
 VpnWidget 1.0 yoake/VpnWidget.qml
