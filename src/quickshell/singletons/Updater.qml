@@ -9,6 +9,22 @@ Item {
 
     property bool isChecking: false
     property string localVersion: "2.0.0"
+
+    // Версию апстрим берёт из ~/.local/state/yoake/version, который пишет его
+    // установщик. Мы ставим из чекаута, установщик не запускался, и в
+    // интерфейсе оставалась зашитая по умолчанию 2.0.0 -- даже после
+    // обновления дерева. Источник истины здесь -- version.txt рядом с кодом.
+    FileView {
+        path: (typeof Caching !== "undefined" && Caching.yoakeDir)
+            ? Caching.yoakeDir + "/../version.txt" : ""
+        watchChanges: true
+        printErrors: false
+        onLoaded: {
+            const v = text().trim();
+            if (v !== "") root.localVersion = v;
+        }
+        onFileChanged: reload()
+    }
     property string remoteVersion: ""
     property bool updateAvailable: false
     property string lastNotifiedVersion: ""
