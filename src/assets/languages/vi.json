@@ -5,6 +5,7 @@
       "loading": "Đang tải...",
       "unknown": "Không rõ",
       "version_by": "v{version} • bởi {author}",
+      "fork_of": "bản fork của serpantinum bởi @{author}",
       "hardware": {
         "device_name": "Tên thiết bị",
         "processor": "Bộ xử lý",
@@ -21,7 +22,8 @@
         "uptime": "Thời gian hoạt động",
         "default_os": "Linux"
       },
-      "github_repo": "ilyamiro/serpantinum"
+      "github_repo": "yorushi-code/yoake",
+      "github_upstream": "ilyamiro/serpantinum"
     },
     "tabs": {
       "welcome": "Chào mừng",

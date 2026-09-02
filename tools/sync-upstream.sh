@@ -74,17 +74,21 @@ WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT
 
 # Дерево апстрима целиком, затем переименование. Рабочей копии это не касается.
+# Дерево лежит в своём подкаталоге: временный индекс git рядом с ним попал бы
+# под "add -A" и уехал в коммит -- .sync-index.lock так и уехал однажды.
+TREEDIR="$WORK/tree"
+mkdir -p "$TREEDIR"
 say "переименовываю дерево апстрима..."
-git archive "$UPSTREAM_SHA" | tar -x -C "$WORK"
-python3 tools/rename-upstream.py "$WORK" | sed 's/^/    /'
+git archive "$UPSTREAM_SHA" | tar -x -C "$TREEDIR"
+python3 tools/rename-upstream.py "$TREEDIR" | sed 's/^/    /'
 
 if [ "$DRY_RUN" = true ]; then
     say "--dry-run: коммит посредника не создан"
     exit 0
 fi
 
-INDEX="$WORK/.sync-index"
-TREE=$(cd "$WORK" && GIT_DIR="$GIT_DIR_ABS" GIT_INDEX_FILE="$INDEX" \
+INDEX="$WORK/sync-index"
+TREE=$(cd "$TREEDIR" && GIT_DIR="$GIT_DIR_ABS" GIT_INDEX_FILE="$INDEX" \
     sh -c 'git --work-tree="$PWD" add -A . && git --work-tree="$PWD" write-tree')
 [ -n "$TREE" ] || die "не удалось собрать дерево"
 
