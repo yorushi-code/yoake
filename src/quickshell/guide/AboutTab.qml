@@ -146,11 +146,23 @@ Item {
                             Text {
                                 text: I18n.t("guide.about.version_by", {
                                     version: (Updater.localVersion !== "..." ? Updater.localVersion : (rootObj.dotsVersion !== "Loading..." && rootObj.dotsVersion !== I18n.t("guide.about.loading") ? rootObj.dotsVersion : "2.0.0")),
-                                    author: "@ilyamiro"
+                                    author: "@yorushi"
                                 })
                                 font.family: ThemeBackend.fontFamily
                                 font.pixelSize: rootObj.s(13)
                                 color: ThemeBackend.subtext0
+                                Layout.alignment: Qt.AlignHCenter
+                            }
+
+                            // Форк называет свой источник на своей же главной
+                            // странице, а не только в README, который никто не
+                            // открывает. Лицензия этого требует, и это просто
+                            // верно: почти всё, что здесь видно, написал не я.
+                            Text {
+                                text: I18n.t("guide.about.fork_of", { author: "ilyamiro" })
+                                font.family: ThemeBackend.fontFamily
+                                font.pixelSize: rootObj.s(11)
+                                color: ThemeBackend.overlay1
                                 Layout.alignment: Qt.AlignHCenter
                             }
                         }
@@ -384,7 +396,7 @@ Item {
                 spacing: rootObj.s(12)
 
                 ClickButton {
-                    Layout.preferredWidth: rootObj.s(260)
+                    Layout.preferredWidth: rootObj.s(220)
                     Layout.preferredHeight: rootObj.s(42)
                     horizontalPadding: rootObj.s(14)
                     cornerRadius: ThemeBackend.borderRadius
@@ -394,6 +406,21 @@ Item {
                     iconFontSize: rootObj.s(16)
                     accentColor: ThemeBackend.surface0
                     textColor: ThemeBackend.text
+
+                    onTriggered: Quickshell.execDetached(["xdg-open", "https://github.com/yorushi-code/yoake"])
+                }
+
+                ClickButton {
+                    Layout.preferredWidth: rootObj.s(220)
+                    Layout.preferredHeight: rootObj.s(42)
+                    horizontalPadding: rootObj.s(14)
+                    cornerRadius: ThemeBackend.borderRadius
+                    buttonText: I18n.t("guide.about.github_upstream")
+                    textFontSize: rootObj.s(13)
+                    buttonIcon: "󰊤"
+                    iconFontSize: rootObj.s(16)
+                    accentColor: ThemeBackend.surface0
+                    textColor: ThemeBackend.subtext0
 
                     onTriggered: Quickshell.execDetached(["xdg-open", "https://github.com/ilyamiro/serpantinum"])
                 }

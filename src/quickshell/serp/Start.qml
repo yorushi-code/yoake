@@ -551,7 +551,7 @@ PanelWindow {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: serpText.bottom
                     anchors.topMargin: window.s(12)
-                    text: I18n.t("start.made_by", { "author": "ilyamiro" })
+                    text: I18n.t("start.made_by", { "author": "yorushi" })
                     font.family: ThemeBackend.fontFamily
                     font.pixelSize: window.s(15)
                     scale: 0.88
@@ -650,7 +650,7 @@ PanelWindow {
 
                     Text {
                         id: introAuthorText
-                        text: I18n.t("start.made_by", { "author": "ilyamiro" })
+                        text: I18n.t("start.made_by", { "author": "yorushi" })
                         font.family: ThemeBackend.fontFamily
                         font.pixelSize: window.s(14)
                         color: window.subtext0

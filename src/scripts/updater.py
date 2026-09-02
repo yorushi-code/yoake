@@ -5,8 +5,15 @@ import sys
 import time
 import urllib.request
 
+# Следим за релизами апстрима: «доступно обновление» для форка означает, что у
+# источника вышла версия, которую можно к себе подтянуть.
 REPO = "ilyamiro/serpantinum"
 DEFAULT_VER = "2.0.0"
+
+# version.txt лежит в корне дерева, а этот скрипт -- в src/scripts/.
+TREE_VERSION_FILE = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, "version.txt"
+)
 
 state_dir = os.path.expanduser("~/.local/state/yoake")
 if "--state-dir" in sys.argv:
@@ -47,7 +54,17 @@ if "--delay" in sys.argv:
     print(0)
     sys.exit(0)
 
-def get_local_ver():
+def get_tree_ver():
+    """Версия из дерева. Источник истины, когда оболочка запущена из чекаута."""
+    try:
+        with open(TREE_VERSION_FILE, "r") as f:
+            return f.read().strip()
+    except Exception:
+        return ""
+
+
+def get_state_ver():
+    """Версия, записанная установщиком: у установленной копии дерева рядом нет."""
     if os.path.isfile(state_file):
         try:
             with open(state_file, "r") as f:
@@ -58,7 +75,13 @@ def get_local_ver():
                             return v
         except Exception:
             pass
-    return DEFAULT_VER
+    return ""
+
+
+def get_local_ver():
+    # Дерево впереди установщика: ставим отсюда, install.sh не запускался, и
+    # зашитая по умолчанию 2.0.0 годами показывалась бы вместо настоящей.
+    return get_tree_ver() or get_state_ver() or DEFAULT_VER
 
 def get_last_notified():
     if os.path.isfile(notified_file):
