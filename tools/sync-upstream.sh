@@ -117,7 +117,11 @@ say "пробую слить в стороне..."
 TRY="$WORK/merge"
 git worktree add --quiet --detach "$TRY" master
 CONFLICTED=""
-if ( cd "$TRY" && git merge --no-edit --no-ff "$VENDOR" >/dev/null 2>&1 ); then
+# Слияние идёт в отсоединённой голове, и git подписал бы его "into HEAD".
+MERGE_MSG="upstream $UPSTREAM_VER
+
+$(git rev-parse --short "$UPSTREAM_SHA"), through $VENDOR."
+if ( cd "$TRY" && git merge --no-ff -m "$MERGE_MSG" "$VENDOR" >/dev/null 2>&1 ); then
     MERGED=$(cd "$TRY" && git rev-parse HEAD)
 else
     CONFLICTED=$(cd "$TRY" && git diff --name-only --diff-filter=U || true)
