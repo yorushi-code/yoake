@@ -226,10 +226,20 @@ Item {
                             iconFontSize: rootObj.s(16)
                             fillDuration: 1200
 
+                            // Установщик апстрима здесь запускать нельзя: он
+                            // выкладывает своё дерево поверх нашего и снимает
+                            // переименование, то есть стирает форк. Обновление
+                            // для нас -- это протащить его изменения через
+                            // переименование и слить, чем и занят скрипт.
+                            //
+                            // Оболочку не закрываем, как делал апстрим: слияние
+                            // либо проходит целиком, либо не трогает рабочую
+                            // копию вовсе, а quickshell перечитает файлы сам.
                             onTriggered: {
-                                let cmd = "if command -v kitty >/dev/null 2>&1; then kitty --hold bash -c 'eval \"$(curl -fsSL https://raw.githubusercontent.com/ilyamiro/serpantinum/master/install/install.sh)\"'; else ${TERM:-xterm} -hold -e bash -c 'eval \"$(curl -fsSL https://raw.githubusercontent.com/ilyamiro/serpantinum/master/install/install.sh)\"'; fi";
+                                let repo = rootObj.appPaths.yoakeDir + "/..";
+                                let sync = "bash '" + repo + "/tools/sync-upstream.sh'";
+                                let cmd = "if command -v kitty >/dev/null 2>&1; then kitty --hold bash -c \"" + sync + "\"; else ${TERM:-xterm} -hold -e bash -c \"" + sync + "\"; fi";
                                 Quickshell.execDetached(["bash", "-c", cmd]);
-                                Quickshell.execDetached(["bash", rootObj.appPaths.yoakeDir + "/scripts/qs_manager.sh", "close"]);
                             }
                         }
                     }
