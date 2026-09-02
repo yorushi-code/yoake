@@ -19,6 +19,18 @@ get_installed_version() {
     if [ -f "$version_file" ]; then
         ver=$(awk -F= '/^YOAKE_VERSION=/{gsub(/["'\'' ]/, "", $2); print $2}' "$version_file")
     fi
+    if [ -z "$ver" ] && [ -n "$YOAKE_VERSION" ]; then
+        ver="$YOAKE_VERSION"
+    fi
+    if [ -z "$ver" ]; then
+        if [ -n "$YOAKE_DIR" ] && [ -f "$YOAKE_DIR/version.txt" ]; then
+            ver=$(cat "$YOAKE_DIR/version.txt" 2>/dev/null | xargs)
+        elif [ -f "$(dirname "$BIN_DIR")/version.txt" ]; then
+            ver=$(cat "$(dirname "$BIN_DIR")/version.txt" 2>/dev/null | xargs)
+        elif [ -n "$YOAKE_DIR" ] && [ -f "$(dirname "$YOAKE_DIR")/version.txt" ]; then
+            ver=$(cat "$(dirname "$YOAKE_DIR")/version.txt" 2>/dev/null | xargs)
+        fi
+    fi
     if [ -z "$ver" ]; then
         ver="2.0.0"
     fi
@@ -169,7 +181,8 @@ if [[ "$1" == "kill" ]]; then
     else
         pkill -TERM -f "yoaked" 2>/dev/null
     fi
-    pkill hyprsunset 2>/dev/null
+    rm -f "/tmp/yoaked.pid" 2>/dev/null
+    rm -f "/tmp/yoaked.lock" 2>/dev/null
     echo "$(t "cli.daemon_stopped")"
     exit 0
 fi

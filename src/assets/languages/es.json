@@ -39,7 +39,7 @@
       "update": "Actualizaciones",
       "about": "Acerca de",
       "autostart": "Inicio automático",
-      "display_widget": "Widgets",
+      "display_widgets": "Widgets",
       "display_general": "General"
     },
     "launcher": {
@@ -1076,5 +1076,8 @@
     "auto_paste_sub": "Si está desactivado — solo se copia al portapapeles",
     "keep_clipboard": "Guardar traducción en el portapapeles",
     "keep_clipboard_sub": "Si está desactivado — se restaura el portapapeles original"
+  },
+  "datetime": {
+    "full_date": "dddd, d 'de' MMMM"
   }
 }

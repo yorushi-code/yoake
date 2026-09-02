@@ -233,7 +233,7 @@
       },
       "schedule": {
         "title": "Automated schedule",
-        "desc": "Adjust color temperature automatically based on sunset and sunrise"
+        "desc": "Adjust color temperature automatically based on sunset and sunrise in"
       },
       "temperature": {
         "title": "Color temperature",
@@ -1032,5 +1032,8 @@
     "auto_paste_sub": "If disabled — translation is only copied to clipboard",
     "keep_clipboard": "Keep translation in clipboard",
     "keep_clipboard_sub": "If disabled — original clipboard content is restored after paste"
+  },
+  "datetime": {
+    "full_date": "dddd, MMMM dd"
   }
 }

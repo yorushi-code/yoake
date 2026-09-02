@@ -67,7 +67,6 @@ Item {
     Behavior on yellow { ColorAnimation { duration: root.paletteFade } }
     Behavior on maroon { ColorAnimation { duration: root.paletteFade } }
     Behavior on teal { ColorAnimation { duration: root.paletteFade } }
-
     property string configPath: Quickshell.env("QS_COLORS_JSON") ?? "~/.local/state/yoake/qs_colors.json"
     property string matugenConfigPath: (typeof Caching !== "undefined" && Caching.stateDir ? Caching.stateDir : ((Quickshell.env("HOME") ?? "") + "/.local/state/yoake")) + "/qs_matugen_colors.json"
 

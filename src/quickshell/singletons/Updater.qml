@@ -9,37 +9,27 @@ Item {
 
     property bool isChecking: false
     property string localVersion: "2.0.0"
-
-    // Версию апстрим берёт из ~/.local/state/yoake/version, который пишет его
-    // установщик. Мы ставим из чекаута, установщик не запускался, и в
-    // интерфейсе оставалась зашитая по умолчанию 2.0.0 -- даже после
-    // обновления дерева. Источник истины здесь -- version.txt рядом с кодом.
-    //
-    // Читателя этого файла было три: этот FileView, второй на файл установщика
-    // и updater.py, который возвращал ту же зашитую 2.0.0 и затирал остальных
-    // через полторы секунды после входа. Побеждал он, а не правда. Теперь
-    // порядок знает один updater.py -- дерево, потом установщик, -- а здесь
-    // остался только быстрый первый ответ, пока он не сходил в сеть.
-    FileView {
-        path: (typeof Caching !== "undefined" && Caching.yoakeDir)
-            ? Caching.yoakeDir + "/../version.txt" : ""
-        watchChanges: true
-        printErrors: false
-        onLoaded: {
-            const v = text().trim();
-            if (v !== "") root.localVersion = v;
-        }
-        onFileChanged: reload()
-    }
     property string remoteVersion: ""
     property bool updateAvailable: false
     property string lastNotifiedVersion: ""
+
+    property string stateVersion: ""
+    property string packageVersion: ""
 
     Connections {
         target: typeof SystemInfo !== "undefined" ? SystemInfo : null
         function onOsNameChanged() {
             root.reevaluateUpdate();
         }
+    }
+
+    function syncLocalVersion() {
+        if (root.stateVersion !== "") {
+            root.localVersion = root.stateVersion;
+        } else if (root.packageVersion !== "") {
+            root.localVersion = root.packageVersion;
+        }
+        root.reevaluateUpdate();
     }
 
     function parseVersion(v) {
@@ -124,6 +114,50 @@ Item {
         if (typeof Caching === "undefined" || !Caching.yoakeDir) return;
         if (checkDelayProc.running) return;
         checkDelayProc.running = true;
+    }
+
+    FileView {
+        id: pkgVersionFileView
+        // Апстрим ищет version.txt внутри src/. Файл лежит в корне дерева, на
+        // уровень выше -- его же bin/yoake проверяет оба места, а этот FileView
+        // только одно, и в чекауте не находит ничего.
+        path: (typeof Caching !== "undefined" && Caching.yoakeDir ? Caching.yoakeDir + "/.." : "") + "/version.txt"
+        onFileChanged: {
+            pkgVersionFileView.reload();
+        }
+        onLoaded: {
+            let content = this.text();
+            if (!content) return;
+            let v = content.trim();
+            if (v) {
+                root.packageVersion = v;
+                root.syncLocalVersion();
+            }
+        }
+    }
+
+    FileView {
+        id: versionFileView
+        path: (typeof Caching !== "undefined" ? Caching.getStateDir() : "") + "/version"
+        onFileChanged: {
+            versionFileView.reload();
+        }
+        onLoaded: {
+            let content = this.text();
+            if (!content) return;
+            let lines = content.split("\n");
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i].trim();
+                if (line.indexOf("YOAKE_VERSION=") === 0) {
+                    let v = line.substring("YOAKE_VERSION=".length).replace(/["']/g, "").trim();
+                    if (v) {
+                        root.stateVersion = v;
+                        root.syncLocalVersion();
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     Timer {

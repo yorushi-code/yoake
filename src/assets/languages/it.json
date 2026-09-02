@@ -26,7 +26,7 @@
       "github_upstream": "ilyamiro/serpantinum"
     },
     "tabs": {
-      "welcome": "Benvenuto",
+      "welcome": "Benvenuto/a",
       "general": "Generale",
       "display": "Schermo",
       "bar": "Barra",
@@ -38,7 +38,7 @@
       "tutorial": "Tutorial",
       "update": "Aggiorna",
       "about": "Informazioni",
-      "display_widget": "Widget",
+      "display_widgets": "Widget",
       "display_general": "Generale"
     },
     "launcher": {
@@ -102,7 +102,7 @@
         "desc": "Attiva la gestione energetica e i timeout di blocco"
       },
       "manual_inhibit": {
-        "title": "Non Disturbare (tieni acceso)",
+        "title": "Non disturbare (tieni acceso)",
         "desc": "Previeni manualmente al sistema di sospendersi"
       },
       "mpris_inhibit": {
@@ -129,12 +129,12 @@
         "placeholder": "es. invio-notifica 'avviso'"
       },
       "before_command": {
-        "title": "Prima del Comando",
+        "title": "Prima del comando",
         "desc": "Eseguito prima che l'azione si avvii",
         "placeholder": "es. playerctl pause"
       },
       "resume_command": {
-        "title": "Comando al Ripristino",
+        "title": "Comando al ripristino",
         "desc": "Eseguito quando l'utente ritorna ad usare il dispositivo",
         "placeholder": "es. invio-notifica 'ripristinato'"
       },
@@ -162,7 +162,7 @@
       "by_author": "fatto da @{author}",
       "about": "Informazioni",
       "hold_for_tutorial": "Tieni premuto per il tutorial",
-      "start_tutorial": "Avvia Tutorial"
+      "start_tutorial": "Avvia tutorial"
     },
     "tutorial": {
       "section_title": "{section} tutorial",
@@ -185,7 +185,7 @@
         "select_image_path": "Seleziona un percorso..."
       },
       "mutesfx": {
-        "title": "Muta SFX",
+        "title": "Muta effetti sonori",
         "desc": "Disabilita gli effetti sonori dell'UI"
       },
       "sfxvolume": {
@@ -198,7 +198,7 @@
       },
       "location": {
         "title": "Posizione",
-        "desc": "Imposta la posizione per il meteo e l'orario solare automatico",
+        "desc": "Imposta la posizione per il meteo e l'orario solare in automatico",
         "popup_title": "Dettagli posizione",
         "autodetect": "Auto-Rileva",
         "latitude": "Latitudine",
@@ -246,14 +246,14 @@
       "widgets": {
         "title": "Widget desktop",
         "desc": "Piazza e configura i Widget per questo monitor",
-        "open": "Apri Configurazione"
+        "open": "Apri configurazione"
       }
     },
     "bar": {
       "modules": {
         "vis": "Visualizzatore (cava)",
         "actions": "Azioni",
-        "workspaces": "Spazi di Lavoro",
+        "workspaces": "Spazi di lavoro",
         "media": "Media",
         "tray": "Tray",
         "keyboard": "Tastiera",
@@ -262,9 +262,9 @@
         "volume": "Volume",
         "battery": "Batteria",
         "focus": "Focus",
-        "sysmon": "Monitor Sistema",
+        "sysmon": "Monitor sistema",
         "timedate": "Data/Ora",
-        "info": "Registratore/timer",
+        "info": "Registratore/Timer",
         "weather": "Meteo"
       },
       "position": {
@@ -281,7 +281,7 @@
       },
       "workspaces": {
         "title": "Scegli il numero di spazi di lavoro da visualizzare",
-        "disc": "Nota: questo non modifica il numero reale di workspace nel compositor"
+        "desc": "Nota: questo non modifica il numero reale di workspace nel compositor"
       },
       "opacity": {
         "title": "Opacità barra",
@@ -311,7 +311,7 @@
         "desc": "Delay prima che la barra scompaia"
       },
       "config": {
-        "title": "Configurazione Barra",
+        "title": "Configurazione barra",
         "desc": "Fai clic con il tasto destro su un elemento per iniziare a raggruppare, poi su un altro per aggiungerlo. Fai clic con il tasto destro su un elemento raggruppato per rimuoverlo.",
         "reset": "Resetta",
         "available": "Disponibile",
@@ -323,7 +323,7 @@
     "theme": {
       "font": {
         "title": "Font",
-        "desc": "Scegli il font predefinito che yoake userà",
+        "desc": "Scegli il font predefinito che Yoake userà",
         "select": "Seleziona..."
       },
       "radius": {
@@ -347,7 +347,7 @@
     "file_picker": {
       "title": "Scegli immagine",
       "input_placeholder": "Cerca...",
-      "not_found": "Nessun file Trovato",
+      "not_found": "Nessun file trovato",
       "no_file_selected": "Nessun file selezionato",
       "root": "Root",
       "places": {
@@ -361,22 +361,22 @@
       "input_placeholder": "Cerca...",
       "not_found": "Nessun risultato",
       "places": {
-        "user_fonts": "Font dell'Utente",
-        "system_fonts": "Font di Sistema"
+        "user_fonts": "Font dell'utente",
+        "system_fonts": "Font di sistema"
       }
     },
     "sound_picker": {
       "title": "Seleziona una suoneria per le notifiche",
       "no_sound_selected": "Nessun suono selezionato",
       "places": {
-        "user_sounds": "Suoni Utente",
-        "system_sounds": "Suoni di Sistema"
+        "user_sounds": "Suoni dell'utente",
+        "system_sounds": "Suoni di sistema"
       }
     },
     "theme_editor": {
       "title": "Nuova palette colori",
-      "name_placeholder": "Nome Palette...",
-      "preview": "Preview",
+      "name_placeholder": "Nome palette...",
+      "preview": "Anteprima",
       "cancel": "Annulla",
       "save": "Salva",
       "default_name": "Palette Personalizzata",
@@ -447,7 +447,7 @@
         "sunday": "Domenica"
       },
       "settings": {
-        "title": "Impostazioni Benessere",
+        "title": "Impostazioni benessere",
         "overall_limit": "Limite giornaliero generale",
         "off": "Off",
         "app_limits": "Limiti utilizzo app",
@@ -472,13 +472,13 @@
   "updater": {
     "notification": {
       "app_name": "Aggiorna",
-      "action_open_guide": "Apri Guida",
-      "update_available_title": "Aggiornamento Disponibile: v{remote}",
+      "action_open_guide": "Apri guida",
+      "update_available_title": "Aggiornamento disponibile: v{remote}",
       "update_available_body": "Versione corrente: v{local}. Clicca per vedere cosa è cambiato e per aggiornare."
     }
   },
   "polkit": {
-    "title": "Autenticazione Richiesta",
+    "title": "Autenticazione richiesta",
     "default_message": "Un'Applicazione sta chiedendo i permessi di amministratore.",
     "default_description": "Autenticazione necessaria per eseguire quest'app come superuser.",
     "password_placeholder": "Password",
@@ -520,9 +520,9 @@
   "lock": {
     "status": {
       "locked": "Bloccato",
-      "access_denied": "Accesso Negato",
+      "access_denied": "Accesso negato",
       "authenticating": "Autenticazione...",
-      "enter_pin": "Inserisci PIN"
+      "enter_pin": "Inserisci il PIN"
     },
     "power": {
       "suspend": "Sospendi",
@@ -533,7 +533,7 @@
     "unknown": "Sconosciuto"
   },
   "music": {
-    "nothing_playing": "Nessuna riproduzione in corso",
+    "nothing_playing": "Non c'è niente in riproduzione",
     "loading": "Caricamento...",
     "by_artist": "Di {artist}",
     "unknown_artist": "Artista sconosciuto",
@@ -568,7 +568,7 @@
       "unknown": "Sconosciuto",
       "calculating": "Calcolo...",
       "open": "Apri",
-      "current_device": "Device Corrente",
+      "current_device": "Device corrente",
       "powering_on": "Accensione...",
       "powering_off": "Spegnimento...",
       "disconnected": "Disconnesso",
@@ -592,7 +592,7 @@
         "action": "Azione"
       },
       "weather": {
-        "fallback_summary": "Report Meteo",
+        "fallback_summary": "Report meteo",
         "fallback_body": "Nessun dettaglio fornito."
       },
       "screenshot": {
@@ -637,9 +637,9 @@
         "timer_finished_title": "Timer finito",
         "timer_finished_body": "Il tuo timer di {time} è terminato.",
         "focus_complete_title": "Studio completato",
-        "focus_complete_body": "Ottimo Lavoro! È ora di prendersi una bella pausa meritata.",
+        "focus_complete_body": "Ottimo Lavoro! Ora goditi il tuo meritato riposo.",
         "break_over_title": "Pausa Terminata",
-        "break_over_body": "La Pausa è finita. Riprendiamo la concentrazione!",
+        "break_over_body": "La Pausa è finita. Rimettiamoci in gioco!",
         "pomo_skipped_title": "Pomodoro saltato",
         "pomo_skipped_focus_body": "Sessione di concentrazione saltata. Facciamo una pausa.",
         "pomo_skipped_break_body": "Pausa saltata. Ritorniamo a concentrarci."
@@ -657,9 +657,9 @@
       "recorder_app_name": "Registrazione Schermo",
       "system_app_name": "Sistema Screenshot",
       "missing_deps_title": "Dipendenze Mancanti",
-      "missing_deps_body": "Impossibile Avviare. Per favore installa:\n{cmds}",
-      "open_folder": "Apri Cartella",
-      "recording_saved_title": "Registrazione Salvata",
+      "missing_deps_body": "Impossibile avviare. Per favore installa:\n{cmds}",
+      "open_folder": "Apri cartella",
+      "recording_saved_title": "Registrazione salvata",
       "recording_saved_body": "File: {file}\nCartella: {folder}",
       "recording_error_title": "Errore",
       "recording_error_body": "Impossibile salvare il file video.",
@@ -672,7 +672,7 @@
   "start": {
     "title": "Yoake",
     "made_by": "Fatto da @{author}",
-    "welcome": "Benvenuto",
+    "welcome": "Benvenuto/a",
     "tagline": "Una shell desktop creata per",
     "you": "Te",
     "start_preview": "Avvia Anteprima"
@@ -691,7 +691,7 @@
       "empty": "Non c'è altro da vedere."
     },
     "profiles": {
-      "performance": "Performance",
+      "performance": "Prestazioni",
       "balanced": "Bilanciato",
       "power_saver": "Risparmio energia"
     },
@@ -711,9 +711,9 @@
     }
   },
   "volumepopup": {
-    "no_device": "Nessun Dispositivo",
+    "no_device": "Nessun dispositivo",
     "mute": "Muto",
-    "master_output_volume": "Volume Principale",
+    "master_output_volume": "Volume principale",
     "no_active_streams": "Nessun flusso attivo",
     "active_default": "Predefinito attivo",
     "tabs": {
@@ -797,7 +797,7 @@
     },
     "network": {
       "name": "Impostazioni rete",
-      "desc": "Gestisci il WiFi, ethernet, e le connessioni di rete"
+      "desc": "Gestisci il WiFi, Ethernet, e le connessioni di rete"
     },
     "volume": {
       "name": "Volume e audio",
@@ -808,7 +808,7 @@
       "desc": "Impostazioni Yoake"
     },
     "calendar": {
-      "name": "Calendario e Orologio",
+      "name": "Calendario e orologio",
       "desc": "Visualizza la data, l'ora e gli eventi"
     },
     "music": {
@@ -816,7 +816,7 @@
       "desc": "Controlla la riproduzione multimediale"
     },
     "notifications": {
-      "name": "Centro Notifiche",
+      "name": "Centro notifiche",
       "desc": "Vedi le notifiche recenti e la cronologia"
     },
     "system": {
@@ -843,7 +843,7 @@
       "minimal": "Minimal",
       "round": "Rotondo",
       "compact": "Compatto",
-      "rect": "Retto",
+      "rect": "Rettangolare",
       "rounded": "Arrotondato"
     }
   },
@@ -1032,5 +1032,8 @@
     "auto_paste_sub": "Se disattivato — la traduzione viene solo copiata negli appunti",
     "keep_clipboard": "Mantieni la traduzione negli appunti",
     "keep_clipboard_sub": "Se disattivato — il contenuto originale degli appunti viene ripristinato dopo l'incolla"
+  },
+  "datetime": {
+    "full_date": "dddd, d MMMM"
   }
 }

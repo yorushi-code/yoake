@@ -11,6 +11,7 @@ import Quickshell.Services.Pipewire
 import "../"
 import "../reusables"
 import "../notifications"
+import "../singletons"
 
 Item {
     id: root
@@ -88,6 +89,7 @@ Item {
 
     property bool isDraggingVol: false
     property bool isDraggingBri: false
+    property bool usesDdcBrightness: false
 
     property bool btStateBeforeAirplane: false
     property bool wifiStateBeforeAirplane: true
@@ -225,7 +227,7 @@ Item {
 
     Timer {
         id: briPollerTimer
-        interval: 1500
+        interval: root.usesDdcBrightness ? 10000 : 1500
         repeat: false
         onTriggered: {
             if (root.visible) briPoller.running = true;
@@ -233,8 +235,17 @@ Item {
     }
 
     Process {
+        id: briBackend
+        command: ["bash", Caching.qsDir + "/../scripts/brightness.sh", "backend"]
+        running: true
+        stdout: StdioCollector {
+            onStreamFinished: root.usesDdcBrightness = this.text.trim() === "ddc"
+        }
+    }
+
+    Process {
         id: briPoller
-        command: ["bash", "-c", "brightnessctl -m 2>/dev/null | awk -F, '{print substr($4, 1, length($4)-1)}'"]
+        command: ["bash", Caching.qsDir + "/../scripts/brightness.sh", "get"]
         running: false
         stdout: StdioCollector {
             onStreamFinished: {
@@ -640,19 +651,21 @@ Item {
                                 accentColor: ThemeBackend.surface1
                                 textColor: isHoveredOrHighlighted ? ThemeBackend.text : root.briColor
                                 onClicked: {
+                                    briCmdThrottle.stop();
+                                    briCmdThrottle.targetPct = -1;
                                     let target = root.sysBrightness > 0 ? 0 : 100;
                                     root.sysBrightness = target;
-                                    Quickshell.execDetached(["brightnessctl", "set", target + "%"]);
+                                    Quickshell.execDetached(["bash", Caching.qsDir + "/../scripts/brightness.sh", "set", target.toString()]);
                                 }
                             }
 
                             Timer {
                                 id: briCmdThrottle
-                                interval: 50
+                                interval: 400
                                 property int targetPct: -1
                                 onTriggered: {
                                     if (targetPct >= 0) {
-                                        Quickshell.execDetached(["brightnessctl", "set", targetPct + "%"]);
+                                        Quickshell.execDetached(["bash", Caching.qsDir + "/../scripts/brightness.sh", "set", targetPct.toString()]);
                                         targetPct = -1;
                                     }
                                 }
@@ -686,9 +699,9 @@ Item {
                                     root.isDraggingBri = true;
                                 }
                                 onDragFinished: {
-                                    if (briCmdThrottle.running && briCmdThrottle.targetPct >= 0) {
+                                    if (briCmdThrottle.targetPct >= 0) {
                                         briCmdThrottle.stop();
-                                        Quickshell.execDetached(["brightnessctl", "set", briCmdThrottle.targetPct + "%"]);
+                                        Quickshell.execDetached(["bash", Caching.qsDir + "/../scripts/brightness.sh", "set", briCmdThrottle.targetPct.toString()]);
                                         briCmdThrottle.targetPct = -1;
                                     }
                                     briSyncDelay.restart();
@@ -698,7 +711,7 @@ Item {
                                     root.sysBrightness = pct;
                                     briSlider.value = pct;
                                     briCmdThrottle.targetPct = pct;
-                                    if (!briCmdThrottle.running) briCmdThrottle.start();
+                                    if (!briSlider.isDragging) briCmdThrottle.restart();
                                 }
                             }
                         }
@@ -728,13 +741,17 @@ Item {
                             activeColor: ThemeBackend.peach
 
                             function updateState() {
-                                let ds = Config.getSetting("display", {"monitors": {}});
-                                let mons = ds.monitors || {};
                                 let anyEnabled = false;
-                                for (let mName in mons) {
-                                    if (mons[mName].enabled) {
-                                        anyEnabled = true;
-                                        break;
+                                if (typeof BlueLight !== "undefined" && typeof BlueLight.isAnyEnabled === "function") {
+                                    anyEnabled = BlueLight.isAnyEnabled();
+                                } else if (typeof Config !== "undefined") {
+                                    let ds = Config.getSetting("display", {"monitors": {}});
+                                    let mons = (ds && ds.monitors) ? ds.monitors : {};
+                                    for (let mName in mons) {
+                                        if (mons[mName] && mons[mName].enabled) {
+                                            anyEnabled = true;
+                                            break;
+                                        }
                                     }
                                 }
                                 isActive = anyEnabled;
@@ -743,35 +760,51 @@ Item {
                             Component.onCompleted: updateState()
 
                             Connections {
-                                target: Config
+                                target: typeof Config !== "undefined" ? Config : null
+                                ignoreUnknownSignals: true
                                 function onSettingsLoaded() {
+                                    nightLightBtn.updateState();
+                                }
+                            }
+
+                            Connections {
+                                target: typeof BlueLight !== "undefined" ? BlueLight : null
+                                ignoreUnknownSignals: true
+                                function onSettingsChanged() {
                                     nightLightBtn.updateState();
                                 }
                             }
 
                             onLeftClicked: {
                                 Sounds.playSfx("system/quick_click.wav");
-                                isActive = !isActive;
-                                let ds = Config.getSetting("display", {"monitors": {}});
-                                let mons = ds.monitors || {};
-                                let temp = 50;
-                                for (let mName in mons) {
-                                    let mSet = mons[mName] || {};
-                                    if (mSet.temperature !== undefined) {
-                                        temp = mSet.temperature;
-                                    }
-                                    let kelvin = Math.round(6500 - (temp / 100) * (6500 - 2500));
+                                let target = !nightLightBtn.isActive;
+                                nightLightBtn.isActive = target;
 
-                                    if (isActive) {
-                                        Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/blue_light_filter.sh", "set", kelvin.toString(), mName]);
-                                    } else {
-                                        Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/blue_light_filter.sh", "reset", mName]);
+                                let monNames = [];
+                                let ds = typeof Config !== "undefined" ? Config.getSetting("display", {"monitors": {}}) : {"monitors": {}};
+                                let mons = (ds && ds.monitors) ? ds.monitors : {};
+                                for (let m in mons) {
+                                    if (monNames.indexOf(m) === -1) {
+                                        monNames.push(m);
                                     }
-                                    mSet.enabled = isActive;
-                                    mons[mName] = mSet;
                                 }
-                                ds.monitors = mons;
-                                Config.setSetting("display", ds);
+                                if (typeof Quickshell !== "undefined" && Quickshell.screens) {
+                                    for (let i = 0; i < Quickshell.screens.length; i++) {
+                                        let scr = Quickshell.screens[i];
+                                        if (scr && scr.name && monNames.indexOf(scr.name) === -1) {
+                                            monNames.push(scr.name);
+                                        }
+                                    }
+                                }
+
+                                if (monNames.length > 0) {
+                                    for (let i = 0; i < monNames.length; i++) {
+                                        BlueLight.setEnabled(monNames[i], target);
+                                    }
+                                } else {
+                                    BlueLight.setEnabled("", target);
+                                }
+                                nightLightBtn.updateState();
                             }
 
                             onRightClicked: {
