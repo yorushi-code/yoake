@@ -5,7 +5,7 @@ import "."
 Scope {
     id: runnerRoot
 
-    property string targetFile: Quickshell.env("SERPANTINUM_TARGET_FILE") || ""
+    property string targetFile: Quickshell.env("YOAKE_TARGET_FILE") || ""
 
     Loader {
         active: runnerRoot.targetFile !== ""

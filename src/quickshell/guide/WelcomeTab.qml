@@ -148,7 +148,7 @@ Item {
                     anchors.centerIn: parent
                     width: rootObj.s(210)
                     height: rootObj.s(210)
-                    source: "file://" + rootObj.appPaths.serpantinumDir + "/assets/logo.svg"
+                    source: "file://" + rootObj.appPaths.yoakeDir + "/assets/logo.svg"
                     sourceSize: Qt.size(width, height)
                     fillMode: Image.PreserveAspectFit
                     smooth: true

@@ -1,7 +1,7 @@
 {
   "guide": {
     "about": {
-      "title": "Serpantinum",
+      "title": "Yoake",
       "loading": "Cargando...",
       "unknown": "Desconocido",
       "version_by": "v{version} • por {author}",
@@ -37,7 +37,7 @@
       "update": "Actualizaciones",
       "about": "Acerca de",
       "autostart": "Inicio automático",
-      "display_widget": "Widgets",
+      "display_widgets": "Widgets",
       "display_general": "General"
     },
     "launcher": {
@@ -322,7 +322,7 @@
     "theme": {
       "font": {
         "title": "Fuente",
-        "desc": "Elegir la fuente predeterminada usada por serpantinum",
+        "desc": "Elegir la fuente predeterminada usada por yoake",
         "select": "Seleccionar..."
       },
       "radius": {
@@ -712,7 +712,7 @@
     }
   },
   "start": {
-    "title": "Serpantinum",
+    "title": "Yoake",
     "made_by": "Hecho por @{author}",
     "welcome": "Bienvenido",
     "tagline": "Un entorno de escritorio creado para",
@@ -847,7 +847,7 @@
     },
     "guide": {
       "name": "Configuración",
-      "desc": "Configuración de serpantinum"
+      "desc": "Configuración de yoake"
     },
     "calendar": {
       "name": "Calendario y reloj",
@@ -890,7 +890,7 @@
     }
   },
   "cli": {
-    "usage": "Uso: serpantinum [comando] [opciones...]",
+    "usage": "Uso: yoake [comando] [opciones...]",
     "description": "Un entorno de escritorio para compositores de wayland.",
     "commands": "Comandos:",
     "script_commands": "Comandos de scripts:",
@@ -903,23 +903,23 @@
     "version_desc": "Mostrar información de versión y salir",
     "help_desc": "Mostrar este mensaje de ayuda y salir",
     "examples": "Ejemplos:",
-    "daemon_stopped": "Demonio de serpantinum detenido.",
-    "starting_daemon": "El demonio no está en ejecución. Iniciando serpantinumd en segundo plano...",
+    "daemon_stopped": "Demonio de yoake detenido.",
+    "starting_daemon": "El demonio no está en ejecución. Iniciando yoaked en segundo plano...",
     "error_missing_qml": "Error: falta el destino a ejecutar.",
-    "launch_usage": "Uso: serpantinum launch <start|widgetredactor> [argumentos...]",
+    "launch_usage": "Uso: yoake launch <start|widgetredactor> [argumentos...]",
     "error_qml_not_found": "Error: no se pudo encontrar {NAME}.qml en {DIR}",
     "error_shell_qml_not_found": "Error: no se pudo resolver la ruta a shell.qml en {DIR}",
     "error_unknown_command": "Error: comando desconocido '{CMD}'.",
     "error_unknown_target": "Error: destino desconocido '{TARGET}'.",
     "launch_help": {
-      "usage": "Uso: serpantinum launch <start|widgetredactor> [argumentos...]",
+      "usage": "Uso: yoake launch <start|widgetredactor> [argumentos...]",
       "description": "Lanzar componentes independientes directamente en modo runner.",
       "available_targets": "Destinos disponibles:",
       "target_start": "Lanzar la interfaz de configuración inicial",
       "target_widgetredactor": "Lanzar el editor de widgets de escritorio"
     },
     "msg_help": {
-      "usage": "Uso: serpantinum msg <comando|espaciodetrabajo> [argumentos...]",
+      "usage": "Uso: yoake msg <comando|espaciodetrabajo> [argumentos...]",
       "description": "Enviar mensajes de diseño, espacios de trabajo y gestión de ventanas directamente.",
       "available_commands": "Mensajes disponibles:",
       "cmd_workspace": "Cambiar al espacio de trabajo <num> (añadir 'move' para mover la ventana activa)",
@@ -928,7 +928,7 @@
       "cmd_close": "Cerrar cualquier panel superpuesto activo"
     },
     "ipc_help": {
-      "usage": "Uso: serpantinum ipc call <destino> <método> [argumentos...]",
+      "usage": "Uso: yoake ipc call <destino> <método> [argumentos...]",
       "description": "Enviar una llamada IPC directamente a la instancia activa de quickshell."
     },
     "scripts": {
@@ -949,11 +949,11 @@
   },
   "daemon": {
     "already_running": "El demonio ya está en ejecución. Saliendo...",
-    "shutting_down": "Apagando el demonio de serpantinum...",
-    "launching": "Iniciando el demonio de serpantinum...",
+    "shutting_down": "Apagando el demonio de yoake...",
+    "launching": "Iniciando el demonio de yoake...",
     "cli": {
-      "usage": "Uso: serpantinumd <comando> [opciones...]",
-      "description": "Servicio demonio en segundo plano para el entorno de escritorio serpantinum.",
+      "usage": "Uso: yoaked <comando> [opciones...]",
+      "description": "Servicio demonio en segundo plano para el entorno de escritorio yoake.",
       "commands": "Comandos:",
       "cmd_start": "Iniciar el servicio demonio y los procesos en segundo plano",
       "cmd_stop": "Detener el servicio demonio en ejecución",
@@ -962,9 +962,9 @@
       "opt_verbose": "Habilitar registro detallado (verbose)",
       "opt_version": "Mostrar información de versión y salir",
       "opt_help": "Mostrar este mensaje de ayuda y salir",
-      "stopped": "Demonio de serpantinum detenido.",
-      "status_running": "El demonio de serpantinum está en ejecución (PID: {PID}).",
-      "status_stopped": "El demonio de serpantinum no está en ejecución.",
+      "stopped": "Demonio de yoake detenido.",
+      "status_running": "El demonio de yoake está en ejecución (PID: {PID}).",
+      "status_stopped": "El demonio de yoake no está en ejecución.",
       "unknown_arg": "Argumento desconocido: {ARG}"
     }
   },
@@ -979,7 +979,7 @@
     },
     "os": {
       "error_root": "Error: No ejecutes este script directamente con root/sudo. Ejecútalo como usuario normal.",
-      "error_unsupported": "SO no compatible ({os}). Serpantinum solo es compatible con arch linux y sus derivados.",
+      "error_unsupported": "SO no compatible ({os}). Yoake solo es compatible con arch linux y sus derivados.",
       "error_not_found": "No se puede detectar el SO. /etc/os-release no encontrado.",
       "unknown_cpu": "CPU desconocida",
       "unknown_gpu": "Desconocida / máquina virtual",
@@ -1035,9 +1035,9 @@
       "tagline": "Un entorno de escritorio creado para ti",
       "support_creator": "Apoya al creador:",
       "buy_coffee": "Si disfrutas este proyecto, ¡invítame a un café!",
-      "installed_success": "✔ Serpantinum {ver} ({commit}) instalado con éxito.",
+      "installed_success": "✔ Yoake {ver} ({commit}) instalado con éxito.",
       "failed_packages": "Los siguientes paquetes encontraron errores durante la instalación:",
-      "restart_prompt": "Reinicia tu compositor o ejecuta 'serpantinumd start' para comenzar.",
+      "restart_prompt": "Reinicia tu compositor o ejecuta 'yoaked start' para comenzar.",
       "ask_reboot": "¿Deseas reiniciar? [y/n] "
     },
     "deps": {
@@ -1074,5 +1074,8 @@
     "auto_paste_sub": "Si está desactivado — solo se copia al portapapeles",
     "keep_clipboard": "Guardar traducción en el portapapeles",
     "keep_clipboard_sub": "Si está desactivado — se restaura el portapapeles original"
+  },
+  "datetime": {
+    "full_date": "dddd, d 'de' MMMM"
   }
 }

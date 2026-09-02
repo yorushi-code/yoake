@@ -3,16 +3,17 @@
 with lib;
 
 let
-  cfg = config.programs.serpantinum;
+  cfg = config.programs.yoake;
 in
 {
-  options.programs.serpantinum = {
-    enable = mkEnableOption "system-level support for the Serpantinum desktop shell";
+  options.programs.yoake = {
+    enable = mkEnableOption "system-level support for the Yoake desktop shell";
   };
 
   config = mkIf cfg.enable {
     networking.networkmanager.enable = mkDefault true;
     hardware.bluetooth.enable = mkDefault true;
+    hardware.i2c.enable = mkDefault true;
     services.power-profiles-daemon.enable = mkDefault true;
     security.rtkit.enable = mkDefault true;
 

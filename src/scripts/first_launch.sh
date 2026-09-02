@@ -30,14 +30,14 @@ if [ -n "$WP_DIR" ] && [ -d "$WP_DIR" ]; then
     fi
 fi
 
-START_QML="$(find "$SERPANTINUM_DIR/quickshell" -type f -name "Start.qml" | head -n 1)"
+START_QML="$(find "$YOAKE_DIR/quickshell" -type f -name "Start.qml" | head -n 1)"
 
 if [ -n "$START_QML" ]; then
-    export SERPANTINUM_TARGET_FILE="$START_QML"
-    export SERPANTINUM_LAUNCH_ARGS=""
-    quickshell -p "$SERPANTINUM_DIR/quickshell/Runner.qml"
+    export YOAKE_TARGET_FILE="$START_QML"
+    export YOAKE_LAUNCH_ARGS=""
+    quickshell -p "$YOAKE_DIR/quickshell/Runner.qml"
 fi
 
-if [ -f "$SERPANTINUM_DIR/scripts/qs_manager.sh" ]; then
-    bash "$SERPANTINUM_DIR/scripts/qs_manager.sh" open guide
+if [ -f "$YOAKE_DIR/scripts/qs_manager.sh" ]; then
+    bash "$YOAKE_DIR/scripts/qs_manager.sh" open guide
 fi

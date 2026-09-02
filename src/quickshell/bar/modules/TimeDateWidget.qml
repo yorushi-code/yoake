@@ -59,8 +59,8 @@ Rectangle {
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onClicked: {
-            if (Caching.serpantinumDir) {
-                Quickshell.execDetached(["bash", Caching.serpantinumDir + "/scripts/qs_manager.sh", "toggle", "calendar"]);
+            if (Caching.yoakeDir) {
+                Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/qs_manager.sh", "toggle", "calendar"]);
             }
         }
     }

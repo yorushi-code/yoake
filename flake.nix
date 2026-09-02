@@ -1,5 +1,5 @@
 {
-  description = "Serpantinum - a desktop shell built for YOU.";
+  description = "Yoake - a desktop shell built for YOU.";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -18,7 +18,7 @@
     in
     {
       overlays.default = final: _prev: {
-        serpantinum = final.callPackage ./nix/package.nix {
+        yoake = final.callPackage ./nix/package.nix {
           rev = self.rev or self.dirtyRev or "dirty";
         };
       };
@@ -29,17 +29,17 @@
           default = pkgs.callPackage ./nix/package.nix {
             rev = self.rev or self.dirtyRev or "dirty";
           };
-          serpantinum = self.packages.${system}.default;
+          yoake = self.packages.${system}.default;
         });
 
       apps = forAllSystems (system: {
         default = {
           type = "app";
-          program = "${self.packages.${system}.default}/bin/serpantinum";
+          program = "${self.packages.${system}.default}/bin/yoake";
         };
-        serpantinumd = {
+        yoaked = {
           type = "app";
-          program = "${self.packages.${system}.default}/bin/serpantinumd";
+          program = "${self.packages.${system}.default}/bin/yoaked";
         };
       });
 
@@ -56,10 +56,10 @@
         inherit self;
         wallpapers = serpantinum-wallpapers;
       };
-      homeManagerModules.serpantinum = self.homeManagerModules.default;
+      homeManagerModules.yoake = self.homeManagerModules.default;
 
       nixosModules.default = import ./nix/nixos-module.nix;
-      nixosModules.serpantinum = self.nixosModules.default;
+      nixosModules.yoake = self.nixosModules.default;
 
       formatter = forAllSystems (system: (pkgsFor system).nixpkgs-fmt);
     };

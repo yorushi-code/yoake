@@ -48,7 +48,7 @@ SUPPORTED_DISTROS=(
 REQUIRED_PKGS=(
     "kitty" "cava" "zbar" "pavucontrol" "alsa-utils"
     "wl-clipboard" "fd" "qt6-multimedia" "qt6-5compat" "ripgrep"
-    "cliphist" "jq" "socat" "inotify-tools" "pamixer" "brightnessctl" "acpi" "iw"
+    "cliphist" "jq" "socat" "inotify-tools" "pamixer" "brightnessctl" "ddcutil" "acpi" "iw"
     "bluez" "bluez-utils" "libnotify" "networkmanager" "lm_sensors" "bc" "matugen"
     "pipewire" "wireplumber" "pipewire-pulse" "pipewire-alsa" "libpulse" "python"
     "imagemagick" "wget" "file" "git" "psmisc"
@@ -113,7 +113,7 @@ bootstrap_installer_deps() {
     fi
 
     if ! command -v yay &>/dev/null && ! command -v paru &>/dev/null; then
-        local cache_build="${XDG_CACHE_HOME:-"$HOME/.cache"}/serpantinum-yay-bin"
+        local cache_build="${XDG_CACHE_HOME:-"$HOME/.cache"}/yoake-yay-bin"
         rm -rf "$cache_build"
         mkdir -p "$cache_build"
         git clone https://aur.archlinux.org/yay-bin.git "$cache_build"
@@ -140,7 +140,7 @@ install_pkg() {
 install_fonts() {
     local target_fonts_dir="$HOME/.local/share/fonts/IosevkaNerdFont"
     if [ ! -d "$target_fonts_dir" ] || [ -z "$(ls -A "$target_fonts_dir" 2>/dev/null | grep -i "\.ttf")" ]; then
-        local font_cache="${XDG_CACHE_HOME:-"$HOME/.cache"}/serpantinum-fonts"
+        local font_cache="${XDG_CACHE_HOME:-"$HOME/.cache"}/yoake-fonts"
         mkdir -p "$font_cache" "$target_fonts_dir"
         echo -e "\n\e[36m[ INFO ]\e[0m Downloading Iosevka Nerd Font..."
         if curl -# -L --connect-timeout 15 --retry 3 "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Iosevka.zip" -o "$font_cache/Iosevka.zip"; then

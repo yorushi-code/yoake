@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 
-STATE_DIR="$HOME/.local/state/serpantinum"
+MODULE_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+if [ -z "$YOAKE_DIR" ]; then
+    if [ -d "$(dirname "$(dirname "$MODULE_DIR")")/src" ]; then
+        export YOAKE_DIR="$(dirname "$(dirname "$MODULE_DIR")")/src"
+    fi
+fi
+
+if [ -n "$YOAKE_DIR" ] && [ -f "$YOAKE_DIR/scripts/caching.sh" ]; then
+    source "$YOAKE_DIR/scripts/caching.sh"
+fi
+
+STATE_DIR="${QS_STATE_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/yoake}"
 VERSION_FILE="$STATE_DIR/version"
 DEFAULT_FALLBACK_VERSION="2.0.0"
 
@@ -51,14 +62,31 @@ get_telemetry_enabled() {
 }
 
 get_installed_version() {
+    local ver=""
     if [ -f "$VERSION_FILE" ]; then
-        awk -F= '/^SERPANTINUM_VERSION=/{gsub(/"/, "", $2); print $2}' "$VERSION_FILE"
+        ver=$(awk -F= '/^YOAKE_VERSION=/{gsub(/"/, "", $2); print $2}' "$VERSION_FILE")
     fi
+    if [ -z "$ver" ] && [ -n "$YOAKE_VERSION" ]; then
+        ver="$YOAKE_VERSION"
+    fi
+    if [ -z "$ver" ]; then
+        if [ -n "$YOAKE_DIR" ] && [ -f "$YOAKE_DIR/version.txt" ]; then
+            ver=$(cat "$YOAKE_DIR/version.txt" 2>/dev/null | xargs)
+        elif [ -n "$YOAKE_DIR" ] && [ -f "$(dirname "$YOAKE_DIR")/version.txt" ]; then
+            ver=$(cat "$(dirname "$YOAKE_DIR")/version.txt" 2>/dev/null | xargs)
+        elif [ -n "$REPO_ROOT" ] && [ -f "$REPO_ROOT/version.txt" ]; then
+            ver=$(cat "$REPO_ROOT/version.txt" 2>/dev/null | xargs)
+        fi
+    fi
+    if [ -z "$ver" ]; then
+        ver="$DEFAULT_FALLBACK_VERSION"
+    fi
+    echo "$ver"
 }
 
 get_installed_commit() {
     if [ -f "$VERSION_FILE" ]; then
-        awk -F= '/^SERPANTINUM_COMMIT=/{gsub(/"/, "", $2); print $2}' "$VERSION_FILE"
+        awk -F= '/^YOAKE_COMMIT=/{gsub(/"/, "", $2); print $2}' "$VERSION_FILE"
     fi
 }
 
@@ -126,8 +154,8 @@ write_version_state() {
     mkdir -p "$STATE_DIR"
     local tmp_file="${VERSION_FILE}.tmp.$$"
     cat <<EOF > "$tmp_file"
-SERPANTINUM_VERSION="$version"
-SERPANTINUM_COMMIT="$commit"
+YOAKE_VERSION="$version"
+YOAKE_COMMIT="$commit"
 TELEMETRY_ID="$tel_id"
 ENABLE_TELEMETRY="$tel_enabled"
 SELECTED_COMPOSITORS="$compositors"
