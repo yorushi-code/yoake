@@ -126,6 +126,58 @@ DNS в туннеле держится на `dns-hijack: ["any:53"]` — mihomo 
 Панель, со своей стороны, теперь проверяет `resolvectl status mihomo-tun` при
 открытии и прямо говорит, если резолвер всё-таки перехвачен.
 
+## Гритер serpantinum вместо своего
+
+До этого вход держал greetd: `cage -s -- /usr/local/bin/yoake-greeter`, то есть
+свой гритер на quickshell из `/usr/share/yoake/greeter/shell.qml`, с обвязкой,
+которая перезапускает его несколько раз и только потом отдаёт экран `gtkgreet`.
+serpantinum вместо этого возит тему для SDDM — `config/sddm/themes/material-you`
+(сторонняя, Darkkal44, MIT).
+
+Что уже сделано и работает без переключения:
+
+```
+sudo dnf install sddm sddm-wayland-generic
+sudo cp -r config/sddm/themes/material-you/. /usr/share/sddm/themes/material-you/
+sudo cp config/sddm/themes/material-you/font/*.ttf /usr/share/fonts/TTF/ && sudo fc-cache -f
+```
+
+`/etc/sddm.conf.d/10-material-you.conf` записан с `DisplayServer=wayland`.
+Иначе нельзя: Xorg на машине нет вовсе, а SDDM по умолчанию поднимает
+X11-гритер. В wayland-режиме он запускает `weston --shell=kiosk`, отсюда и
+`sddm-wayland-generic` — сам пакет пустой, он тянет weston.
+
+Тема проверена до переключения, а не после:
+
+```
+sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/material-you
+```
+
+Рисуется целиком — часы, быстрые действия, поле пароля, — и сессию видит
+правильно: `SESSION · NIRI`, из `/usr/share/wayland-sessions/niri.desktop`.
+
+Переключение остаётся за человеком, потому что ошибка здесь стоит входа в
+систему:
+
+```
+sudo systemctl disable greetd
+sudo systemctl enable --force sddm
+```
+
+`--force` нужен, потому что символьная ссылка `display-manager.service` уже
+занята greetd. Действует со следующей загрузки. Не добавляй `--now` к
+`disable`: greetd — родитель текущей сессии, и она закроется на месте.
+
+Откат — тем же способом наоборот; greetd и его гритер никуда не делись:
+
+```
+sudo systemctl disable sddm
+sudo systemctl enable --force greetd
+```
+
+Если экран входа не поднялся, до этого можно добраться с текстовой консоли
+(Ctrl+Alt+F3).
+
 ## Known, and upstream's
 
 Present before any change here, left alone deliberately:
