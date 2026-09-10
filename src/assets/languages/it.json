@@ -37,7 +37,9 @@
       "update": "Aggiorna",
       "about": "Informazioni",
       "display_widgets": "Widget",
-      "display_general": "Generale"
+      "display_general": "Generale",
+      "osd": "OSD",
+      "dock": "Dock"
     },
     "launcher": {
       "position": {
@@ -46,7 +48,8 @@
         "top": "Superiore",
         "bottom": "Inferiore",
         "left": "Sinistro",
-        "right": "Destro"
+        "right": "Destro",
+        "center": "Centro"
       },
       "width": {
         "title": "Larghezza avviatore",
@@ -79,7 +82,9 @@
         "bottom_right": "In basso a destra",
         "bottom_left": "In basso a sinistra",
         "top_center": "In alto al centro",
-        "bottom_center": "In basso al centro"
+        "bottom_center": "In basso al centro",
+        "select_on_screen": "Seleziona sullo schermo...",
+        "close_selector": "Chiudi selettore"
       },
       "sound": {
         "title": "Suono delle notifiche",
@@ -218,6 +223,10 @@
         "title": "Copia impostazioni",
         "desc": "Copia il JSON di configurazione nelle note",
         "button": "Copia Impostazioni"
+      },
+      "screenshot_on_release": {
+        "title": "Cattura area al rilascio del mouse",
+        "desc": "Cattura lo screenshot non appena si rilascia il cursore, senza cliccare l'otturatore"
       }
     },
     "display": {
@@ -244,7 +253,11 @@
       "widgets": {
         "title": "Widget desktop",
         "desc": "Piazza e configura i Widget per questo monitor",
-        "open": "Apri configurazione"
+        "open": "Apri configurazione",
+        "hide_bar": {
+          "title": "Nascondi barra nel redattore",
+          "desc": "Nascondi automaticamente la barra durante la modifica dei widget in modalità redattore"
+        }
       }
     },
     "bar": {
@@ -316,6 +329,10 @@
         "left": "Sinistra",
         "center": "Centro",
         "right": "Destra"
+      },
+      "distinct_pills": {
+        "title": "Abilita uno stile modulare e compatto per i widget",
+        "desc": "Aggiunge un bordo ai moduli della barra e ne riduce le dimensioni per adattarsi a un aspetto modulare"
       }
     },
     "theme": {
@@ -409,7 +426,7 @@
     },
     "wellbeing": {
       "desktop": "Desktop",
-      "not_available": "N/a",
+      "not_available": "N/d",
       "am": "AM",
       "pm": "PM",
       "today": "Oggi",
@@ -454,7 +471,126 @@
         "excluded_apps_desc": "Escludi le app dal tracciamento complessivo da ora in poi"
       }
     },
-    "update_available": "Aggiornamento disponibile"
+    "update_available": "Aggiornamento disponibile",
+    "osd": {
+      "capslock": {
+        "title": "Mostra con Blocco Maiuscole"
+      },
+      "numlock": {
+        "title": "Mostra con Blocco Numeri"
+      },
+      "airplane": {
+        "title": "Mostra in Modalità Aereo"
+      },
+      "attach_bar": {
+        "title": "Aggancia alla barra in stile solid/fill",
+        "desc": "Aggancia l'OSD alla barra nei modi solid o fill. Se disattivato, l'OSD rimarrà sempre nella posizione configurata."
+      },
+      "test": "Testa OSD",
+      "position": {
+        "title": "Posizione sullo schermo dell'On-Screen Display",
+        "desc": "Trascina la casella di anteprima per cambiare posizione",
+        "select_on_screen": "Seleziona sullo schermo...",
+        "close_selector": "Chiudi selettore",
+        "bottom_center": "In basso al centro",
+        "bottom_left": "In basso a sinistra",
+        "bottom_right": "In basso a destra",
+        "top_center": "In alto al centro",
+        "top_left": "In alto a sinistra",
+        "top_right": "In alto a destra"
+      },
+      "orientation": {
+        "horizontal": "Orizzontale",
+        "vertical": "Verticale"
+      }
+    },
+    "common": {
+      "show_bar": "Mostra barra",
+      "unavailable": "Non disponibile"
+    },
+    "position": {
+      "custom": "Personalizzato"
+    },
+    "dock": {
+      "enabled": {
+        "title": "Abilita dock",
+        "desc": "Abilita la dock mobile delle applicazioni"
+      },
+      "position": {
+        "title": "Posizione dock",
+        "desc": "Seleziona il bordo dello schermo a cui agganciare la dock",
+        "bottom": "In basso",
+        "top": "In alto",
+        "left": "Sinistra",
+        "right": "Destra"
+      },
+      "elements": {
+        "title": "Numero di elementi",
+        "desc": "Scorciatoie totali mostrate nella dock"
+      },
+      "size": {
+        "title": "Dimensione elementi",
+        "desc": "Dimensioni dei singoli pulsanti in pixel"
+      },
+      "autohide": {
+        "title": "Nascondi automaticamente",
+        "desc": "Nascondi la dock quando il puntatore non è sul bordo"
+      },
+      "timeout": {
+        "title": "Ritardo scomparsa automatica",
+        "desc": "Durata prima di nascondere dopo l'uscita del cursore"
+      },
+      "floating": {
+        "title": "Dock fluttuante",
+        "desc": "Separa la dock dal bordo con angoli arrotondati"
+      },
+      "transparency": {
+        "title": "Trasparenza dock",
+        "desc": "Regola l'opacità dello sfondo della dock"
+      },
+      "apps": {
+        "title": "Applicazioni dock",
+        "singular": "app",
+        "plural": "app",
+        "shuffle": "Mescola app",
+        "empty": "Nessuna applicazione configurata per la dock",
+        "enter_edit": "Modalità modifica",
+        "exit_edit": "Esci da modifica"
+      },
+      "picker": {
+        "search": "Cerca applicazioni...",
+        "done": "Fatto",
+        "empty": "Nessuna applicazione trovata"
+      },
+      "opacity": {
+        "title": "Opacità dock",
+        "desc": "Regola il livello di opacità dello sfondo della dock"
+      },
+      "override_bounds": {
+        "title": "Ignora correzione dimensioni fuori schermo",
+        "desc": "Mantieni dimensione personalizzata anche se la dock supera i limiti dello schermo"
+      },
+      "scrolling": {
+        "title": "Abilita scorrimento elementi",
+        "desc": "Limita elementi visibili e consenti lo scorrimento tramite rotellina o touchpad"
+      },
+      "visible_elements": {
+        "title": "Elementi visibili",
+        "desc": "Numero di elementi della dock visibili contemporaneamente"
+      },
+      "hover_scale": {
+        "title": "Effetto ingrandimento al passaggio",
+        "desc": "Livello di ingrandimento al passaggio del cursore sulle icone del dock"
+      },
+      "cascade_scale": {
+        "title": "Scala elementi vicini",
+        "desc": "Ingrandimento a cascata sulle icone adiacenti"
+      },
+      "exclusive": {
+        "title": "Modalità esclusiva",
+        "desc": "Impedisci alle finestre di occupare lo spazio del dock"
+      }
+    }
   },
   "sysnotif": {
     "battery": {
@@ -832,7 +968,9 @@
       "clock": "Orologio",
       "music": "Musica",
       "weather": "Meteo",
-      "image": "Immagine"
+      "image": "Immagine",
+      "visualizer": "Visualizzatore",
+      "user": "Utente"
     },
     "variants": {
       "digital": "Digitale",
@@ -842,7 +980,10 @@
       "round": "Rotondo",
       "compact": "Compatto",
       "rect": "Rettangolare",
-      "rounded": "Arrotondato"
+      "rounded": "Arrotondato",
+      "bars": "Barre",
+      "continuous": "Continuo",
+      "default": "Predefinito"
     }
   },
   "cli": {
@@ -994,7 +1135,7 @@
       "installed_success": "✔ Yoake {ver} ({commit}) installato con successo.",
       "failed_packages": "Si sono verificati errori durante l'installazione dei seguenti pacchetti:",
       "restart_prompt": "Riavvia il compositor o esegui 'yoaked start' per iniziare.",
-      "ask_reboot": "Vuoi riavviare ora? [s/n] "
+      "ask_reboot": "Vuoi riavviare ora? [y/n] "
     },
     "deps": {
       "syncing": "Sincronizzazione e aggiornamento dei pacchetti di sistema (pacman -syyu)...",

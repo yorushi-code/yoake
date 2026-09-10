@@ -2,7 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import "../"
+import "../../"
 
 Item {
     id: root
@@ -100,8 +100,11 @@ Item {
     }
 
     Component.onCompleted: {
-        if (root.source !== "manual" && (root.latitude === 0 && root.longitude === 0)) {
-            root.detectAuto();
+        if (typeof Config !== "undefined" && Config.dataReady) {
+            let gs = Config.getSetting("general", {});
+            if (gs && gs.location) {
+                root.locationData = gs.location;
+            }
         }
     }
 }

@@ -1,3 +1,114 @@
+### 2.1.4
+
+- style: add icons to each setting in the guidepopup, change margins, rework the wellbeing tab
+- increase the padding for grouped elements in the bar
+- feat: add new notification sounds
+- fix: dock having an element cut off on position change and disconnect the dock when the bar is in modular mode
+- fix: launcher having a bad corner at the bottom
+- fix: dock evaluation warning
+- fix: Dock taking up mouse area clicking when in hidden mode
+- fix a local function call bug in yoaked
+- fix: make all dock settings hide when dock is disabled
+
+### 2.1.3
+
+- feat: add a dock functionality: dock.qml, dock settings
+- feat: make clicking on a random area in the screenposition selector not relocate the item for usability
+- flake.lock update
+- fix: detach OSD from the bar in autohide mode
+- fix: make sure the bar doesn't disappear on startup
+- fix: a bug with duplicated bar modules
+- fix: make the launcher remove the bar offset when in full-screen or autohide mode
+- fix repositioning bug with the notifications
+- fix: make the screenselector not offset its coordinates due to the bar
+- style: make the temp in calendarpopup have 1 number after the dot instead of integer rounded
+
+### 2.1.2
+
+- style: tune down the scale effect for clickbutton
+- feat: create a on-screen position configuration for notifications and osd. New reusable - screen selector
+- style: make all of the settings have separate configuration boxes
+- fix: wallpaper picker recent wallpaper animation fixed
+- fix wallpaper dir not being properly set on install
+- fix: yoake not cleanly killing the quickshell process
+- fix: a right corner in clipboard having a wrong target coordinate
+- fix sounds not having access to the config
+- Remove duplicate no-op lines in QR polygon parser (#253)
+- Fix QR marker vertical position (#252)
+- refactor: remove all fauly singleton imports, categorize singletons
+- fix faulty pull request
+- style: overhaul the systempanel colors
+- fix: add previous/next media key bindings (#247)
+- fix(current_focus): exit after SIGTERM cleanup instead of resuming loop (#245)
+- really minor change (#242)
+- fix a singleton bug
+- i18n: add missing translations for new widgets
+
+### 2.1.1
+
+- feat/refactor: add a user widget and relocate sysinfo singletons
+- fix: prevent location from auto-updating on re-boots or updates
+- fix: fix inotifywait processes not being killed and being left as orphans
+- style: change the toggle style in the launchertab
+- feat: add a toggle to show the bar in the widget redactor
+- fix: fix resize clamping bug in a widgetredactor
+- fix: duplication bug in the wallpaperpicker
+- style: change the cava template background color to surface
+- i18n: add languages for the new capture setting
+- feat(screenshot): optionally capture the region on mouse release (#239)
+- style: make the visualizer widgets smoothly zero-out on the edges
+- replace widget ipc calls with faster and immidiate singleton calls
+- fix: fix jitter by removing continous background wifi-scanning
+- feat: switch close-window keybind from Alt+f4 to Super + Q, and switch a music keybind to Super+M instead of Super + Q
+- fix: a typo in matugen static config. Replace fastfetch with config
+- feat: make the widgets in the redactor shrink if they become too big after rotation to prevent inaccassible states
+- fix: fix the bug where the redactor toolbar for widgets wouldn't disappear
+- fix: remove automatic network scanning to prevent jitter
+
+### 2.1.0
+
+- feat: add rotation iconbutton into the widget toolbar, allow to rotate widgets by 90 degrees
+- feat: add a new visualizer widget
+- fix: make sure the first launch applies the wallpaper through the wallpaper singleton
+- fix: prevent crashes in the networkpopup widget. fixes #229
+- feat: switch the wallpaperengine to use the singleton for communicating with the wallpaperpicker
+- fix: battery widgets not following theme's borderradius
+- style: make the draggable handle size bigger in the osd to match the syspanel
+- feat: add a distinctPills setting for the solid and fill styles of the bar
+- feat: optimize the opening sequence for the systempanel
+- fix: make sure Main.qml specified the monitor the widget is open on
+- feat/fix: add a distinctPills support for the topbar and sidebar, fix the topbar sliding out on all monitors when syspanel was open
+- fix: make sure the visualizer widgets zero-out when nothing is playing
+- feat: add a search animation for the clipboard
+- feat: add a search animation for the launcher, add a center position
+- i18n: add new keys for distinctPills setting for the bar and launcher center position
+- style: implement a distinctPills property for pill-like look for all of the widgets. Change the paddings and adjust the sizes or all widgets for better look
+- fix: eliminate the race condition of the displaywidgettab when only the last connected monitor was correctly reporting the existing desktop widgets
+- feat: add Korean language support (#233)
+- fix: show system monitor on the correct screen - #221
+- style: increase the widget width and change alignment of icon glyps in the weatherfaceround
+- style: change the harcoded JetBrains Font in dropdowns and switches to the fontfamily
+- fix: prevent duplicate lockscreen cava subscriptions (#219)
+
+### 2.0.7
+
+- feat: a series of optimizations tied to visibility of widgets
+- docs: add an update note. Solves #218
+- fix: fix a duplication of modules bug
+- make sure first launch correctly applies the wallpaper
+- feat: a series of performance optimizations for components
+- feat: make the first launch script a singleton instead
+- fix a bug where location.sh was replaced by a single function
+- i18n: add a missing translation for workspaces.desc
+- feat: make the Sidebar able to change its height from the bartab settings like the topbar
+- style: make the osd capslock, numlock and airplane mode display in the bottom center when the bar is on the side
+- fix: clipboard search bar getting swallowed on the sides
+- fix: make the order of calendar words depend on the language
+- fix: change fullDate property to use toLocaleDateString (#214)
+- fix: update targetMonthName formatting to use locale (#213)
+- Fix installation script URL formatting in README (#215)
+- fix: prevent niri workspaces variation from infinite looping
+
 ### 2.0.6-1
 
 - Fix disc to desc typo and general improvements (#210)

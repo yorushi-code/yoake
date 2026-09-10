@@ -37,7 +37,9 @@
       "update": "Cập nhật",
       "about": "Giới thiệu",
       "display_widgets": "Tiện ích",
-      "display_general": "Chung"
+      "display_general": "Chung",
+      "osd": "OSD",
+      "dock": "Dock"
     },
     "launcher": {
       "position": {
@@ -46,7 +48,8 @@
         "top": "Trên",
         "bottom": "Dưới",
         "left": "Trái",
-        "right": "Phải"
+        "right": "Phải",
+        "center": "Giữa"
       },
       "width": {
         "title": "Chiều rộng trình khởi chạy",
@@ -79,7 +82,9 @@
         "bottom_right": "Dưới cùng bên phải",
         "bottom_left": "Dưới cùng bên trái",
         "top_center": "Giữa phía trên",
-        "bottom_center": "Giữa phía dưới"
+        "bottom_center": "Giữa phía dưới",
+        "select_on_screen": "Chọn trên màn hình...",
+        "close_selector": "Đóng bộ chọn"
       },
       "sound": {
         "title": "Âm thanh thông báo",
@@ -218,6 +223,10 @@
         "title": "Sao chép cài đặt",
         "desc": "Sao chép JSON cấu hình vào bộ nhớ tạm",
         "button": "Sao chép cài đặt"
+      },
+      "screenshot_on_release": {
+        "title": "Chụp vùng khi thả chuột",
+        "desc": "Chụp ảnh màn hình ngay khi kéo xong mà không cần nhấn nút chụp"
       }
     },
     "display": {
@@ -244,7 +253,11 @@
       "widgets": {
         "title": "Tiện ích màn hình",
         "desc": "Cấu hình và đặt tiện ích cho màn hình này",
-        "open": "Mở trình chỉnh sửa"
+        "open": "Mở trình chỉnh sửa",
+        "hide_bar": {
+          "title": "Ẩn thanh trong trình chỉnh sửa",
+          "desc": "Tự động ẩn thanh khi chỉnh sửa tiện ích con ở chế độ biên tập"
+        }
       }
     },
     "bar": {
@@ -317,6 +330,10 @@
         "left": "Trái",
         "center": "Giữa",
         "right": "Phải"
+      },
+      "distinct_pills": {
+        "title": "Bật kiểu dáng mô-đun và gọn gàng cho tiện ích",
+        "desc": "Thêm đường viền cho các mô-đun trên thanh và thu nhỏ kích thước để phù hợp với giao diện mô-đun"
       }
     },
     "theme": {
@@ -455,7 +472,126 @@
         "excluded_apps_desc": "Loại trừ ứng dụng khỏi việc theo dõi tổng thể từ bây giờ"
       }
     },
-    "update_available": "Có bản cập nhật mới"
+    "update_available": "Có bản cập nhật mới",
+    "osd": {
+      "capslock": {
+        "title": "Hiện khi bật Caps Lock"
+      },
+      "numlock": {
+        "title": "Hiện khi bật Num Lock"
+      },
+      "airplane": {
+        "title": "Hiện ở Chế độ máy bay"
+      },
+      "attach_bar": {
+        "title": "Gắn vào thanh ở kiểu solid/fill",
+        "desc": "Gắn OSD vào thanh trạng thái ở chế độ solid hoặc fill. Khi tắt, OSD sẽ luôn ở vị trí đã định cấu hình."
+      },
+      "test": "Thử nghiệm OSD",
+      "position": {
+        "title": "Vị trí màn hình của On-Screen Display",
+        "desc": "Kéo hộp xem trước để thay đổi vị trí",
+        "select_on_screen": "Chọn trên màn hình...",
+        "close_selector": "Đóng bộ chọn",
+        "bottom_center": "Dưới cùng ở giữa",
+        "bottom_left": "Dưới cùng bên trái",
+        "bottom_right": "Dưới cùng bên phải",
+        "top_center": "Trên cùng ở giữa",
+        "top_left": "Trên cùng bên trái",
+        "top_right": "Trên cùng bên phải"
+      },
+      "orientation": {
+        "horizontal": "Ngang",
+        "vertical": "Dọc"
+      }
+    },
+    "common": {
+      "show_bar": "Hiện thanh bar",
+      "unavailable": "Không khả dụng"
+    },
+    "position": {
+      "custom": "Tùy chỉnh"
+    },
+    "dock": {
+      "enabled": {
+        "title": "Bật dock",
+        "desc": "Bật thanh dock ứng dụng nổi"
+      },
+      "position": {
+        "title": "Vị trí dock",
+        "desc": "Chọn cạnh màn hình để ghim dock",
+        "bottom": "Dưới",
+        "top": "Trên",
+        "left": "Trái",
+        "right": "Phải"
+      },
+      "elements": {
+        "title": "Số lượng mục",
+        "desc": "Tổng số phím tắt hiển thị trên dock"
+      },
+      "size": {
+        "title": "Kích thước mục",
+        "desc": "Kích thước các nút ứng dụng theo pixel"
+      },
+      "autohide": {
+        "title": "Tự động ẩn",
+        "desc": "Ẩn dock khi không rê chuột vào cạnh màn hình"
+      },
+      "timeout": {
+        "title": "Độ trễ tự động ẩn",
+        "desc": "Thời gian chờ trước khi ẩn sau khi rời chuột"
+      },
+      "floating": {
+        "title": "Dock nổi",
+        "desc": "Tách dock khỏi cạnh màn hình với các góc bo tròn"
+      },
+      "transparency": {
+        "title": "Độ trong suốt dock",
+        "desc": "Điều chỉnh độ mờ của nền dock"
+      },
+      "apps": {
+        "title": "Ứng dụng dock",
+        "singular": "ứng dụng",
+        "plural": "ứng dụng",
+        "shuffle": "Xáo trộn ứng dụng",
+        "empty": "Không có ứng dụng nào được cấu hình cho dock",
+        "enter_edit": "Chế độ chỉnh sửa",
+        "exit_edit": "Thoát chỉnh sửa"
+      },
+      "picker": {
+        "search": "Tìm kiếm ứng dụng...",
+        "done": "Xong",
+        "empty": "Không tìm thấy ứng dụng phù hợp"
+      },
+      "opacity": {
+        "title": "Độ đục của dock",
+        "desc": "Điều chỉnh mức độ đục của nền dock"
+      },
+      "override_bounds": {
+        "title": "Ghi đè điều chỉnh kích thước ngoài giới hạn màn hình",
+        "desc": "Giữ nguyên kích thước phần tử ngay cả khi dock vượt quá giới hạn màn hình"
+      },
+      "scrolling": {
+        "title": "Bật cuộn phần tử",
+        "desc": "Giới hạn các phần tử hiển thị và cho phép cuộn bằng con lăn chuột hoặc bàn di chuột"
+      },
+      "visible_elements": {
+        "title": "Phần tử hiển thị",
+        "desc": "Số lượng mục dock hiển thị đồng thời"
+      },
+      "hover_scale": {
+        "title": "Hiệu ứng phóng to khi di chuột",
+        "desc": "Mức độ phóng to khi di chuột qua các biểu tượng dock"
+      },
+      "cascade_scale": {
+        "title": "Phóng to các mục lân cận",
+        "desc": "Phóng to phân tầng cho các biểu tượng liền kề"
+      },
+      "exclusive": {
+        "title": "Chế độ độc quyền",
+        "desc": "Ngăn cửa sổ chiếm không gian của dock"
+      }
+    }
   },
   "sysnotif": {
     "battery": {
@@ -833,7 +969,9 @@
       "clock": "Đồng hồ",
       "music": "Nhạc",
       "weather": "Thời tiết",
-      "image": "Hình ảnh"
+      "image": "Hình ảnh",
+      "visualizer": "Trình trực quan hóa",
+      "user": "Người dùng"
     },
     "variants": {
       "digital": "Điện tử",
@@ -843,7 +981,10 @@
       "round": "Tròn",
       "compact": "Gọn nhẹ",
       "rect": "Chữ nhật",
-      "rounded": "Bo tròn"
+      "rounded": "Bo tròn",
+      "bars": "Thanh",
+      "continuous": "Liên tục",
+      "default": "Mặc định"
     }
   },
   "cli": {
