@@ -39,7 +39,8 @@
       "update": "Update",
       "about": "About",
       "display_widgets": "Widgets",
-      "display_general": "General"
+      "display_general": "General",
+      "vpn": "VPN"
     },
     "launcher": {
       "position": {
@@ -265,7 +266,8 @@
         "sysmon": "System monitor",
         "timedate": "Time/date",
         "info": "Recording/timer",
-        "weather": "Weather"
+        "weather": "Weather",
+        "vpn": "VPN"
       },
       "position": {
         "title": "Bar position",

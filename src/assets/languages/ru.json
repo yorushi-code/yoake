@@ -40,7 +40,8 @@
       "about": "О программе",
       "autostart": "Автозапуск",
       "display_widgets": "Виджеты",
-      "display_general": "Общие"
+      "display_general": "Общие",
+      "vpn": "VPN"
     },
     "launcher": {
       "position": {
@@ -266,7 +267,8 @@
         "sysmon": "Монитор системы",
         "timedate": "Время/дата",
         "info": "Запись/таймер",
-        "weather": "Погода"
+        "weather": "Погода",
+        "vpn": "VPN"
       },
       "position": {
         "title": "Положение панели",

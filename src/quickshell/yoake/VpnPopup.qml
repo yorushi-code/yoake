@@ -343,6 +343,35 @@ Item {
                     }
                 }
 
+                // ── сколько трафика вообще идёт через правила ──
+                // Контроллер это умеет и без yworld, а вопрос «почему сайт открылся
+                // мимо туннеля» чаще всего именно про режим.
+                RowLayout {
+                    Layout.fillWidth: true
+                    visible: Mihomo.running && Mihomo.mode !== ""
+                    spacing: window.s(6)
+
+                    Repeater {
+                        model: [
+                            { id: "rule", label: "По правилам" },
+                            { id: "global", label: "Через прокси" },
+                            { id: "direct", label: "Напрямую" }
+                        ]
+                        ClickButton {
+                            required property var modelData
+                            height: window.s(28)
+                            cornerRadius: Math.max(0, ThemeBackend.borderRadius - 2)
+                            horizontalPadding: window.s(14)
+                            buttonText: modelData.label
+                            textFontSize: window.s(11)
+                            property bool picked: Mihomo.mode === modelData.id
+                            accentColor: picked ? ThemeBackend.mauve : ThemeBackend.surface0
+                            textColor: picked ? ThemeBackend.base : ThemeBackend.subtext1
+                            onClicked: Mihomo.setMode(modelData.id)
+                        }
+                    }
+                }
+
                 // ── groups, only when a config actually has more than one ──
                 Flow {
                     Layout.fillWidth: true
