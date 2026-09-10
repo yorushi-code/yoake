@@ -200,14 +200,22 @@ something to compare against once it runs for real.
 QR (`--scan-qr`); запись, если `gpu-screen-recorder` не найден, идёт через
 `wf-recorder`. Обычный снимок работает с одним `grim`.
 
-Что откуда на Fedora:
+Что откуда на Fedora (всё стоит с 10.09.2026):
 
-- `zbarimg` — в репозиториях: `sudo dnf install zbar`.
-- `satty` — в Fedora не пакуется; бинарник из релизов
-  <https://github.com/gabm/Satty/releases> кладётся в `~/.local/bin`
-  (скрипт добавляет этот каталог в `PATH` сам). Стоит v0.22.0.
-- `gpu-screen-recorder` — тоже нет в репозиториях; не обязателен, пока
-  устраивает `wf-recorder` (`sudo dnf install wf-recorder`, уже стоит).
-  Если захочется аппаратное кодирование — собирать из
-  <https://git.dec05eba.com/gpu-screen-recorder>; flatpak не подходит,
-  скрипт зовёт бинарник по имени.
+- `zbarimg` — `sudo dnf install zbar`.
+- `satty` — в Fedora не пакуется; бинарник v0.22.0 из релизов
+  <https://github.com/gabm/Satty/releases> лежит в `~/.local/bin`
+  (скрипт добавляет этот каталог в `PATH` сам).
+- `gpu-screen-recorder` 6.1.1 — собран из <https://repo.dec05eba.com/gpu-screen-recorder>
+  и поставлен в `/usr/local` (`meson setup --buildtype=release -Dstrip=true
+  -Dnvidia_suspend_fix=false build && ninja -C build && sudo meson install -C build`).
+  Сборочные пакеты: `gcc-c++ meson libva-devel libcap-devel vulkan-headers
+  mesa-libEGL-devel` плюс уже стоявший `ffmpeg-devel` из RPM Fusion.
+  Установщик выставляет `cap_sys_admin` на `gsr-kms-server` — так захват
+  монитора идёт без запроса пароля. Кодирует `h264_vaapi` на Vega.
+  Снести: `sudo rm -rf /usr/local/bin/{gpu-screen-recorder,gsr-cli,gsr-kms-server}
+  /usr/local/share/gpu-screen-recorder /usr/local/include/gsr
+  /usr/local/share/man/man1/{gpu-screen-recorder,gsr-cli,gsr-kms-server}.1
+  /usr/local/lib/systemd/user/gpu-screen-recorder.service`.
+- `wf-recorder` остаётся запасным бэкендом (скрипт переключится сам, если
+  gpu-screen-recorder пропадёт).
