@@ -191,3 +191,23 @@ Present before any change here, left alone deliberately:
 Idle CPU measured 18.3% of one core inside a nested compositor shortly after
 startup — a rough figure taken under bad conditions, recorded only so there is
 something to compare against once it runs for real.
+
+## Скриншоты: зависимости
+
+Апстрим собран под Arch и считает обязательными `satty`, `zbarimg` и
+`gpu-screen-recorder`. У нас `src/scripts/screenshot.sh` требует их только
+для своего режима: `satty` — разметка (`--edit`), `zbarimg` — сканирование
+QR (`--scan-qr`); запись, если `gpu-screen-recorder` не найден, идёт через
+`wf-recorder`. Обычный снимок работает с одним `grim`.
+
+Что откуда на Fedora:
+
+- `zbarimg` — в репозиториях: `sudo dnf install zbar`.
+- `satty` — в Fedora не пакуется; бинарник из релизов
+  <https://github.com/gabm/Satty/releases> кладётся в `~/.local/bin`
+  (скрипт добавляет этот каталог в `PATH` сам). Стоит v0.22.0.
+- `gpu-screen-recorder` — тоже нет в репозиториях; не обязателен, пока
+  устраивает `wf-recorder` (`sudo dnf install wf-recorder`, уже стоит).
+  Если захочется аппаратное кодирование — собирать из
+  <https://git.dec05eba.com/gpu-screen-recorder>; flatpak не подходит,
+  скрипт зовёт бинарник по имени.
