@@ -7,7 +7,6 @@ import Quickshell.Io
 import QtQuick.Window
 import "../"
 import "../reusables"
-import "../singletons"
 
 Item {
     id: window
@@ -955,10 +954,10 @@ Item {
 
                         Text {
                             Layout.alignment: Qt.AlignRight
-                            text: Math.round(window.displayedTemp) + (Weather.unitSym || "°")
+                            text: window.displayedTemp.toFixed(1) + (Weather.unitSym || "°")
                             font.family: ThemeBackend.fontFamily
                             font.weight: Font.Black
-                            font.pixelSize: window.s(72)
+                            font.pixelSize: window.s(68)
                             color: window.tempGlowColor
                             style: Text.Outline
                             styleColor: window.isTempAnimating ? Qt.alpha(window.tempGlowColor, 0.5) : Qt.alpha(window.crust, 0.4)

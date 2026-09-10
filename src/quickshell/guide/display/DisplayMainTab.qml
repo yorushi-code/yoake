@@ -5,8 +5,6 @@ import Quickshell
 import Quickshell.Io
 import "../../"
 import "../../reusables"
-import "../../info"
-import "../../singletons"
 
 Item {
     id: displayTabRoot
@@ -22,8 +20,6 @@ Item {
     Behavior on slideY { NumberAnimation { duration: 250; easing.type: Easing.OutQuart } }
     transform: Translate { y: slideY }
     Behavior on opacity { NumberAnimation { duration: 250 } }
-
-    property real cardRadius: ThemeBackend.borderRadius <= 16 ? ThemeBackend.borderRadius * 2 : Math.min(32, 32 - 16 * Math.exp(-(ThemeBackend.borderRadius - 16) / 12))
 
     property var defaultDisplaySettings: ({
         "monitors": {}
@@ -563,7 +559,7 @@ Item {
 
                     Layout.fillWidth: true
                     clip: true
-                    radius: displayTabRoot.cardRadius
+                    radius: ThemeBackend.borderRadius
 
                     property string monName: modelData.name
                     property var monSettings: (displayTabRoot.displaySettings && displayTabRoot.displaySettings.monitors && displayTabRoot.displaySettings.monitors[monName]) ? displayTabRoot.displaySettings.monitors[monName] : ({})
@@ -631,11 +627,13 @@ Item {
                         anchors.right: parent.right
                         anchors.top: parent.top
                         anchors.margins: rootObj.s(12)
-                        spacing: 0
+                        spacing: rootObj.s(6)
 
                         RowLayout {
                             Layout.fillWidth: true
-                            Layout.bottomMargin: rootObj.s(12)
+                            Layout.bottomMargin: rootObj.s(6)
+                            Layout.leftMargin: rootObj.s(4)
+                            Layout.rightMargin: rootObj.s(4)
                             spacing: rootObj.s(8)
 
                             Text {
@@ -659,23 +657,40 @@ Item {
                         Rectangle {
                             visible: displayTabRoot.monitorsList.length > 1
                             Layout.fillWidth: true
-                            implicitHeight: rowPowerToggleLayout.implicitHeight + rootObj.s(18)
-                            color: "transparent"
+                            implicitHeight: rowPowerToggleLayout.implicitHeight + rootObj.s(24)
+                            radius: ThemeBackend.borderRadius
+                            color: Qt.alpha(ThemeBackend.surface1, 0.35)
+                            border.width: 0
 
                             RowLayout {
                                 id: rowPowerToggleLayout
                                 anchors.left: parent.left
-                                anchors.leftMargin: rootObj.s(12)
+                                anchors.leftMargin: rootObj.s(14)
                                 anchors.right: parent.right
-                                anchors.rightMargin: rootObj.s(12)
+                                anchors.rightMargin: rootObj.s(14)
                                 anchors.verticalCenter: parent.verticalCenter
-                                spacing: rootObj.s(16)
+                                spacing: rootObj.s(12)
+
+                                IconButton {
+                                    enabled: false
+                                    size: rootObj.s(32)
+                                    Layout.preferredWidth: rootObj.s(32)
+                                    Layout.preferredHeight: rootObj.s(32)
+                                    Layout.alignment: Qt.AlignVCenter
+                                    cornerRadius: ThemeBackend.borderRadius
+                                    buttonIcon: "󰐥"
+                                    iconFontSize: rootObj.s(16)
+                                    accentColor: ThemeBackend.surface0
+                                    textColor: "#ffffff"
+                                }
 
                                 ColumnLayout {
                                     Layout.fillWidth: true
+                                    Layout.alignment: Qt.AlignVCenter
                                     spacing: rootObj.s(2)
 
                                     Text {
+                                        Layout.fillWidth: true
                                         text: I18n.t("guide.display.enable.title", "Enable Monitor")
                                         font.family: ThemeBackend.fontFamily
                                         font.pixelSize: rootObj.s(13)
@@ -683,6 +698,7 @@ Item {
                                     }
 
                                     Text {
+                                        Layout.fillWidth: true
                                         text: I18n.t("guide.display.enable.desc", "Turn display output on or off")
                                         font.family: ThemeBackend.fontFamily
                                         font.pixelSize: rootObj.s(11)
@@ -714,33 +730,41 @@ Item {
                         }
 
                         Rectangle {
-                            visible: displayTabRoot.monitorsList.length > 1
                             Layout.fillWidth: true
-                            height: 1
-                            color: Qt.alpha(ThemeBackend.surface1, 0.2)
-                            Layout.topMargin: rootObj.s(5)
-                            Layout.bottomMargin: rootObj.s(5)
-                        }
-
-                        Rectangle {
-                            Layout.fillWidth: true
-                            implicitHeight: rowToggleLayout.implicitHeight + rootObj.s(18)
-                            color: "transparent"
+                            implicitHeight: rowToggleLayout.implicitHeight + rootObj.s(24)
+                            radius: ThemeBackend.borderRadius
+                            color: Qt.alpha(ThemeBackend.surface1, 0.35)
+                            border.width: 0
 
                             RowLayout {
                                 id: rowToggleLayout
                                 anchors.left: parent.left
-                                anchors.leftMargin: rootObj.s(12)
+                                anchors.leftMargin: rootObj.s(14)
                                 anchors.right: parent.right
-                                anchors.rightMargin: rootObj.s(12)
+                                anchors.rightMargin: rootObj.s(14)
                                 anchors.verticalCenter: parent.verticalCenter
-                                spacing: rootObj.s(16)
+                                spacing: rootObj.s(12)
+
+                                IconButton {
+                                    enabled: false
+                                    size: rootObj.s(32)
+                                    Layout.preferredWidth: rootObj.s(32)
+                                    Layout.preferredHeight: rootObj.s(32)
+                                    Layout.alignment: Qt.AlignVCenter
+                                    cornerRadius: ThemeBackend.borderRadius
+                                    buttonIcon: "󰖔"
+                                    iconFontSize: rootObj.s(16)
+                                    accentColor: ThemeBackend.surface0
+                                    textColor: "#ffffff"
+                                }
 
                                 ColumnLayout {
                                     Layout.fillWidth: true
+                                    Layout.alignment: Qt.AlignVCenter
                                     spacing: rootObj.s(2)
 
                                     Text {
+                                        Layout.fillWidth: true
                                         text: I18n.t("guide.display.bluelight.title")
                                         font.family: ThemeBackend.fontFamily
                                         font.pixelSize: rootObj.s(13)
@@ -748,6 +772,7 @@ Item {
                                     }
 
                                     Text {
+                                        Layout.fillWidth: true
                                         text: I18n.t("guide.display.bluelight.desc")
                                         font.family: ThemeBackend.fontFamily
                                         font.pixelSize: rootObj.s(11)
@@ -795,35 +820,44 @@ Item {
                                 anchors.left: parent.left
                                 anchors.right: parent.right
                                 anchors.top: parent.top
-                                spacing: 0
+                                spacing: rootObj.s(6)
 
                                 Rectangle {
                                     Layout.fillWidth: true
-                                    height: 1
-                                    color: Qt.alpha(ThemeBackend.surface1, 0.2)
-                                    Layout.topMargin: rootObj.s(5)
-                                    Layout.bottomMargin: rootObj.s(5)
-                                }
-
-                                Rectangle {
-                                    Layout.fillWidth: true
-                                    implicitHeight: rowAutoLayout.implicitHeight + rootObj.s(18)
-                                    color: "transparent"
+                                    implicitHeight: rowAutoLayout.implicitHeight + rootObj.s(24)
+                                    radius: ThemeBackend.borderRadius
+                                    color: Qt.alpha(ThemeBackend.surface1, 0.35)
+                                    border.width: 0
 
                                     RowLayout {
                                         id: rowAutoLayout
                                         anchors.left: parent.left
-                                        anchors.leftMargin: rootObj.s(12)
+                                        anchors.leftMargin: rootObj.s(14)
                                         anchors.right: parent.right
-                                        anchors.rightMargin: rootObj.s(12)
+                                        anchors.rightMargin: rootObj.s(14)
                                         anchors.verticalCenter: parent.verticalCenter
-                                        spacing: rootObj.s(16)
+                                        spacing: rootObj.s(12)
+
+                                        IconButton {
+                                            enabled: false
+                                            size: rootObj.s(32)
+                                            Layout.preferredWidth: rootObj.s(32)
+                                            Layout.preferredHeight: rootObj.s(32)
+                                            Layout.alignment: Qt.AlignVCenter
+                                            cornerRadius: ThemeBackend.borderRadius
+                                            buttonIcon: "󰥔"
+                                            iconFontSize: rootObj.s(16)
+                                            accentColor: ThemeBackend.surface0
+                                            textColor: "#ffffff"
+                                        }
 
                                         ColumnLayout {
                                             Layout.fillWidth: true
+                                            Layout.alignment: Qt.AlignVCenter
                                             spacing: rootObj.s(2)
 
                                             Text {
+                                                Layout.fillWidth: true
                                                 text: I18n.t("guide.display.schedule.title")
                                                 font.family: ThemeBackend.fontFamily
                                                 font.pixelSize: rootObj.s(13)
@@ -831,6 +865,7 @@ Item {
                                             }
 
                                             Text {
+                                                Layout.fillWidth: true
                                                 text: I18n.t("guide.display.schedule.desc") + " " + displayTabRoot.scheduleDescription
                                                 font.family: ThemeBackend.fontFamily
                                                 font.pixelSize: rootObj.s(11)
@@ -868,89 +903,94 @@ Item {
                                     clip: true
                                     visible: implicitHeight > 0
                                     opacity: isOpen ? 1.0 : 0.0
-                                    implicitHeight: isOpen ? tempInnerCol.implicitHeight : 0
+                                    implicitHeight: isOpen ? tempInnerBox.implicitHeight : 0
 
                                     Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
                                     Behavior on implicitHeight { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
 
-                                    ColumnLayout {
-                                        id: tempInnerCol
+                                    Rectangle {
+                                        id: tempInnerBox
                                         anchors.left: parent.left
                                         anchors.right: parent.right
                                         anchors.top: parent.top
-                                        spacing: 0
+                                        implicitHeight: rowTempLayout.implicitHeight + rootObj.s(24)
+                                        radius: ThemeBackend.borderRadius
+                                        color: Qt.alpha(ThemeBackend.surface1, 0.35)
+                                        border.width: 0
 
-                                        Rectangle {
-                                            Layout.fillWidth: true
-                                            height: 1
-                                            color: Qt.alpha(ThemeBackend.surface1, 0.2)
-                                            Layout.topMargin: rootObj.s(5)
-                                            Layout.bottomMargin: rootObj.s(5)
-                                        }
+                                        RowLayout {
+                                            id: rowTempLayout
+                                            anchors.left: parent.left
+                                            anchors.leftMargin: rootObj.s(14)
+                                            anchors.right: parent.right
+                                            anchors.rightMargin: rootObj.s(14)
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            spacing: rootObj.s(12)
 
-                                        Rectangle {
-                                            Layout.fillWidth: true
-                                            implicitHeight: rowTempLayout.implicitHeight + rootObj.s(18)
-                                            color: "transparent"
+                                            IconButton {
+                                                enabled: false
+                                                size: rootObj.s(32)
+                                                Layout.preferredWidth: rootObj.s(32)
+                                                Layout.preferredHeight: rootObj.s(32)
+                                                Layout.alignment: Qt.AlignVCenter
+                                                cornerRadius: ThemeBackend.borderRadius
+                                                buttonIcon: "󰔏"
+                                                iconFontSize: rootObj.s(16)
+                                                accentColor: ThemeBackend.surface0
+                                                textColor: "#ffffff"
+                                            }
 
-                                            RowLayout {
-                                                id: rowTempLayout
-                                                anchors.left: parent.left
-                                                anchors.leftMargin: rootObj.s(12)
-                                                anchors.right: parent.right
-                                                anchors.rightMargin: rootObj.s(12)
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                spacing: rootObj.s(16)
+                                            ColumnLayout {
+                                                Layout.fillWidth: true
+                                                Layout.alignment: Qt.AlignVCenter
+                                                spacing: rootObj.s(2)
 
-                                                ColumnLayout {
+                                                Text {
                                                     Layout.fillWidth: true
-                                                    spacing: rootObj.s(2)
-
-                                                    Text {
-                                                        text: I18n.t("guide.display.temperature.title")
-                                                        font.family: ThemeBackend.fontFamily
-                                                        font.pixelSize: rootObj.s(13)
-                                                        color: ThemeBackend.text
-                                                    }
-
-                                                    Text {
-                                                        text: I18n.t("guide.display.temperature.desc")
-                                                        font.family: ThemeBackend.fontFamily
-                                                        font.pixelSize: rootObj.s(11)
-                                                        color: ThemeBackend.subtext0
-                                                    }
+                                                    text: I18n.t("guide.display.temperature.title")
+                                                    font.family: ThemeBackend.fontFamily
+                                                    font.pixelSize: rootObj.s(13)
+                                                    color: ThemeBackend.text
                                                 }
 
-                                                RowLayout {
-                                                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                                                    spacing: rootObj.s(12)
-                                                    Layout.rightMargin: rootObj.s(8)
+                                                Text {
+                                                    Layout.fillWidth: true
+                                                    text: I18n.t("guide.display.temperature.desc")
+                                                    font.family: ThemeBackend.fontFamily
+                                                    font.pixelSize: rootObj.s(11)
+                                                    color: ThemeBackend.subtext0
+                                                }
+                                            }
 
-                                                    Draggable {
-                                                        id: temperatureSlider
-                                                        implicitWidth: rootObj.s(220)
-                                                        implicitHeight: rootObj.s(18)
-                                                        from: 0
-                                                        to: 100
-                                                        stepSize: 1
-                                                        defaultValue: 50
-                                                        showValueBubble: true
-                                                        valueFormatter: function(v) { return Math.round(v).toString() }
-                                                        value: monDelegate.currentTemp
-                                                        backgroundColor: ThemeBackend.surface0
-                                                        accentColor: ThemeBackend.mauve
-                                                        handleColor: ThemeBackend.text
-                                                        handleBorderColor: ThemeBackend.mantle
-                                                        onMoved: function(val) {
-                                                            let rounded = Math.round(val);
-                                                            if (monDelegate.currentTemp !== rounded) {
-                                                                monDelegate.currentTemp = rounded;
-                                                                displayTabRoot.updateMonitorSettingDebounced(monDelegate.monName, rounded);
-                                                            }
+                                            RowLayout {
+                                                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                                                spacing: rootObj.s(12)
+                                                Layout.rightMargin: rootObj.s(8)
+
+                                                Draggable {
+                                                    id: temperatureSlider
+                                                    implicitWidth: rootObj.s(220)
+                                                    implicitHeight: rootObj.s(18)
+                                                    from: 0
+                                                    to: 100
+                                                    stepSize: 1
+                                                    defaultValue: 50
+                                                    showValueBubble: true
+                                                    valueFormatter: function(v) { return Math.round(v).toString() }
+                                                    value: monDelegate.currentTemp
+                                                    backgroundColor: ThemeBackend.surface0
+                                                    accentColor: ThemeBackend.mauve
+                                                    handleColor: ThemeBackend.text
+                                                    handleBorderColor: ThemeBackend.mantle
+                                                    onMoved: function(val) {
+                                                        let rounded = Math.round(val);
+                                                        if (monDelegate.currentTemp !== rounded) {
+                                                            monDelegate.currentTemp = rounded;
+                                                            displayTabRoot.updateMonitorSettingDebounced(monDelegate.monName, rounded);
                                                         }
-                                                        onDragFinished: {
-                                                            displayTabRoot.flushMonitorSetting(monDelegate.monName);
-                                                        }
+                                                    }
+                                                    onDragFinished: {
+                                                        displayTabRoot.flushMonitorSetting(monDelegate.monName);
                                                     }
                                                 }
                                             }
@@ -962,31 +1002,40 @@ Item {
 
                         Rectangle {
                             Layout.fillWidth: true
-                            height: 1
-                            color: Qt.alpha(ThemeBackend.surface1, 0.2)
-                            Layout.topMargin: rootObj.s(5)
-                            Layout.bottomMargin: rootObj.s(5)
-                        }
-
-                        Rectangle {
-                            Layout.fillWidth: true
-                            implicitHeight: rowScaleLayout.implicitHeight + rootObj.s(18)
-                            color: "transparent"
+                            implicitHeight: rowScaleLayout.implicitHeight + rootObj.s(24)
+                            radius: ThemeBackend.borderRadius
+                            color: Qt.alpha(ThemeBackend.surface1, 0.35)
+                            border.width: 0
 
                             RowLayout {
                                 id: rowScaleLayout
                                 anchors.left: parent.left
-                                anchors.leftMargin: rootObj.s(12)
+                                anchors.leftMargin: rootObj.s(14)
                                 anchors.right: parent.right
-                                anchors.rightMargin: rootObj.s(12)
+                                anchors.rightMargin: rootObj.s(14)
                                 anchors.verticalCenter: parent.verticalCenter
-                                spacing: rootObj.s(16)
+                                spacing: rootObj.s(12)
+
+                                IconButton {
+                                    enabled: false
+                                    size: rootObj.s(32)
+                                    Layout.preferredWidth: rootObj.s(32)
+                                    Layout.preferredHeight: rootObj.s(32)
+                                    Layout.alignment: Qt.AlignVCenter
+                                    cornerRadius: ThemeBackend.borderRadius
+                                    buttonIcon: "󰍍"
+                                    iconFontSize: rootObj.s(16)
+                                    accentColor: ThemeBackend.surface0
+                                    textColor: "#ffffff"
+                                }
 
                                 ColumnLayout {
                                     Layout.fillWidth: true
+                                    Layout.alignment: Qt.AlignVCenter
                                     spacing: rootObj.s(2)
 
                                     Text {
+                                        Layout.fillWidth: true
                                         text: I18n.t("guide.display.uiscale.title")
                                         font.family: ThemeBackend.fontFamily
                                         font.pixelSize: rootObj.s(13)
@@ -994,6 +1043,7 @@ Item {
                                     }
 
                                     Text {
+                                        Layout.fillWidth: true
                                         text: I18n.t("guide.display.uiscale.desc")
                                         font.family: ThemeBackend.fontFamily
                                         font.pixelSize: rootObj.s(11)

@@ -41,6 +41,7 @@ PanelWindow {
 
     property bool isVisible: ClipboardController.isVisible
     property int configRevision: 0
+    property bool isDirty: true
 
     Connections {
         target: (typeof Config !== "undefined") ? Config : null
@@ -109,7 +110,7 @@ PanelWindow {
     property real animatedLauncherHeight: targetLauncherHeight
     Behavior on animatedLauncherHeight {
         NumberAnimation {
-            duration: 260
+            duration: 300
             easing.type: Easing.OutCubic
         }
     }
@@ -152,7 +153,11 @@ PanelWindow {
         command: ["wl-paste", "--watch", "echo", "1"]
         stdout: SplitParser {
             onRead: (data) => {
-                clipWatchDebounce.restart();
+                if (clipboardWindow.isVisible) {
+                    clipWatchDebounce.restart();
+                } else {
+                    clipboardWindow.isDirty = true;
+                }
             }
         }
     }
@@ -198,24 +203,59 @@ PanelWindow {
         return i === sub.length;
     }
 
-    function syncClipBoxModel(targetItems) {
-        let curCount = clipBoxModel.count;
-        let newCount = targetItems.length;
+    function getClipKey(item) {
+        return (item && item.id !== undefined && item.id !== null) ? item.id.toString() : "";
+    }
 
-        for (let i = curCount - 1; i >= newCount; i--) {
-            clipBoxModel.remove(i);
+    function syncClipBoxModel(targetItems) {
+        let newKeys = {};
+        for (let i = 0; i < targetItems.length; i++) {
+            newKeys[getClipKey(targetItems[i])] = true;
         }
 
-        for (let i = 0; i < newCount; i++) {
+        for (let i = clipBoxModel.count - 1; i >= 0; i--) {
+            let key = getClipKey(clipBoxModel.get(i));
+            if (!newKeys[key]) {
+                clipBoxModel.remove(i);
+            }
+        }
+
+        for (let i = 0; i < targetItems.length; i++) {
             let item = targetItems[i];
+            let targetKey = getClipKey(item);
+
             if (i < clipBoxModel.count) {
-                let cur = clipBoxModel.get(i);
-                if (cur.id !== item.id || cur.pinned !== item.pinned || cur.content !== item.content || cur.type !== item.type || cur.sectionCategory !== item.sectionCategory) {
-                    clipBoxModel.set(i, item);
+                let currentKey = getClipKey(clipBoxModel.get(i));
+                if (currentKey === targetKey) {
+                    let cur = clipBoxModel.get(i);
+                    if (cur.pinned !== item.pinned || cur.content !== item.content || cur.type !== item.type || cur.sectionCategory !== item.sectionCategory) {
+                        clipBoxModel.set(i, item);
+                    }
+                } else {
+                    let foundIndex = -1;
+                    for (let j = i + 1; j < clipBoxModel.count; j++) {
+                        if (getClipKey(clipBoxModel.get(j)) === targetKey) {
+                            foundIndex = j;
+                            break;
+                        }
+                    }
+                    if (foundIndex !== -1) {
+                        clipBoxModel.move(foundIndex, i, 1);
+                        let cur = clipBoxModel.get(i);
+                        if (cur.pinned !== item.pinned || cur.content !== item.content || cur.type !== item.type || cur.sectionCategory !== item.sectionCategory) {
+                            clipBoxModel.set(i, item);
+                        }
+                    } else {
+                        clipBoxModel.insert(i, item);
+                    }
                 }
             } else {
                 clipBoxModel.append(item);
             }
+        }
+
+        while (clipBoxModel.count > targetItems.length) {
+            clipBoxModel.remove(clipBoxModel.count - 1);
         }
     }
 
@@ -299,7 +339,7 @@ PanelWindow {
 
     Timer {
         id: filterDebounceTimer
-        interval: 60
+        interval: 80
         repeat: false
         onTriggered: {
             clipboardWindow.executeClipFilter(clipboardWindow.pendingQuery);
@@ -541,8 +581,12 @@ PanelWindow {
         if (isVisible) {
             searchInput.clear();
             filterDebounceTimer.stop();
-            executeClipFilter("");
-            refreshClips();
+            if (clipboardWindow.isDirty || clipboardWindow.allFetchedClips.length === 0) {
+                clipboardWindow.isDirty = false;
+                refreshClips();
+            } else {
+                executeClipFilter("");
+            }
             clipboardWindow.grabInputFocus();
             focusTimer.restart();
             focusRetryTimer.restart();
@@ -555,10 +599,6 @@ PanelWindow {
             focusFinalTimer.stop();
             keyboardNavTimer.stop();
         }
-    }
-
-    Component.onCompleted: {
-        refreshClips();
     }
 
     MouseArea {
@@ -1026,14 +1066,59 @@ PanelWindow {
                         }
 
                         add: Transition {
-                            NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 220; easing.type: Easing.OutQuint }
-                            NumberAnimation { property: "scale"; from: 0.95; to: 1; duration: 220; easing.type: Easing.OutQuint }
+                            NumberAnimation {
+                                property: "opacity"
+                                from: 0.0
+                                to: 1.0
+                                duration: 250
+                                easing.type: Easing.OutCubic
+                            }
+                            NumberAnimation {
+                                property: "scale"
+                                from: 0.96
+                                to: 1.0
+                                duration: 270
+                                easing.type: Easing.OutCubic
+                            }
                         }
+
                         remove: Transition {
-                            NumberAnimation { property: "opacity"; to: 0; duration: 200; easing.type: Easing.OutQuint }
+                            NumberAnimation {
+                                property: "opacity"
+                                to: 0.0
+                                duration: 170
+                                easing.type: Easing.OutCubic
+                            }
+                            NumberAnimation {
+                                property: "scale"
+                                to: 0.96
+                                duration: 170
+                                easing.type: Easing.OutCubic
+                            }
                         }
+
                         displaced: Transition {
-                            NumberAnimation { properties: "y"; duration: 250; easing.type: Easing.OutCubic }
+                            NumberAnimation {
+                                properties: "y"
+                                duration: 280
+                                easing.type: Easing.OutCubic
+                            }
+                        }
+
+                        move: Transition {
+                            NumberAnimation {
+                                properties: "y"
+                                duration: 280
+                                easing.type: Easing.OutCubic
+                            }
+                        }
+
+                        moveDisplaced: Transition {
+                            NumberAnimation {
+                                properties: "y"
+                                duration: 280
+                                easing.type: Easing.OutCubic
+                            }
                         }
 
                         onContentYChanged: {
@@ -1383,6 +1468,7 @@ PanelWindow {
                                     }
 
                                     Text {
+                                        id: delegateFontIcon
                                         anchors.centerIn: parent
                                         font.family: "Iosevka Nerd Font"
                                         font.pixelSize: clipboardWindow.s(14)
