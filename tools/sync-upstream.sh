@@ -31,6 +31,9 @@ die() { echo "  ошибка: $*" >&2; exit 1; }
 say() { echo "  $*"; }
 
 command -v git >/dev/null || die "нет git"
+# Кнопка Update запускает скрипт в свежем терминале с cwd в домашнем каталоге,
+# поэтому репозиторий ищем от самого скрипта, а не от текущего каталога.
+cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/.."
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || die "здесь нет репозитория"
 cd "$REPO_ROOT"
 GIT_DIR_ABS=$(git rev-parse --absolute-git-dir)
