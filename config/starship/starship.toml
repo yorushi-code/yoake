@@ -1,0 +1,99 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# yoake night prompt: every segment says what it is.
+#
+#    󰉋 ~/codes/project     task-3  󰏫 2 󰋗 1 ⇡1              ⌛ 3s  󰥔 18:52
+#   ❯
+#
+#   violet pill   where you are (folder icon, path)
+#   plum pill     git: branch, then what changed in it
+#                   󰏫 modified  󰐕 staged  󰋗 untracked  󰆴 deleted
+#                   ⇡ ahead of remote  ⇣ behind  󰘬 diverged  󰞇 conflicts
+#   right side    ⌛ how long the last command took (from 2 s), 󰥔 the time
+#   ❯             ready; red after a failed command
+
+format = """
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_status\
+$fill\
+$cmd_duration\
+$time\
+$line_break\
+$character"""
+
+palette = 'yoake_night'
+
+[palettes.yoake_night]
+ink      = "#0b0a10"
+plum     = "#2a1845"
+violet   = "#9b6bff"
+lavender = "#d7c6ff"
+mist     = "#ece6ff"
+muted    = "#8a7fa6"
+rose     = "#ff6b8b"
+amber    = "#f5d38a"
+
+# Only shown over SSH or as root, where it actually matters.
+[username]
+show_always = false
+style_user = "bold lavender"
+style_root = "bold rose"
+format = "[󰀄 $user]($style) "
+
+[hostname]
+ssh_only = true
+style = "bold lavender"
+format = "[@$hostname]($style) "
+
+[directory]
+style = "bold fg:ink bg:violet"
+read_only = " 󰌾"
+read_only_style = "fg:ink bg:violet"
+#  /  are the rounded pill caps (kept as escapes: they are
+# Private Use characters that editors and tools tend to drop).
+format = "[](fg:violet)[󰉋 $path$read_only]($style)[](fg:violet) "
+truncation_length = 3
+truncate_to_repo = true
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = " "
+style = "fg:lavender bg:plum"
+format = "[](fg:plum)[$symbol$branch]($style)[](fg:plum) "
+
+[git_status]
+style = "fg:lavender"
+format = '([$all_status$ahead_behind]($style) )'
+modified = "󰏫 $count "
+staged = "󰐕 $count "
+untracked = "󰋗 $count "
+deleted = "󰆴 $count "
+renamed = "󰑕 $count "
+conflicted = "[󰞇 $count ](rose)"
+stashed = "󰆓 $count "
+ahead = "⇡$count"
+behind = "⇣$count"
+diverged = "󰘬 ⇡$ahead_count⇣$behind_count"
+up_to_date = ""
+
+[fill]
+symbol = " "
+
+[cmd_duration]
+min_time = 2000
+style = "fg:lavender"
+format = "[⌛ $duration]($style)  "
+
+[time]
+disabled = false
+time_format = "%H:%M"
+style = "fg:muted"
+format = "[󰥔 $time]($style)"
+
+[character]
+success_symbol = "[❯](bold violet)"
+error_symbol = "[❯](bold rose)"
+vimcmd_symbol = "[❮](bold lavender)"
