@@ -9,6 +9,12 @@ Item {
 
     readonly property string soundsDir: Caching.qsDir + "/../assets/sounds/"
 
+    // Every effect is played as its own short-lived pw-play stream. Naming the
+    // streams lets the volume panel leave them out of the app list (they would
+    // flash in and out) and show one permanent "Interface sounds" row instead.
+    readonly property string streamName: "Yoake interface sounds"
+    readonly property var pwPlayProps: ["-P", "{ application.name = \"" + streamName + "\" media.role = \"Event\" }"]
+
     property var activeHandles: ({})
     property int nextHandleId: 1
 
@@ -26,6 +32,21 @@ Item {
         function onSettingsLoaded() {
             root.generalSettings = Config.getSetting("general", { "muteSfx": false, "sfxVolume": 100 });
         }
+    }
+
+    readonly property int volumePercent: Math.round(root.masterVolume * 100)
+
+    // persist=false only previews (while a slider is being dragged); the
+    // settings file is written once, when the drag ends.
+    function setVolumePercent(pct, persist) {
+        let v = Math.max(0, Math.min(100, Math.round(pct)));
+        root.generalSettings = Object.assign({}, root.generalSettings || {}, { "sfxVolume": v });
+        if (persist !== false) Config.setSetting("general.sfxVolume", v);
+    }
+
+    function setMuted(muted) {
+        root.generalSettings = Object.assign({}, root.generalSettings || {}, { "muteSfx": muted === true });
+        Config.setSetting("general.muteSfx", muted === true);
     }
 
     function play(filePath, volume, duration, overrideSfxBlock) {
@@ -52,14 +73,9 @@ Item {
 
     function _reallyPlay(filePath, vol, dur) {
         let cleanPath = filePath.startsWith("file://") ? filePath.substring(7) : filePath;
+        let cmd = ["pw-play", "--volume=" + vol.toString()].concat(root.pwPlayProps, [cleanPath]);
         try {
-            if (dur > 0) {
-                let escaped = cleanPath.replace(/'/g, "'\\''");
-                Quickshell.execDetached(["sh", "-c",
-                    "exec timeout " + dur + " pw-play --volume=" + vol + " '" + escaped + "' >/dev/null 2>&1"]);
-            } else {
-                Quickshell.execDetached(["pw-play", "--volume=" + vol.toString(), cleanPath]);
-            }
+            Quickshell.execDetached(dur > 0 ? ["timeout", String(dur)].concat(cmd) : cmd);
         } catch(e) {}
     }
 
@@ -79,21 +95,18 @@ Item {
         let cleanPath = (filenameOrPath.startsWith("/") || filenameOrPath.startsWith("file://")) ?
             (filenameOrPath.startsWith("file://") ? filenameOrPath.substring(7) : filenameOrPath) :
             (root.soundsDir + filenameOrPath);
-        let volFlag = "--volume=" + finalVol;
+        let playCmd = ["pw-play", "--volume=" + finalVol].concat(root.pwPlayProps, [cleanPath]);
 
         let id = root.nextHandleId++;
 
-        let script;
-        if (doLoop) {
-            script =
-                "trap 'kill $CPID 2>/dev/null; exit' TERM; " +
-                "while :; do pw-play " + volFlag + " '" + cleanPath + "' & CPID=$!; wait $CPID; done";
-        } else {
-            script = "exec pw-play " + volFlag + " '" + cleanPath + "'";
-        }
+        // The loop needs a shell; the command reaches it as positional
+        // arguments ("$@"), so no path or property string is re-quoted.
+        let command = doLoop
+            ? ["sh", "-c", "trap 'kill $CPID 2>/dev/null; exit' TERM; while :; do \"$@\" & CPID=$!; wait $CPID; done", "sh"].concat(playCmd)
+            : playCmd;
 
         let proc = stoppableProcess.createObject(root, {
-            "command": ["sh", "-c", script],
+            "command": command,
             "handleId": id
         });
         proc.running = true;

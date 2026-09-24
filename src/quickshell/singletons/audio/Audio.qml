@@ -2,6 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Services.Pipewire
+import "../../"
 
 Singleton {
     id: root
@@ -56,16 +57,25 @@ Singleton {
         return true;
     }
 
+    // The equaliser is a smart filter: WirePlumber puts it in front of
+    // whichever device is chosen. Its sink is not a device to choose, and its
+    // playback side is plumbing, not an application.
+    function _isEffect(n) {
+        var name = n.name || "";
+        return name.startsWith("effect_input.") || name.startsWith("effect_output.");
+    }
+
     function rebuild() {
-        var o = root._collect(function (n) { return !n.isStream && n.isSink && n.audio; });
+        var o = root._collect(function (n) { return !n.isStream && n.isSink && n.audio && !root._isEffect(n); });
         var i = root._collect(function (n) {
             return !n.isStream && !n.isSink && n.audio
                 && n.properties?.["device.class"] !== "monitor"
                 && !n.name?.endsWith(".monitor");
         });
         var a = root._collect(function (n) {
-            return n.isStream && n.audio
-                && n.properties?.["application.id"] !== "org.PulseAudio.pavucontrol";
+            return n.isStream && n.audio && !root._isEffect(n)
+                && n.properties?.["application.id"] !== "org.PulseAudio.pavucontrol"
+                && n.properties?.["application.name"] !== Sounds.streamName;
         });
 
         // Присваиваем только при смене состава: иначе модель сбрасывается

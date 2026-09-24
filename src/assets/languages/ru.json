@@ -948,6 +948,8 @@
     "master_output_volume": "Общая громкость вывода",
     "no_active_streams": "Нет активных потоков",
     "active_default": "По умолчанию активен",
+    "interface_sounds": "Звуки интерфейса",
+    "interface_sounds_desc": "Щелчки и эффекты оболочки",
     "tabs": {
       "outputs": "Выходы",
       "inputs": "Входы",

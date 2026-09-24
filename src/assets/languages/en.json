@@ -904,6 +904,8 @@
     "master_output_volume": "Master output volume",
     "no_active_streams": "No active streams",
     "active_default": "Active default",
+    "interface_sounds": "Interface sounds",
+    "interface_sounds_desc": "Clicks and effects of the shell",
     "tabs": {
       "outputs": "Outputs",
       "inputs": "Inputs",
