@@ -3,6 +3,17 @@
 VERBOSE=false
 
 BIN_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+
+# The launcher lists whatever XDG_DATA_DIRS points at. Snap installs its
+# desktop files outside the defaults and only adds them through login-shell
+# hooks, so a session started before snapd was installed -- or from a shell
+# without the hook -- would never show snap apps.
+if [ -d /var/lib/snapd/desktop ] && [[ ":${XDG_DATA_DIRS}:" != *":/var/lib/snapd/desktop:"* ]]; then
+    export XDG_DATA_DIRS="${XDG_DATA_DIRS:-/usr/local/share:/usr/share}:/var/lib/snapd/desktop"
+fi
+if [ -d /var/lib/snapd/snap/bin ] && [[ ":${PATH}:" != *":/var/lib/snapd/snap/bin:"* ]]; then
+    export PATH="$PATH:/var/lib/snapd/snap/bin"
+fi
 if [ -z "$YOAKE_DIR" ]; then
     export YOAKE_DIR="$(dirname "$BIN_DIR")/src"
 fi
