@@ -154,6 +154,22 @@ Singleton {
         artFetchProc.running = true;
     }
 
+    // What to call a player in the UI. MPRIS identities are often not names:
+    // Firefox reports "Mozilla org.mozilla.firefox". The desktop entry's Name
+    // is what the user knows the app by; failing that, the identity without
+    // any reverse-DNS token.
+    function playerName(p, fallback) {
+        if (!p) return fallback || "";
+        // DesktopEntries is scanned asynchronously; reading the list makes the
+        // calling binding re-evaluate once the scan has finished.
+        if (DesktopEntries.applications.values.length === 0) return p.identity || fallback || "";
+        let entry = p.desktopEntry ? DesktopEntries.byId(p.desktopEntry) : null;
+        if (entry && entry.name) return entry.name;
+        let words = String(p.identity || "").split(/\s+/).filter(w => w !== "" && !/^[a-z0-9-]+(\.[a-z0-9-]+){2,}$/i.test(w));
+        if (words.length > 0) return words.join(" ");
+        return p.desktopEntry || fallback || "";
+    }
+
     function forceArtRefresh() {
         root.fetchArt();
     }

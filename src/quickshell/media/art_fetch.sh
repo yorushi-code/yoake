@@ -188,6 +188,24 @@ if ! $CACHE_VALID && [ -n "$trackHash" ]; then
         fi
     fi
 
+    # No artwork from the player (browsers rarely export it): look the cover up
+    # by title and artist. A miss is remembered for half an hour, since the
+    # fetch reruns on every metadata or playback change.
+    missMarker="$TMP_DIR/${trackHash}_miss"
+    if ! $downloadOk && [ -n "$TITLE" ] && [ -n "$ARTIST" ] \
+        && ! { [ -f "$missMarker" ] && [ $(( $(date +%s) - $(stat -c %Y "$missMarker") )) -lt 1800 ]; }; then
+        lookupUrl=$(timeout 15 python3 "$(dirname "${BASH_SOURCE[0]}")/cover_lookup.py" "$TITLE" "$ARTIST" 2>/dev/null)
+        if [ -n "$lookupUrl" ] \
+            && curl -s -L --max-time 6 -o "$tempArt" "$lookupUrl" 2>/dev/null \
+            && identify "$tempArt" >/dev/null 2>&1; then
+            downloadOk=true
+            rm -f "$missMarker"
+        else
+            rm -f "$tempArt"
+            touch "$missMarker"
+        fi
+    fi
+
     if $downloadOk && [ -s "$tempArt" ]; then
         convert "$tempArt" -blur 0x18 "$tempBlur" 2>/dev/null
         colors=$(convert "$tempArt" -resize 50x50 -alpha off +dither -quantize RGB -colors 3 -depth 8 -format "%c" histogram:info: 2>/dev/null | grep -E -o '#[0-9A-Fa-f]{6}' | head -n 3 | tr '\n' ' ')

@@ -141,12 +141,12 @@ Item {
         let names = [];
         let counts = {};
         for (let i = 0; i < list.length; i++) {
-            let base = list[i].identity || list[i].desktopEntry || ("Player " + (i + 1));
+            let base = MprisController.playerName(list[i], "Player " + (i + 1));
             counts[base] = (counts[base] || 0) + 1;
         }
         for (let i = 0; i < list.length; i++) {
             let p = list[i];
-            let base = p.identity || p.desktopEntry || ("Player " + (i + 1));
+            let base = MprisController.playerName(p, "Player " + (i + 1));
             if (counts[base] > 1 && p.trackTitle) {
                 names.push(base + " (" + p.trackTitle + ")");
             } else {
@@ -1142,7 +1142,7 @@ Item {
                                     Layout.preferredHeight: root.s(22)
                                     cornerRadius: ThemeBackend.borderRadius
                                     horizontalPadding: root.s(10)
-                                    buttonText: I18n.t("music.via_source", { "source": root.targetPlayer ? (root.targetPlayer.identity || root.targetPlayer.desktopEntry || "Media") : I18n.t("music.offline") })
+                                    buttonText: I18n.t("music.via_source", { "source": root.targetPlayer ? MprisController.playerName(root.targetPlayer, "Media") : I18n.t("music.offline") })
                                     textFontSize: root.s(11.5)
                                     accentColor: ThemeBackend.surface0 || "#313244"
                                     textColor: ThemeBackend.subtext0 || "#9399b2"
