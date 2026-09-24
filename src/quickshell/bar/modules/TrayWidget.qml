@@ -142,8 +142,39 @@ Rectangle {
 
             delegate: Image {
                 id: trayIcon
-                source: modelData.icon || ""
+                // An icon name the theme cannot resolve does not fail: the icon
+                // provider hands back its magenta/black "missing" checkerboard.
+                // The same happens to a stale item whose app has exited. Such
+                // names are checked up front and replaced by a letter badge.
+                readonly property string iconUrl: modelData.icon || ""
+                readonly property bool iconMissing: {
+                    if (iconUrl === "") return true;
+                    if (!iconUrl.startsWith("image://icon/")) return false;
+                    let name = iconUrl.substring("image://icon/".length);
+                    if (name.indexOf("?") !== -1) return false;
+                    return Quickshell.iconPath(name, true) === "";
+                }
+                readonly property string badgeLetter: {
+                    let label = String(modelData.title || modelData.tooltipTitle || modelData.id || "?").trim();
+                    return label.charAt(0).toUpperCase() || "?";
+                }
+                source: iconMissing ? "" : iconUrl
                 fillMode: Image.PreserveAspectFit
+
+                Rectangle {
+                    anchors.fill: parent
+                    visible: trayIcon.iconMissing
+                    radius: width / 2
+                    color: ThemeBackend.surface1
+                    Text {
+                        anchors.centerIn: parent
+                        text: trayIcon.badgeLetter
+                        font.family: ThemeBackend.fontFamily
+                        font.weight: Font.Bold
+                        font.pixelSize: parent.height * 0.6
+                        color: ThemeBackend.text
+                    }
+                }
 
                 sourceSize: Qt.size(trayWidgetRoot.iconSize, trayWidgetRoot.iconSize)
                 width: trayWidgetRoot.iconSize
