@@ -32,6 +32,9 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+# satty и gpu-screen-recorder не во всех дистрибутивах пакуются; пусть
+# сработает и установка в домашний каталог.
+export PATH="$HOME/.local/bin:$PATH"
 SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 source "$SCRIPT_DIR/caching.sh"
 source "$SCRIPT_DIR/i18n.sh"
@@ -43,7 +46,12 @@ SAVE_DIR="${XDG_PICTURES_DIR:-$HOME/Pictures}/Screenshots"
 RECORD_DIR="${XDG_VIDEOS_DIR:-$HOME/Videos}/Recordings"
 mkdir -p "$SAVE_DIR" "$RECORD_DIR"
 
-REQUIRED_CMDS=("grim" "satty" "wl-copy" "pactl" "quickshell" "zbarimg" "python3")
+# Требовать только то, что нужно этому режиму: satty -- разметке, zbarimg --
+# сканированию QR. Раньше их отсутствие валило и обычный снимок, хотя ему
+# хватает grim.
+REQUIRED_CMDS=("grim" "wl-copy" "pactl" "quickshell" "python3")
+[ "$EDIT_MODE" = true ] && REQUIRED_CMDS+=("satty")
+[ "$SCAN_QR_MODE" = true ] && REQUIRED_CMDS+=("zbarimg")
 MISSING_CMDS=()
 for cmd in "${REQUIRED_CMDS[@]}"; do
     if ! command -v "$cmd" &> /dev/null; then
@@ -51,7 +59,19 @@ for cmd in "${REQUIRED_CMDS[@]}"; do
     fi
 done
 
+# Бэкенд записи: если выбранного нет, а другой стоит -- пишем им, а не
+# отказываемся. gpu-screen-recorder есть не во всех дистрибутивах.
+pick_video_backend() {
+    local want="$1" alt
+    if command -v "$want" &> /dev/null; then echo "$want"; return; fi
+    for alt in gpu-screen-recorder wf-recorder; do
+        if command -v "$alt" &> /dev/null; then echo "$alt"; return; fi
+    done
+    echo "$want"
+}
+
 if [ "$RECORD_MODE" = true ]; then
+    VIDEO_BACKEND="$(pick_video_backend "$VIDEO_BACKEND")"
     if ! command -v "$VIDEO_BACKEND" &> /dev/null; then
         MISSING_CMDS+=("$VIDEO_BACKEND")
     fi
@@ -162,6 +182,7 @@ if [ "$SCAN_QR_MODE" = false ] && [ "$RECORD_MODE" = false ] && [ "$FULL_MODE" =
     [ -f "$VIDEO_CACHE_FILE" ] && QS_CACHED_VIDEO_GEOM=$(cat "$VIDEO_CACHE_FILE") || QS_CACHED_VIDEO_GEOM=""
     [ -f "$MODE_CACHE_FILE" ] && QS_CACHED_MODE=$(cat "$MODE_CACHE_FILE") || QS_CACHED_MODE="false"
     [ -f "$BACKEND_CACHE_FILE" ] && QS_CACHED_BACKEND=$(cat "$BACKEND_CACHE_FILE") || QS_CACHED_BACKEND="gpu-screen-recorder"
+    QS_CACHED_BACKEND="$(pick_video_backend "$QS_CACHED_BACKEND")"
 
     if [ "$EDIT_MODE" = true ]; then
         QS_CACHED_MODE="false"
@@ -228,8 +249,6 @@ try:
                                     max_x = max(max_x, x)
                                     min_y = min(min_y, y)
                                     max_y = max(max_y, y)
-                                    min_y = min(min_y, y)
-                                    max_y = max(max_y, y)
                                 except ValueError:
                                     pass
             if min_x == float('inf'): min_x, min_y, max_x, max_y = 0, 0, 0, 0
@@ -282,7 +301,7 @@ if [ "$FULL_MODE" = true ] || [ -n "$GEOMETRY" ]; then
             wf-recorder "${WF_ARGS[@]}" > /dev/null 2>&1 &
             REC_PID=$!
         else
-            GSR_ARGS=(-w "screen" -c "mp4" -f "60" -ac "aac")
+            GSR_ARGS=(-w "${TARGET_MON:-screen}" -c "mp4" -f "60" -ac "aac")
             if [ "$DESK_MUTE" != "true" ]; then
                 DESK_SINK=$(pactl get-default-sink 2>/dev/null)
                 if [ -n "$DESK_SINK" ]; then

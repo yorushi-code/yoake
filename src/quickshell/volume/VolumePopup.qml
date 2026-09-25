@@ -497,9 +497,119 @@ Item {
                     opacity: introContent
                     transform: Translate { y: window.s(15) * (1.0 - introContent) }
 
+                    // The shell's own effects: each is a stream that lives for a
+                    // fraction of a second, so it gets a permanent row here
+                    // (backed by general.sfxVolume / muteSfx) instead.
+                    Rectangle {
+                        id: sfxCard
+                        visible: window.activeTab === "apps"
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: visible ? window.s(88) : 0
+                        radius: ThemeBackend.borderRadius
+                        color: ThemeBackend.surface0
+                        border.color: ThemeBackend.surface1
+                        border.width: 1
+
+                        ColumnLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: window.s(12)
+                            anchors.rightMargin: window.s(12)
+                            anchors.topMargin: window.s(10)
+                            anchors.bottomMargin: window.s(12)
+                            spacing: window.s(10)
+
+                            RowLayout {
+                                Layout.fillWidth: true
+                                spacing: window.s(10)
+                                Text {
+                                    font.family: "Iosevka Nerd Font"; font.pixelSize: window.s(18)
+                                    color: ThemeBackend.text
+                                    text: "󰗅"
+                                }
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    spacing: window.s(2)
+                                    Text {
+                                        Layout.fillWidth: true; elide: Text.ElideRight
+                                        font.family: ThemeBackend.fontFamily; font.weight: Font.Bold; font.pixelSize: window.s(13)
+                                        color: ThemeBackend.text
+                                        text: I18n.t("volumepopup.interface_sounds")
+                                    }
+                                    Text {
+                                        Layout.fillWidth: true; elide: Text.ElideRight
+                                        font.family: ThemeBackend.fontFamily; font.pixelSize: window.s(10.5)
+                                        color: ThemeBackend.subtext0
+                                        text: I18n.t("volumepopup.interface_sounds_desc")
+                                    }
+                                }
+                            }
+
+                            RowLayout {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: window.s(20)
+                                spacing: window.s(10)
+
+                                IconButton {
+                                    Layout.alignment: Qt.AlignVCenter
+                                    size: window.s(24)
+                                    cornerRadius: window.s(8)
+                                    buttonIcon: Sounds.isMuted || Sounds.volumePercent === 0 ? "󰖁" : (Sounds.volumePercent > 50 ? "󰕾" : "󰖀")
+                                    iconFontSize: window.s(14)
+                                    accentColor: ThemeBackend.surface1
+                                    textColor: isHoveredOrHighlighted ? ThemeBackend.text : (Sounds.isMuted ? ThemeBackend.overlay0 : ThemeBackend.subtext0)
+                                    onClicked: Sounds.setMuted(!Sounds.isMuted)
+                                }
+
+                                Draggable {
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: window.s(16)
+                                    Layout.alignment: Qt.AlignVCenter
+                                    from: 0.0
+                                    to: 100.0
+                                    value: Sounds.volumePercent
+                                    backgroundColor: ThemeBackend.surface1
+                                    accentColor: Sounds.isMuted ? ThemeBackend.surface2 : window.tabColor
+                                    gradColor1: Sounds.isMuted ? ThemeBackend.surface2 : window.tabColor
+                                    gradColor2: Sounds.isMuted ? ThemeBackend.surface2 : Qt.lighter(window.tabColor, 1.05)
+                                    gradColor3: Sounds.isMuted ? ThemeBackend.surface2 : Qt.lighter(window.tabColor, 1.10)
+                                    cornerRadius: window.s(5)
+                                    handleSize: window.s(18)
+                                    handleColor: Sounds.isMuted ? ThemeBackend.overlay0 : Qt.lighter(window.tabColor, 1.15)
+                                    handleHoverColor: Sounds.isMuted ? ThemeBackend.subtext0 : Qt.lighter(window.tabColor, 1.5)
+                                    handleDragColor: Sounds.isMuted ? ThemeBackend.text : Qt.lighter(window.tabColor, 1.45)
+                                    handleBorderColor: Qt.rgba(0, 0, 0, 0.2)
+
+                                    onMoved: (val) => {
+                                        if (Math.round(val) > 0 && Sounds.isMuted) Sounds.setMuted(false);
+                                        Sounds.setVolumePercent(val, false);
+                                    }
+                                    onDragFinished: {
+                                        Sounds.setVolumePercent(Sounds.volumePercent, true);
+                                        Sounds.playSfx("reusables/clickbutton/click.wav");
+                                    }
+                                }
+
+                                Text {
+                                    Layout.preferredWidth: window.s(30)
+                                    Layout.alignment: Qt.AlignVCenter
+                                    font.family: ThemeBackend.fontFamily; font.weight: Font.Bold; font.pixelSize: window.s(11)
+                                    color: ThemeBackend.subtext0
+                                    text: Sounds.volumePercent + "%"
+                                    horizontalAlignment: Text.AlignRight
+                                }
+                            }
+                        }
+                    }
+
                     ListView {
                         id: contentList
-                        anchors.fill: parent
+                        anchors.top: sfxCard.bottom
+                        anchors.topMargin: sfxCard.visible ? window.s(10) : 0
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
                         spacing: window.s(10)
                         clip: true
                         boundsBehavior: Flickable.StopAtBounds

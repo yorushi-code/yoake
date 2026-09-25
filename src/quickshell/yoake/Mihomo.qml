@@ -68,6 +68,10 @@ Singleton {
     property var delays: ({})
     property bool probing: false
 
+    // rule / global / direct, как его отдаёт контроллер. Читается вместе с
+    // остальным при обновлении: отдельного опроса под это заводить незачем.
+    property string mode: ""
+
     // Bytes per second, from the controller's streaming endpoint.
     property real upSpeed: 0
     property real downSpeed: 0
@@ -297,6 +301,22 @@ Singleton {
     function refresh() {
         root._run(statusProc, ["status"]);
         root._run(subsProc, ["subs"]);
+        MihomoApi.configs((data, err) => {
+            if (!err && data) root.mode = data.mode || "";
+        });
+    }
+
+    // Смена режима применяется наперёд: контроллер отвечает мгновенно, и ждать
+    // ответа, прежде чем подсветить кнопку, значит показать залипание. Если
+    // всё-таки не вышло -- возвращаем прежний.
+    function setMode(mode) {
+        const previous = root.mode;
+        root.mode = mode;
+        MihomoApi.setMode(mode, (data, err) => {
+            if (!err) return;
+            root.lastError = err;
+            root.mode = previous;
+        });
     }
 
     function start(name) {

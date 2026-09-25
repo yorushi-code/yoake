@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+rm -f /tmp/yoaked.lock /tmp/yoaked.pid 2>/dev/null
+
 if command -v systemctl &>/dev/null && [ -d /run/systemd/system ]; then
     systemctl reboot && exit 0
 fi

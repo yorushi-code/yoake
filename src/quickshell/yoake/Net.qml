@@ -33,12 +33,14 @@ Singleton {
 
     // Четыре ступени по dBm: -50 и выше отлично, ниже -80 край.
     readonly property string wifiIcon: {
-        if (!root.wifiEnabled) return "󰴮";
-        if (root.ssid === "") return "󰴯";
-        if (root.signalDbm >= -50) return "󰴨";
-        if (root.signalDbm >= -60) return "󰴥";
-        if (root.signalDbm >= -70) return "󰴢";
-        return "󰴟";
+        // md-wifi-strength-* (U+F091F..F092D). The U+F0D1x range used before
+        // is a different set of icons in current Nerd Fonts.
+        if (!root.wifiEnabled) return "󰤭";
+        if (root.ssid === "") return "󰤯";
+        if (root.signalDbm >= -50) return "󰤨";
+        if (root.signalDbm >= -60) return "󰤥";
+        if (root.signalDbm >= -70) return "󰤢";
+        return "󰤟";
     }
 
     property Process poll: Process {

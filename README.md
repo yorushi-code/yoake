@@ -10,8 +10,48 @@ widget or panel means editing `bar/TopBar.qml`, `widgets/WidgetRegistry.qml` or
 everything of ours that can live in `src/quickshell/yoake/` does — so this can
 be rebased onto an upstream that has already rewritten its history once.
 
-**Running it on Fedora: [docs/fedora.md](docs/fedora.md).** Upstream's installer
-refuses to run on anything outside the Arch family, by design and on purpose.
+## Installing
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/yorushi-code/yoake/master/install/install.sh)"
+```
+
+It asks what to install:
+
+- **yoake**, this fork;
+- **Serpantinum**, clean upstream, installed by upstream's own installer.
+
+Both work on Arch and on Fedora (and their derivatives). Upstream's installer
+refuses anything outside the Arch family; for Serpantinum on Fedora it runs
+behind a small compatibility layer that answers its `pacman` calls with dnf,
+so what it installs is still exactly what upstream ships.
+
+Without questions: `--product yoake --yes` (yoake with defaults), or
+`--product serpantinum` (upstream's own menus follow). Details, and the manual
+path it replaces: **[docs/fedora.md](docs/fedora.md)**.
+
+## Taking upstream's updates
+
+`tools/sync-upstream.sh`. Upstream cannot be merged directly: the fork is
+renamed throughout, so every line upstream touches also differs from ours by
+the name, and the merge to 2.0.4 produced sixteen conflicts that were almost
+all empty.
+
+So a branch sits between us and upstream. `upstream-renamed` holds upstream's
+tree with `tools/rename-upstream.py` already applied and nothing of ours in it.
+Merging that branch compares renamed against renamed, and what conflicts is
+only what we and upstream both changed in substance.
+
+Its commits are deliberately single-parent. Making them merges with upstream
+would put upstream's raw commits into our ancestry, the next merge base would
+move back to an unrenamed tree, and the conflicts would return.
+
+The merge is rehearsed in a throwaway worktree first. The checkout here is a
+running shell — quickshell watches these files and reloads them by itself —
+and it must never see QML with conflict markers in it. On conflict the script
+stops and leaves the working copy untouched; on success it fast-forwards.
+
+Running it from the About tab's Update button does the same thing.
 
 ## What is ours
 
@@ -20,6 +60,7 @@ refuses to run on anything outside the Arch family, by design and on purpose.
 | `src/quickshell/yoake/` | the layer: everything added rather than modified |
 | `src/scripts/wallpaper-palette.py` | the palette, measured off the wallpaper in OKLCh |
 | `docs/fedora.md` | how this actually gets installed and run here |
+| `tools/` | how upstream's updates get in, renamed on the way |
 
 Colours are not a preset. The wallpaper's dominant hue is measured as a
 chroma-weighted circular mean in OKLCh and the accent is synthesized on it,
@@ -76,11 +117,14 @@ Copyright (C) 2026 yorushi, for modifications made in this fork.
 
 ### Arch Linux and its derivatives
 
-For Arch-based distributions (including systemd, OpenRC, and other init systems), run the automated installation script:
+For Arch-based distributions (including systemd, OpenRC, and other init systems), run the automated installation script.:
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/ilyamiro/serpantinum/master/install/install.sh)"
 ```
+
+> [!NOTE]
+> To update, when or if you recieve a notification about the new version being available, just run the script again and choose "update"
 
 ---
 

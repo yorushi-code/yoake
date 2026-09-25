@@ -1,44 +1,101 @@
 #!/usr/bin/env bash
+# The music panel's ten-band equaliser.
+#
+# Upstream drives EasyEffects here. This fork uses a PipeWire filter-chain
+# instead (no extra daemon): ten bq_peaking sections, one per slider, declared
+# as a WirePlumber *smart filter*, so WirePlumber itself places it in front of
+# whichever output is the default -- speakers, headphones, Bluetooth -- and
+# follows when that changes.
+#
+#   get                 print the panel state (JSON)
+#   set_band N GAIN     move one band live; marks the state as unsaved
+#   apply               save: write the gains into the PipeWire config too
+#   preset NAME         load a preset, live and saved
+#   install             (re)write the PipeWire config from the saved state
+#
+# Gains move live through `pw-cli set-param`, so dragging a slider never
+# restarts the graph. The config file is rewritten on save only so the curve
+# survives a PipeWire restart or a reboot.
 
 source "$(dirname "${BASH_SOURCE[0]}")/../../scripts/caching.sh"
 qs_ensure_cache "music"
 
-STATE_FILE="$QS_RUN_MUSIC/eq_state.json"
-PRESET_DIR="$HOME/.config/easyeffects/output"
-PRESET_NAME="live_eq"
-PRESET_FILE="$PRESET_DIR/${PRESET_NAME}.json"
+STATE_FILE="$QS_STATE_MUSIC/eq_state.json"
+CONF_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/pipewire/pipewire.conf.d/99-yoake-eq.conf"
+NODE="effect_input.yoake-eq"
+FREQS=(31 63 125 250 500 1000 2000 4000 8000 16000)
 
-mkdir -p "$PRESET_DIR"
-
+# One-time move of the state from its old place in the runtime dir.
+if [ ! -f "$STATE_FILE" ] && [ -f "$QS_RUN_MUSIC/eq_state.json" ]; then
+    cp "$QS_RUN_MUSIC/eq_state.json" "$STATE_FILE"
+fi
 if [ ! -f "$STATE_FILE" ]; then
     echo '{"b1": 0, "b2": 0, "b3": 0, "b4": 0, "b5": 0, "b6": 0, "b7": 0, "b8": 0, "b9": 0, "b10": 0, "preset": "Flat", "pending": false}' > "$STATE_FILE"
 fi
 
-apply_eq() {
-    vals=$(cat "$STATE_FILE")
-    python3 -c "
-import sys, json
-try:
-    data = json.loads(sys.argv[1])
-    slider_map = { 0:0, 1:3, 2:6, 3:9, 4:12, 5:15, 6:18, 7:21, 8:24, 9:27 }
-    freqs = [32, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000, 22000, 24000, 24000]
-    gains = [float(data['b1']), float(data['b2']), float(data['b3']), float(data['b4']), float(data['b5']), float(data['b6']), float(data['b7']), float(data['b8']), float(data['b9']), float(data['b10'])]
-    bands = {}
-    for i in range(32):
-        freq = freqs[i] if i < len(freqs) else 20000.0
-        gain = 0.0
-        for s_idx, b_idx in slider_map.items():
-            if i == b_idx:
-                gain = gains[s_idx]
-                break
-        bands[f\"band{i}\"] = { \"frequency\": freq, \"gain\": gain, \"mode\": \"Bell\", \"mute\": False, \"q\": 1.0, \"solo\": False, \"width\": 1.0, \"slope\": \"x1\" }
-    preset = { \"output\": { \"blocklist\": [], \"plugins_order\": [ \"equalizer\" ], \"equalizer\": { \"bypass\": False, \"input-gain\": 0.0, \"output-gain\": 0.0, \"left\": bands, \"right\": bands, \"mode\": \"IIR\", \"num-bands\": 32, \"split-channels\": False } } }
-    print(json.dumps(preset, indent=4))
-except:
-    sys.exit(1)
-" "$vals" > "$PRESET_FILE"
+# Always as floats: the filter's controls are Float, and pw-cli passes a bare
+# integer through as Int, which the node ignores.
+gains() {
+    jq -r '[.b1, .b2, .b3, .b4, .b5, .b6, .b7, .b8, .b9, .b10] | map(tonumber? // 0) | .[]' "$STATE_FILE" \
+        | xargs printf '%.1f\n'
+}
 
-    easyeffects -l "$PRESET_NAME" >/dev/null 2>&1 &
+apply_live() {
+    local params="" i=1 g
+    while read -r g; do
+        params+=" \"eq_band_${i}:Gain\" ${g}"
+        i=$((i + 1))
+    done < <(gains)
+    pw-cli set-param "$NODE" Props "{ params = [${params} ] }" >/dev/null 2>&1
+}
+
+write_conf() {
+    local nodes="" links="" i g
+    local -a g_arr
+    mapfile -t g_arr < <(gains)
+    for i in "${!FREQS[@]}"; do
+        g=${g_arr[$i]:-0}
+        nodes+="                    { type = builtin name = eq_band_$((i + 1)) label = bq_peaking control = { \"Freq\" = ${FREQS[$i]}.0 \"Q\" = 1.4 \"Gain\" = ${g} } }"$'\n'
+        if [ "$i" -gt 0 ]; then
+            links+="                    { output = \"eq_band_${i}:Out\" input = \"eq_band_$((i + 1)):In\" }"$'\n'
+        fi
+    done
+    mkdir -p "$(dirname "$CONF_FILE")"
+    cat > "$CONF_FILE" <<EOF
+# Yoake's ten-band equaliser. Written by src/quickshell/media/equalizer.sh;
+# edits here are overwritten when the panel saves.
+#
+# filter.smart makes WirePlumber insert it in front of the default output and
+# re-link it when the default changes, so it is never chosen as a device itself.
+context.modules = [
+    { name = libpipewire-module-filter-chain
+        args = {
+            node.description = "Yoake Equalizer"
+            media.name       = "Yoake Equalizer"
+            filter.graph = {
+                nodes = [
+${nodes}                ]
+                links = [
+${links}                ]
+            }
+            audio.channels = 2
+            audio.position = [ FL FR ]
+            capture.props = {
+                node.name         = "${NODE}"
+                media.class       = Audio/Sink
+                filter.smart      = true
+                filter.smart.name = "yoake-eq"
+            }
+            playback.props = {
+                node.name         = "effect_output.yoake-eq"
+                node.passive      = true
+                filter.smart      = true
+                filter.smart.name = "yoake-eq"
+            }
+        }
+    }
+]
+EOF
 }
 
 save_preset() {
@@ -54,15 +111,15 @@ arg2=$3
 case $cmd in
     "get") cat "$STATE_FILE" ;;
     "set_band")
-        tmp=$(cat "$STATE_FILE")
-        updated=$(echo "$tmp" | jq -c --arg val "$arg2" ".b$arg1 = \$val | .preset = \"Custom\" | .pending = true")
+        updated=$(jq -c --arg val "$arg2" ".b$arg1 = \$val | .preset = \"Custom\" | .pending = true" "$STATE_FILE")
         echo "$updated" > "$STATE_FILE"
+        apply_live
         ;;
     "apply")
-        tmp=$(cat "$STATE_FILE")
-        updated=$(echo "$tmp" | jq -c ".pending = false")
+        updated=$(jq -c ".pending = false" "$STATE_FILE")
         echo "$updated" > "$STATE_FILE"
-        apply_eq
+        apply_live
+        write_conf
         ;;
     "preset")
         case $arg1 in
@@ -75,6 +132,10 @@ case $cmd in
             "Jazz")    save_preset 3 3 1 1 1 1 2 1 2 3 "Jazz" ;;
             "Classic") save_preset 0 1 2 2 2 2 1 2 3 4 "Classic" ;;
         esac
-        apply_eq
+        apply_live
+        write_conf
+        ;;
+    "install")
+        write_conf
         ;;
 esac

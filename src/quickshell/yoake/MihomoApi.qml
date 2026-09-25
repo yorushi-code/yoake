@@ -100,4 +100,13 @@ Singleton {
     function closeConnections(done) {
         root._request("DELETE", "/connections", null, done);
     }
+
+    // Режим правил живёт в running config, отдельной точки под него нет.
+    function configs(done) {
+        root._request("GET", "/configs", null, done);
+    }
+
+    function setMode(mode, done) {
+        root._request("PATCH", "/configs", { mode: mode }, done);
+    }
 }

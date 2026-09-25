@@ -3,7 +3,6 @@ import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import "../"
-import "../singletons"
 import "../reusables"
 
 Item {
@@ -289,7 +288,7 @@ Item {
             }
 
             Text {
-                text: I18n.t("guide.welcome.by_author", { author: "ilyamiro" })
+                text: I18n.t("guide.welcome.by_author", { author: "yorushi" })
                 font.family: ThemeBackend.fontFamily
                 font.pixelSize: rootObj.s(14)
                 color: ThemeBackend.subtext0

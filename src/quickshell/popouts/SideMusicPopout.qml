@@ -107,12 +107,12 @@ PanelWindow {
         let names = [];
         let counts = {};
         for (let i = 0; i < list.length; i++) {
-            let base = list[i].identity || list[i].desktopEntry || ("Player " + (i + 1));
+            let base = MprisController.playerName(list[i], "Player " + (i + 1));
             counts[base] = (counts[base] || 0) + 1;
         }
         for (let i = 0; i < list.length; i++) {
             let p = list[i];
-            let base = p.identity || p.desktopEntry || ("Player " + (i + 1));
+            let base = MprisController.playerName(p, "Player " + (i + 1));
             if (counts[base] > 1 && p.trackTitle) {
                 names.push(base + " (" + p.trackTitle + ")");
             } else {
@@ -660,7 +660,7 @@ PanelWindow {
 
                         Text {
                             Layout.fillWidth: true
-                            text: targetPlayer && targetPlayer.trackArtist ? targetPlayer.trackArtist : (targetPlayer ? targetPlayer.identity : "")
+                            text: targetPlayer && targetPlayer.trackArtist ? targetPlayer.trackArtist : (targetPlayer ? MprisController.playerName(targetPlayer, "") : "")
                             font.family: ThemeBackend.fontFamily
                             font.weight: Font.Bold
                             font.pixelSize: sideMusicPopout.s(11)
@@ -703,7 +703,7 @@ PanelWindow {
                         Layout.preferredHeight: sideMusicPopout.s(20)
                         cornerRadius: ThemeBackend.borderRadius
                         horizontalPadding: sideMusicPopout.s(8)
-                        buttonText: I18n.t("music.via_source", { "source": sideMusicPopout.targetPlayer ? (sideMusicPopout.targetPlayer.identity || sideMusicPopout.targetPlayer.desktopEntry || "Media") : I18n.t("music.offline") })
+                        buttonText: I18n.t("music.via_source", { "source": sideMusicPopout.targetPlayer ? MprisController.playerName(sideMusicPopout.targetPlayer, "Media") : I18n.t("music.offline") })
                         textFontSize: sideMusicPopout.s(10)
                         accentColor: ThemeBackend.surface0
                         textColor: ThemeBackend.overlay2

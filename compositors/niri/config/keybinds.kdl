@@ -3,7 +3,7 @@ binds {
     Mod+F { spawn "firefox"; }
     Mod+E { spawn "nautilus"; }
     Mod+Backspace { toggle-overview; }
-    Alt+F4 { close-window; }
+    Mod+Q { close-window; }
     Mod+Shift+F { toggle-window-floating; }
 
     XF86MonBrightnessDown { spawn "yoake" "brightness" "lower"; }
@@ -20,6 +20,8 @@ binds {
     Mod+Space { spawn "playerctl" "play-pause"; }
     XF86AudioPause { spawn "playerctl" "play-pause"; }
     XF86AudioPlay { spawn "playerctl" "play-pause"; }
+    XF86AudioPrev { spawn "playerctl" "previous"; }
+    XF86AudioNext { spawn "playerctl" "next"; }
     XF86AudioMicMute { spawn "yoake" "volume" "mic-toggle"; }
     XF86AudioMute { spawn "yoake" "volume" "mute-toggle"; }
     XF86AudioLowerVolume { spawn "yoake" "volume" "lower"; }
@@ -28,13 +30,14 @@ binds {
     Mod+R { spawn "yoake" "reload"; }
     Mod+C { spawn "yoake" "msg" "toggle" "clipboard"; }
     Mod+D { spawn "yoake" "msg" "toggle" "launcher"; }
-    Mod+Q { spawn "yoake" "msg" "toggle" "music"; }
+    Mod+M { spawn "yoake" "msg" "toggle" "music"; }
     Mod+B { spawn "yoake" "msg" "toggle" "system"; }
     Mod+W { spawn "yoake" "msg" "toggle" "wallpaper"; }
     Mod+S { spawn "yoake" "msg" "toggle" "calendar"; }
     Mod+N { spawn "yoake" "msg" "toggle" "network"; }
     Mod+V { spawn "yoake" "msg" "toggle" "volume"; }
     Mod+H { spawn "yoake" "msg" "toggle" "guide"; }
+    Mod+A { spawn "yoake" "msg" "toggle" "autohide"; }
 
     Mod+Left { focus-column-left; }
     Mod+Right { focus-column-right; }

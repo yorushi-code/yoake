@@ -5,7 +5,48 @@ set -e
 setterm -blank 0 -powerdown 0 2>/dev/null || true
 printf '\033[9;0]' 2>/dev/null || true
 
-RAW_SLUG="${REPO_SLUG:-ilyamiro/serpantinum}"
+# --product yoake|serpantinum: what to install (asked when not given).
+#   yoake        this fork
+#   serpantinum  clean upstream, through its own installer (install/serpantinum.sh)
+# --yes / -y: no menus. The detected compositor (niri if none is found),
+# SDDM with its defaults, the full wallpaper pack. Implies yoake unless
+# --product says otherwise; upstream's installer has menus of its own.
+ASSUME_YES=false
+PRODUCT=""
+PASSTHROUGH=()
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -y|--yes) ASSUME_YES=true ;;
+        --product) PRODUCT="${2:-}"; shift ;;
+        --product=*) PRODUCT="${1#--product=}" ;;
+        *) PASSTHROUGH+=("$1") ;;
+    esac
+    shift
+done
+
+choose_product() {
+    if [ "$ASSUME_YES" = true ]; then
+        PRODUCT=yoake
+        return
+    fi
+    printf '\n  What should be installed?\n\n'
+    printf '    1) yoake        the fork: Fedora-first, niri, its own palette, VPN panel\n'
+    printf '    2) Serpantinum  clean upstream (ilyamiro/serpantinum), as its author ships it\n\n'
+    local answer=""
+    while [[ "$answer" != "1" && "$answer" != "2" ]]; do
+        printf '  Choose 1 or 2: '
+        read -r answer < /dev/tty || exit 1
+    done
+    [ "$answer" = "1" ] && PRODUCT=yoake || PRODUCT=serpantinum
+}
+
+[ -z "$PRODUCT" ] && choose_product
+case "$PRODUCT" in
+    yoake|serpantinum) ;;
+    *) echo "Unknown --product '$PRODUCT' (expected yoake or serpantinum)." >&2; exit 1 ;;
+esac
+
+RAW_SLUG="${REPO_SLUG:-yorushi-code/yoake}"
 REPO_SLUG="$(printf '%s' "$RAW_SLUG" | tr -d '\r\n\t ' | sed 's/[^a-zA-Z0-9_\/-]//g')"
 CACHE_BASE="${XDG_CACHE_HOME:-$HOME/.cache}/yoake-installer"
 export REPO_SLUG
@@ -19,7 +60,13 @@ else
 fi
 
 if [[ -z "$PROJECT_ROOT" || ! -f "$PROJECT_ROOT/install/modules/deps.sh" || ! -d "$PROJECT_ROOT/src" ]]; then
-    command -v git &>/dev/null || sudo pacman -Sy --noconfirm --needed git
+    if ! command -v git &>/dev/null; then
+        if command -v dnf &>/dev/null; then
+            sudo dnf -y install git
+        else
+            sudo pacman -Sy --noconfirm --needed git
+        fi
+    fi
     if [ ! -d "$CACHE_BASE/.git" ]; then
         rm -rf "$CACHE_BASE"
         mkdir -p "$CACHE_BASE"
@@ -33,12 +80,17 @@ if [[ -z "$PROJECT_ROOT" || ! -f "$PROJECT_ROOT/install/modules/deps.sh" || ! -d
     PROJECT_ROOT="$CACHE_BASE"
 fi
 
+if [ "$PRODUCT" = "serpantinum" ]; then
+    exec bash "$INSTALL_DIR/serpantinum.sh" "${PASSTHROUGH[@]}"
+fi
+
 export YOAKE_DIR="$PROJECT_ROOT/src"
 export I18N_DIR="$PROJECT_ROOT/src/assets/languages"
 
 MODULES_DIR="$INSTALL_DIR/modules"
 
 source "$PROJECT_ROOT/src/scripts/i18n.sh"
+source "$MODULES_DIR/pkg.sh"
 source "$MODULES_DIR/deps.sh"
 source "$MODULES_DIR/state.sh"
 source "$MODULES_DIR/migrate.sh"
@@ -46,6 +98,7 @@ source "$MODULES_DIR/deploy.sh"
 source "$MODULES_DIR/version.sh"
 source "$MODULES_DIR/config.sh"
 source "$MODULES_DIR/service.sh"
+source "$MODULES_DIR/session.sh"
 source "$MODULES_DIR/ui.sh"
 
 TELEMETRY_ID=$(get_telemetry_id)
@@ -61,7 +114,14 @@ TARGET_COMMIT=$(get_target_commit "$PROJECT_ROOT" "$REPO_SLUG")
 OLD_COMMIT=$(get_installed_commit)
 
 init_compositor_detection
-run_installer_ui
+if [ "$ASSUME_YES" = true ]; then
+    if [ ${#SELECTED_COMPOSITORS[@]} -eq 0 ]; then
+        SELECTED_COMPOSITORS=("niri")
+    fi
+    echo -e "\e[36m[ INFO ]\e[0m Unattended install (${PKG_FAMILY}): ${SELECTED_COMPOSITORS[*]}, SDDM=${OPT_SDDM}"
+else
+    run_installer_ui
+fi
 
 TARGET_VERSION=$(get_target_version "$PROJECT_ROOT" "$REPO_SLUG")
 TARGET_COMMIT=$(get_target_commit "$PROJECT_ROOT" "$REPO_SLUG")
@@ -73,14 +133,15 @@ elif [[ "$INSTALL_STATE" == "fresh" || "$IS_REINSTALL" == true ]]; then
     backup_compositors "${SELECTED_COMPOSITORS[@]}"
 fi
 
-install_dependencies "${SELECTED_COMPOSITORS[@]}"
+install_dependencies "$INSTALL_STATE" "$IS_REINSTALL" "${SELECTED_COMPOSITORS[@]}"
 
 deploy_package "$PROJECT_ROOT" "$OLD_COMMIT" "$TARGET_COMMIT" "$IS_REINSTALL" "$INSTALL_STATE" "${SELECTED_COMPOSITORS[@]}"
-setup_sddm "$PROJECT_ROOT"
+setup_sddm "$PROJECT_ROOT" "$INSTALL_STATE" "$IS_REINSTALL"
 install_wallpapers "$INSTALL_FULL_WALLPAPERS"
 
 WALLPAPER_DIR=$(get_wallpaper_dir)
 init_yoake_config "$PROJECT_ROOT" "$WALLPAPER_DIR" "$INSTALL_STATE" "$IS_REINSTALL"
+setup_session_extras "$PROJECT_ROOT" "$INSTALL_STATE" "$IS_REINSTALL"
 
 setup_services
 write_version_state "$TARGET_VERSION" "$TARGET_COMMIT" "$TELEMETRY_ID" "$ENABLE_TELEMETRY" "${SELECTED_COMPOSITORS[*]}"

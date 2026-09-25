@@ -127,8 +127,16 @@ install_wallpapers() {
 
 setup_sddm() {
     local project_root="$1"
+    local install_state="${2:-$INSTALL_STATE}"
+    local is_reinstall="${3:-$IS_REINSTALL}"
+
     if [ "$OPT_SDDM" != true ]; then
         return 0
+    fi
+
+    local is_update=false
+    if [[ "$install_state" == "current" && "$is_reinstall" != "true" ]]; then
+        is_update=true
     fi
 
     local init_sys="generic"
@@ -138,17 +146,17 @@ setup_sddm() {
 
     echo -e "\n\e[36m[ INFO ]\e[0m $(t "installer.deploy.configuring_sddm")"
 
-    if [ "$REPLACE_DM" = true ]; then
+    if [ "$is_update" != true ] && [ "$REPLACE_DM" = true ]; then
         local dms=("gdm" "gdm3" "lightdm" "lxdm" "lxdm-gtk3" "ly" "greetd" "emptty")
         for dm in "${dms[@]}"; do
-            if declare -f disable_system_service >/dev/null; then
-                disable_system_service "$dm" "$init_sys"
+            if declare -f disable_display_manager >/dev/null; then
+                disable_display_manager "$dm" "$init_sys"
             fi
-            if command -v pacman &>/dev/null; then
-                if pacman -Qq "$dm" &>/dev/null; then
-                    echo "  $(t "installer.deploy.disabling_dm" "dm=$dm")"
-                    sudo pacman -Rns --noconfirm "$dm" >/dev/null 2>&1 || true
-                fi
+            # Arch removes the old display manager; elsewhere it is only
+            # disabled, so switching back stays one command away.
+            if [ "$PKG_FAMILY" = "arch" ] && pacman -Qq "$dm" &>/dev/null; then
+                echo "  $(t "installer.deploy.disabling_dm" "dm=$dm")"
+                sudo pacman -Rns --noconfirm "$dm" >/dev/null 2>&1 || true
             fi
         done
     fi
@@ -157,7 +165,11 @@ setup_sddm() {
     sudo rm -rf /usr/share/sddm/themes/material-you
     sudo rm -f /etc/sddm.conf.d/*matugen*.conf
     sudo rm -f /etc/sddm.conf.d/*material-you*.conf
-    sudo rm -f /etc/sddm.conf
+
+    if [ "$is_update" != true ] && [ -f /etc/sddm.conf ]; then
+        sudo cp -a /etc/sddm.conf "/etc/sddm.conf.backup.$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
+        sudo rm -f /etc/sddm.conf
+    fi
 
     local sddm_theme_src="$project_root/config/sddm/themes/material-you"
     local sddm_theme_dest="/usr/share/sddm/themes/material-you"
@@ -197,8 +209,8 @@ InputMethod=
 EOF
     fi
 
-    if declare -f enable_system_service >/dev/null; then
-        enable_system_service "sddm" "$init_sys"
+    if declare -f enable_display_manager >/dev/null; then
+        enable_display_manager "sddm" "$init_sys"
     else
         case "$init_sys" in
             systemd)

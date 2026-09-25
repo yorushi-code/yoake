@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# pacman, as upstream Serpantinum's installer uses it, answered on Fedora.
+#
+# install/serpantinum.sh puts this directory in front of PATH while upstream's
+# own installer runs, so that installer stays unmodified in what it installs.
+# Only the operations it performs are implemented; package names are upstream's
+# (Arch) and are translated by install/modules/pkg.sh.
+#
+#   -T pkgs      print the ones not installed
+#   -Q[q] pkgs   succeed if all are installed
+#   -Si pkg      succeed (the install step decides what is available)
+#   -S… pkgs     install; with no packages, refresh metadata (-Sy, -Syyu)
+#   -R… pkgs     nothing: packages are never removed on Fedora
+
+source "${YOAKE_PKG_LIB:?YOAKE_PKG_LIB must point at install/modules/pkg.sh}"
+
+op=""
+pkgs=()
+for arg in "$@"; do
+    case "$arg" in
+        --noconfirm|--needed|--asdeps) ;;
+        -*) op+="${arg#-}" ;;
+        *) pkgs+=("$arg") ;;
+    esac
+done
+
+case "$op" in
+    T*)
+        # Unlike pkg_missing, report what Fedora does not package as missing:
+        # upstream then tries to install it, and it shows up among the failed
+        # packages instead of silently not being there.
+        for pkg in "${pkgs[@]}"; do
+            if [ -n "${RELEASE_URLS[$pkg]:-}" ]; then
+                command -v "$pkg" &>/dev/null || echo "$pkg"
+            elif [ "$pkg" = "base-devel" ]; then
+                continue
+            elif [ -z "$(pkg_name "$pkg")" ]; then
+                echo "$pkg"
+            else
+                pkg_installed "$pkg" || echo "$pkg"
+            fi
+        done
+        ;;
+    Q*)
+        for pkg in "${pkgs[@]}"; do
+            pkg_installed "$pkg" || exit 1
+        done
+        ;;
+    Si*)
+        exit 0
+        ;;
+    S*)
+        if [ ${#pkgs[@]} -eq 0 ]; then
+            exec sudo dnf -y makecache
+        fi
+        status=0
+        for pkg in "${pkgs[@]}"; do
+            pkg_install_compat "$pkg" || status=1
+        done
+        exit $status
+        ;;
+    R*)
+        echo "[compat] not removing ${pkgs[*]} (packages are kept on Fedora)" >&2
+        ;;
+    *)
+        echo "[compat] pacman -$op is not supported here" >&2
+        exit 1
+        ;;
+esac
