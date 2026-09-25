@@ -5,14 +5,46 @@ set -e
 setterm -blank 0 -powerdown 0 2>/dev/null || true
 printf '\033[9;0]' 2>/dev/null || true
 
+# --product yoake|serpantinum: what to install (asked when not given).
+#   yoake        this fork
+#   serpantinum  clean upstream, through its own installer (install/serpantinum.sh)
 # --yes / -y: no menus. The detected compositor (niri if none is found),
-# SDDM with its defaults, the full wallpaper pack.
+# SDDM with its defaults, the full wallpaper pack. Implies yoake unless
+# --product says otherwise; upstream's installer has menus of its own.
 ASSUME_YES=false
-for arg in "$@"; do
-    case "$arg" in
+PRODUCT=""
+PASSTHROUGH=()
+while [ $# -gt 0 ]; do
+    case "$1" in
         -y|--yes) ASSUME_YES=true ;;
+        --product) PRODUCT="${2:-}"; shift ;;
+        --product=*) PRODUCT="${1#--product=}" ;;
+        *) PASSTHROUGH+=("$1") ;;
     esac
+    shift
 done
+
+choose_product() {
+    if [ "$ASSUME_YES" = true ]; then
+        PRODUCT=yoake
+        return
+    fi
+    printf '\n  What should be installed?\n\n'
+    printf '    1) yoake        the fork: Fedora-first, niri, its own palette, VPN panel\n'
+    printf '    2) Serpantinum  clean upstream (ilyamiro/serpantinum), as its author ships it\n\n'
+    local answer=""
+    while [[ "$answer" != "1" && "$answer" != "2" ]]; do
+        printf '  Choose 1 or 2: '
+        read -r answer < /dev/tty || exit 1
+    done
+    [ "$answer" = "1" ] && PRODUCT=yoake || PRODUCT=serpantinum
+}
+
+[ -z "$PRODUCT" ] && choose_product
+case "$PRODUCT" in
+    yoake|serpantinum) ;;
+    *) echo "Unknown --product '$PRODUCT' (expected yoake or serpantinum)." >&2; exit 1 ;;
+esac
 
 RAW_SLUG="${REPO_SLUG:-yorushi-code/yoake}"
 REPO_SLUG="$(printf '%s' "$RAW_SLUG" | tr -d '\r\n\t ' | sed 's/[^a-zA-Z0-9_\/-]//g')"
@@ -46,6 +78,10 @@ if [[ -z "$PROJECT_ROOT" || ! -f "$PROJECT_ROOT/install/modules/deps.sh" || ! -d
     fi
     INSTALL_DIR="$CACHE_BASE/install"
     PROJECT_ROOT="$CACHE_BASE"
+fi
+
+if [ "$PRODUCT" = "serpantinum" ]; then
+    exec bash "$INSTALL_DIR/serpantinum.sh" "${PASSTHROUGH[@]}"
 fi
 
 export YOAKE_DIR="$PROJECT_ROOT/src"

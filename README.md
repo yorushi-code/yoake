@@ -10,9 +10,25 @@ widget or panel means editing `bar/TopBar.qml`, `widgets/WidgetRegistry.qml` or
 everything of ours that can live in `src/quickshell/yoake/` does — so this can
 be rebased onto an upstream that has already rewritten its history once.
 
-**Running it on Fedora: [docs/fedora.md](docs/fedora.md).** Upstream's installer
-refuses to run on anything outside the Arch family; this one also installs on
-Fedora and its derivatives (`bash install/install.sh --yes`).
+## Installing
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/yorushi-code/yoake/master/install/install.sh)"
+```
+
+It asks what to install:
+
+- **yoake**, this fork;
+- **Serpantinum**, clean upstream, installed by upstream's own installer.
+
+Both work on Arch and on Fedora (and their derivatives). Upstream's installer
+refuses anything outside the Arch family; for Serpantinum on Fedora it runs
+behind a small compatibility layer that answers its `pacman` calls with dnf,
+so what it installs is still exactly what upstream ships.
+
+Without questions: `--product yoake --yes` (yoake with defaults), or
+`--product serpantinum` (upstream's own menus follow). Details, and the manual
+path it replaces: **[docs/fedora.md](docs/fedora.md)**.
 
 ## Taking upstream's updates
 

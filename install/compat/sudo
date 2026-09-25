@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Upstream's installer runs `sudo pacman ...`. sudo resolves commands through
+# its own secure_path, which would skip the pacman shim next to this file, so
+# those calls go to the shim directly (it uses the real sudo for dnf itself).
+# Everything else is the real sudo.
+
+case "${1:-}" in
+    pacman|yay|paru)
+        exec "$(dirname "$(realpath "$0")")/$1" "${@:2}"
+        ;;
+esac
+exec /usr/bin/sudo "$@"

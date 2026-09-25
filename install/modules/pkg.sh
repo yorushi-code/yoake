@@ -33,6 +33,9 @@ declare -A FEDORA_NAMES=(
     [wget]=wget2-wget
     [ffmpeg]=ffmpeg-free
     [adw-gtk-theme]=adw-gtk3-theme
+    # Fedora 41+ ships tuned-ppd, which conflicts with power-profiles-daemon;
+    # both provide ppd-service, and either serves the same D-Bus API.
+    [power-profiles-daemon]=ppd-service
     [base-devel]=-
     # The shell's own palette layer replaces matugen (docs/fedora.md).
     [matugen]=-
@@ -43,6 +46,13 @@ declare -A FEDORA_NAMES=(
     # blue light filter is simply unavailable.
     [gpu-screen-recorder]=-
     [wl-gammarelay-rs]=-
+)
+
+# Release downloads for what Fedora does not package (Arch gets both from its
+# repositories or the AUR).
+declare -A RELEASE_URLS=(
+    [satty]="https://github.com/gabm/Satty/releases/latest/download/satty-x86_64-unknown-linux-gnu.tar.gz"
+    [starship]="https://github.com/starship/starship/releases/latest/download/starship-x86_64-unknown-linux-musl.tar.gz"
 )
 
 # Fedora-only additions: fonts the shell names that Arch pulls in otherwise,
@@ -70,6 +80,15 @@ detect_pkg_family() {
 
 PKG_FAMILY="${PKG_FAMILY:-$(detect_pkg_family)}"
 export PKG_FAMILY
+
+# What is being installed: yoake, or clean upstream Serpantinum through its
+# own installer (install/serpantinum.sh). Upstream themes with matugen, which
+# Fedora packages; yoake does not need it.
+PKG_PRODUCT="${PKG_PRODUCT:-yoake}"
+export PKG_PRODUCT
+if [ "$PKG_PRODUCT" = "serpantinum" ]; then
+    FEDORA_NAMES[matugen]=matugen
+fi
 
 # Maps an upstream (Arch) name to this family's name; empty = skip.
 pkg_name() {
@@ -229,15 +248,31 @@ install_release_binary() {
 pkg_install_extra() {
     [ "$PKG_FAMILY" = "fedora" ] || return 0
 
-    if ! command -v satty &>/dev/null; then
-        echo -e "\n\e[36m[ INFO ]\e[0m Installing satty (screenshot annotation) from its release..."
-        install_release_binary "https://github.com/gabm/Satty/releases/latest/download/satty-x86_64-unknown-linux-gnu.tar.gz" satty \
-            || FAILED_PKGS+=("satty")
-    fi
+    local tool
+    for tool in satty starship; do
+        if ! command -v "$tool" &>/dev/null; then
+            echo -e "\n\e[36m[ INFO ]\e[0m Installing $tool from its release..."
+            install_release_binary "${RELEASE_URLS[$tool]}" "$tool" || FAILED_PKGS+=("$tool")
+        fi
+    done
+}
 
-    if ! command -v starship &>/dev/null; then
-        echo -e "\n\e[36m[ INFO ]\e[0m Installing starship (terminal prompt) from its release..."
-        install_release_binary "https://github.com/starship/starship/releases/latest/download/starship-x86_64-unknown-linux-musl.tar.gz" starship \
-            || FAILED_PKGS+=("starship")
+# Installs one upstream (Arch) package name the way this family can: from the
+# repositories, from a release download, or not at all. Used by the pacman
+# shim (install/compat) that lets upstream's own installer run on Fedora.
+pkg_install_compat() {
+    local pkg="$1"
+    if [ -n "${RELEASE_URLS[$pkg]:-}" ]; then
+        command -v "$pkg" &>/dev/null && return 0
+        install_release_binary "${RELEASE_URLS[$pkg]}" "$pkg"
+        return
     fi
+    case "$pkg" in
+        base-devel) return 0 ;;
+    esac
+    if [ -z "$(pkg_name "$pkg")" ]; then
+        echo "  $pkg is not packaged for Fedora; skipped." >&2
+        return 1
+    fi
+    pkg_installed "$pkg" || pkg_install "$pkg"
 }

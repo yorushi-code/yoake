@@ -6,10 +6,35 @@ only build Fedora ships).
 ## Installing
 
 ```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/yorushi-code/yoake/master/install/install.sh)"
+
+# or from a checkout:
 git clone https://github.com/yorushi-code/yoake.git && cd yoake
-bash install/install.sh          # menus: compositors, SDDM, wallpapers
-bash install/install.sh --yes    # no questions: detected compositor (niri if none), SDDM
+bash install/install.sh                          # asks: yoake or Serpantinum
+bash install/install.sh --product yoake --yes    # yoake, no questions
+bash install/install.sh --product serpantinum    # clean upstream, its own menus
 ```
+
+### Clean Serpantinum
+
+`--product serpantinum` (or answering 2) runs `install/serpantinum.sh`: it
+clones `ilyamiro/serpantinum` where upstream's own installer would, and runs
+that installer. On Arch nothing else happens. On Fedora two things do:
+
+- `install/compat/` goes in front of `PATH` for the duration: `pacman` and
+  `yay` shims that answer upstream's queries and installs with dnf, through
+  the same name map as yoake (`install/modules/pkg.sh`), and a `sudo` shim,
+  because sudo's `secure_path` would otherwise bypass them. Nothing is ever
+  removed on Fedora. What Fedora does not package (`gpu-screen-recorder`,
+  `wl-gammarelay-rs`) is reported among upstream's failed packages;
+  `satty` comes from its release.
+- three patches to upstream's cloned installer: `fedora` in its distro
+  allowlist, SDDM's Wayland greeter by default (without Xorg the X11 greeter
+  would leave no login screen), and GPU detection that does not end the
+  installer under `set -e`. Each is checked after it is applied; if upstream
+  has changed the lines they target, the script stops instead of guessing.
+
+### yoake
 
 Run it as your user, not root; it asks for sudo where it needs it. Fedora and
 its derivatives are detected through `/etc/os-release` (`ID`/`ID_LIKE`), and
