@@ -1,12 +1,45 @@
 # Running yoake on Fedora
 
-Upstream's installer does not run here and is not meant to. `check_supported_os()`
-in `install/modules/deps.sh` allowlists Arch and its derivatives and exits 1 on
-anything else, and every package call underneath it is `pacman`/`yay`. This is
-the manual path instead, written down as it was actually walked.
-
 Verified on Fedora 44, niri 26.04, quickshell 0.2.1 (`0.2.1^git20260209`, the
 only build Fedora ships).
+
+## Installing
+
+```bash
+git clone https://github.com/yorushi-code/yoake.git && cd yoake
+bash install/install.sh          # menus: compositors, SDDM, wallpapers
+bash install/install.sh --yes    # no questions: detected compositor (niri if none), SDDM
+```
+
+Run it as your user, not root; it asks for sudo where it needs it. Fedora and
+its derivatives are detected through `/etc/os-release` (`ID`/`ID_LIKE`), and
+every package call goes through `install/modules/pkg.sh`, which maps
+upstream's Arch names to Fedora's and installs everything in one dnf
+transaction. The Arch path is unchanged.
+
+What it sets up, so that nothing has to be done by hand afterwards:
+
+- packages from the Fedora repositories, plus the fonts the shell names
+  (Iosevka Nerd Font downloaded, JetBrains Mono, Font Awesome 6);
+- `satty` and `starship`, which Fedora does not package, from their releases
+  into `~/.local/bin`; Hyprland through the `solopasha/hyprland` COPR, only if
+  Hyprland is chosen;
+- the shell into `~/.local/share/yoake`, the compositor config (the old one
+  backed up), `~/.config/yoake/settings.json`, wallpapers;
+- the equaliser as a PipeWire filter-chain (active from the next login), the
+  yoake night kitty colours, the starship prompt and its hook in fish, bash
+  and zsh (existing files are backed up as `*.bak.<date>`);
+- SDDM with the material-you theme in Wayland mode (Fedora has no Xorg), as
+  the display manager from the next boot.
+
+Deliberately not done: `gpu-screen-recorder` and `wl-gammarelay-rs` are not
+packaged for Fedora and are optional (recording falls back to `wf-recorder`;
+the blue light filter is simply unavailable). Display managers are switched
+for the next boot only: the installer usually runs inside a graphical session,
+which stopping the current display manager would end.
+
+The rest of this document is the manual path, written down as it was walked
+before the installer supported Fedora; it explains what the installer does.
 
 ## Quickshell version
 

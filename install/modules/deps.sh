@@ -53,9 +53,12 @@ REQUIRED_PKGS=(
     "pipewire" "wireplumber" "pipewire-pulse" "pipewire-alsa" "libpulse" "python"
     "imagemagick" "wget" "file" "git" "psmisc"
     "ffmpeg" "fastfetch" "quickshell" "unzip" "python-websockets" "qt6-websockets"
-    "grim" "playerctl" "satty" "xdg-desktop-portal-gtk" "slurp" "wmctrl" "power-profiles-daemon" "easyeffects" "nautilus" "qt5-wayland" "qt5-quickcontrols" "qt5-quickcontrols2" "qt5-graphicaleffects" "qt6-wayland"
-    "qt5ct" "qt6ct" "gpu-screen-recorder" "wf-recorder" "adw-gtk-theme" "wl-gammarelay-rs"
+    "grim" "playerctl" "satty" "xdg-desktop-portal-gtk" "slurp" "wmctrl" "power-profiles-daemon" "nautilus" "qt5-wayland" "qt5-quickcontrols" "qt5-quickcontrols2" "qt5-graphicaleffects" "qt6-wayland"
+    "qt5ct" "qt6ct" "gpu-screen-recorder" "wf-recorder" "adw-gtk-theme" "wl-gammarelay-rs" "starship"
 )
+# easyeffects is gone from the list: the equaliser is a PipeWire filter-chain
+# now (src/quickshell/media/equalizer.sh). starship draws the terminal prompt
+# that config/starship/starship.toml configures.
 
 FAILED_PKGS=()
 
@@ -80,6 +83,11 @@ check_supported_os() {
             fi
         done
 
+        # Fedora and its derivatives (Nobara, Ultramarine...) through dnf.
+        if [ "$PKG_FAMILY" = "fedora" ]; then
+            return 0
+        fi
+
         echo "$(t "installer.os.error_unsupported" "os=$DETECTED_OS")"
         exit 1
     else
@@ -99,42 +107,29 @@ enable_multilib() {
 
 bootstrap_installer_deps() {
     suppress_tty_sleep
-    enable_multilib
-
-    local missing=()
-    for tool in fzf jq curl git pciutils unzip fontconfig base-devel; do
-        if ! command -v "$tool" &>/dev/null; then
-            missing+=("$tool")
-        fi
-    done
-
-    if [ ${#missing[@]} -gt 0 ]; then
-        sudo pacman -Sy --noconfirm --needed "${missing[@]}"
-    fi
-
-    if ! command -v yay &>/dev/null && ! command -v paru &>/dev/null; then
-        local cache_build="${XDG_CACHE_HOME:-"$HOME/.cache"}/yoake-yay-bin"
-        rm -rf "$cache_build"
-        mkdir -p "$cache_build"
-        git clone https://aur.archlinux.org/yay-bin.git "$cache_build"
-        (cd "$cache_build" && makepkg -si --noconfirm)
-        rm -rf "$cache_build"
-    fi
+    [ "$PKG_FAMILY" = "arch" ] && enable_multilib
+    pkg_bootstrap
 }
 
 install_pkg() {
-    local pkg="$1"
-    local safe_jobs="$2"
+    pkg_install "$1" "$2"
+}
 
-    if pacman -Si "$pkg" &>/dev/null; then
-        sudo pacman -S --noconfirm --needed "$pkg"
-    elif command -v yay &>/dev/null; then
-        env CARGO_BUILD_JOBS="$safe_jobs" MAKEFLAGS="-j$safe_jobs" yay -S --noconfirm --needed "$pkg"
-    elif command -v paru &>/dev/null; then
-        env CARGO_BUILD_JOBS="$safe_jobs" MAKEFLAGS="-j$safe_jobs" paru -S --noconfirm --needed "$pkg"
-    else
-        sudo pacman -S --noconfirm --needed "$pkg"
+# The full list for this install: upstream's packages, the chosen
+# compositors, SDDM if selected, and what the family needs on top.
+target_packages() {
+    local list=("${REQUIRED_PKGS[@]}")
+    local comp
+    for comp in "$@"; do
+        list+=("$comp")
+    done
+    if [ "$OPT_SDDM" = true ]; then
+        list+=("sddm" "qt6-declarative" "qt6-svg")
+        # No Xorg on Fedora: SDDM has to run its Wayland greeter (weston).
+        [ "$PKG_FAMILY" = "fedora" ] && list+=("sddm-wayland-generic")
     fi
+    [ "$PKG_FAMILY" = "fedora" ] && list+=("${FEDORA_EXTRA_PKGS[@]}")
+    printf '%s\n' "${list[@]}"
 }
 
 install_fonts() {
@@ -172,26 +167,20 @@ install_dependencies() {
     shift 2 2>/dev/null || true
     local compositors=("$@")
 
-    if pacman -Qq quickshell-git &>/dev/null; then
+    if [ "$PKG_FAMILY" = "arch" ] && pacman -Qq quickshell-git &>/dev/null; then
         yay -R --noconfirm quickshell-git 2>/dev/null || sudo pacman -Rdd --noconfirm quickshell-git 2>/dev/null || true
     fi
 
-    local target_list=("${REQUIRED_PKGS[@]}")
-    for comp in "${compositors[@]}"; do
-        target_list+=("$comp")
-    done
-
-    if [ "$OPT_SDDM" = true ]; then
-        target_list+=("sddm" "qt6-declarative" "qt6-svg")
-    fi
+    local target_list=()
+    mapfile -t target_list < <(target_packages "${compositors[@]}")
 
     if [[ ("$install_state" == "fresh" || "$install_state" == "legacy") && "$is_reinstall" != "true" ]]; then
         echo -e "\n\e[36m[ INFO ]\e[0m $(t "installer.deps.syncing")"
-        sudo pacman -Syyu --noconfirm
+        pkg_sync
     fi
 
     local missing_raw
-    missing_raw=$(pacman -T "${target_list[@]}" 2>/dev/null || true)
+    missing_raw=$(pkg_missing "${target_list[@]}")
 
     local MISSING_PKGS=()
     while IFS= read -r pkg; do
@@ -210,6 +199,11 @@ install_dependencies() {
         [[ $SAFE_JOBS -lt 1 ]] && SAFE_JOBS=1
         [[ $SAFE_JOBS -gt 4 ]] && SAFE_JOBS=4
 
+        if pkg_install_batch "${MISSING_PKGS[@]}"; then
+            echo -e "\n\e[32m[ OK ] ${MISSING_PKGS[*]}\e[0m"
+            MISSING_PKGS=()
+        fi
+
         for pkg in "${MISSING_PKGS[@]}"; do
             echo -e "\n\e[36m=================================================================\e[0m"
             echo -e "\e[34m::\e[0m \e[1m$(t "installer.deps.installing_pkg" "pkg=$pkg")\e[0m"
@@ -225,5 +219,6 @@ install_dependencies() {
         done
     fi
 
+    pkg_install_extra
     install_fonts
 }

@@ -11,7 +11,8 @@ everything of ours that can live in `src/quickshell/yoake/` does — so this can
 be rebased onto an upstream that has already rewritten its history once.
 
 **Running it on Fedora: [docs/fedora.md](docs/fedora.md).** Upstream's installer
-refuses to run on anything outside the Arch family, by design and on purpose.
+refuses to run on anything outside the Arch family; this one also installs on
+Fedora and its derivatives (`bash install/install.sh --yes`).
 
 ## Taking upstream's updates
 
