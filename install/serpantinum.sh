@@ -92,6 +92,9 @@ mapfile -t upstream_pkgs < <(
     source "$UPSTREAM_DIR/install/modules/deps.sh" >/dev/null 2>&1
     printf '%s\n' "${REQUIRED_PKGS[@]}" sddm qt6-declarative qt6-svg sddm-wayland-generic
 )
+# What Arch pulls in with those packages and Fedora splits out: pw-play (the
+# shell's interface sounds) lives in pipewire-utils, and the fonts it names.
+upstream_pkgs+=("${FEDORA_EXTRA_PKGS[@]}")
 if [ ${#upstream_pkgs[@]} -gt 0 ]; then
     missing_pkgs=()
     for pkg in "${upstream_pkgs[@]}"; do
