@@ -45,3 +45,16 @@ if [ -d "$QS_DIR" ]; then
 fi
 
 qs_ensure_cache "focustime"
+
+if [ ! -f "$QS_STATE_DIR/version" ]; then
+    ver=""
+    if [ -f "$YOAKE_DIR/version.txt" ]; then
+        ver="$(cat "$YOAKE_DIR/version.txt" 2>/dev/null | xargs)"
+    elif [ -f "$(dirname "$YOAKE_DIR")/version.txt" ]; then
+        ver="$(cat "$(dirname "$YOAKE_DIR")/version.txt" 2>/dev/null | xargs)"
+    fi
+    [ -z "$ver" ] && ver="${YOAKE_VERSION:-2.0.0}"
+    echo "YOAKE_VERSION=\"$ver\"" > "$QS_STATE_DIR/version"
+fi
+
+[ -f "$QS_STATE_DIR/quickactions/palettes.json" ] || echo "[]" > "$QS_STATE_DIR/quickactions/palettes.json"
