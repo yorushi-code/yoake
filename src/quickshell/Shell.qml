@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import "widgets"
 
 ShellRoot {
     readonly property bool performanceMode: !!(Config.getSetting("general", {}).performance)
@@ -21,6 +22,7 @@ ShellRoot {
     Main {}
     Bar {}
     Lock {}
+    WidgetRedactor {}
 
     Launcher {}
     Clipboard {}    
@@ -55,6 +57,10 @@ ShellRoot {
     }
 
     Component.onCompleted: {
+        Qt.application.organization = "yoake";
+        Qt.application.domain = "yoake.org";
+        Qt.application.name = "yoake";
         FirstLaunch.checkFirstLaunch();
+        SysNotif.checkBattery();
     }
 }

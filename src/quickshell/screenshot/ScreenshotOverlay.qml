@@ -362,9 +362,8 @@ PanelWindow {
         id: audioPrefsFile
         path: Caching.getStateDir("screenshot") + "/audio_prefs"
 
-        // FileView.loaded приходит без аргумента; содержимое -- в text().
         onLoaded: {
-            let content = audioPrefsFile.text().trim();
+            let content = (typeof text === "function" ? text() : "").trim();
             if (content !== "") {
                 let parts = content.split(",");
                 root.deskVol = parts[0] !== undefined && parts[0] !== "" ? parseFloat(parts[0]) : 1.0;
