@@ -59,6 +59,17 @@ migrate_yoake_to_kizashi() {
         if [ -d "$base/yoake" ] && [ ! -e "$base/kizashi" ]; then
             mv "$base/yoake" "$base/kizashi"
         fi
+        # Внутри кэша и состояния своя подпапка на каждый виджет, и у самой
+        # оболочки она тоже называлась yoake.
+        if [ -d "$base/kizashi/yoake" ] && [ ! -e "$base/kizashi/kizashi" ]; then
+            mv "$base/kizashi/yoake" "$base/kizashi/kizashi"
+        fi
+        # Пути к звукам и шрифтам записаны абсолютными: репозиторий мог
+        # переехать вместе с именем (~/codes/yoake -> ~/codes/kizashi).
+        if [ -n "${KIZASHI_DIR:-}" ] && [ -d "$KIZASHI_DIR/quickshell" ] && [ -d "$base/kizashi" ]; then
+            grep -rlI --null "/yoake/src/" "$base/kizashi" 2>/dev/null |
+                xargs -0 -r sed -i "s|[^\"]*/yoake/src/|$KIZASHI_DIR/|g"
+        fi
     done
 
     local eq_dir="${XDG_CONFIG_HOME:-$HOME/.config}/pipewire/pipewire.conf.d"

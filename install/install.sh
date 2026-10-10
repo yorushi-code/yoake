@@ -134,7 +134,7 @@ elif [[ "$INSTALL_STATE" == "fresh" || "$IS_REINSTALL" == true ]]; then
 fi
 
 # Переезд yoake -> kizashi нужен при любой установке, а не только при legacy.
-migrate_yoake_to_kizashi
+KIZASHI_DIR="$PROJECT_ROOT/src" migrate_yoake_to_kizashi
 
 install_dependencies "$INSTALL_STATE" "$IS_REINSTALL" "${SELECTED_COMPOSITORS[@]}"
 
