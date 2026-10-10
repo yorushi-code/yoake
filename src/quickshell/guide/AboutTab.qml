@@ -91,41 +91,12 @@ Item {
                             width: rootObj.s(160)
                             height: width
 
-                            Item {
-                                id: aboutLogoMask
+                            // Живой знак Kizashi вместо картинки-маски: связки
+                            // дышат, по нитям бежит поток, мерцает трещина.
+                            KizashiMark {
                                 anchors.fill: parent
-                                visible: false
-                                layer.enabled: true
-
-                                Image {
-                                    anchors.fill: parent
-                                    source: "file://" + rootObj.appPaths.kizashiDir + "/assets/logo.svg"
-                                    sourceSize: Qt.size(512, 512)
-                                    fillMode: Image.PreserveAspectFit
-                                    smooth: true
-                                    antialiasing: true
-                                }
-                            }
-
-                            Item {
-                                id: aboutLogoColor
-                                anchors.fill: parent
-                                visible: false
-                                layer.enabled: true
-                                layer.smooth: true
-
-                                Rectangle {
-                                    anchors.fill: parent
-                                    color: ThemeBackend.mauve
-                                }
-                            }
-
-                            MultiEffect {
-                                anchors.fill: parent
-                                source: aboutLogoColor
-                                maskEnabled: true
-                                maskSource: aboutLogoMask
-                                autoPaddingEnabled: false
+                                accent: ThemeBackend.red
+                                running: visible
                             }
                         }
 

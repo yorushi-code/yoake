@@ -251,26 +251,21 @@ PanelWindow {
                         scale: 1.0 + (windowContent.breathB * 0.03)
                         opacity: 1.0
 
-                        Image {
-                            id: rawSvgImage
+                        // Живой знак вместо картинки: дыхание связок, поток по
+                        // нитям, ромб и мерцание трещины. Цвет -- из палитры обоев.
+                        KizashiMark {
                             anchors.fill: parent
-                            source: "file://" + Caching.kizashiDir + "/assets/logo.svg"
-                            sourceSize: Qt.size(1024, 1024)
-                            fillMode: Image.PreserveAspectFit
-                            antialiasing: true
-                            mipmap: true
-                            visible: false
-                        }
+                            accent: ThemeBackend.red
+                            running: logotypeWrapper.visible
 
-                        MultiEffect {
-                            source: rawSvgImage
-                            anchors.fill: rawSvgImage
-                            autoPaddingEnabled: true
-
-                            shadowEnabled: true
-                            shadowColor: ThemeBackend.crust
-                            shadowBlur: 15
-                            shadowOpacity: 0.7
+                            layer.enabled: true
+                            layer.effect: MultiEffect {
+                                autoPaddingEnabled: true
+                                shadowEnabled: true
+                                shadowColor: ThemeBackend.crust
+                                shadowBlur: 15
+                                shadowOpacity: 0.7
+                            }
                         }
                     }
                 }

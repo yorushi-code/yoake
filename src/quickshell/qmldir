@@ -68,3 +68,4 @@ singleton KizashiPalette 1.0 kizashi/Palette.qml
 singleton KizashiNet 1.0 kizashi/Net.qml
 singleton Mihomo 1.0 kizashi/Mihomo.qml
 singleton MihomoApi 1.0 kizashi/MihomoApi.qml
+KizashiMark 1.0 kizashi/KizashiMark.qml
