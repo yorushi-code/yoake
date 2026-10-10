@@ -1,4 +1,4 @@
-# yoake
+# kizashi
 
 A Wayland shell, forked from [ilyamiro/serpantinum](https://github.com/ilyamiro/serpantinum)
 and renamed. Fedora and niri, where upstream targets Arch and leads with Hyprland.
