@@ -3,11 +3,11 @@
 with lib;
 
 let
-  cfg = config.programs.yoake;
+  cfg = config.programs.kizashi;
 in
 {
-  options.programs.yoake = {
-    enable = mkEnableOption "system-level support for the Yoake desktop shell";
+  options.programs.kizashi = {
+    enable = mkEnableOption "system-level support for the Kizashi desktop shell";
   };
 
   config = mkIf cfg.enable {

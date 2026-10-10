@@ -30,6 +30,6 @@ Item {
         iconFontSize: barWindow ? barWindow.s(root.isCompact ? 14 : 15) : (root.isCompact ? 14 : 15)
         accentColor: root.isCompact ? Qt.lighter(ThemeBackend.surface0, 1.18) : ThemeBackend.surface0
         textColor: isHoveredOrHighlighted ? ThemeBackend.text : (root.isCompact ? ThemeBackend.subtext0 : ThemeBackend.overlay2)
-        onClicked: Quickshell.execDetached(["bash", "-c", Caching.yoakeDir + "/scripts/qs_manager.sh toggle guide"])
+        onClicked: Quickshell.execDetached(["bash", "-c", Caching.kizashiDir + "/scripts/qs_manager.sh toggle guide"])
     }
 }

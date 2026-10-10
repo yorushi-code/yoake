@@ -62,7 +62,7 @@ Item {
                 }
             }
         }
-        Quickshell.execDetached(["yoake", "ipc", "call", "main", "clearNotifications"]);
+        Quickshell.execDetached(["kizashi", "ipc", "call", "main", "clearNotifications"]);
     }
 
     Timer {
@@ -223,7 +223,7 @@ Item {
                         size: root.emptyGraphicSize
                         cornerRadius: root.s(0)
                         imageRadius: root.s(0)
-                        source: Caching.yoakeDir ? ("file://" + Caching.yoakeDir + "/assets/pushy.gif") : Qt.resolvedUrl("../../assets/pushy.gif")
+                        source: Caching.kizashiDir ? ("file://" + Caching.kizashiDir + "/assets/pushy.gif") : Qt.resolvedUrl("../../assets/pushy.gif")
                         isGif: true
                         playing: true
                         fillMode: Image.PreserveAspectFit
@@ -294,7 +294,7 @@ Item {
                         let app = (appn || "").toLowerCase().trim();
                         if (app === "weather") return "weather";
                         if (app === "screenshot" || app === "screen recorder") return "screenshot";
-                        if (app === "update" || app === "updater" || app === "yoake updater") return "update";
+                        if (app === "update" || app === "updater" || app === "kizashi updater") return "update";
                         return "default";
                     }
 
@@ -434,7 +434,7 @@ Item {
                             let app = appn.toLowerCase().trim();
                             if (app === "weather") return "../../notifications/types/Weather.qml";
                             if (app === "screenshot" || app === "screen recorder") return "../../notifications/types/Screenshot.qml";
-                            if (app === "update" || app === "updater" || app === "yoake updater") return "../../notifications/types/Update.qml";
+                            if (app === "update" || app === "updater" || app === "kizashi updater") return "../../notifications/types/Update.qml";
                             return "../../notifications/types/Default.qml";
                         }
                         onLoaded: {
@@ -918,7 +918,7 @@ Item {
                                                     let app = appn.toLowerCase().trim();
                                                     if (app === "weather") return "../../notifications/types/Weather.qml";
                                                     if (app === "screenshot" || app === "screen recorder") return "../../notifications/types/Screenshot.qml";
-                                                    if (app === "update" || app === "updater" || app === "yoake updater") return "../../notifications/types/Update.qml";
+                                                    if (app === "update" || app === "updater" || app === "kizashi updater") return "../../notifications/types/Update.qml";
                                                     return "../../notifications/types/Default.qml";
                                                 }
 

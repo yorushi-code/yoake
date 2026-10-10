@@ -1093,7 +1093,7 @@ Variants {
                         property vector2d itemSize: Qt.vector2d(width, height)
                         property real cornerIndex: 2.0
                         property color color: Qt.rgba(ThemeBackend.base.r, ThemeBackend.base.g, ThemeBackend.base.b, 0.95)
-                        fragmentShader: "file://" + Caching.yoakeDir + "/assets/shaders/ui/corner_cutout.frag.qsb"
+                        fragmentShader: "file://" + Caching.kizashiDir + "/assets/shaders/ui/corner_cutout.frag.qsb"
                     }
 
                     ShaderEffect {
@@ -1105,7 +1105,7 @@ Variants {
                         property vector2d itemSize: Qt.vector2d(width, height)
                         property real cornerIndex: 0.0
                         property color color: Qt.rgba(ThemeBackend.base.r, ThemeBackend.base.g, ThemeBackend.base.b, 0.95)
-                        fragmentShader: "file://" + Caching.yoakeDir + "/assets/shaders/ui/corner_cutout.frag.qsb"
+                        fragmentShader: "file://" + Caching.kizashiDir + "/assets/shaders/ui/corner_cutout.frag.qsb"
                     }
                     Rectangle {
                         id: morphingBackground

@@ -1,12 +1,12 @@
-CONFIG_DIR="$HOME/.config/yoake"
+CONFIG_DIR="$HOME/.config/kizashi"
 CONFIG_FILE="$CONFIG_DIR/settings.json"
 
-init_yoake_config() {
+init_kizashi_config() {
     local project_root="$1"
     local wallpaper_dir="$2"
     local install_state="$3"
     local is_reinstall="$4"
-    local template_json="$project_root/config/yoake/settings.json"
+    local template_json="$project_root/config/kizashi/settings.json"
     local script_path="$project_root/src/scripts/location.sh"
 
     if [[ "$install_state" == "current" && "$is_reinstall" != "true" ]]; then
@@ -52,8 +52,8 @@ init_yoake_config() {
     if [[ "$is_reinstall" == "true" || "$install_state" == "fresh" || "$install_state" == "legacy" ]]; then
         if [ -f "$script_path" ]; then
             bash "$script_path" --refresh >/dev/null 2>&1 || true
-        elif [ -f "$HOME/.local/share/yoake/src/scripts/location.sh" ]; then
-            bash "$HOME/.local/share/yoake/src/scripts/location.sh" --refresh >/dev/null 2>&1 || true
+        elif [ -f "$HOME/.local/share/kizashi/src/scripts/location.sh" ]; then
+            bash "$HOME/.local/share/kizashi/src/scripts/location.sh" --refresh >/dev/null 2>&1 || true
         fi
     fi
 }

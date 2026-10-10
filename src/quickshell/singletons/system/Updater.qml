@@ -65,11 +65,11 @@ Item {
     }
 
     function saveNotifiedVersion(ver) {
-        if (typeof Caching === "undefined" || !Caching.yoakeDir) return;
+        if (typeof Caching === "undefined" || !Caching.kizashiDir) return;
         let stateDir = Caching.getStateDir();
         Quickshell.execDetached([
             "python3",
-            Caching.yoakeDir + "/scripts/updater.py",
+            Caching.kizashiDir + "/scripts/updater.py",
             "--state-dir",
             stateDir,
             "--save-notified",
@@ -78,7 +78,7 @@ Item {
     }
 
     function sendNotification() {
-        let serpDir = (typeof Caching !== "undefined" && Caching.yoakeDir) ? Caching.yoakeDir : "";
+        let serpDir = (typeof Caching !== "undefined" && Caching.kizashiDir) ? Caching.kizashiDir : "";
         let guideDir = (typeof Caching !== "undefined") ? Caching.getCacheDir("guide") : "";
         let appName = I18n.t("updater.notification.app_name");
         let actionText = I18n.t("updater.notification.action_open_guide");
@@ -103,7 +103,7 @@ Item {
 
     function checkUpdate() {
         if (typeof SystemInfo !== "undefined" && SystemInfo.osName.toLowerCase().indexOf("nixos") !== -1) return;
-        if (typeof Caching === "undefined" || !Caching.yoakeDir) return;
+        if (typeof Caching === "undefined" || !Caching.kizashiDir) return;
         if (updateProc.running) return;
         root.isChecking = true;
         updateProc.running = true;
@@ -111,14 +111,14 @@ Item {
 
     function scheduleInitialCheck() {
         if (typeof SystemInfo !== "undefined" && SystemInfo.osName.toLowerCase().indexOf("nixos") !== -1) return;
-        if (typeof Caching === "undefined" || !Caching.yoakeDir) return;
+        if (typeof Caching === "undefined" || !Caching.kizashiDir) return;
         if (checkDelayProc.running) return;
         checkDelayProc.running = true;
     }
 
     FileView {
         id: pkgVersionFileView
-        path: (typeof Caching !== "undefined" && Caching.yoakeDir ? Caching.yoakeDir : "") + "/version.txt"
+        path: (typeof Caching !== "undefined" && Caching.kizashiDir ? Caching.kizashiDir : "") + "/version.txt"
         onFileChanged: {
             pkgVersionFileView.reload();
         }
@@ -145,8 +145,8 @@ Item {
             let lines = content.split("\n");
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i].trim();
-                if (line.indexOf("YOAKE_VERSION=") === 0) {
-                    let v = line.substring("YOAKE_VERSION=".length).replace(/["']/g, "").trim();
+                if (line.indexOf("KIZASHI_VERSION=") === 0) {
+                    let v = line.substring("KIZASHI_VERSION=".length).replace(/["']/g, "").trim();
                     if (v) {
                         root.stateVersion = v;
                         root.syncLocalVersion();
@@ -189,7 +189,7 @@ Item {
         running: false
         command: [
             "python3",
-            (typeof Caching !== "undefined" ? Caching.yoakeDir : "") + "/scripts/updater.py",
+            (typeof Caching !== "undefined" ? Caching.kizashiDir : "") + "/scripts/updater.py",
             "--state-dir",
             (typeof Caching !== "undefined" ? Caching.getStateDir() : ""),
             "--delay"
@@ -213,7 +213,7 @@ Item {
         running: false
         command: [
             "python3",
-            (typeof Caching !== "undefined" ? Caching.yoakeDir : "") + "/scripts/updater.py",
+            (typeof Caching !== "undefined" ? Caching.kizashiDir : "") + "/scripts/updater.py",
             "--state-dir",
             (typeof Caching !== "undefined" ? Caching.getStateDir() : "")
         ]

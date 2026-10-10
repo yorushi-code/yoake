@@ -42,7 +42,7 @@ function getWidgetLauncherEntries(i18n) {
         {
             id: "guide",
             name: tr("widgets.guide.name", "Settings"),
-            description: tr("widgets.guide.desc", "Yoake settings"),
+            description: tr("widgets.guide.desc", "Kizashi settings"),
             icon: "help-browser",
             fontIcon: "󰋖"
         },

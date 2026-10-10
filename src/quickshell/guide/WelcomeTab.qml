@@ -147,7 +147,7 @@ Item {
                     anchors.centerIn: parent
                     width: rootObj.s(210)
                     height: rootObj.s(210)
-                    source: "file://" + rootObj.appPaths.yoakeDir + "/assets/logo.svg"
+                    source: "file://" + rootObj.appPaths.kizashiDir + "/assets/logo.svg"
                     sourceSize: Qt.size(width, height)
                     fillMode: Image.PreserveAspectFit
                     smooth: true
@@ -180,7 +180,7 @@ Item {
                     property color baseColor: ThemeBackend.mauve
                     property vector4d params: Qt.vector4d(rootObj.s(12), 0.0, 0.0, 0.0)
 
-                    fragmentShader: "file://" + Caching.yoakeDir + "/assets/shaders/fluid/logo_water_wave.frag.qsb"
+                    fragmentShader: "file://" + Caching.kizashiDir + "/assets/shaders/fluid/logo_water_wave.frag.qsb"
                 }
             }
 

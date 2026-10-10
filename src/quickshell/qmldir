@@ -12,7 +12,7 @@ Idle 1.0 idle/Idle.qml
 Lock 1.0 lock/Lock.qml
 
 Start 1.0 serp/Start.qml
-Yoake 1.0 serp/Yoake.qml
+Kizashi 1.0 serp/Kizashi.qml
 
 Osd 1.0 popouts/Osd.qml
 PopoutManager 1.0 popouts/PopoutManager.qml

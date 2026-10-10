@@ -249,7 +249,7 @@ deploy_package() {
     shift 5
     local COMPOSITORS=("$@")
 
-    local TARGET_BASE="$HOME/.local/share/yoake"
+    local TARGET_BASE="$HOME/.local/share/kizashi"
     local BIN_DIR="$HOME/.local/bin"
 
     local is_update=false
@@ -432,13 +432,13 @@ deploy_package() {
         fi
     fi
 
-    if [ -f "$TARGET_BASE/bin/yoake" ]; then
-        ln -sf "$TARGET_BASE/bin/yoake" "$BIN_DIR/yoake"
-        sudo ln -sf "$TARGET_BASE/bin/yoake" /usr/local/bin/yoake 2>/dev/null || true
+    if [ -f "$TARGET_BASE/bin/kizashi" ]; then
+        ln -sf "$TARGET_BASE/bin/kizashi" "$BIN_DIR/kizashi"
+        sudo ln -sf "$TARGET_BASE/bin/kizashi" /usr/local/bin/kizashi 2>/dev/null || true
     fi
 
-    if [ -f "$TARGET_BASE/bin/yoaked" ]; then
-        ln -sf "$TARGET_BASE/bin/yoaked" "$BIN_DIR/yoaked"
-        sudo ln -sf "$TARGET_BASE/bin/yoaked" /usr/local/bin/yoaked 2>/dev/null || true
+    if [ -f "$TARGET_BASE/bin/kizashid" ]; then
+        ln -sf "$TARGET_BASE/bin/kizashid" "$BIN_DIR/kizashid"
+        sudo ln -sf "$TARGET_BASE/bin/kizashid" /usr/local/bin/kizashid 2>/dev/null || true
     fi
 }

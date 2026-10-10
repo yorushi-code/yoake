@@ -1242,7 +1242,7 @@ Variants {
                                 return 1.0; // top
                             }
                             property color color: ThemeBackend.base
-                            fragmentShader: "file://" + Caching.yoakeDir + "/assets/shaders/ui/corner_cutout.frag.qsb"
+                            fragmentShader: "file://" + Caching.kizashiDir + "/assets/shaders/ui/corner_cutout.frag.qsb"
                         }
 
                         ShaderEffect {
@@ -1268,7 +1268,7 @@ Variants {
                                 return 0.0; // top
                             }
                             property color color: ThemeBackend.base
-                            fragmentShader: "file://" + Caching.yoakeDir + "/assets/shaders/ui/corner_cutout.frag.qsb"
+                            fragmentShader: "file://" + Caching.kizashiDir + "/assets/shaders/ui/corner_cutout.frag.qsb"
                         }
                     }
 

@@ -41,8 +41,8 @@ Item {
     property color maroon: "#eba0ac"
     property color teal: "#94e2d5"
 
-    property string configPath: Quickshell.env("QS_COLORS_JSON") ?? "~/.local/state/yoake/qs_colors.json"
-    property string matugenConfigPath: (typeof Caching !== "undefined" && Caching.stateDir ? Caching.stateDir : ((Quickshell.env("HOME") ?? "") + "/.local/state/yoake")) + "/qs_matugen_colors.json"
+    property string configPath: Quickshell.env("QS_COLORS_JSON") ?? "~/.local/state/kizashi/qs_colors.json"
+    property string matugenConfigPath: (typeof Caching !== "undefined" && Caching.stateDir ? Caching.stateDir : ((Quickshell.env("HOME") ?? "") + "/.local/state/kizashi")) + "/qs_matugen_colors.json"
 
     property bool _readInProgress: false
     property var matugenColors: null
@@ -53,8 +53,8 @@ Item {
 
     FontLoader {
         id: iconFontLoader
-        source: (typeof Caching !== "undefined" && Caching.yoakeDir && Caching.yoakeDir !== "")
-            ? ("file://" + Caching.yoakeDir + "/assets/fonts/SymbolsNerdFontMono-Regular.ttf")
+        source: (typeof Caching !== "undefined" && Caching.kizashiDir && Caching.kizashiDir !== "")
+            ? ("file://" + Caching.kizashiDir + "/assets/fonts/SymbolsNerdFontMono-Regular.ttf")
             : ""
     }
 
@@ -110,9 +110,9 @@ Item {
         property bool forceRescan: false
 
         command: {
-            let sys = Caching.yoakeDir ? (Caching.yoakeDir + "/assets/fonts") : "";
-            let usr = Caching.stateDir ? (Caching.stateDir + "/fonts") : (Caching.home + "/.local/state/yoake/fonts");
-            let cacheFile = Caching.stateDir ? (Caching.stateDir + "/fonts_cache.txt") : (Caching.home + "/.local/state/yoake/fonts_cache.txt");
+            let sys = Caching.kizashiDir ? (Caching.kizashiDir + "/assets/fonts") : "";
+            let usr = Caching.stateDir ? (Caching.stateDir + "/fonts") : (Caching.home + "/.local/state/kizashi/fonts");
+            let cacheFile = Caching.stateDir ? (Caching.stateDir + "/fonts_cache.txt") : (Caching.home + "/.local/state/kizashi/fonts_cache.txt");
             let force = forceRescan ? "true" : "false";
 
             let cmd = "CACHE=\"" + cacheFile + "\"; ";

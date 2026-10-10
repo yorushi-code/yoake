@@ -7,7 +7,7 @@ import "../../"
 Item {
     id: root
 
-    readonly property string i18nDir: Caching.yoakeDir + "/assets/languages"
+    readonly property string i18nDir: Caching.kizashiDir + "/assets/languages"
     property string currentLang: systemLanguage()
     property var translations: ({})
     property bool isReady: false

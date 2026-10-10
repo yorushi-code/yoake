@@ -152,7 +152,7 @@ Item {
             property color accentColor: circleRoot.accentColor
             property vector4d params: Qt.vector4d(barWindow ? barWindow.s(0.9) : 0.9, 0.0, 0.0, 0.0)
 
-            fragmentShader: "file://" + Caching.yoakeDir + "/assets/shaders/gauges/circular_wave_gauge.frag.qsb"
+            fragmentShader: "file://" + Caching.kizashiDir + "/assets/shaders/gauges/circular_wave_gauge.frag.qsb"
         }
 
         Text {

@@ -1,7 +1,7 @@
 {
   "guide": {
     "about": {
-      "title": "Yoake",
+      "title": "Kizashi",
       "loading": "Загрузка...",
       "unknown": "Неизвестно",
       "version_by": "v{version} • от {author}",
@@ -457,7 +457,7 @@
     "theme": {
       "font": {
         "title": "Шрифт",
-        "desc": "Выберите шрифт по умолчанию для yoake",
+        "desc": "Выберите шрифт по умолчанию для kizashi",
         "select": "Выбрать..."
       },
       "radius": {
@@ -1006,7 +1006,7 @@
     }
   },
   "start": {
-    "title": "Yoake",
+    "title": "Kizashi",
     "made_by": "Создано @{author}",
     "welcome": "Добро пожаловать",
     "tagline": "Оболочка рабочего стола, созданная для",
@@ -1141,7 +1141,7 @@
     },
     "guide": {
       "name": "Настройки",
-      "desc": "Настройки yoake"
+      "desc": "Настройки kizashi"
     },
     "calendar": {
       "name": "Календарь и часы",
@@ -1233,7 +1233,7 @@
     }
   },
   "cli": {
-    "usage": "Использование: yoake [команда] [опции...]",
+    "usage": "Использование: kizashi [команда] [опции...]",
     "description": "Оболочка рабочего стола для композиторов wayland.",
     "commands": "Команды:",
     "script_commands": "Команды скриптов:",
@@ -1246,23 +1246,23 @@
     "version_desc": "Показать информацию о версии и выйти",
     "help_desc": "Показать эту справку и выйти",
     "examples": "Примеры:",
-    "daemon_stopped": "Служба yoake остановлена.",
-    "starting_daemon": "Служба не запущена. Запуск yoaked в фоновом режиме...",
+    "daemon_stopped": "Служба kizashi остановлена.",
+    "starting_daemon": "Служба не запущена. Запуск kizashid в фоновом режиме...",
     "error_missing_qml": "Ошибка: не указана цель для запуска.",
-    "launch_usage": "Использование: yoake launch <start|widgetredactor> [аргументы...]",
+    "launch_usage": "Использование: kizashi launch <start|widgetredactor> [аргументы...]",
     "error_qml_not_found": "Ошибка: не удалось найти {NAME}.qml в {DIR}",
     "error_shell_qml_not_found": "Ошибка: не удалось определить путь к shell.qml в {DIR}",
     "error_unknown_command": "Ошибка: неизвестная команда '{CMD}'.",
     "error_unknown_target": "Ошибка: неизвестная цель '{TARGET}'.",
     "launch_help": {
-      "usage": "Использование: yoake launch <start|widgetredactor> [аргументы...]",
+      "usage": "Использование: kizashi launch <start|widgetredactor> [аргументы...]",
       "description": "Запуск автономных компонентов напрямую в режиме runner.",
       "available_targets": "Доступные цели:",
       "target_start": "Запустить интерфейс начальной настройки",
       "target_widgetredactor": "Запустить интерфейс редактора виджетов рабочего стола"
     },
     "msg_help": {
-      "usage": "Использование: yoake msg <команда|рабочеепространство> [аргументы...]",
+      "usage": "Использование: kizashi msg <команда|рабочеепространство> [аргументы...]",
       "description": "Отправка сообщений разметки, рабочих пространств и управления окнами напрямую.",
       "available_commands": "Доступные сообщения:",
       "cmd_workspace": "Переключиться на рабочее пространство <номер> (добавьте 'move', чтобы переместить активное окно)",
@@ -1271,7 +1271,7 @@
       "cmd_close": "Закрыть любой активный оверлей оболочки"
     },
     "ipc_help": {
-      "usage": "Использование: yoake ipc call <цель> <метод> [аргументы...]",
+      "usage": "Использование: kizashi ipc call <цель> <метод> [аргументы...]",
       "description": "Отправить вызов IPC напрямую запущенному экземпляру quickshell."
     },
     "scripts": {
@@ -1292,11 +1292,11 @@
   },
   "daemon": {
     "already_running": "Служба уже запущена. Выход...",
-    "shutting_down": "Завершение работы службы yoake...",
-    "launching": "Запуск службы yoake...",
+    "shutting_down": "Завершение работы службы kizashi...",
+    "launching": "Запуск службы kizashi...",
     "cli": {
-      "usage": "Использование: yoaked <команда> [опции...]",
-      "description": "Фоновая служба для оболочки рабочего стола yoake.",
+      "usage": "Использование: kizashid <команда> [опции...]",
+      "description": "Фоновая служба для оболочки рабочего стола kizashi.",
       "commands": "Команды:",
       "cmd_start": "Запустить службу и фоновые процессы",
       "cmd_stop": "Остановить работающую службу",
@@ -1305,9 +1305,9 @@
       "opt_verbose": "Включить подробный вывод логов",
       "opt_version": "Показать информацию о версии и выйти",
       "opt_help": "Показать эту справку и выйти",
-      "stopped": "Служба yoake остановлена.",
-      "status_running": "Служба yoake запущена (PID: {PID}).",
-      "status_stopped": "Служба yoake не запущена.",
+      "stopped": "Служба kizashi остановлена.",
+      "status_running": "Служба kizashi запущена (PID: {PID}).",
+      "status_stopped": "Служба kizashi не запущена.",
       "unknown_arg": "Неизвестный аргумент: {ARG}"
     }
   },
@@ -1322,7 +1322,7 @@
     },
     "os": {
       "error_root": "Ошибка: не запускайте этот скрипт от root/sudo. Запустите от обычного пользователя.",
-      "error_unsupported": "Неподдерживаемая ОС ({os}). Yoake поддерживает только arch linux и его производные.",
+      "error_unsupported": "Неподдерживаемая ОС ({os}). Kizashi поддерживает только arch linux и его производные.",
       "error_not_found": "Не удалось определить ОС. /etc/os-release не найден.",
       "unknown_cpu": "Неизвестный процессор",
       "unknown_gpu": "Неизвестно / виртуальная машина",
@@ -1378,9 +1378,9 @@
       "tagline": "Оболочка рабочего стола, созданная для вас",
       "support_creator": "Поддержать автора:",
       "buy_coffee": "Если вам нравится этот проект, угостите автора кофе!",
-      "installed_success": "✔ Yoake {ver} ({commit}) успешно установлен.",
+      "installed_success": "✔ Kizashi {ver} ({commit}) успешно установлен.",
       "failed_packages": "При установке следующих пакетов возникли ошибки:",
-      "restart_prompt": "Перезапустите композитор или выполните 'yoaked start' для начала работы.",
+      "restart_prompt": "Перезапустите композитор или выполните 'kizashid start' для начала работы.",
       "ask_reboot": "Перезагрузить систему сейчас? [y/n] "
     },
     "deps": {

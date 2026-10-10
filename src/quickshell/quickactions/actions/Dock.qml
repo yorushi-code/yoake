@@ -73,7 +73,7 @@ Item {
 
         Quickshell.execDetached(["python3", Caching.qsDir + "/applauncher/app_fetcher.py", "--log", appName]);
         Quickshell.execDetached(["bash", "-c", loggedCmd]);
-        Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/qs_manager.sh", "close"]);
+        Quickshell.execDetached(["bash", Caching.kizashiDir + "/scripts/qs_manager.sh", "close"]);
     }
 
     Item {

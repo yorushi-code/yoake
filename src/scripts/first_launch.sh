@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
-YOAKE_DIR="$(dirname "$SCRIPT_DIR")"
+KIZASHI_DIR="$(dirname "$SCRIPT_DIR")"
 
 source "$SCRIPT_DIR/caching.sh" 2>/dev/null || true
 source "$SCRIPT_DIR/config.sh" 2>/dev/null || true
 
-STATE_DIR="${QS_STATE_DIR:-$HOME/.local/state/yoake}"
+STATE_DIR="${QS_STATE_DIR:-$HOME/.local/state/kizashi}"
 FLAG_FILE="$STATE_DIR/first_launch.done"
 
 check_status() {
@@ -30,19 +30,19 @@ check_status() {
     fi
 
     START_QML=""
-    if [ -f "$YOAKE_DIR/quickshell/serp/Start.qml" ]; then
-        START_QML="$YOAKE_DIR/quickshell/serp/Start.qml"
-    elif [ -f "$YOAKE_DIR/quickshell/Start.qml" ]; then
-        START_QML="$YOAKE_DIR/quickshell/Start.qml"
+    if [ -f "$KIZASHI_DIR/quickshell/serp/Start.qml" ]; then
+        START_QML="$KIZASHI_DIR/quickshell/serp/Start.qml"
+    elif [ -f "$KIZASHI_DIR/quickshell/Start.qml" ]; then
+        START_QML="$KIZASHI_DIR/quickshell/Start.qml"
     else
-        START_QML="$(find "$YOAKE_DIR/quickshell" -type f -name "Start.qml" 2>/dev/null | head -n 1)"
+        START_QML="$(find "$KIZASHI_DIR/quickshell" -type f -name "Start.qml" 2>/dev/null | head -n 1)"
     fi
 
     echo "FIRST|$RANDOM_WP|$START_QML"
 }
 
 open_guide() {
-    local script_path="$YOAKE_DIR/scripts/qs_manager.sh"
+    local script_path="$KIZASHI_DIR/scripts/qs_manager.sh"
     if [ -f "$script_path" ]; then
         bash "$script_path" open guide
     fi

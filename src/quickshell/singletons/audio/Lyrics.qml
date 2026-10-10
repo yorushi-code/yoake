@@ -23,8 +23,8 @@ Item {
     function getMemCache() {
         try {
             if (typeof globalThis !== "undefined" && globalThis) {
-                if (!globalThis._yoakeLyrics) globalThis._yoakeLyrics = {};
-                return globalThis._yoakeLyrics;
+                if (!globalThis._kizashiLyrics) globalThis._kizashiLyrics = {};
+                return globalThis._kizashiLyrics;
             }
         } catch(e) {}
         if (!root.localCache) root.localCache = {};
@@ -756,7 +756,7 @@ Item {
         let url = "https://lrclib.net/api/get?" + params;
         let xhr = new XMLHttpRequest();
         xhr.open("GET", url);
-        xhr.setRequestHeader("Lrclib-Client", "yoake-shell");
+        xhr.setRequestHeader("Lrclib-Client", "kizashi-shell");
 
         xhr.onreadystatechange = function() {
             if (xhr.readyState !== XMLHttpRequest.DONE) return;
@@ -796,7 +796,7 @@ Item {
         let url = "https://lrclib.net/api/search?q=" + encodeURIComponent(uniq[idx]);
         let xhr = new XMLHttpRequest();
         xhr.open("GET", url);
-        xhr.setRequestHeader("Lrclib-Client", "yoake-shell");
+        xhr.setRequestHeader("Lrclib-Client", "kizashi-shell");
 
         xhr.onreadystatechange = function() {
             if (xhr.readyState !== XMLHttpRequest.DONE) return;
@@ -833,7 +833,7 @@ Item {
         let url = "https://lrclib.net/api/get?" + params;
         let xhr = new XMLHttpRequest();
         xhr.open("GET", url);
-        xhr.setRequestHeader("Lrclib-Client", "yoake-shell");
+        xhr.setRequestHeader("Lrclib-Client", "kizashi-shell");
 
         xhr.onreadystatechange = function() {
             if (xhr.readyState !== XMLHttpRequest.DONE) return;
@@ -898,7 +898,7 @@ Item {
         command: [
             "bash",
             "-c",
-            'CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/yoake/lyrics"; HASH=$(echo -n "$1" | md5sum | cut -d" " -f1); FILE="$CACHE_DIR/${HASH}.json"; if [ -f "$FILE" ] && [ -s "$FILE" ]; then cat "$FILE"; fi',
+            'CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/kizashi/lyrics"; HASH=$(echo -n "$1" | md5sum | cut -d" " -f1); FILE="$CACHE_DIR/${HASH}.json"; if [ -f "$FILE" ] && [ -s "$FILE" ]; then cat "$FILE"; fi',
             "--",
             targetKey
         ]
@@ -933,7 +933,7 @@ Item {
         command: [
             "bash",
             "-c",
-            'CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/yoake/lyrics"; mkdir -p "$CACHE_DIR"; HASH=$(echo -n "$1" | md5sum | cut -d" " -f1); printf "%s" "$2" > "$CACHE_DIR/${HASH}.json"',
+            'CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/kizashi/lyrics"; mkdir -p "$CACHE_DIR"; HASH=$(echo -n "$1" | md5sum | cut -d" " -f1); printf "%s" "$2" > "$CACHE_DIR/${HASH}.json"',
             "--",
             pendingKey,
             pendingData

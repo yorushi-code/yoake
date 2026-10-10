@@ -105,7 +105,7 @@ Item {
             property vector4d weights2: Qt.vector4d(w(8), w(9), w(10), w(11))
             property vector4d params: Qt.vector4d(Math.min(width, height) * 0.435, Math.min(width, height) * 0.042, 0.0, 0.0)
 
-            fragmentShader: "file://" + Caching.yoakeDir + "/assets/shaders/gauges/clock_lumen_dial.frag.qsb"
+            fragmentShader: "file://" + Caching.kizashiDir + "/assets/shaders/gauges/clock_lumen_dial.frag.qsb"
         }
 
         Item {

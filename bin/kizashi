@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 
 BIN_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
-if [ -z "$YOAKE_DIR" ]; then
-    export YOAKE_DIR="$(dirname "$BIN_DIR")/src"
+if [ -z "$KIZASHI_DIR" ]; then
+    export KIZASHI_DIR="$(dirname "$BIN_DIR")/src"
 fi
 
-source "$YOAKE_DIR/scripts/caching.sh"
-source "$YOAKE_DIR/scripts/config.sh"
-source "$YOAKE_DIR/scripts/i18n.sh"
+source "$KIZASHI_DIR/scripts/caching.sh"
+source "$KIZASHI_DIR/scripts/config.sh"
+source "$KIZASHI_DIR/scripts/i18n.sh"
 
 if [ -z "$MAIN_QML" ]; then
-    export MAIN_QML="$(find "$YOAKE_DIR/quickshell" -type f \( -name "Shell.qml" -o -name "Bar.qml" \) 2>/dev/null | head -n 1)"
+    export MAIN_QML="$(find "$KIZASHI_DIR/quickshell" -type f \( -name "Shell.qml" -o -name "Bar.qml" \) 2>/dev/null | head -n 1)"
 fi
 
 is_alive() {
@@ -57,21 +57,21 @@ terminate_and_wait() {
 }
 
 get_installed_version() {
-    local version_file="${XDG_STATE_HOME:-$HOME/.local/state}/yoake/version"
+    local version_file="${XDG_STATE_HOME:-$HOME/.local/state}/kizashi/version"
     local ver=""
     if [ -f "$version_file" ]; then
-        ver=$(awk -F= '/^YOAKE_VERSION=/{gsub(/["'\'' ]/, "", $2); print $2}' "$version_file")
+        ver=$(awk -F= '/^KIZASHI_VERSION=/{gsub(/["'\'' ]/, "", $2); print $2}' "$version_file")
     fi
-    if [ -z "$ver" ] && [ -n "$YOAKE_VERSION" ]; then
-        ver="$YOAKE_VERSION"
+    if [ -z "$ver" ] && [ -n "$KIZASHI_VERSION" ]; then
+        ver="$KIZASHI_VERSION"
     fi
     if [ -z "$ver" ]; then
-        if [ -n "$YOAKE_DIR" ] && [ -f "$YOAKE_DIR/version.txt" ]; then
-            ver=$(cat "$YOAKE_DIR/version.txt" 2>/dev/null | xargs)
+        if [ -n "$KIZASHI_DIR" ] && [ -f "$KIZASHI_DIR/version.txt" ]; then
+            ver=$(cat "$KIZASHI_DIR/version.txt" 2>/dev/null | xargs)
         elif [ -f "$(dirname "$BIN_DIR")/version.txt" ]; then
             ver=$(cat "$(dirname "$BIN_DIR")/version.txt" 2>/dev/null | xargs)
-        elif [ -n "$YOAKE_DIR" ] && [ -f "$(dirname "$YOAKE_DIR")/version.txt" ]; then
-            ver=$(cat "$(dirname "$YOAKE_DIR")/version.txt" 2>/dev/null | xargs)
+        elif [ -n "$KIZASHI_DIR" ] && [ -f "$(dirname "$KIZASHI_DIR")/version.txt" ]; then
+            ver=$(cat "$(dirname "$KIZASHI_DIR")/version.txt" 2>/dev/null | xargs)
         fi
     fi
     if [ -z "$ver" ]; then
@@ -120,15 +120,15 @@ show_help() {
     echo "  -h, --help                   $(t "cli.help_desc")"
     echo ""
     echo "$(t "cli.examples")"
-    echo "  yoake launch start"
-    echo "  yoake launch widgetredactor"
-    echo "  yoake msg workspace 1"
-    echo "  yoake msg workspace 2 move"
-    echo "  yoake msg open network wifi"
-    echo "  yoake msg toggle launcher"
-    echo "  yoake msg toggle clipboard"
-    echo "  yoake weather --current-temp"
-    echo "  yoake kill"
+    echo "  kizashi launch start"
+    echo "  kizashi launch widgetredactor"
+    echo "  kizashi msg workspace 1"
+    echo "  kizashi msg workspace 2 move"
+    echo "  kizashi msg open network wifi"
+    echo "  kizashi msg toggle launcher"
+    echo "  kizashi msg toggle clipboard"
+    echo "  kizashi weather --current-temp"
+    echo "  kizashi kill"
     echo ""
 }
 
@@ -174,20 +174,20 @@ show_ipc_help() {
 
 ensure_daemon() {
     local pid=""
-    if [ -f "/tmp/yoaked.pid" ]; then
-        pid="$(cat "/tmp/yoaked.pid" 2>/dev/null)"
+    if [ -f "/tmp/kizashid.pid" ]; then
+        pid="$(cat "/tmp/kizashid.pid" 2>/dev/null)"
     fi
 
     if [ -z "$pid" ] || ! is_alive "$pid"; then
-        rm -f "/tmp/yoaked.pid" 2>/dev/null
-        rm -f "/tmp/yoaked.lock" 2>/dev/null
+        rm -f "/tmp/kizashid.pid" 2>/dev/null
+        rm -f "/tmp/kizashid.lock" 2>/dev/null
 
         [ "$VERBOSE" = true ] && echo "$(t "cli.starting_daemon")"
-        "$BIN_DIR/yoaked" start > /dev/null 2>&1 &
+        "$BIN_DIR/kizashid" start > /dev/null 2>&1 &
 
         local count=0
         while [ "$count" -lt 15 ]; do
-            if [ -f "/tmp/yoaked.pid" ] && is_alive "$(cat "/tmp/yoaked.pid" 2>/dev/null)"; then
+            if [ -f "/tmp/kizashid.pid" ] && is_alive "$(cat "/tmp/kizashid.pid" 2>/dev/null)"; then
                 break
             fi
             sleep 0.1
@@ -202,11 +202,11 @@ while [[ "$1" == -* ]]; do
     case "$1" in
         -v|--verbose)
             VERBOSE=true
-            export YOAKE_VERBOSE=true
+            export KIZASHI_VERBOSE=true
             shift
             ;;
         -V|--version)
-            echo "yoake v$(get_installed_version)"
+            echo "kizashi v$(get_installed_version)"
             exit 0
             ;;
         -h|--help)
@@ -226,8 +226,8 @@ fi
 
 if [[ "$1" == "kill" ]]; then
     pid=""
-    if [ -f "/tmp/yoaked.pid" ]; then
-        pid="$(cat "/tmp/yoaked.pid" 2>/dev/null)"
+    if [ -f "/tmp/kizashid.pid" ]; then
+        pid="$(cat "/tmp/kizashid.pid" 2>/dev/null)"
     fi
 
     pkill -TERM -f "focus_daemon.py" 2>/dev/null
@@ -238,9 +238,9 @@ if [[ "$1" == "kill" ]]; then
     if [ -n "$pid" ] && is_alive "$pid"; then
         terminate_and_wait "$pid" 2
     else
-        pkill -TERM -f "yoaked" 2>/dev/null
+        pkill -TERM -f "kizashid" 2>/dev/null
         sleep 0.2
-        pkill -KILL -f "yoaked" 2>/dev/null
+        pkill -KILL -f "kizashid" 2>/dev/null
     fi
 
     pkill -KILL -f "focus_daemon.py" 2>/dev/null
@@ -248,8 +248,8 @@ if [[ "$1" == "kill" ]]; then
         pkill -KILL -f "quickshell.*$MAIN_QML" 2>/dev/null
     fi
 
-    rm -f "/tmp/yoaked.pid" 2>/dev/null
-    rm -f "/tmp/yoaked.lock" 2>/dev/null
+    rm -f "/tmp/kizashid.pid" 2>/dev/null
+    rm -f "/tmp/kizashid.lock" 2>/dev/null
     echo "$(t "cli.daemon_stopped")"
     exit 0
 fi
@@ -281,16 +281,16 @@ if [[ "$1" == "launch" ]]; then
     esac
 
     shift 2
-    export YOAKE_LAUNCH_ARGS="$*"
+    export KIZASHI_LAUNCH_ARGS="$*"
 
-    QML_FILE=$(find "$YOAKE_DIR/quickshell" -type f -name "${QML_NAME}.qml" 2>/dev/null | head -n 1)
+    QML_FILE=$(find "$KIZASHI_DIR/quickshell" -type f -name "${QML_NAME}.qml" 2>/dev/null | head -n 1)
 
     if [ -n "$QML_FILE" ]; then
         ensure_daemon
-        export YOAKE_TARGET_FILE="$QML_FILE"
-        exec quickshell -p "$YOAKE_DIR/quickshell/Runner.qml"
+        export KIZASHI_TARGET_FILE="$QML_FILE"
+        exec quickshell -p "$KIZASHI_DIR/quickshell/Runner.qml"
     else
-        echo "$(t "cli.error_qml_not_found" NAME="${QML_NAME}" DIR="$YOAKE_DIR/quickshell/")"
+        echo "$(t "cli.error_qml_not_found" NAME="${QML_NAME}" DIR="$KIZASHI_DIR/quickshell/")"
         exit 1
     fi
 fi
@@ -305,7 +305,7 @@ if [[ "$1" == "msg" ]]; then
     if [[ "$1" == "workspace" ]]; then
         shift
     fi
-    exec "$YOAKE_DIR/scripts/qs_manager.sh" "$@"
+    exec "$KIZASHI_DIR/scripts/qs_manager.sh" "$@"
 fi
 
 if [[ "$1" == "ipc" ]]; then
@@ -316,14 +316,14 @@ if [[ "$1" == "ipc" ]]; then
 
     ensure_daemon
 
-    SHELL_QML=$(find "$YOAKE_DIR/quickshell" -type f -name "Shell.qml" 2>/dev/null | head -n 1)
+    SHELL_QML=$(find "$KIZASHI_DIR/quickshell" -type f -name "Shell.qml" 2>/dev/null | head -n 1)
 
     if [ -z "$SHELL_QML" ] && [ -n "$MAIN_QML" ]; then
         SHELL_QML="$MAIN_QML"
     fi
 
     if [ -z "$SHELL_QML" ]; then
-        echo "$(t "cli.error_shell_qml_not_found" DIR="$YOAKE_DIR/quickshell/")"
+        echo "$(t "cli.error_shell_qml_not_found" DIR="$KIZASHI_DIR/quickshell/")"
         exit 1
     fi
 
@@ -355,7 +355,7 @@ for s in "${ALLOWED_SCRIPTS[@]}"; do
     fi
 done
 
-SCRIPT_PATH="$YOAKE_DIR/scripts/${COMMAND}.sh"
+SCRIPT_PATH="$KIZASHI_DIR/scripts/${COMMAND}.sh"
 
 if [ "$IS_ALLOWED" = true ] && [ -f "$SCRIPT_PATH" ]; then
     shift

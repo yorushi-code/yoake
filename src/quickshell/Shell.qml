@@ -52,9 +52,9 @@ ShellRoot {
     }
 
     Component.onCompleted: {
-        Qt.application.organization = "yoake";
-        Qt.application.domain = "yoake.org";
-        Qt.application.name = "yoake";
+        Qt.application.organization = "kizashi";
+        Qt.application.domain = "kizashi.org";
+        Qt.application.name = "kizashi";
         FirstLaunch.checkFirstLaunch();
         SysNotif.checkBattery();
     }

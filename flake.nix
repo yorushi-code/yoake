@@ -1,5 +1,5 @@
 {
-  description = "Yoake - a desktop shell built for YOU.";
+  description = "Kizashi - a desktop shell built for YOU.";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -18,7 +18,7 @@
     in
     {
       overlays.default = final: _prev: {
-        yoake = final.callPackage ./nix/package.nix {
+        kizashi = final.callPackage ./nix/package.nix {
           rev = self.rev or self.dirtyRev or "dirty";
         };
       };
@@ -29,17 +29,17 @@
           default = pkgs.callPackage ./nix/package.nix {
             rev = self.rev or self.dirtyRev or "dirty";
           };
-          yoake = self.packages.${system}.default;
+          kizashi = self.packages.${system}.default;
         });
 
       apps = forAllSystems (system: {
         default = {
           type = "app";
-          program = "${self.packages.${system}.default}/bin/yoake";
+          program = "${self.packages.${system}.default}/bin/kizashi";
         };
-        yoaked = {
+        kizashid = {
           type = "app";
-          program = "${self.packages.${system}.default}/bin/yoaked";
+          program = "${self.packages.${system}.default}/bin/kizashid";
         };
       });
 
@@ -56,10 +56,10 @@
         inherit self;
         wallpapers = serpantinum-wallpapers;
       };
-      homeManagerModules.yoake = self.homeManagerModules.default;
+      homeManagerModules.kizashi = self.homeManagerModules.default;
 
       nixosModules.default = import ./nix/nixos-module.nix;
-      nixosModules.yoake = self.nixosModules.default;
+      nixosModules.kizashi = self.nixosModules.default;
 
       formatter = forAllSystems (system: (pkgsFor system).nixpkgs-fmt);
     };

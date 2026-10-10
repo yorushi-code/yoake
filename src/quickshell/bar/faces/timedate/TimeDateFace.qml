@@ -85,8 +85,8 @@ Item {
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onClicked: {
-            if (Caching.yoakeDir) {
-                Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/qs_manager.sh", "toggle", "calendar"]);
+            if (Caching.kizashiDir) {
+                Quickshell.execDetached(["bash", Caching.kizashiDir + "/scripts/qs_manager.sh", "toggle", "calendar"]);
             }
         }
     }

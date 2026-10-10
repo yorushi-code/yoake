@@ -7,14 +7,14 @@ import "../../"
 Item {
     id: root
 
-    readonly property string yoakeDir: {
-        if (typeof Caching !== "undefined" && Caching.yoakeDir) {
-            return Caching.yoakeDir;
+    readonly property string kizashiDir: {
+        if (typeof Caching !== "undefined" && Caching.kizashiDir) {
+            return Caching.kizashiDir;
         }
         return "";
     }
 
-    readonly property string helperScript: root.yoakeDir + "/scripts/first_launch.sh"
+    readonly property string helperScript: root.kizashiDir + "/scripts/first_launch.sh"
 
     property bool isFirstLaunch: false
     property bool executed: false

@@ -66,14 +66,14 @@ Item {
     }
 
     function detectAuto() {
-        if (!Caching.yoakeDir) return;
+        if (!Caching.kizashiDir) return;
         root.isDetecting = true;
         autoProcess.running = false;
         autoProcess.running = true;
     }
 
     function setManual(lat, lon) {
-        if (!Caching.yoakeDir) return;
+        if (!Caching.kizashiDir) return;
         root.isDetecting = true;
         manualProcess.lat = lat.toString();
         manualProcess.lon = lon.toString();
@@ -83,7 +83,7 @@ Item {
 
     Process {
         id: autoProcess
-        command: ["bash", "-c", Caching.yoakeDir + "/scripts/location.sh --refresh"]
+        command: ["bash", "-c", Caching.kizashiDir + "/scripts/location.sh --refresh"]
         onExited: {
             root.isDetecting = false;
         }
@@ -93,7 +93,7 @@ Item {
         id: manualProcess
         property string lat: ""
         property string lon: ""
-        command: ["bash", "-c", Caching.yoakeDir + "/scripts/location_manual.sh '" + lat + "' '" + lon + "'"]
+        command: ["bash", "-c", Caching.kizashiDir + "/scripts/location_manual.sh '" + lat + "' '" + lon + "'"]
         onExited: {
             root.isDetecting = false;
         }

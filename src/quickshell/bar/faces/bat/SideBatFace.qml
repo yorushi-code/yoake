@@ -299,7 +299,7 @@ Item {
                 hoverEnabled: true
                 enabled: !root.isPreview
                 cursorShape: Qt.PointingHandCursor
-                onClicked: Quickshell.execDetached(["bash", "-c", Caching.yoakeDir + "/scripts/qs_manager.sh toggle system"])
+                onClicked: Quickshell.execDetached(["bash", "-c", Caching.kizashiDir + "/scripts/qs_manager.sh toggle system"])
             }
         }
     }

@@ -148,7 +148,7 @@ Item {
     Process {
         id: hibernateCheck
         running: false
-        command: ["bash", Caching.yoakeDir + "/scripts/system/can_hibernate.sh"]
+        command: ["bash", Caching.kizashiDir + "/scripts/system/can_hibernate.sh"]
         stdout: StdioCollector {
             onStreamFinished: {
                 let out = this.text.trim();
@@ -315,7 +315,7 @@ Item {
         }
         ScriptAction {
             script: {
-                Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/qs_manager.sh", "close"]);
+                Quickshell.execDetached(["bash", Caching.kizashiDir + "/scripts/qs_manager.sh", "close"]);
             }
         }
     }
@@ -551,7 +551,7 @@ Item {
                                 interval: 150
                                 onTriggered: {
                                     closeSequence.start();
-                                    Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/system/exit.sh"]);
+                                    Quickshell.execDetached(["bash", Caching.kizashiDir + "/scripts/system/exit.sh"]);
                                     Quickshell.execDetached(["sh", "-c", "echo 'close' > " + Caching.runDir + "/widget_state"]);
                                 }
                             }
@@ -837,7 +837,7 @@ Item {
 
                             onRightClicked: {
                                 closeSequence.start();
-                                Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/qs_manager.sh", "toggle", "guide", "display"]);
+                                Quickshell.execDetached(["bash", Caching.kizashiDir + "/scripts/qs_manager.sh", "toggle", "guide", "display"]);
                             }
                         }
 
@@ -1031,7 +1031,7 @@ Item {
                             }
                             onRightClicked: {
                                 closeSequence.start();
-                                Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/qs_manager.sh", "toggle", "network", "wifi"]);
+                                Quickshell.execDetached(["bash", Caching.kizashiDir + "/scripts/qs_manager.sh", "toggle", "network", "wifi"]);
                             }
                         }
 
@@ -1047,7 +1047,7 @@ Item {
                             }
                             onRightClicked: {
                                 closeSequence.start();
-                                Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/qs_manager.sh", "toggle", "network", "bt"]);
+                                Quickshell.execDetached(["bash", Caching.kizashiDir + "/scripts/qs_manager.sh", "toggle", "network", "bt"]);
                             }
                         }
 
@@ -1319,7 +1319,7 @@ Item {
                                         Sounds.stopSfx(actionCapsule.chargingSoundHandle);
                                         actionCapsule.chargingSoundHandle = -1;
                                     }
-                                    let scriptPath = cmd === "lock" ? Caching.yoakeDir + "/scripts/lock.sh" : Caching.yoakeDir + "/scripts/system/" + (cmd === "sleep" ? "suspend.sh" : cmd + ".sh");
+                                    let scriptPath = cmd === "lock" ? Caching.kizashiDir + "/scripts/lock.sh" : Caching.kizashiDir + "/scripts/system/" + (cmd === "sleep" ? "suspend.sh" : cmd + ".sh");
                                     Quickshell.execDetached(["bash", scriptPath]);
                                     Quickshell.execDetached(["sh", "-c", "echo 'close' > " + Caching.runDir + "/widget_state"]);
 

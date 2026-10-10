@@ -185,7 +185,7 @@ Item {
             property color indicatorColor: root.indicatorColor
             property vector4d params: Qt.vector4d(0.0, 0.0, 0.0, 0.0)
 
-            fragmentShader: "file://" + Caching.yoakeDir + "/assets/shaders/gauges/clock_second_arc.frag.qsb"
+            fragmentShader: "file://" + Caching.kizashiDir + "/assets/shaders/gauges/clock_second_arc.frag.qsb"
         }
 
         Item {

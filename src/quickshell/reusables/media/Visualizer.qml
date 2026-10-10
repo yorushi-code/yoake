@@ -225,6 +225,6 @@ Item {
         property real ringBarWidth: root.ringBarWidth
         property real tintStrength: root.tintStrength
 
-        fragmentShader: "file://" + Caching.yoakeDir + "/assets/shaders/audio/" + (root.continuous ? "visualizer_wave" : "visualizer_bars") + ".frag.qsb"
+        fragmentShader: "file://" + Caching.kizashiDir + "/assets/shaders/audio/" + (root.continuous ? "visualizer_wave" : "visualizer_bars") + ".frag.qsb"
     }
 }

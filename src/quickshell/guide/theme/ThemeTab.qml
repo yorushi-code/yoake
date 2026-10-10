@@ -369,7 +369,7 @@ Item {
 
     FileView {
         id: matugenColorsWatcher
-        path: (typeof Caching !== "undefined" && Caching.stateDir ? Caching.stateDir : ((Quickshell.env("HOME") ?? "") + "/.local/state/yoake")) + "/qs_matugen_colors.json"
+        path: (typeof Caching !== "undefined" && Caching.stateDir ? Caching.stateDir : ((Quickshell.env("HOME") ?? "") + "/.local/state/kizashi")) + "/qs_matugen_colors.json"
         watchChanges: true
         onFileChanged: reload()
         onLoaded: {
@@ -389,8 +389,8 @@ Item {
         id: themesLoader
         running: false
         command: {
-            let assetsPath = Caching.yoakeDir ? (Caching.yoakeDir + "/assets/themes") : "";
-            let userPath = Caching.stateDir ? (Caching.stateDir + "/themes") : (Caching.home + "/.local/state/yoake/themes");
+            let assetsPath = Caching.kizashiDir ? (Caching.kizashiDir + "/assets/themes") : "";
+            let userPath = Caching.stateDir ? (Caching.stateDir + "/themes") : (Caching.home + "/.local/state/kizashi/themes");
             let cachePath = Caching.getCacheDir("themes") + "/theme_sort_cache.json";
             let scriptPath = Caching.qsDir ? (Caching.qsDir + "/guide/theme/theme_sorter.py") : "theme_sorter.py";
             return ["python3", scriptPath, assetsPath, userPath, cachePath];
@@ -436,7 +436,7 @@ Item {
     }
 
     function saveCustomTheme(themeObj) {
-        let userPath = Caching.stateDir ? (Caching.stateDir + "/themes") : (Caching.home + "/.local/state/yoake/themes");
+        let userPath = Caching.stateDir ? (Caching.stateDir + "/themes") : (Caching.home + "/.local/state/kizashi/themes");
         let sanitizeName = themeObj.name.replace(/[^a-zA-Z0-9_\- ]/g, "").trim();
         if (sanitizeName === "") sanitizeName = "CustomTheme";
         themeObj.name = sanitizeName;
@@ -454,7 +454,7 @@ Item {
     }
 
     function deleteCustomTheme(themeName) {
-        let userPath = Caching.stateDir ? (Caching.stateDir + "/themes") : (Caching.home + "/.local/state/yoake/themes");
+        let userPath = Caching.stateDir ? (Caching.stateDir + "/themes") : (Caching.home + "/.local/state/kizashi/themes");
         let sanitizeName = themeName.replace(/[^a-zA-Z0-9_\- ]/g, "").trim();
         let filePath = userPath + "/" + sanitizeName + ".json";
         let escapeBash = function(str) { return String(str).replace(/(["\\$`])/g, '\\$1'); };
@@ -848,7 +848,7 @@ Item {
             return;
         }
 
-        let userFontsPath = Caching.stateDir ? (Caching.stateDir + "/fonts") : (Caching.home + "/.local/state/yoake/fonts");
+        let userFontsPath = Caching.stateDir ? (Caching.stateDir + "/fonts") : (Caching.home + "/.local/state/kizashi/fonts");
         let escapeBash = function(str) { return String(str).replace(/(["\\$`])/g, '\\$1'); };
 
         let script = 
@@ -1147,7 +1147,7 @@ Item {
                         textColor: ThemeBackend.base
                         contentAlignment: Qt.AlignHCenter
                         onClicked: {
-                            Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/qs_manager.sh", "toggle", "wallpaper"]);
+                            Quickshell.execDetached(["bash", Caching.kizashiDir + "/scripts/qs_manager.sh", "toggle", "wallpaper"]);
                         }
                     }
 
@@ -1282,7 +1282,7 @@ Item {
                     accentColor: ThemeBackend.surface0
                     textColor: isHoveredOrHighlighted ? ThemeBackend.text : ThemeBackend.overlay2
                     onClicked: {
-                        let userFontsPath = Caching.stateDir ? (Caching.stateDir + "/fonts") : (Caching.home + "/.local/state/yoake/fonts");
+                        let userFontsPath = Caching.stateDir ? (Caching.stateDir + "/fonts") : (Caching.home + "/.local/state/kizashi/fonts");
                         let escapeBash = function(str) { return String(str).replace(/(["\\$`])/g, '\\$1'); };
                         Quickshell.execDetached(["bash", "-c", "mkdir -p \"" + escapeBash(userFontsPath) + "\" && xdg-open \"" + escapeBash(userFontsPath) + "\""]);
                     }

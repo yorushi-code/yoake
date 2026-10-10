@@ -1,7 +1,7 @@
 {
   "guide": {
     "about": {
-      "title": "Yoake",
+      "title": "Kizashi",
       "loading": "Loading...",
       "unknown": "Unknown",
       "version_by": "v{version} • by {author}",
@@ -456,7 +456,7 @@
     "theme": {
       "font": {
         "title": "Font",
-        "desc": "Choose the default used by yoake",
+        "desc": "Choose the default used by kizashi",
         "select": "Select..."
       },
       "radius": {
@@ -962,7 +962,7 @@
     }
   },
   "start": {
-    "title": "Yoake",
+    "title": "Kizashi",
     "made_by": "Made by @{author}",
     "welcome": "Welcome",
     "tagline": "A desktop shell built for",
@@ -1097,7 +1097,7 @@
     },
     "guide": {
       "name": "Settings",
-      "desc": "Yoake settings"
+      "desc": "Kizashi settings"
     },
     "calendar": {
       "name": "Calendar & clock",
@@ -1186,7 +1186,7 @@
     }
   },
   "cli": {
-    "usage": "Usage: yoake [command] [options...]",
+    "usage": "Usage: kizashi [command] [options...]",
     "description": "A desktop shell for wayland compositors.",
     "commands": "Commands:",
     "script_commands": "Script commands:",
@@ -1199,23 +1199,23 @@
     "version_desc": "Display version information and exit",
     "help_desc": "Show this help message and exit",
     "examples": "Examples:",
-    "daemon_stopped": "Yoake daemon stopped.",
-    "starting_daemon": "Daemon not running. Starting yoaked in the background...",
+    "daemon_stopped": "Kizashi daemon stopped.",
+    "starting_daemon": "Daemon not running. Starting kizashid in the background...",
     "error_missing_qml": "Error: missing target to launch.",
-    "launch_usage": "Usage: yoake launch <start|widgetredactor> [args...]",
+    "launch_usage": "Usage: kizashi launch <start|widgetredactor> [args...]",
     "error_qml_not_found": "Error: could not resolve {NAME}.qml in {DIR}",
     "error_shell_qml_not_found": "Error: could not resolve path to shell.qml in {DIR}",
     "error_unknown_command": "Error: unknown command '{CMD}'.",
     "error_unknown_target": "Error: unknown target '{TARGET}'.",
     "launch_help": {
-      "usage": "Usage: yoake launch <start|widgetredactor> [arguments...]",
+      "usage": "Usage: kizashi launch <start|widgetredactor> [arguments...]",
       "description": "Launch standalone components directly in runner mode.",
       "available_targets": "Available targets:",
       "target_start": "Launch the start setup interface",
       "target_widgetredactor": "Launch the desktop widget editor interface"
     },
     "msg_help": {
-      "usage": "Usage: yoake msg <command|workspace> [arguments...]",
+      "usage": "Usage: kizashi msg <command|workspace> [arguments...]",
       "description": "Send layout, workspace, and window management messages directly.",
       "available_commands": "Available messages:",
       "cmd_workspace": "Switch to workspace <num> (append 'move' to send active window)",
@@ -1224,7 +1224,7 @@
       "cmd_close": "Close any active shell overlay"
     },
     "ipc_help": {
-      "usage": "Usage: yoake ipc call <target> <method> [arguments...]",
+      "usage": "Usage: kizashi ipc call <target> <method> [arguments...]",
       "description": "Send an IPC call directly to the running quickshell instance."
     },
     "scripts": {
@@ -1245,11 +1245,11 @@
   },
   "daemon": {
     "already_running": "Daemon is already running. Exiting...",
-    "shutting_down": "Shutting down yoake daemon...",
-    "launching": "Launching yoake daemon...",
+    "shutting_down": "Shutting down kizashi daemon...",
+    "launching": "Launching kizashi daemon...",
     "cli": {
-      "usage": "Usage: yoaked <command> [options...]",
-      "description": "Background service daemon for yoake desktop shell.",
+      "usage": "Usage: kizashid <command> [options...]",
+      "description": "Background service daemon for kizashi desktop shell.",
       "commands": "Commands:",
       "cmd_start": "Start the daemon service and launch background workers",
       "cmd_stop": "Stop the running daemon service",
@@ -1258,9 +1258,9 @@
       "opt_verbose": "Enable verbose output logging",
       "opt_version": "Show version information and exit",
       "opt_help": "Show this help message and exit",
-      "stopped": "Yoake daemon stopped.",
-      "status_running": "Yoake daemon is running (PID: {PID}).",
-      "status_stopped": "Yoake daemon is not running.",
+      "stopped": "Kizashi daemon stopped.",
+      "status_running": "Kizashi daemon is running (PID: {PID}).",
+      "status_stopped": "Kizashi daemon is not running.",
       "unknown_arg": "Unknown argument: {ARG}"
     }
   },
@@ -1275,7 +1275,7 @@
     },
     "os": {
       "error_root": "Error: Do not run this script directly with root/sudo. Run as normal user.",
-      "error_unsupported": "Unsupported OS ({os}). Yoake strictly supports arch linux and derivatives.",
+      "error_unsupported": "Unsupported OS ({os}). Kizashi strictly supports arch linux and derivatives.",
       "error_not_found": "Cannot detect OS. /etc/os-release not found.",
       "unknown_cpu": "Unknown CPU",
       "unknown_gpu": "Unknown / virtual machine",
@@ -1331,9 +1331,9 @@
       "tagline": "A desktop shell built for you",
       "support_creator": "Support the creator:",
       "buy_coffee": "If you enjoy this project, consider buying me a coffee!",
-      "installed_success": "✔ Yoake {ver} ({commit}) installed successfully.",
+      "installed_success": "✔ Kizashi {ver} ({commit}) installed successfully.",
       "failed_packages": "The following packages encountered errors during installation:",
-      "restart_prompt": "Restart your compositor or run 'yoaked start' to begin.",
+      "restart_prompt": "Restart your compositor or run 'kizashid start' to begin.",
       "ask_reboot": "Do you want to restart? [y/n] "
     },
     "deps": {

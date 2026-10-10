@@ -101,8 +101,8 @@ Item {
         let keys = Object.keys(pendingTargets);
         if (keys.length === 0) return;
 
-        let scriptPath = (typeof Caching !== "undefined" && Caching.yoakeDir)
-            ? Caching.yoakeDir + "/scripts/blue_light_filter.sh"
+        let scriptPath = (typeof Caching !== "undefined" && Caching.kizashiDir)
+            ? Caching.kizashiDir + "/scripts/blue_light_filter.sh"
             : "";
 
         if (!scriptPath) {
