@@ -49,7 +49,7 @@ function getWidgetLauncherEntries(i18n) {
         {
             id: "guide",
             name: tr("widgets.guide.name", "Settings"),
-            description: tr("widgets.guide.desc", "Yoake settings"),
+            description: tr("widgets.guide.desc", "Kizashi settings"),
             icon: "help-browser",
             fontIcon: "󰋖"
         },
@@ -83,7 +83,7 @@ function getLayout(name, mx, my, mw, mh, userScale, barPosition) {
 
     let base = {
         "vpn": {
-            w: 620, h: 660, comp: "yoake/VpnPopup.qml",
+            w: 620, h: 660, comp: "kizashi/VpnPopup.qml",
             pos: {
                 "top": { anchor: "top-right", mt: 52, mr: 4 },
                 "bottom": { anchor: "bottom-right", mb: 52, mr: 4 },

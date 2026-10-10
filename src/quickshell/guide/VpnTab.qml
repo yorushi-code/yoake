@@ -167,7 +167,7 @@ Item {
                         accentColor: ThemeBackend.surface1
                         textColor: ThemeBackend.text
                         onClicked: Quickshell.execDetached(["bash", "-c",
-                            Caching.yoakeDir + "/scripts/qs_manager.sh toggle vpn"])
+                            Caching.kizashiDir + "/scripts/qs_manager.sh toggle vpn"])
                     }
                 }
             }

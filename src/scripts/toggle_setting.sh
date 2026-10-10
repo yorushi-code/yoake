@@ -9,7 +9,7 @@
 #     toggle_setting.sh .idle.manualInhibit
 set -eu
 KEY="${1:?путь к ключу, например .notifications.dnd}"
-FILE="${QS_SETTINGS:-$HOME/.config/yoake/settings.json}"
+FILE="${QS_SETTINGS:-$HOME/.config/kizashi/settings.json}"
 [ -f "$FILE" ] || { echo "нет файла настроек: $FILE" >&2; exit 1; }
 TMP="$(mktemp "${FILE}.XXXXXX")"
 # Пишем во временный и подменяем целиком: FileView читает асинхронно, и

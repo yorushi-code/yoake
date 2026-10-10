@@ -154,8 +154,8 @@ Item {
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
-                    if (Caching.yoakeDir) {
-                        Quickshell.execDetached(["bash", "-c", Caching.yoakeDir + "/scripts/qs_manager.sh toggle music"]);
+                    if (Caching.kizashiDir) {
+                        Quickshell.execDetached(["bash", "-c", Caching.kizashiDir + "/scripts/qs_manager.sh toggle music"]);
                     }
                 }
             }

@@ -47,8 +47,8 @@ Item {
             textColor: isHoveredOrHighlighted ? ThemeBackend.text : (root.isCompact ? ThemeBackend.subtext0 : ThemeBackend.overlay2)
             anchors.horizontalCenter: parent.horizontalCenter
             onClicked: {
-                if (Caching.yoakeDir) {
-                    Quickshell.execDetached(["bash", "-c", Caching.yoakeDir + "/scripts/qs_manager.sh toggle applauncher"])
+                if (Caching.kizashiDir) {
+                    Quickshell.execDetached(["bash", "-c", Caching.kizashiDir + "/scripts/qs_manager.sh toggle applauncher"])
                 }
             }
         }
@@ -85,8 +85,8 @@ Item {
         cursorShape: Qt.PointingHandCursor
         z: -1
         onClicked: {
-            if (Caching.yoakeDir) {
-                Quickshell.execDetached(["bash", "-c", Caching.yoakeDir + "/scripts/qs_manager.sh toggle applauncher"])
+            if (Caching.kizashiDir) {
+                Quickshell.execDetached(["bash", "-c", Caching.kizashiDir + "/scripts/qs_manager.sh toggle applauncher"])
             }
         }
     }

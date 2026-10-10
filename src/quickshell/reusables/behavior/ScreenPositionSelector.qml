@@ -151,7 +151,7 @@ Item {
                 property real lineWidth: 1.0
                 property color lineColor: Qt.rgba(ThemeBackend.text.r, ThemeBackend.text.g, ThemeBackend.text.b, 0.08)
 
-                fragmentShader: "file://" + Caching.yoakeDir + "/assets/shaders/ui/grid_pattern.frag.qsb"
+                fragmentShader: "file://" + Caching.kizashiDir + "/assets/shaders/ui/grid_pattern.frag.qsb"
             }
         }
 

@@ -7,7 +7,7 @@ import Quickshell.Io
 // the root qmldir, which a subdirectory is not part of. Same line as Cava.qml.
 import "../"
 
-// The yoake layer's first seam into the base shell.
+// The kizashi layer's first seam into the base shell.
 //
 // ThemeBackend is a flat vocabulary of twenty-one Catppuccin-shaped colours
 // that every widget in the tree reads by name. That makes it the one place
@@ -29,14 +29,14 @@ Singleton {
     readonly property string _home: Quickshell.env("HOME") ?? ""
     readonly property string _stateDir: (typeof Caching !== "undefined" && Caching.stateDir)
         ? Caching.stateDir
-        : (_home + "/.local/state/yoake")
+        : (_home + "/.local/state/kizashi")
 
     // Off by one setting, so the base shell can be seen unaltered without
     // editing QML -- which is the only honest way to tell whether a difference
     // came from the layer or from upstream.
     readonly property bool active: {
         const t = Config.getSetting("theme", {});
-        return t.yoake !== false;
+        return t.kizashi !== false;
     }
 
     // -- what the extractor hands over --
@@ -138,8 +138,8 @@ Singleton {
         };
     }
 
-    readonly property string _scriptsDir: (typeof Caching !== "undefined" && Caching.yoakeDir)
-        ? Caching.yoakeDir + "/scripts" : ""
+    readonly property string _scriptsDir: (typeof Caching !== "undefined" && Caching.kizashiDir)
+        ? Caching.kizashiDir + "/scripts" : ""
 
     property Process _gen: Process {}
 

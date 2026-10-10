@@ -1,7 +1,7 @@
 {
   "guide": {
     "about": {
-      "title": "Yoake",
+      "title": "Kizashi",
       "loading": "Yüklənir...",
       "unknown": "Naməlum",
       "version_by": "v{version} • müəllif: {author}",
@@ -454,7 +454,7 @@
     "theme": {
       "font": {
         "title": "Yazı növü",
-        "desc": "Yoake üçün standart yazı növünü seçin",
+        "desc": "Kizashi üçün standart yazı növünü seçin",
         "select": "Seç..."
       },
       "radius": {
@@ -956,7 +956,7 @@
     }
   },
   "start": {
-    "title": "Yoake",
+    "title": "Kizashi",
     "made_by": "Hazırlayan: @{author}",
     "welcome": "Xoş gəlmisiniz",
     "tagline": "Bu iş masası mühitinin hazırlandığı şəxs",
@@ -1091,7 +1091,7 @@
     },
     "guide": {
       "name": "Parametrlər",
-      "desc": "Yoake parametrləri"
+      "desc": "Kizashi parametrləri"
     },
     "calendar": {
       "name": "Təqvim və saat",
@@ -1183,7 +1183,7 @@
     }
   },
   "cli": {
-    "usage": "İstifadə: yoake [command] [options...]",
+    "usage": "İstifadə: kizashi [command] [options...]",
     "description": "Wayland görüntü birləşdiriciləri üçün iş masası qabığı.",
     "commands": "Əmrlər:",
     "script_commands": "Skript əmrləri:",
@@ -1196,23 +1196,23 @@
     "version_desc": "Versiya məlumatını göstər və çıx",
     "help_desc": "Bu kömək mətnini göstər və çıx",
     "examples": "Nümunələr:",
-    "daemon_stopped": "Yoake arxa plan xidməti dayandırıldı.",
-    "starting_daemon": "Arxa plan xidməti işləmir. yoaked arxa planda başladılır...",
+    "daemon_stopped": "Kizashi arxa plan xidməti dayandırıldı.",
+    "starting_daemon": "Arxa plan xidməti işləmir. kizashid arxa planda başladılır...",
     "error_missing_qml": "Xəta: başladılacaq hədəf göstərilməyib.",
-    "launch_usage": "İstifadə: yoake launch <start|widgetredactor> [args...]",
+    "launch_usage": "İstifadə: kizashi launch <start|widgetredactor> [args...]",
     "error_qml_not_found": "Xəta: {DIR} daxilində {NAME}.qml tapılmadı",
     "error_shell_qml_not_found": "Xəta: {DIR} daxilində shell.qml yolu tapılmadı",
     "error_unknown_command": "Xəta: naməlum əmr '{CMD}'.",
     "error_unknown_target": "Xəta: naməlum hədəf '{TARGET}'.",
     "launch_help": {
-      "usage": "İstifadə: yoake launch <start|widgetredactor> [arguments...]",
+      "usage": "İstifadə: kizashi launch <start|widgetredactor> [arguments...]",
       "description": "Müstəqil tərkib hissələrini birbaşa icra rejimində başlat.",
       "available_targets": "Mövcud hədəflər:",
       "target_start": "İlkin quraşdırma interfeysini başlat",
       "target_widgetredactor": "İş masası vidcetlərinə düzəliş etmək üçün interfeysi başlat"
     },
     "msg_help": {
-      "usage": "İstifadə: yoake msg <command|workspace> [arguments...]",
+      "usage": "İstifadə: kizashi msg <command|workspace> [arguments...]",
       "description": "Düzülüş, iş sahəsi və pəncərə idarəetmə mesajlarını birbaşa göndər.",
       "available_commands": "Mövcud mesajlar:",
       "cmd_workspace": "<num> nömrəli iş sahəsinə keç (fəal pəncərəni ora köçürmək üçün 'move' əlavə et)",
@@ -1221,7 +1221,7 @@
       "cmd_close": "Qabığın hər hansı fəal üst qatını bağla"
     },
     "ipc_help": {
-      "usage": "İstifadə: yoake ipc call <target> <method> [arguments...]",
+      "usage": "İstifadə: kizashi ipc call <target> <method> [arguments...]",
       "description": "IPC çağırışını birbaşa işləyən Quickshell nüsxəsinə göndər."
     },
     "scripts": {
@@ -1242,11 +1242,11 @@
   },
   "daemon": {
     "already_running": "Arxa plan xidməti artıq işləyir. Çıxılır...",
-    "shutting_down": "Yoake arxa plan xidməti dayandırılır...",
-    "launching": "Yoake arxa plan xidməti başladılır...",
+    "shutting_down": "Kizashi arxa plan xidməti dayandırılır...",
+    "launching": "Kizashi arxa plan xidməti başladılır...",
     "cli": {
-      "usage": "İstifadə: yoaked <command> [options...]",
-      "description": "Yoake iş masası qabığı üçün arxa plan xidməti.",
+      "usage": "İstifadə: kizashid <command> [options...]",
+      "description": "Kizashi iş masası qabığı üçün arxa plan xidməti.",
       "commands": "Əmrlər:",
       "cmd_start": "Arxa plan xidmətini və arxa planda işləyən prosesləri başlat",
       "cmd_stop": "İşləyən arxa plan xidmətini dayandır",
@@ -1255,9 +1255,9 @@
       "opt_verbose": "Çıxışın ətraflı qeydini aktivləşdir",
       "opt_version": "Versiya məlumatını göstər və çıx",
       "opt_help": "Bu kömək mətnini göstər və çıx",
-      "stopped": "Yoake arxa plan xidməti dayandırıldı.",
-      "status_running": "Yoake arxa plan xidməti işləyir (PID: {PID}).",
-      "status_stopped": "Yoake arxa plan xidməti işləmir.",
+      "stopped": "Kizashi arxa plan xidməti dayandırıldı.",
+      "status_running": "Kizashi arxa plan xidməti işləyir (PID: {PID}).",
+      "status_stopped": "Kizashi arxa plan xidməti işləmir.",
       "unknown_arg": "Naməlum arqument: {ARG}"
     }
   },
@@ -1272,7 +1272,7 @@
     },
     "os": {
       "error_root": "Xəta: bu skripti birbaşa root/sudo ilə işə salmayın. Adi istifadəçi kimi işə salın.",
-      "error_unsupported": "Dəstəklənməyən əməliyyat sistemi ({os}). Yoake yalnız Arch Linux və onun törəmələrini dəstəkləyir.",
+      "error_unsupported": "Dəstəklənməyən əməliyyat sistemi ({os}). Kizashi yalnız Arch Linux və onun törəmələrini dəstəkləyir.",
       "error_not_found": "Əməliyyat sistemini müəyyən etmək mümkün deyil. /etc/os-release tapılmadı.",
       "unknown_cpu": "Naməlum CPU",
       "unknown_gpu": "Naməlum / virtual maşın",
@@ -1328,9 +1328,9 @@
       "tagline": "Sizin üçün hazırlanmış iş masası mühiti",
       "support_creator": "Müəllifə dəstək olun:",
       "buy_coffee": "Layihə xoşunuza gəlirsə, mənə bir fincan qəhvə almaqla dəstək ola bilərsiniz!",
-      "installed_success": "✔ Yoake {ver} ({commit}) uğurla quraşdırıldı.",
+      "installed_success": "✔ Kizashi {ver} ({commit}) uğurla quraşdırıldı.",
       "failed_packages": "Aşağıdakı paketlərin quraşdırılması zamanı xətalar baş verdi:",
-      "restart_prompt": "Başlamaq üçün görüntü birləşdiricisini yenidən başladın və ya 'yoaked start' əmrini icra edin.",
+      "restart_prompt": "Başlamaq üçün görüntü birləşdiricisini yenidən başladın və ya 'kizashid start' əmrini icra edin.",
       "ask_reboot": "Yenidən başlatmaq istəyirsiniz? [y/n] "
     },
     "deps": {

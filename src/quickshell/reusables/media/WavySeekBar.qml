@@ -96,7 +96,7 @@ Item {
         property vector4d motion0: Qt.vector4d(1.0, 0.0, 0.0, 0.0)
         property vector4d motion1: Qt.vector4d(2.2, 1.8, Math.PI, 0.0)
 
-        fragmentShader: "file://" + Caching.yoakeDir + "/assets/shaders/audio/seekbar_wave.frag.qsb"
+        fragmentShader: "file://" + Caching.kizashiDir + "/assets/shaders/audio/seekbar_wave.frag.qsb"
     }
 
     Rectangle {

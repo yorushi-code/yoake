@@ -171,7 +171,7 @@ let
     enabled = mkOpt types.bool "Whether this output is used by the shell.";
     powerEnabled = mkOpt types.bool "Whether the monitor output display is powered on.";
     scale = mkOpt (types.either types.int types.float) "Display scale factor.";
-    auto = mkOpt types.bool "Let Yoake auto-manage this output instead of using the fields above.";
+    auto = mkOpt types.bool "Let Kizashi auto-manage this output instead of using the fields above.";
     temperature = mkOpt types.int "Colour-temperature override for this output.";
   };
 
@@ -197,7 +197,7 @@ in
     notifications = mkOption { type = notificationsSubmodule; default = { }; };
     display = mkOption { type = displaySubmodule; default = { }; };
     wallpaperDir = mkOpt types.str ''
-      Directory Yoake reads wallpapers from.
+      Directory Kizashi reads wallpapers from.
     '';
     wallpaper_dir = mkOpt types.str ''
       Alias for wallpaperDir.

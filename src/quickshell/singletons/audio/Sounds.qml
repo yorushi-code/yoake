@@ -12,7 +12,7 @@ Item {
     // Every effect is played as its own short-lived pw-play stream. Naming the
     // streams lets the volume panel leave them out of the app list (they would
     // flash in and out) and show one permanent "Interface sounds" row instead.
-    readonly property string streamName: "Yoake interface sounds"
+    readonly property string streamName: "Kizashi interface sounds"
     readonly property var pwPlayProps: ["-P", "{ application.name = \"" + streamName + "\" media.role = \"Event\" }"]
 
     property var activeHandles: ({})

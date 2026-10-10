@@ -102,7 +102,7 @@ Item {
     }
 
     function refresh(showLoader) {
-        if (!Caching.yoakeDir) return;
+        if (!Caching.kizashiDir) return;
         let shouldShowLoader = showLoader !== undefined ? !!showLoader : true;
         root._forceFetchMode = shouldShowLoader;
         if (shouldShowLoader) {
@@ -182,7 +182,7 @@ Item {
     Process {
         id: fetchProcess
         command: {
-            if (!Caching.yoakeDir) return [];
+            if (!Caching.kizashiDir) return [];
             let locObj = root.activeLocation || {};
             let locJson = JSON.stringify(locObj);
             let locEscaped = locJson.replace(/'/g, "'\\''");
@@ -190,9 +190,9 @@ Item {
             let cmd = "";
             if (root._forceFetchMode) {
                 let cacheFile = (Caching.getCacheDir("weather") || (Caching.cacheDir + "/weather")) + "/weather.json";
-                cmd = Caching.yoakeDir + "/scripts/weather.sh --getdata --location '" + locEscaped + "' --unit '" + curUnit + "' && cat \"" + cacheFile + "\"";
+                cmd = Caching.kizashiDir + "/scripts/weather.sh --getdata --location '" + locEscaped + "' --unit '" + curUnit + "' && cat \"" + cacheFile + "\"";
             } else {
-                cmd = Caching.yoakeDir + "/scripts/weather.sh --json --location '" + locEscaped + "' --unit '" + curUnit + "'";
+                cmd = Caching.kizashiDir + "/scripts/weather.sh --json --location '" + locEscaped + "' --unit '" + curUnit + "'";
             }
             return ["bash", "-c", cmd];
         }

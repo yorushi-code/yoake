@@ -35,8 +35,8 @@ HOME = Path.home()
 # ~/.config/quickshell/generated-colors.json; writing there would have one
 # shell repainting another one while both are running. State also simply does
 # not belong beside the source now that the source is a git checkout.
-STATE_DIR = Path(os.environ.get("YOAKE_STATE_DIR")
-                 or HOME / ".local" / "state" / "yoake")
+STATE_DIR = Path(os.environ.get("KIZASHI_STATE_DIR")
+                 or HOME / ".local" / "state" / "kizashi")
 COLORS_FILE = STATE_DIR / "generated-colors.json"
 OVERRIDE_FILE = STATE_DIR / "palette-override.json"
 FUZZEL_FILE = HOME / ".config" / "fuzzel" / "fuzzel.ini"

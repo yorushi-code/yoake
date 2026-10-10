@@ -55,7 +55,7 @@
 , ...
 }:
 let
-  pname = "yoake";
+  pname = "kizashi";
   version = lib.strings.trim (builtins.readFile ../version.txt);
   pythonEnv = python3.withPackages (ps: [ ps.websockets ps.jeepney ]);
   pathDeps = [
@@ -137,18 +137,18 @@ stdenv.mkDerivation (finalAttrs: {
     cp -r config "$out/share/${finalAttrs.pname}/config"
     cp version.txt "$out/share/${finalAttrs.pname}/version.txt"
     find "$out/share/${finalAttrs.pname}" -type f \( -name "*.sh" -o -name "*.py" \) -exec chmod +x {} +
-    install -Dm755 bin/yoake  "$out/bin/.yoake-wrapped"
-    install -Dm755 bin/yoaked "$out/bin/.yoaked-wrapped"
+    install -Dm755 bin/kizashi  "$out/bin/.kizashi-wrapped"
+    install -Dm755 bin/kizashid "$out/bin/.kizashid-wrapped"
     runHook postInstall
   '';
   postFixup = ''
-    for bin in yoake yoaked; do
+    for bin in kizashi kizashid; do
       makeWrapper "$out/bin/.$bin-wrapped" "$out/bin/$bin" \
         "''${qtWrapperArgs[@]}" \
         --prefix QML2_IMPORT_PATH : "${qmlImportPath}" \
         --prefix QT_PLUGIN_PATH : "${qtPluginPath}" \
-        --set YOAKE_DIR "$out/share/${finalAttrs.pname}" \
-        --set YOAKE_VERSION "${finalAttrs.version}" \
+        --set KIZASHI_DIR "$out/share/${finalAttrs.pname}" \
+        --set KIZASHI_VERSION "${finalAttrs.version}" \
         --prefix PATH : "${lib.makeBinPath pathDeps}"
     done
   '';
@@ -158,6 +158,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/ilyamiro/serpantinum";
     license = licenses.agpl3Plus;
     platforms = platforms.linux;
-    mainProgram = "yoake";
+    mainProgram = "kizashi";
   };
 })

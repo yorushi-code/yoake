@@ -85,7 +85,7 @@ Item {
 
     property real sysBrightness: 0
 
-    property bool wifiRadioEnabled: YoakeNet.wifiEnabled
+    property bool wifiRadioEnabled: KizashiNet.wifiEnabled
     property bool btRadioEnabled: Boolean(Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled)
 
     Connections {
@@ -147,7 +147,7 @@ Item {
     Process {
         id: hibernateCheck
         running: false
-        command: ["bash", Caching.yoakeDir + "/scripts/system/can_hibernate.sh"]
+        command: ["bash", Caching.kizashiDir + "/scripts/system/can_hibernate.sh"]
         stdout: StdioCollector {
             onStreamFinished: {
                 let out = this.text.trim();
@@ -314,7 +314,7 @@ Item {
         }
         ScriptAction {
             script: {
-                Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/qs_manager.sh", "close"]);
+                Quickshell.execDetached(["bash", Caching.kizashiDir + "/scripts/qs_manager.sh", "close"]);
             }
         }
     }
@@ -550,7 +550,7 @@ Item {
                                 interval: 150
                                 onTriggered: {
                                     closeSequence.start();
-                                    Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/system/exit.sh"]);
+                                    Quickshell.execDetached(["bash", Caching.kizashiDir + "/scripts/system/exit.sh"]);
                                     Quickshell.execDetached(["sh", "-c", "echo 'close' > " + Caching.runDir + "/widget_state"]);
                                 }
                             }
@@ -836,7 +836,7 @@ Item {
 
                             onRightClicked: {
                                 closeSequence.start();
-                                Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/qs_manager.sh", "toggle", "guide", "display"]);
+                                Quickshell.execDetached(["bash", Caching.kizashiDir + "/scripts/qs_manager.sh", "toggle", "guide", "display"]);
                             }
                         }
 
@@ -1026,11 +1026,11 @@ Item {
                             isActive: root.wifiRadioEnabled
                             onLeftClicked: {
                                 Sounds.playSfx("system/quick_click.wav");
-                                Quickshell.execDetached(["nmcli","radio","wifi", YoakeNet.wifiEnabled ? "off" : "on"]);
+                                Quickshell.execDetached(["nmcli","radio","wifi", KizashiNet.wifiEnabled ? "off" : "on"]);
                             }
                             onRightClicked: {
                                 closeSequence.start();
-                                Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/qs_manager.sh", "toggle", "network", "wifi"]);
+                                Quickshell.execDetached(["bash", Caching.kizashiDir + "/scripts/qs_manager.sh", "toggle", "network", "wifi"]);
                             }
                         }
 
@@ -1046,7 +1046,7 @@ Item {
                             }
                             onRightClicked: {
                                 closeSequence.start();
-                                Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/qs_manager.sh", "toggle", "network", "bt"]);
+                                Quickshell.execDetached(["bash", Caching.kizashiDir + "/scripts/qs_manager.sh", "toggle", "network", "bt"]);
                             }
                         }
 
@@ -1318,7 +1318,7 @@ Item {
                                         Sounds.stopSfx(actionCapsule.chargingSoundHandle);
                                         actionCapsule.chargingSoundHandle = -1;
                                     }
-                                    let scriptPath = cmd === "lock" ? Caching.yoakeDir + "/scripts/lock.sh" : Caching.yoakeDir + "/scripts/system/" + (cmd === "sleep" ? "suspend.sh" : cmd + ".sh");
+                                    let scriptPath = cmd === "lock" ? Caching.kizashiDir + "/scripts/lock.sh" : Caching.kizashiDir + "/scripts/system/" + (cmd === "sleep" ? "suspend.sh" : cmd + ".sh");
                                     Quickshell.execDetached(["bash", scriptPath]);
                                     Quickshell.execDetached(["sh", "-c", "echo 'close' > " + Caching.runDir + "/widget_state"]);
 

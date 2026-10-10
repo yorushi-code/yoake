@@ -21,8 +21,8 @@ source "$(dirname "${BASH_SOURCE[0]}")/../../scripts/caching.sh"
 qs_ensure_cache "music"
 
 STATE_FILE="$QS_STATE_MUSIC/eq_state.json"
-CONF_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/pipewire/pipewire.conf.d/99-yoake-eq.conf"
-NODE="effect_input.yoake-eq"
+CONF_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/pipewire/pipewire.conf.d/99-kizashi-eq.conf"
+NODE="effect_input.kizashi-eq"
 FREQS=(31 63 125 250 500 1000 2000 4000 8000 16000)
 
 # One-time move of the state from its old place in the runtime dir.
@@ -62,7 +62,7 @@ write_conf() {
     done
     mkdir -p "$(dirname "$CONF_FILE")"
     cat > "$CONF_FILE" <<EOF
-# Yoake's ten-band equaliser. Written by src/quickshell/media/equalizer.sh;
+# Kizashi's ten-band equaliser. Written by src/quickshell/media/equalizer.sh;
 # edits here are overwritten when the panel saves.
 #
 # filter.smart makes WirePlumber insert it in front of the default output and
@@ -70,8 +70,8 @@ write_conf() {
 context.modules = [
     { name = libpipewire-module-filter-chain
         args = {
-            node.description = "Yoake Equalizer"
-            media.name       = "Yoake Equalizer"
+            node.description = "Kizashi Equalizer"
+            media.name       = "Kizashi Equalizer"
             filter.graph = {
                 nodes = [
 ${nodes}                ]
@@ -84,13 +84,13 @@ ${links}                ]
                 node.name         = "${NODE}"
                 media.class       = Audio/Sink
                 filter.smart      = true
-                filter.smart.name = "yoake-eq"
+                filter.smart.name = "kizashi-eq"
             }
             playback.props = {
-                node.name         = "effect_output.yoake-eq"
+                node.name         = "effect_output.kizashi-eq"
                 node.passive      = true
                 filter.smart      = true
-                filter.smart.name = "yoake-eq"
+                filter.smart.name = "kizashi-eq"
             }
         }
     }

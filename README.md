@@ -1,4 +1,4 @@
-# yoake
+# kizashi
 
 A Wayland shell, forked from [ilyamiro/serpantinum](https://github.com/ilyamiro/serpantinum)
 and renamed. Fedora and niri, where upstream targets Arch and leads with Hyprland.
@@ -7,18 +7,18 @@ It is a fork rather than a configuration because the parts being added do not
 fit through a config file: upstream has no plugin system, so a new bar module,
 widget or panel means editing `bar/TopBar.qml`, `widgets/WidgetRegistry.qml` or
 `WindowRegistry.js`. Changes here are therefore kept narrow and separable —
-everything of ours that can live in `src/quickshell/yoake/` does — so this can
+everything of ours that can live in `src/quickshell/kizashi/` does — so this can
 be rebased onto an upstream that has already rewritten its history once.
 
 ## Installing
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/yorushi-code/yoake/master/install/install.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/yorushi-code/kizashi/master/install/install.sh)"
 ```
 
 It asks what to install:
 
-- **yoake**, this fork;
+- **kizashi**, this fork;
 - **Serpantinum**, clean upstream, installed by upstream's own installer.
 
 Both work on Arch and on Fedora (and their derivatives). Upstream's installer
@@ -26,7 +26,7 @@ refuses anything outside the Arch family; for Serpantinum on Fedora it runs
 behind a small compatibility layer that answers its `pacman` calls with dnf,
 so what it installs is still exactly what upstream ships.
 
-Without questions: `--product yoake --yes` (yoake with defaults), or
+Without questions: `--product kizashi --yes` (kizashi with defaults), or
 `--product serpantinum` (upstream's own menus follow). Details, and the manual
 path it replaces: **[docs/fedora.md](docs/fedora.md)**.
 
@@ -57,7 +57,7 @@ Running it from the About tab's Update button does the same thing.
 
 | | |
 |---|---|
-| `src/quickshell/yoake/` | the layer: everything added rather than modified |
+| `src/quickshell/kizashi/` | the layer: everything added rather than modified |
 | `src/scripts/wallpaper-palette.py` | the palette, measured off the wallpaper in OKLCh |
 | `docs/fedora.md` | how this actually gets installed and run here |
 | `tools/` | how upstream's updates get in, renamed on the way |
@@ -66,11 +66,11 @@ Colours are not a preset. The wallpaper's dominant hue is measured as a
 chroma-weighted circular mean in OKLCh and the accent is synthesized on it,
 with the measured chroma carried along as a confidence value — so a
 near-monochrome image yields a genuinely muted accent instead of an invented
-one. `YoakePalette` derives upstream's twenty-two named colours from that and
+one. `KizashiPalette` derives upstream's twenty-two named colours from that and
 hands them to `ThemeBackend`, which every widget already reads, so the whole
 shell re-themes with the wallpaper and fades rather than snaps.
 
-Set `theme.yoake` to `false` in `~/.config/yoake/settings.json` to stand the
+Set `theme.kizashi` to `false` in `~/.config/kizashi/settings.json` to stand the
 layer down and see the base shell unaltered.
 
 ## License
@@ -98,7 +98,7 @@ Copyright (C) 2026 yorushi, for modifications made in this fork.
 </div>
 
 <div align="center">
-  <img src="docs/assets/banner.png" alt="Yoake" width="850" />
+  <img src="docs/assets/banner.png" alt="Kizashi" width="850" />
 </div>
 
 ## Previews
@@ -130,26 +130,26 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/ilyamiro/serpantinum/mas
 
 ### NixOS
 
-Yoake provides flake outputs, a NixOS module for system dependencies, and a Home Manager module for user configuration and service management.
+Kizashi provides flake outputs, a NixOS module for system dependencies, and a Home Manager module for user configuration and service management.
 
 #### 1. Add Flake Input
 
-Add Yoake to your `flake.nix`:
+Add Kizashi to your `flake.nix`:
 
 ```nix
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    yoake.url = "github:ilyamiro/serpantinum";
+    kizashi.url = "github:ilyamiro/serpantinum";
   };
 
-  outputs = { self, nixpkgs, yoake, ... }: {
+  outputs = { self, nixpkgs, kizashi, ... }: {
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
-      specialArgs = { inherit yoake; };
+      specialArgs = { inherit kizashi; };
       modules = [
         ./configuration.nix
-        yoake.nixosModules.default
+        kizashi.nixosModules.default
       ];
     };
   };
@@ -163,7 +163,7 @@ Enable the NixOS module to configure system prerequisites:
 
 ```nix
 {
-  programs.yoake.enable = true;
+  programs.kizashi.enable = true;
 }
 
 ```
@@ -171,11 +171,11 @@ Enable the NixOS module to configure system prerequisites:
 If you prefer installing the package directly without the system module:
 
 ```nix
-{ pkgs, yoake, ... }:
+{ pkgs, kizashi, ... }:
 
 {
   environment.systemPackages = [
-    yoake.packages.${pkgs.stdenv.hostPlatform.system}.default
+    kizashi.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 }
 
@@ -184,14 +184,14 @@ If you prefer installing the package directly without the system module:
 #### 3. Home Manager Configuration
 
 ```nix
-{ yoake, ... }:
+{ kizashi, ... }:
 
 {
   imports = [
-    yoake.homeManagerModules.default
+    kizashi.homeManagerModules.default
   ];
 
-  programs.yoake = {
+  programs.kizashi = {
     enable = true;
     systemd.enable = true;
 
@@ -239,7 +239,7 @@ If you prefer installing the package directly without the system module:
 Ensure your compositor config launches the daemon or shell binary on startup:
 
 ```bash
-yoaked start
+kizashid start
 
 ```
 

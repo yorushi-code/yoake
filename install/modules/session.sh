@@ -19,14 +19,14 @@ hook_starship() {
     local rc="$1" line="$2"
     [ -f "$rc" ] || return 0
     grep -q 'starship init' "$rc" && return 0
-    printf '\n# Added by the yoake installer: terminal prompt.\n%s\n' "$line" >> "$rc"
+    printf '\n# Added by the kizashi installer: terminal prompt.\n%s\n' "$line" >> "$rc"
 }
 
 setup_session_extras() {
     local project_root="$1"
     local install_state="$2"
     local is_reinstall="$3"
-    local deployed="$HOME/.local/share/yoake"
+    local deployed="$HOME/.local/share/kizashi"
 
     if [[ "$install_state" == "current" && "$is_reinstall" != "true" ]]; then
         return 0
@@ -39,16 +39,16 @@ setup_session_extras() {
     # Equaliser: a PipeWire filter-chain that WirePlumber puts in front of
     # whichever output is chosen. Picked up at the next login.
     if [ -f "$deployed/src/quickshell/media/equalizer.sh" ]; then
-        YOAKE_DIR="$deployed/src" bash "$deployed/src/quickshell/media/equalizer.sh" install 2>/dev/null || true
+        KIZASHI_DIR="$deployed/src" bash "$deployed/src/quickshell/media/equalizer.sh" install 2>/dev/null || true
     fi
 
     # kitty: upstream's kitty.conf includes colors.conf, which only matugen
-    # writes. The yoake night palette takes its place.
+    # writes. The kizashi night palette takes its place.
     local kitty_dir="$HOME/.config/kitty"
-    if [ -f "$project_root/config/kitty/yoake-night.conf" ]; then
+    if [ -f "$project_root/config/kitty/kizashi-night.conf" ]; then
         mkdir -p "$kitty_dir"
         backup_file "$kitty_dir/colors.conf"
-        cp "$project_root/config/kitty/yoake-night.conf" "$kitty_dir/colors.conf"
+        cp "$project_root/config/kitty/kizashi-night.conf" "$kitty_dir/colors.conf"
     fi
 
     # starship: the prompt's config, and a hook in every shell rc present
@@ -61,8 +61,8 @@ setup_session_extras() {
         if [ -d "$HOME/.config/fish" ] || command -v fish &>/dev/null; then
             if ! grep -qs 'starship init' "$HOME/.config/fish/config.fish"; then
                 mkdir -p "$HOME/.config/fish/conf.d"
-                cat > "$HOME/.config/fish/conf.d/yoake-starship.fish" <<'EOF'
-# Added by the yoake installer: terminal prompt.
+                cat > "$HOME/.config/fish/conf.d/kizashi-starship.fish" <<'EOF'
+# Added by the kizashi installer: terminal prompt.
 if status is-interactive; and type -q starship
     starship init fish | source
 end

@@ -28,5 +28,5 @@ ShaderEffect {
     property real amplitude: 0.9
     property real frequency: perimeter > 0 ? (2 * Math.PI * Math.max(4, Math.round(perimeter / 28))) / perimeter : 0
 
-    fragmentShader: "file://" + Caching.yoakeDir + "/assets/shaders/widgets/widget_outline.frag.qsb"
+    fragmentShader: "file://" + Caching.kizashiDir + "/assets/shaders/widgets/widget_outline.frag.qsb"
 }

@@ -306,7 +306,7 @@ PanelWindow {
                 return sideMusicPopout.alignBottom ? 3.0 : 1.0;
             }
             property color color: ThemeBackend.base
-            fragmentShader: "file://" + Caching.yoakeDir + "/assets/shaders/ui/corner_cutout.frag.qsb"
+            fragmentShader: "file://" + Caching.kizashiDir + "/assets/shaders/ui/corner_cutout.frag.qsb"
         }
 
         ShaderEffect {
@@ -333,7 +333,7 @@ PanelWindow {
                 return sideMusicPopout.alignBottom ? 2.0 : 0.0;
             }
             property color color: ThemeBackend.base
-            fragmentShader: "file://" + Caching.yoakeDir + "/assets/shaders/ui/corner_cutout.frag.qsb"
+            fragmentShader: "file://" + Caching.kizashiDir + "/assets/shaders/ui/corner_cutout.frag.qsb"
         }
 
         Rectangle {
@@ -454,8 +454,8 @@ PanelWindow {
                     Layout.preferredHeight: titleSection.implicitHeight
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        if (Caching.yoakeDir) {
-                            Quickshell.execDetached(["bash", "-c", Caching.yoakeDir + "/scripts/qs_manager.sh toggle music"]);
+                        if (Caching.kizashiDir) {
+                            Quickshell.execDetached(["bash", "-c", Caching.kizashiDir + "/scripts/qs_manager.sh toggle music"]);
                         }
                     }
 

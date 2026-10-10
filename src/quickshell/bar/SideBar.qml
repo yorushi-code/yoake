@@ -525,7 +525,7 @@ Item {
         property real cornerIndex: (barWindow && barWindow.barPosition === "right") ? 1.0 : 0.0
         property color color: Qt.alpha(ThemeBackend.base, (barWindow && barWindow.barOpacity !== undefined) ? barWindow.barOpacity : 1.0)
 
-        fragmentShader: "file://" + Caching.yoakeDir + "/assets/shaders/ui/corner_cutout.frag.qsb"
+        fragmentShader: "file://" + Caching.kizashiDir + "/assets/shaders/ui/corner_cutout.frag.qsb"
 
         Behavior on opacity {
             enabled: barWindow && !barWindow.positionChanging && barWindow.startupCascadeFinished && !contentWrapper.suppressAnimation
@@ -547,7 +547,7 @@ Item {
         property real cornerIndex: (barWindow && barWindow.barPosition === "right") ? 3.0 : 2.0
         property color color: Qt.alpha(ThemeBackend.base, (barWindow && barWindow.barOpacity !== undefined) ? barWindow.barOpacity : 1.0)
 
-        fragmentShader: "file://" + Caching.yoakeDir + "/assets/shaders/ui/corner_cutout.frag.qsb"
+        fragmentShader: "file://" + Caching.kizashiDir + "/assets/shaders/ui/corner_cutout.frag.qsb"
 
         Behavior on opacity {
             enabled: barWindow && !barWindow.positionChanging && barWindow.startupCascadeFinished && !contentWrapper.suppressAnimation

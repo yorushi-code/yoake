@@ -14,7 +14,7 @@ DEFAULT_VER = "2.0.0"
 TREE_VERSION_FILE = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, "version.txt"
 )
-state_dir = os.path.expanduser("~/.local/state/yoake")
+state_dir = os.path.expanduser("~/.local/state/kizashi")
 if "--state-dir" in sys.argv:
     try:
         idx = sys.argv.index("--state-dir")
@@ -68,7 +68,7 @@ def get_state_ver():
         try:
             with open(state_file, "r") as f:
                 for line in f:
-                    if line.startswith("YOAKE_VERSION="):
+                    if line.startswith("KIZASHI_VERSION="):
                         v = line.split("=", 1)[1].strip().strip('"').strip("'")
                         if v:
                             return v

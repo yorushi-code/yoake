@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installs clean upstream Serpantinum (ilyamiro/serpantinum), not yoake.
+# Installs clean upstream Serpantinum (ilyamiro/serpantinum), not kizashi.
 #
 # Upstream's own installer does the work, so what gets installed is exactly
 # what upstream ships. On Arch it runs as it is. On Fedora it runs with
@@ -16,12 +16,12 @@
 
 set -e
 
-YOAKE_INSTALL_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+KIZASHI_INSTALL_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 UPSTREAM_SLUG="${UPSTREAM_SLUG:-ilyamiro/serpantinum}"
 UPSTREAM_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/serpantinum-installer"
 
 export PKG_PRODUCT=serpantinum
-source "$YOAKE_INSTALL_DIR/modules/pkg.sh"
+source "$KIZASHI_INSTALL_DIR/modules/pkg.sh"
 
 if [ "$EUID" -eq 0 ]; then
     echo "Run this as your user, not root; it asks for sudo where it needs it." >&2
@@ -68,7 +68,7 @@ patch_upstream() {
     sed -i "$expr" "$file"
     if ! grep -qE "$check" "$file"; then
         echo "Upstream's installer changed ($1: $check); stopping rather than guessing." >&2
-        echo "Please report it at https://github.com/yorushi-code/yoake/issues" >&2
+        echo "Please report it at https://github.com/yorushi-code/kizashi/issues" >&2
         exit 1
     fi
 }
@@ -108,6 +108,6 @@ if [ ${#upstream_pkgs[@]} -gt 0 ]; then
     fi
 fi
 
-export YOAKE_PKG_LIB="$YOAKE_INSTALL_DIR/modules/pkg.sh"
-export PATH="$YOAKE_INSTALL_DIR/compat:$PATH"
+export KIZASHI_PKG_LIB="$KIZASHI_INSTALL_DIR/modules/pkg.sh"
+export PATH="$KIZASHI_INSTALL_DIR/compat:$PATH"
 exec bash "$UPSTREAM_DIR/install/install.sh" "$@"

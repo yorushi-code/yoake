@@ -485,7 +485,7 @@ ShellRoot {
                         property vector2d origin: Qt.vector2d(barWindow.transitionOriginX, barWindow.transitionOriginY)
                         property vector4d params: Qt.vector4d(barWindow.wipeIsVertical ? 1.0 : 0.0, barWindow.swipeDirection, 0.0, 0.0)
 
-                        fragmentShader: "file://" + Caching.yoakeDir + "/assets/shaders/transitions/wallpaper_transition.frag.qsb"
+                        fragmentShader: "file://" + Caching.kizashiDir + "/assets/shaders/transitions/wallpaper_transition.frag.qsb"
                     }
 
                     Item {
@@ -552,7 +552,7 @@ ShellRoot {
                         property vector2d origin: Qt.vector2d(barWindow.transitionOriginX, barWindow.transitionOriginY)
                         property vector4d params: Qt.vector4d(barWindow.wipeIsVertical ? 1.0 : 0.0, barWindow.swipeDirection, 0.0, 0.0)
 
-                        fragmentShader: "file://" + Caching.yoakeDir + "/assets/shaders/transitions/wallpaper_transition.frag.qsb"
+                        fragmentShader: "file://" + Caching.kizashiDir + "/assets/shaders/transitions/wallpaper_transition.frag.qsb"
                     }
 
                     Item {

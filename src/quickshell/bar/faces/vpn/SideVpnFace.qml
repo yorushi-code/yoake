@@ -48,6 +48,6 @@ Item {
                 : (root.isCompact ? Qt.lighter(ThemeBackend.surface0, 1.18) : ThemeBackend.surface0))
         textColor: (root.isBad || root.isUp) ? ThemeBackend.base : ThemeBackend.text
         onClicked: Quickshell.execDetached(["bash", "-c",
-            Caching.yoakeDir + "/scripts/qs_manager.sh toggle vpn"])
+            Caching.kizashiDir + "/scripts/qs_manager.sh toggle vpn"])
     }
 }

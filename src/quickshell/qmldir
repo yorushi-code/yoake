@@ -12,7 +12,7 @@ Idle 1.0 idle/Idle.qml
 Lock 1.0 lock/Lock.qml
 
 Start 1.0 serp/Start.qml
-Yoake 1.0 serp/Yoake.qml
+Kizashi 1.0 serp/Kizashi.qml
 
 Osd 1.0 popouts/Osd.qml
 PopoutManager 1.0 popouts/PopoutManager.qml
@@ -64,7 +64,7 @@ singleton TrayMenuController 1.0 singletons/widgetcontrols/TrayMenuController.qm
 singleton WidgetSync 1.0 singletons/widgetcontrols/WidgetSync.qml
 singleton DesktopMenuController singletons/widgetcontrols/DesktopMenuController.qml
 
-singleton YoakePalette 1.0 yoake/Palette.qml
-singleton YoakeNet 1.0 yoake/Net.qml
-singleton Mihomo 1.0 yoake/Mihomo.qml
-singleton MihomoApi 1.0 yoake/MihomoApi.qml
+singleton KizashiPalette 1.0 kizashi/Palette.qml
+singleton KizashiNet 1.0 kizashi/Net.qml
+singleton Mihomo 1.0 kizashi/Mihomo.qml
+singleton MihomoApi 1.0 kizashi/MihomoApi.qml

@@ -12,7 +12,7 @@
 #   -S… pkgs     install; with no packages, refresh metadata (-Sy, -Syyu)
 #   -R… pkgs     nothing: packages are never removed on Fedora
 
-source "${YOAKE_PKG_LIB:?YOAKE_PKG_LIB must point at install/modules/pkg.sh}"
+source "${KIZASHI_PKG_LIB:?KIZASHI_PKG_LIB must point at install/modules/pkg.sh}"
 
 op=""
 pkgs=()

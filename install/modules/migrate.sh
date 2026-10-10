@@ -48,3 +48,28 @@ migrate_legacy() {
         mv "$HOME/.local/state/imperative-dots-version" "$HOME/.config/hypr_backup/imperative-dots-version.bak" 2>/dev/null || true
     fi
 }
+
+# yoake -> kizashi (10.10.2026). Настройки, кэш и состояние переезжают под
+# новое имя один раз; если kizashi уже есть, старое не трогаем -- там может
+# быть свежее. Эквалайзер и starship установщик создаёт под новым именем, и
+# со старыми файлами рядом фильтр и приглашение срабатывали бы дважды.
+migrate_yoake_to_kizashi() {
+    local base
+    for base in "$HOME/.config" "${XDG_CACHE_HOME:-$HOME/.cache}" "${XDG_STATE_HOME:-$HOME/.local/state}" "${XDG_DATA_HOME:-$HOME/.local/share}"; do
+        if [ -d "$base/yoake" ] && [ ! -e "$base/kizashi" ]; then
+            mv "$base/yoake" "$base/kizashi"
+        fi
+    done
+
+    local eq_dir="${XDG_CONFIG_HOME:-$HOME/.config}/pipewire/pipewire.conf.d"
+    if [ -f "$eq_dir/99-yoake-eq.conf" ]; then
+        if [ -e "$eq_dir/99-kizashi-eq.conf" ]; then
+            rm -f "$eq_dir/99-yoake-eq.conf"
+        else
+            sed 's/yoake/kizashi/g' "$eq_dir/99-yoake-eq.conf" > "$eq_dir/99-kizashi-eq.conf" &&
+                rm -f "$eq_dir/99-yoake-eq.conf"
+        fi
+    fi
+
+    rm -f "$HOME/.config/fish/conf.d/yoake-starship.fish"
+}

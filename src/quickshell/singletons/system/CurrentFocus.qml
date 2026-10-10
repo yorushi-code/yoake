@@ -28,8 +28,8 @@ Item {
 
     Process {
         id: focusDaemon
-        command: ["bash", "-c", "exec " + Caching.yoakeDir + "/scripts/current_focus.sh"]
-        running: typeof Caching !== "undefined" && Caching.yoakeDir !== undefined && Caching.yoakeDir !== ""
+        command: ["bash", "-c", "exec " + Caching.kizashiDir + "/scripts/current_focus.sh"]
+        running: typeof Caching !== "undefined" && Caching.kizashiDir !== undefined && Caching.kizashiDir !== ""
         stdout: SplitParser {
             onRead: data => root.updateFocus(data)
         }

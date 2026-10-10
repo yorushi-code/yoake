@@ -44,7 +44,7 @@ if not os.path.exists(DB_PATH) and os.path.exists(OLD_DB_BASE):
         pass
 
 STATE_FILE = os.path.join(RUN_DIR, "focustime_state.json")
-CONFIG_PATH = os.environ.get("QS_SETTINGS", os.path.expanduser("~/.config/yoake/settings.json"))
+CONFIG_PATH = os.environ.get("QS_SETTINGS", os.path.expanduser("~/.config/kizashi/settings.json"))
 
 SYSTEM_STATES = {"Desktop", "Locked", "Quickshell", "Unknown"}
 
@@ -130,7 +130,7 @@ def get_active_window_niri():
     except Exception:
         return "Desktop", "Desktop"
 
-LOCK_RUN_DIR = os.environ.get("QS_RUN_LOCK", os.path.join(os.environ.get("QS_RUN_DIR", f"{os.environ.get('XDG_RUNTIME_DIR', '/tmp')}/yoake"), "lock"))
+LOCK_RUN_DIR = os.environ.get("QS_RUN_LOCK", os.path.join(os.environ.get("QS_RUN_DIR", f"{os.environ.get('XDG_RUNTIME_DIR', '/tmp')}/kizashi"), "lock"))
 LOCK_STATE_PATH = os.path.join(LOCK_RUN_DIR, "locked")
 
 def is_locked():

@@ -19,15 +19,15 @@ Item {
     readonly property var barWindow: module ? module.barWindow : null
 
     property bool isDesktop: false
-    // Данные берёт общий синглтон YoakeNet -- он же кормит боковой виджет,
+    // Данные берёт общий синглтон KizashiNet -- он же кормит боковой виджет,
     // так что опросчик в системе один. Подробности, почему не служба
     // Quickshell.Networking, -- в самом Net.qml.
-    readonly property bool isWifiOn: YoakeNet.wifiEnabled
-    readonly property string wifiSsid: YoakeNet.ssid
-    readonly property string wifiIcon: YoakeNet.wifiIcon
-    readonly property string ethStatus: YoakeNet.ethConnected ? "Connected"
-        : (YoakeNet.ethPresent ? "Disconnected" : "Ethernet")
-    readonly property string wifiStatus: YoakeNet.wifiEnabled ? "Enabled" : "Off"
+    readonly property bool isWifiOn: KizashiNet.wifiEnabled
+    readonly property string wifiSsid: KizashiNet.ssid
+    readonly property string wifiIcon: KizashiNet.wifiIcon
+    readonly property string ethStatus: KizashiNet.ethConnected ? "Connected"
+        : (KizashiNet.ethPresent ? "Disconnected" : "Ethernet")
+    readonly property string wifiStatus: KizashiNet.wifiEnabled ? "Enabled" : "Off"
     property bool showEthernet: ethStatus === "Connected" || (isDesktop && !isWifiOn)
     property bool showLayout: (!module || module.moduleActive) && (!barWindow || (barWindow.isStartupReady && barWindow.isDataReady))
     property alias wifiPill: wifiPill
@@ -94,7 +94,7 @@ Item {
             transform: Translate { y: wifiPill.initAnimTrigger ? 0 : (barWindow ? barWindow.s(15) : 15); Behavior on y { NumberAnimation { duration: 620; easing.type: Easing.OutQuint } } }
             Behavior on opacity { NumberAnimation { duration: 450; easing.type: Easing.OutCubic } }
 
-            onClicked: Quickshell.execDetached(["bash", "-c", Caching.yoakeDir + "/scripts/qs_manager.sh toggle network wifi"])
+            onClicked: Quickshell.execDetached(["bash", "-c", Caching.kizashiDir + "/scripts/qs_manager.sh toggle network wifi"])
         }
     }
 }

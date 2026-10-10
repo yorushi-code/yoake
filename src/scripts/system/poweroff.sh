@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-rm -f /tmp/yoaked.lock /tmp/yoaked.pid 2>/dev/null
+rm -f /tmp/kizashid.lock /tmp/kizashid.pid 2>/dev/null
 
 if command -v systemctl &>/dev/null && [ -d /run/systemd/system ]; then
     systemctl poweroff -i && exit 0

@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 
-if [ -z "$YOAKE_DIR" ]; then
+if [ -z "$KIZASHI_DIR" ]; then
     SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
-    export YOAKE_DIR="$(dirname "$SCRIPT_DIR")"
+    export KIZASHI_DIR="$(dirname "$SCRIPT_DIR")"
 fi
 
-export QS_DIR="$YOAKE_DIR/quickshell"
+export QS_DIR="$KIZASHI_DIR/quickshell"
 export MAIN_QML="$QS_DIR/Shell.qml"
-export IPC_SOCKET="${XDG_RUNTIME_DIR:-/tmp}/yoake.sock"
+export IPC_SOCKET="${XDG_RUNTIME_DIR:-/tmp}/kizashi.sock"
 
-export QS_CACHE_DIR="$HOME/.cache/yoake"
-export QS_STATE_DIR="$HOME/.local/state/yoake"
-export QS_RUN_DIR="${XDG_RUNTIME_DIR:-/tmp}/yoake"
+export QS_CACHE_DIR="$HOME/.cache/kizashi"
+export QS_STATE_DIR="$HOME/.local/state/kizashi"
+export QS_RUN_DIR="${XDG_RUNTIME_DIR:-/tmp}/kizashi"
 export QS_LOG_DIR="$QS_RUN_DIR/logs"
-export QS_SETTINGS="$HOME/.config/yoake/settings.json"
+export QS_SETTINGS="$HOME/.config/kizashi/settings.json"
 
 [[ -d "$QS_LOG_DIR" && -d "$QS_CACHE_DIR" && -d "$QS_STATE_DIR" ]] || mkdir -p "$QS_CACHE_DIR" "$QS_STATE_DIR" "$QS_RUN_DIR" "$QS_LOG_DIR"
 
@@ -48,13 +48,13 @@ qs_ensure_cache "focustime"
 
 if [ ! -f "$QS_STATE_DIR/version" ]; then
     ver=""
-    if [ -f "$YOAKE_DIR/version.txt" ]; then
-        ver="$(cat "$YOAKE_DIR/version.txt" 2>/dev/null | xargs)"
-    elif [ -f "$(dirname "$YOAKE_DIR")/version.txt" ]; then
-        ver="$(cat "$(dirname "$YOAKE_DIR")/version.txt" 2>/dev/null | xargs)"
+    if [ -f "$KIZASHI_DIR/version.txt" ]; then
+        ver="$(cat "$KIZASHI_DIR/version.txt" 2>/dev/null | xargs)"
+    elif [ -f "$(dirname "$KIZASHI_DIR")/version.txt" ]; then
+        ver="$(cat "$(dirname "$KIZASHI_DIR")/version.txt" 2>/dev/null | xargs)"
     fi
-    [ -z "$ver" ] && ver="${YOAKE_VERSION:-2.0.0}"
-    echo "YOAKE_VERSION=\"$ver\"" > "$QS_STATE_DIR/version"
+    [ -z "$ver" ] && ver="${KIZASHI_VERSION:-2.0.0}"
+    echo "KIZASHI_VERSION=\"$ver\"" > "$QS_STATE_DIR/version"
 fi
 
 [ -f "$QS_STATE_DIR/quickactions/palettes.json" ] || echo "[]" > "$QS_STATE_DIR/quickactions/palettes.json"

@@ -1,6 +1,6 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-# yoake night prompt: every segment says what it is.
+# kizashi night prompt: every segment says what it is.
 #
 #    󰉋 ~/codes/project     task-3  󰏫 2 󰋗 1 ⇡1              ⌛ 3s  󰥔 18:52
 #   ❯
@@ -24,9 +24,9 @@ $time\
 $line_break\
 $character"""
 
-palette = 'yoake_night'
+palette = 'kizashi_night'
 
-[palettes.yoake_night]
+[palettes.kizashi_night]
 ink      = "#0b0a10"
 plum     = "#2a1845"
 violet   = "#9b6bff"

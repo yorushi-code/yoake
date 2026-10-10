@@ -6,38 +6,38 @@ binds {
     Mod+Q { close-window; }
     Mod+Shift+F { toggle-window-floating; }
 
-    XF86MonBrightnessDown { spawn "yoake" "brightness" "lower"; }
-    XF86MonBrightnessUp { spawn "yoake" "brightness" "raise"; }
+    XF86MonBrightnessDown { spawn "kizashi" "brightness" "lower"; }
+    XF86MonBrightnessUp { spawn "kizashi" "brightness" "raise"; }
 
-    Print { spawn "yoake" "screenshot"; }
-    Shift+Print { spawn "yoake" "screenshot" "--edit"; }
-    Super+Print { spawn "yoake" "screenshot" "--full"; }
-    Super+Shift+Print { spawn "yoake" "screenshot" "--full" "--edit"; }
+    Print { spawn "kizashi" "screenshot"; }
+    Shift+Print { spawn "kizashi" "screenshot" "--edit"; }
+    Super+Print { spawn "kizashi" "screenshot" "--full"; }
+    Super+Shift+Print { spawn "kizashi" "screenshot" "--full" "--edit"; }
 
-    XF86PowerOff { spawn "yoake" "lock"; }
-    Mod+L { spawn "yoake" "lock"; }
+    XF86PowerOff { spawn "kizashi" "lock"; }
+    Mod+L { spawn "kizashi" "lock"; }
 
     Mod+Space { spawn "playerctl" "play-pause"; }
     XF86AudioPause { spawn "playerctl" "play-pause"; }
     XF86AudioPlay { spawn "playerctl" "play-pause"; }
     XF86AudioPrev { spawn "playerctl" "previous"; }
     XF86AudioNext { spawn "playerctl" "next"; }
-    XF86AudioMicMute { spawn "yoake" "volume" "mic-toggle"; }
-    XF86AudioMute { spawn "yoake" "volume" "mute-toggle"; }
-    XF86AudioLowerVolume { spawn "yoake" "volume" "lower"; }
-    XF86AudioRaiseVolume { spawn "yoake" "volume" "raise"; }
+    XF86AudioMicMute { spawn "kizashi" "volume" "mic-toggle"; }
+    XF86AudioMute { spawn "kizashi" "volume" "mute-toggle"; }
+    XF86AudioLowerVolume { spawn "kizashi" "volume" "lower"; }
+    XF86AudioRaiseVolume { spawn "kizashi" "volume" "raise"; }
 
-    Mod+R { spawn "yoake" "reload"; }
-    Mod+C { spawn "yoake" "msg" "toggle" "clipboard"; }
-    Mod+D { spawn "yoake" "msg" "toggle" "launcher"; }
-    Mod+M { spawn "yoake" "msg" "toggle" "music"; }
-    Mod+B { spawn "yoake" "msg" "toggle" "system"; }
-    Mod+W { spawn "yoake" "msg" "toggle" "wallpaper"; }
-    Mod+S { spawn "yoake" "msg" "toggle" "calendar"; }
-    Mod+N { spawn "yoake" "msg" "toggle" "network"; }
-    Mod+V { spawn "yoake" "msg" "toggle" "volume"; }
-    Mod+H { spawn "yoake" "msg" "toggle" "guide"; }
-    Mod+A { spawn "yoake" "msg" "toggle" "autohide"; }
+    Mod+R { spawn "kizashi" "reload"; }
+    Mod+C { spawn "kizashi" "msg" "toggle" "clipboard"; }
+    Mod+D { spawn "kizashi" "msg" "toggle" "launcher"; }
+    Mod+M { spawn "kizashi" "msg" "toggle" "music"; }
+    Mod+B { spawn "kizashi" "msg" "toggle" "system"; }
+    Mod+W { spawn "kizashi" "msg" "toggle" "wallpaper"; }
+    Mod+S { spawn "kizashi" "msg" "toggle" "calendar"; }
+    Mod+N { spawn "kizashi" "msg" "toggle" "network"; }
+    Mod+V { spawn "kizashi" "msg" "toggle" "volume"; }
+    Mod+H { spawn "kizashi" "msg" "toggle" "guide"; }
+    Mod+A { spawn "kizashi" "msg" "toggle" "autohide"; }
 
     Mod+Left { focus-column-left; }
     Mod+Right { focus-column-right; }
@@ -54,25 +54,25 @@ binds {
     Mod+Shift+Up { set-window-height "-5%"; }
     Mod+Shift+Down { set-window-height "+5%"; }
 
-    Mod+1 { spawn "yoake" "msg" "workspace" "1"; }
-    Mod+2 { spawn "yoake" "msg" "workspace" "2"; }
-    Mod+3 { spawn "yoake" "msg" "workspace" "3"; }
-    Mod+4 { spawn "yoake" "msg" "workspace" "4"; }
-    Mod+5 { spawn "yoake" "msg" "workspace" "5"; }
-    Mod+6 { spawn "yoake" "msg" "workspace" "6"; }
-    Mod+7 { spawn "yoake" "msg" "workspace" "7"; }
-    Mod+8 { spawn "yoake" "msg" "workspace" "8"; }
-    Mod+9 { spawn "yoake" "msg" "workspace" "9"; }
-    Mod+0 { spawn "yoake" "msg" "workspace" "10"; }
+    Mod+1 { spawn "kizashi" "msg" "workspace" "1"; }
+    Mod+2 { spawn "kizashi" "msg" "workspace" "2"; }
+    Mod+3 { spawn "kizashi" "msg" "workspace" "3"; }
+    Mod+4 { spawn "kizashi" "msg" "workspace" "4"; }
+    Mod+5 { spawn "kizashi" "msg" "workspace" "5"; }
+    Mod+6 { spawn "kizashi" "msg" "workspace" "6"; }
+    Mod+7 { spawn "kizashi" "msg" "workspace" "7"; }
+    Mod+8 { spawn "kizashi" "msg" "workspace" "8"; }
+    Mod+9 { spawn "kizashi" "msg" "workspace" "9"; }
+    Mod+0 { spawn "kizashi" "msg" "workspace" "10"; }
 
-    Mod+Shift+1 { spawn "yoake" "msg" "workspace" "1" "move"; }
-    Mod+Shift+2 { spawn "yoake" "msg" "workspace" "2" "move"; }
-    Mod+Shift+3 { spawn "yoake" "msg" "workspace" "3" "move"; }
-    Mod+Shift+4 { spawn "yoake" "msg" "workspace" "4" "move"; }
-    Mod+Shift+5 { spawn "yoake" "msg" "workspace" "5" "move"; }
-    Mod+Shift+6 { spawn "yoake" "msg" "workspace" "6" "move"; }
-    Mod+Shift+7 { spawn "yoake" "msg" "workspace" "7" "move"; }
-    Mod+Shift+8 { spawn "yoake" "msg" "workspace" "8" "move"; }
-    Mod+Shift+9 { spawn "yoake" "msg" "workspace" "9" "move"; }
-    Mod+Shift+0 { spawn "yoake" "msg" "workspace" "10" "move"; }
+    Mod+Shift+1 { spawn "kizashi" "msg" "workspace" "1" "move"; }
+    Mod+Shift+2 { spawn "kizashi" "msg" "workspace" "2" "move"; }
+    Mod+Shift+3 { spawn "kizashi" "msg" "workspace" "3" "move"; }
+    Mod+Shift+4 { spawn "kizashi" "msg" "workspace" "4" "move"; }
+    Mod+Shift+5 { spawn "kizashi" "msg" "workspace" "5" "move"; }
+    Mod+Shift+6 { spawn "kizashi" "msg" "workspace" "6" "move"; }
+    Mod+Shift+7 { spawn "kizashi" "msg" "workspace" "7" "move"; }
+    Mod+Shift+8 { spawn "kizashi" "msg" "workspace" "8" "move"; }
+    Mod+Shift+9 { spawn "kizashi" "msg" "workspace" "9" "move"; }
+    Mod+Shift+0 { spawn "kizashi" "msg" "workspace" "10" "move"; }
 }

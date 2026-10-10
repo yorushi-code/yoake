@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""serpantinum -> yoake: механическое переименование дерева апстрима.
+"""serpantinum -> kizashi: механическое переименование дерева апстрима.
 
 Правила здесь -- те же, которыми форк переименовали руками один раз (коммит
 af2e216). Записаны кодом потому, что теперь их надо применять к каждому
@@ -18,7 +18,7 @@ import re
 import sys
 
 # Три написания покрывают больше, чем выглядит. serpantinumd распадается в
-# yoaked, а SERPANTINUM_DIR в YOAKE_DIR без отдельных правил: суффиксы всегда
+# kizashid, а SERPANTINUM_DIR в KIZASHI_DIR без отдельных правил: суффиксы всегда
 # прикреплялись к имени, а не жили сами по себе.
 #
 # serpantinum-wallpapers не трогаем: это собственный flake-вход апстрима,
@@ -26,11 +26,16 @@ import sys
 # зависимость на несуществующую.
 LOWER = re.compile(r"serpantinum(?!-wallpapers)")
 
-# ilyamiro/yoake не существует. Ссылки на источник должны называть источник --
+# ilyamiro/kizashi не существует. Ссылки на источник должны называть источник --
 # слаг установщика, проверка версии, домашняя страница в nix, языковые файлы и
 # ссылки на странице "О программе". Общий проход их ломает, поэтому после него
 # слаг возвращается на место.
-UPSTREAM_SLUG = ("ilyamiro/yoake", "ilyamiro/serpantinum")
+UPSTREAM_SLUG = ("ilyamiro/kizashi", "ilyamiro/serpantinum")
+
+# Чужие репозитории, в имени которых есть Serpantinum, -- например, перевод
+# ArseniiTkachuk/Serpantinum-UA. Общий проход давал несуществующий
+# Kizashi-UA (а до того -- Yoake-UA), поэтому имя возвращается на место.
+FOREIGN = [("ArseniiTkachuk/Kizashi-UA", "ArseniiTkachuk/Serpantinum-UA")]
 
 # README апстрима -- не механический перевод. Наш написан руками и первой
 # строкой говорит, что это форк; переименовать половину чужого текста значит
@@ -43,16 +48,19 @@ SKIP_DIRS = {".git"}
 
 
 def rename_text(s):
-    s = LOWER.sub("yoake", s)
-    s = s.replace("Serpantinum", "Yoake")
-    s = s.replace("SERPANTINUM", "YOAKE")
-    return s.replace(*UPSTREAM_SLUG)
+    s = LOWER.sub("kizashi", s)
+    s = s.replace("Serpantinum", "Kizashi")
+    s = s.replace("SERPANTINUM", "KIZASHI")
+    s = s.replace(*UPSTREAM_SLUG)
+    for renamed, original in FOREIGN:
+        s = s.replace(renamed, original)
+    return s
 
 
 def rename_path(p):
     # В путях URL не встречаются, возвращать слаг незачем.
-    p = LOWER.sub("yoake", p)
-    return p.replace("Serpantinum", "Yoake").replace("SERPANTINUM", "YOAKE")
+    p = LOWER.sub("kizashi", p)
+    return p.replace("Serpantinum", "Kizashi").replace("SERPANTINUM", "KIZASHI")
 
 
 def walk(root):

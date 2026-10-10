@@ -1,7 +1,7 @@
 {
   "guide": {
     "about": {
-      "title": "Yoake",
+      "title": "Kizashi",
       "loading": "Завантаження...",
       "unknown": "Невідомо",
       "version_by": "v{version} • від {author}",
@@ -21,7 +21,7 @@
         "uptime": "Час роботи",
         "default_os": "Linux"
       },
-      "github_repo": "ArseniiTkachuk/Yoake-UA"
+      "github_repo": "ArseniiTkachuk/Serpantinum-UA"
     },
     "tabs": {
       "welcome": "Ласкаво просимо",
@@ -440,7 +440,7 @@
     "theme": {
       "font": {
         "title": "Шрифт",
-        "desc": "Оберіть типовий шрифт для yoake",
+        "desc": "Оберіть типовий шрифт для kizashi",
         "select": "Обрати..."
       },
       "radius": {
@@ -985,7 +985,7 @@
     }
   },
   "start": {
-    "title": "Yoake",
+    "title": "Kizashi",
     "made_by": "Створено @{author}",
     "welcome": "Ласкаво просимо",
     "tagline": "Оболонка робочого столу, створена для",
@@ -1120,7 +1120,7 @@
     },
     "guide": {
       "name": "Налаштування",
-      "desc": "Налаштування yoake"
+      "desc": "Налаштування kizashi"
     },
     "calendar": {
       "name": "Календар і годинник",
@@ -1212,7 +1212,7 @@
     }
   },
   "cli": {
-    "usage": "Використання: yoake [команда] [опції...]",
+    "usage": "Використання: kizashi [команда] [опції...]",
     "description": "Оболонка робочого столу для композиторів wayland.",
     "commands": "Команди:",
     "script_commands": "Команди скриптів:",
@@ -1225,23 +1225,23 @@
     "version_desc": "Показати інформацію про версію і вийти",
     "help_desc": "Показати цю довідку і вийти",
     "examples": "Приклади:",
-    "daemon_stopped": "Службу yoake зупинено.",
-    "starting_daemon": "Службу не запущено. Запуск yoaked у фоновому режимі...",
+    "daemon_stopped": "Службу kizashi зупинено.",
+    "starting_daemon": "Службу не запущено. Запуск kizashid у фоновому режимі...",
     "error_missing_qml": "Помилка: не вказано ціль для запуску.",
-    "launch_usage": "Використання: yoake launch <start|widgetredactor> [аргументи...]",
+    "launch_usage": "Використання: kizashi launch <start|widgetredactor> [аргументи...]",
     "error_qml_not_found": "Помилка: не вдалося знайти {NAME}.qml у {DIR}",
     "error_shell_qml_not_found": "Помилка: не вдалося визначити шлях до shell.qml у {DIR}",
     "error_unknown_command": "Помилка: невідома команда '{CMD}'.",
     "error_unknown_target": "Помилка: невідома ціль '{TARGET}'.",
     "launch_help": {
-      "usage": "Використання: yoake launch <start|widgetredactor> [аргументи...]",
+      "usage": "Використання: kizashi launch <start|widgetredactor> [аргументи...]",
       "description": "Запуск автономних компонентів напряму в режимі runner.",
       "available_targets": "Доступні цілі:",
       "target_start": "Запустити інтерфейс початкового налаштування",
       "target_widgetredactor": "Запустити інтерфейс редактора віджетів робочого столу"
     },
     "msg_help": {
-      "usage": "Використання: yoake msg <команда|робочийпростір> [аргументи...]",
+      "usage": "Використання: kizashi msg <команда|робочийпростір> [аргументи...]",
       "description": "Надсилання повідомлень розмітки, робочих просторів і керування вікнами напряму.",
       "available_commands": "Доступні повідомлення:",
       "cmd_workspace": "Перемкнутися на робочий простір <номер> (додайте 'move', щоб перемістити активне вікно)",
@@ -1250,7 +1250,7 @@
       "cmd_close": "Закрити будь-який активний оверлей оболонки"
     },
     "ipc_help": {
-      "usage": "Використання: yoake ipc call <ціль> <метод> [аргументи...]",
+      "usage": "Використання: kizashi ipc call <ціль> <метод> [аргументи...]",
       "description": "Надіслати виклик IPC напряму запущеному екземпляру quickshell."
     },
     "scripts": {
@@ -1271,11 +1271,11 @@
   },
   "daemon": {
     "already_running": "Службу вже запущено. Вихід...",
-    "shutting_down": "Завершення роботи служби yoake...",
-    "launching": "Запуск служби yoake...",
+    "shutting_down": "Завершення роботи служби kizashi...",
+    "launching": "Запуск служби kizashi...",
     "cli": {
-      "usage": "Використання: yoaked <команда> [опції...]",
-      "description": "Фонова служба для оболонки робочого столу yoake.",
+      "usage": "Використання: kizashid <команда> [опції...]",
+      "description": "Фонова служба для оболонки робочого столу kizashi.",
       "commands": "Команди:",
       "cmd_start": "Запустити службу та фонові процеси",
       "cmd_stop": "Зупинити запущену службу",
@@ -1284,9 +1284,9 @@
       "opt_verbose": "Увімкнути докладний вивід логів",
       "opt_version": "Показати інформацію про версію і вийти",
       "opt_help": "Показати цю довідку і вийти",
-      "stopped": "Службу yoake зупинено.",
-      "status_running": "Службу yoake запущено (PID: {PID}).",
-      "status_stopped": "Службу yoake не запущено.",
+      "stopped": "Службу kizashi зупинено.",
+      "status_running": "Службу kizashi запущено (PID: {PID}).",
+      "status_stopped": "Службу kizashi не запущено.",
       "unknown_arg": "Невідомий аргумент: {ARG}"
     }
   },
@@ -1301,7 +1301,7 @@
     },
     "os": {
       "error_root": "Помилка: не запускайте цей скрипт від root/sudo. Запустіть від звичайного користувача.",
-      "error_unsupported": "Непідтримувана ОС ({os}). Yoake підтримує лише arch linux та його похідні.",
+      "error_unsupported": "Непідтримувана ОС ({os}). Kizashi підтримує лише arch linux та його похідні.",
       "error_not_found": "Не вдалося визначити ОС. /etc/os-release не знайдено.",
       "unknown_cpu": "Невідомий процесор",
       "unknown_gpu": "Невідомо / віртуальна машина",
@@ -1357,9 +1357,9 @@
       "tagline": "Оболонка робочого столу, створена для вас",
       "support_creator": "Підтримати автора:",
       "buy_coffee": "Якщо вам подобається цей проєкт, пригостіть автора кавою!",
-      "installed_success": "✔ Yoake {ver} ({commit}) успішно встановлено.",
+      "installed_success": "✔ Kizashi {ver} ({commit}) успішно встановлено.",
       "failed_packages": "Під час встановлення таких пакетів виникли помилки:",
-      "restart_prompt": "Перезапустіть композитор або виконайте 'yoaked start' для початку роботи.",
+      "restart_prompt": "Перезапустіть композитор або виконайте 'kizashid start' для початку роботи.",
       "ask_reboot": "Перезавантажити систему зараз? [y/n] "
     },
     "deps": {

@@ -81,10 +81,10 @@ detect_pkg_family() {
 PKG_FAMILY="${PKG_FAMILY:-$(detect_pkg_family)}"
 export PKG_FAMILY
 
-# What is being installed: yoake, or clean upstream Serpantinum through its
+# What is being installed: kizashi, or clean upstream Serpantinum through its
 # own installer (install/serpantinum.sh). Upstream themes with matugen, which
-# Fedora packages; yoake does not need it.
-PKG_PRODUCT="${PKG_PRODUCT:-yoake}"
+# Fedora packages; kizashi does not need it.
+PKG_PRODUCT="${PKG_PRODUCT:-kizashi}"
 export PKG_PRODUCT
 if [ "$PKG_PRODUCT" = "serpantinum" ]; then
     FEDORA_NAMES[matugen]=matugen
@@ -209,7 +209,7 @@ pkg_bootstrap() {
                 sudo pacman -Sy --noconfirm --needed "${missing[@]}"
             fi
             if ! command -v yay &>/dev/null && ! command -v paru &>/dev/null; then
-                local cache_build="${XDG_CACHE_HOME:-"$HOME/.cache"}/yoake-yay-bin"
+                local cache_build="${XDG_CACHE_HOME:-"$HOME/.cache"}/kizashi-yay-bin"
                 rm -rf "$cache_build"
                 mkdir -p "$cache_build"
                 git clone https://aur.archlinux.org/yay-bin.git "$cache_build"

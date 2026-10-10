@@ -262,7 +262,7 @@ Scope {
 
     Process {
         id: suspendProcess
-        command: ["bash", Caching.yoakeDir + "/scripts/system/suspend.sh"]
+        command: ["bash", Caching.kizashiDir + "/scripts/system/suspend.sh"]
         onExited: {
             SystemInfo.fetch();
             root.updateDeInfo();
@@ -277,12 +277,12 @@ Scope {
 
     Process {
         id: poweroffProcess
-        command: ["bash", Caching.yoakeDir + "/scripts/system/poweroff.sh"]
+        command: ["bash", Caching.kizashiDir + "/scripts/system/poweroff.sh"]
     }
 
     Process {
         id: reloadProcess
-        command: ["bash", Caching.yoakeDir + "/scripts/system/reboot.sh"]
+        command: ["bash", Caching.kizashiDir + "/scripts/system/reboot.sh"]
     }
 
     WlSessionLock {
@@ -974,7 +974,7 @@ Scope {
                         property color color3: ThemeBackend.mauve
                         property color color4: ThemeBackend.surface0
 
-                        fragmentShader: "file://" + Caching.yoakeDir + "/assets/shaders/effects/curtain_wipe.frag.qsb"
+                        fragmentShader: "file://" + Caching.kizashiDir + "/assets/shaders/effects/curtain_wipe.frag.qsb"
                     }
 
                     SequentialAnimation {

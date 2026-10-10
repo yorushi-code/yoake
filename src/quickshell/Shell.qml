@@ -16,7 +16,7 @@ ShellRoot {
     // A QML singleton is constructed on first reference, and nothing
     // references this one: it writes into ThemeBackend instead of being read.
     // Without this line the layer is not late, it is absent.
-    readonly property var _yoakeLayer: [YoakePalette]
+    readonly property var _kizashiLayer: [KizashiPalette]
 
     ScreenshotOverlay {}
     Main {}
@@ -57,9 +57,9 @@ ShellRoot {
     }
 
     Component.onCompleted: {
-        Qt.application.organization = "yoake";
-        Qt.application.domain = "yoake.org";
-        Qt.application.name = "yoake";
+        Qt.application.organization = "kizashi";
+        Qt.application.domain = "kizashi.org";
+        Qt.application.name = "kizashi";
         FirstLaunch.checkFirstLaunch();
         SysNotif.checkBattery();
     }

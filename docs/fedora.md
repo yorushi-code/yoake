@@ -1,4 +1,4 @@
-# Running yoake on Fedora
+# Running kizashi on Fedora
 
 Verified on Fedora 44, niri 26.04, quickshell 0.2.1 (`0.2.1^git20260209`, the
 only build Fedora ships).
@@ -6,12 +6,12 @@ only build Fedora ships).
 ## Installing
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/yorushi-code/yoake/master/install/install.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/yorushi-code/kizashi/master/install/install.sh)"
 
 # or from a checkout:
-git clone https://github.com/yorushi-code/yoake.git && cd yoake
-bash install/install.sh                          # asks: yoake or Serpantinum
-bash install/install.sh --product yoake --yes    # yoake, no questions
+git clone https://github.com/yorushi-code/kizashi.git && cd kizashi
+bash install/install.sh                          # asks: kizashi or Serpantinum
+bash install/install.sh --product kizashi --yes    # kizashi, no questions
 bash install/install.sh --product serpantinum    # clean upstream, its own menus
 ```
 
@@ -23,7 +23,7 @@ that installer. On Arch nothing else happens. On Fedora two things do:
 
 - `install/compat/` goes in front of `PATH` for the duration: `pacman` and
   `yay` shims that answer upstream's queries and installs with dnf, through
-  the same name map as yoake (`install/modules/pkg.sh`), and a `sudo` shim,
+  the same name map as kizashi (`install/modules/pkg.sh`), and a `sudo` shim,
   because sudo's `secure_path` would otherwise bypass them. Nothing is ever
   removed on Fedora. What Fedora does not package (`gpu-screen-recorder`,
   `wl-gammarelay-rs`) is reported among upstream's failed packages;
@@ -34,7 +34,7 @@ that installer. On Arch nothing else happens. On Fedora two things do:
   installer under `set -e`. Each is checked after it is applied; if upstream
   has changed the lines they target, the script stops instead of guessing.
 
-### yoake
+### kizashi
 
 Run it as your user, not root; it asks for sudo where it needs it. Fedora and
 its derivatives are detected through `/etc/os-release` (`ID`/`ID_LIKE`), and
@@ -49,10 +49,10 @@ What it sets up, so that nothing has to be done by hand afterwards:
 - `satty` and `starship`, which Fedora does not package, from their releases
   into `~/.local/bin`; Hyprland through the `solopasha/hyprland` COPR, only if
   Hyprland is chosen;
-- the shell into `~/.local/share/yoake`, the compositor config (the old one
-  backed up), `~/.config/yoake/settings.json`, wallpapers;
+- the shell into `~/.local/share/kizashi`, the compositor config (the old one
+  backed up), `~/.config/kizashi/settings.json`, wallpapers;
 - the equaliser as a PipeWire filter-chain (active from the next login), the
-  yoake night kitty colours, the starship prompt and its hook in fish, bash
+  kizashi night kitty colours, the starship prompt and its hook in fish, bash
   and zsh (existing files are backed up as `*.bak.<date>`);
 - SDDM with the material-you theme in Wayland mode (Fedora has no Xorg), as
   the display manager from the next boot.
@@ -79,30 +79,30 @@ If that changes, the failure will be loud — missing QML types at startup, in
 
 ## Running it
 
-The shell finds its assets, scripts and sounds through `$YOAKE_DIR`, which must
-point at the `src/` directory. `bin/yoake` and `bin/yoaked` derive it from their
+The shell finds its assets, scripts and sounds through `$KIZASHI_DIR`, which must
+point at the `src/` directory. `bin/kizashi` and `bin/kizashid` derive it from their
 own location, so from a checkout they need nothing:
 
 ```bash
-bin/yoaked start
+bin/kizashid start
 ```
 
 Running `qs -p src/quickshell/Shell.qml` by hand without that variable set is
 the one mistake worth warning about, because it half-works: the bar draws and
 reads real system state, but every panel-opening click is silently dead, since
-each widget opens its popout through `$YOAKE_DIR/scripts/qs_manager.sh`.
+each widget opens its popout through `$KIZASHI_DIR/scripts/qs_manager.sh`.
 
 ## Configuration
 
-`~/.config/yoake/settings.json`, seeded once from `config/yoake/settings.json`
+`~/.config/kizashi/settings.json`, seeded once from `config/kizashi/settings.json`
 and live-reloaded thereafter. Two keys matter for this fork:
 
 ```json
-"theme": { "matugen": false, "yoake": true }
+"theme": { "matugen": false, "kizashi": true }
 ```
 
-`yoake: true` puts the layer's palette in charge (see below); `matugen: false`
-stops upstream's generator from overwriting it. Setting `yoake` to `false`
+`kizashi: true` puts the layer's palette in charge (see below); `matugen: false`
+stops upstream's generator from overwriting it. Setting `kizashi` to `false`
 hands the shell back to upstream's theming unaltered, which is the only
 reliable way to tell whether something is the layer's doing.
 
@@ -113,7 +113,7 @@ from upstream's list, and what each one actually gates:
 
 | Package | Gates | Needed? |
 |---|---|---|
-| `matugen` | upstream's wallpaper theming | No — the yoake palette layer replaces it |
+| `matugen` | upstream's wallpaper theming | No — the kizashi palette layer replaces it |
 | `acpi` | nothing | No — it is in upstream's package list, but no code in the tree references it |
 | `satty` | annotating a screenshot after taking it | Only for that |
 | `gpu-screen-recorder` | screen recording | Only for that |
@@ -132,7 +132,7 @@ started first keeps. Run the fork inside a nested niri instead — **without**
 `--session`, so it does not take over D-Bus:
 
 ```bash
-niri -c /path/to/minimal.kdl -- env YOAKE_DIR=$PWD/src qs -p $PWD/src/quickshell/Shell.qml
+niri -c /path/to/minimal.kdl -- env KIZASHI_DIR=$PWD/src qs -p $PWD/src/quickshell/Shell.qml
 ```
 
 niri does not forward the child's stderr, so redirect it inside a wrapper
@@ -142,7 +142,7 @@ screenshot the nested output from outside.
 ## The palette
 
 `src/scripts/wallpaper-palette.py <image>` writes
-`~/.local/state/yoake/generated-colors.json`, which `YoakePalette` watches and
+`~/.local/state/kizashi/generated-colors.json`, which `KizashiPalette` watches and
 applies to `ThemeBackend`. It also rewrites `~/.config/fuzzel/fuzzel.ini`, so
 fuzzel re-themes with the shell.
 
@@ -186,8 +186,8 @@ DNS в туннеле держится на `dns-hijack: ["any:53"]` — mihomo 
 
 ## Гритер serpantinum вместо своего
 
-До этого вход держал greetd: `cage -s -- /usr/local/bin/yoake-greeter`, то есть
-свой гритер на quickshell из `/usr/share/yoake/greeter/shell.qml`, с обвязкой,
+До этого вход держал greetd: `cage -s -- /usr/local/bin/kizashi-greeter`, то есть
+свой гритер на quickshell из `/usr/share/kizashi/greeter/shell.qml`, с обвязкой,
 которая перезапускает его несколько раз и только потом отдаёт экран `gtkgreet`.
 serpantinum вместо этого возит тему для SDDM — `config/sddm/themes/material-you`
 (сторонняя, Darkkal44, MIT).

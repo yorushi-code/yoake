@@ -1897,7 +1897,7 @@ Item {
                                             root.s(30)
                                         )
 
-                                        fragmentShader: "file://" + Caching.yoakeDir + "/assets/shaders/vfx/eq_lightning.frag.qsb"
+                                        fragmentShader: "file://" + Caching.kizashiDir + "/assets/shaders/vfx/eq_lightning.frag.qsb"
                                     }
                                 }
 

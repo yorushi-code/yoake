@@ -4,30 +4,30 @@
 with lib;
 
 let
-  cfg = config.programs.yoake;
+  cfg = config.programs.kizashi;
   system = pkgs.stdenv.hostPlatform.system;
 
   jsonFormat = pkgs.formats.json { };
   inherit (import ./settings-options.nix { inherit lib pkgs; }) settingsSubmodule;
 
-  templateSettings = builtins.fromJSON (builtins.readFile "${self}/config/yoake/settings.json");
+  templateSettings = builtins.fromJSON (builtins.readFile "${self}/config/kizashi/settings.json");
 
   userSettings = lib.filterAttrsRecursive (_: v: v != null) cfg.settings;
 
   mergedSettings = lib.recursiveUpdate templateSettings userSettings;
-  settingsFile = jsonFormat.generate "yoake-settings.json" mergedSettings;
+  settingsFile = jsonFormat.generate "kizashi-settings.json" mergedSettings;
 
-  settingsTarget = "${config.xdg.configHome}/yoake/settings.json";
+  settingsTarget = "${config.xdg.configHome}/kizashi/settings.json";
 in
 {
-  options.programs.yoake = {
-    enable = mkEnableOption "the Yoake Quickshell desktop shell";
+  options.programs.kizashi = {
+    enable = mkEnableOption "the Kizashi Quickshell desktop shell";
 
     package = mkOption {
       type = types.package;
       default = self.packages.${system}.default;
-      defaultText = literalExpression "yoake.packages.<system>.default";
-      description = "The Yoake package to use.";
+      defaultText = literalExpression "kizashi.packages.<system>.default";
+      description = "The Kizashi package to use.";
     };
 
     settings = mkOption {
@@ -42,9 +42,9 @@ in
         }
       '';
       description = ''
-        Yoake configuration, layered on top of the package's
-        bundled `config/yoake/settings.json` and written to
-        `$XDG_CONFIG_HOME/yoake/settings.json`.
+        Kizashi configuration, layered on top of the package's
+        bundled `config/kizashi/settings.json` and written to
+        `$XDG_CONFIG_HOME/kizashi/settings.json`.
         See settings-options.nix for the full list of typed fields;
         anything not listed there can still be set as a plain
         attribute.
@@ -55,20 +55,20 @@ in
       enable = mkOption {
         type = types.bool;
         default = pkgs.stdenv.isLinux;
-        description = "Whether to run yoaked as a `systemd --user` service.";
+        description = "Whether to run kizashid as a `systemd --user` service.";
       };
 
       target = mkOption {
         type = types.str;
         default = "graphical-session.target";
-        description = "Target yoaked is tied to (start/stop/restart with it).";
+        description = "Target kizashid is tied to (start/stop/restart with it).";
       };
 
       environment = mkOption {
         type = types.attrsOf types.str;
         default = { };
         example = { QT_QPA_PLATFORM = "wayland"; };
-        description = "Extra environment variables for the yoaked unit.";
+        description = "Extra environment variables for the kizashid unit.";
       };
     };
   };
@@ -76,25 +76,25 @@ in
   config = mkIf cfg.enable {
     home.packages = [ cfg.package ];
 
-    programs.yoake.settings.wallpaperDir = mkDefault "${config.home.homeDirectory}/Pictures/Wallpapers";
+    programs.kizashi.settings.wallpaperDir = mkDefault "${config.home.homeDirectory}/Pictures/Wallpapers";
 
-    home.activation.yoakeSettings = hm.dag.entryAfter [ "writeBoundary" ] ''
+    home.activation.kizashiSettings = hm.dag.entryAfter [ "writeBoundary" ] ''
       run mkdir -p ${escapeShellArg (builtins.dirOf settingsTarget)}
       if [ ! -e ${escapeShellArg settingsTarget} ]; then
         run install -m 0644 ${settingsFile} ${escapeShellArg settingsTarget}
       fi
     '';
 
-    systemd.user.services.yoake = mkIf cfg.systemd.enable {
+    systemd.user.services.kizashi = mkIf cfg.systemd.enable {
       Unit = {
-        Description = "Yoake shell daemon";
+        Description = "Kizashi shell daemon";
         After = [ cfg.systemd.target ];
         PartOf = [ cfg.systemd.target ];
         X-Restart-Triggers = [ "${settingsFile}" ];
       };
 
       Service = {
-        ExecStart = "${cfg.package}/bin/yoaked start";
+        ExecStart = "${cfg.package}/bin/kizashid start";
         Restart = "on-failure";
         KillMode = "mixed";
         TimeoutStopSec = "5s";

@@ -64,8 +64,8 @@ Singleton {
         triggeredOnStart: true
         onTriggered: {
             if (root.poll.running) return;
-            if (typeof Caching === "undefined" || !Caching.yoakeDir) return;
-            root.poll.command = ["sh", Caching.yoakeDir + "/scripts/wifi_status.sh"];
+            if (typeof Caching === "undefined" || !Caching.kizashiDir) return;
+            root.poll.command = ["sh", Caching.kizashiDir + "/scripts/wifi_status.sh"];
             root.poll.running = true;
         }
     }

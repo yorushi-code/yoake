@@ -1,7 +1,7 @@
 {
   "guide": {
     "about": {
-      "title": "Yoake",
+      "title": "Kizashi",
       "loading": "불러오는 중...",
       "unknown": "알 수 없음",
       "version_by": "v{version} • {author} 제작",
@@ -456,7 +456,7 @@
     "theme": {
       "font": {
         "title": "글꼴",
-        "desc": "yoake이 사용할 기본 글꼴을 선택합니다",
+        "desc": "kizashi이 사용할 기본 글꼴을 선택합니다",
         "select": "선택..."
       },
       "radius": {
@@ -962,7 +962,7 @@
     }
   },
   "start": {
-    "title": "Yoake",
+    "title": "Kizashi",
     "made_by": "@{author} 제작",
     "welcome": "환영합니다",
     "tagline": "이런 분을 위해 만든 데스크톱 셸",
@@ -1097,7 +1097,7 @@
     },
     "guide": {
       "name": "설정",
-      "desc": "Yoake 설정"
+      "desc": "Kizashi 설정"
     },
     "calendar": {
       "name": "달력 및 시계",
@@ -1189,7 +1189,7 @@
     }
   },
   "cli": {
-    "usage": "사용법: yoake [명령] [옵션...]",
+    "usage": "사용법: kizashi [명령] [옵션...]",
     "description": "wayland 컴포지터용 데스크톱 셸입니다.",
     "commands": "명령:",
     "script_commands": "스크립트 명령:",
@@ -1202,23 +1202,23 @@
     "version_desc": "버전 정보를 표시하고 종료합니다",
     "help_desc": "이 도움말을 표시하고 종료합니다",
     "examples": "예시:",
-    "daemon_stopped": "Yoake 데몬이 중지되었습니다.",
-    "starting_daemon": "데몬이 실행 중이 아닙니다. yoaked를 백그라운드에서 시작합니다...",
+    "daemon_stopped": "Kizashi 데몬이 중지되었습니다.",
+    "starting_daemon": "데몬이 실행 중이 아닙니다. kizashid를 백그라운드에서 시작합니다...",
     "error_missing_qml": "오류: 실행할 대상이 지정되지 않았습니다.",
-    "launch_usage": "사용법: yoake launch <start|widgetredactor> [인자...]",
+    "launch_usage": "사용법: kizashi launch <start|widgetredactor> [인자...]",
     "error_qml_not_found": "오류: {DIR}에서 {NAME}.qml을 찾을 수 없습니다",
     "error_shell_qml_not_found": "오류: {DIR}에서 shell.qml 경로를 찾을 수 없습니다",
     "error_unknown_command": "오류: 알 수 없는 명령 '{CMD}'.",
     "error_unknown_target": "오류: 알 수 없는 대상 '{TARGET}'.",
     "launch_help": {
-      "usage": "사용법: yoake launch <start|widgetredactor> [인자...]",
+      "usage": "사용법: kizashi launch <start|widgetredactor> [인자...]",
       "description": "독립 실행 컴포넌트를 러너 모드로 바로 실행합니다.",
       "available_targets": "사용 가능한 대상:",
       "target_start": "초기 설정 인터페이스를 실행합니다",
       "target_widgetredactor": "데스크톱 위젯 편집기를 실행합니다"
     },
     "msg_help": {
-      "usage": "사용법: yoake msg <명령|작업공간> [인자...]",
+      "usage": "사용법: kizashi msg <명령|작업공간> [인자...]",
       "description": "레이아웃, 작업 공간, 창 관리 메시지를 직접 전송합니다.",
       "available_commands": "사용 가능한 메시지:",
       "cmd_workspace": "<num>번 작업 공간으로 전환합니다 ('move'를 덧붙이면 활성 창도 함께 이동)",
@@ -1227,7 +1227,7 @@
       "cmd_close": "활성화된 셸 오버레이를 닫습니다"
     },
     "ipc_help": {
-      "usage": "사용법: yoake ipc call <대상> <메서드> [인자...]",
+      "usage": "사용법: kizashi ipc call <대상> <메서드> [인자...]",
       "description": "실행 중인 quickshell 인스턴스에 IPC 호출을 직접 전송합니다."
     },
     "scripts": {
@@ -1248,11 +1248,11 @@
   },
   "daemon": {
     "already_running": "데몬이 이미 실행 중입니다. 종료합니다...",
-    "shutting_down": "yoake 데몬을 종료하는 중...",
-    "launching": "yoake 데몬을 시작하는 중...",
+    "shutting_down": "kizashi 데몬을 종료하는 중...",
+    "launching": "kizashi 데몬을 시작하는 중...",
     "cli": {
-      "usage": "사용법: yoaked <명령> [옵션...]",
-      "description": "yoake 데스크톱 셸의 백그라운드 서비스 데몬입니다.",
+      "usage": "사용법: kizashid <명령> [옵션...]",
+      "description": "kizashi 데스크톱 셸의 백그라운드 서비스 데몬입니다.",
       "commands": "명령:",
       "cmd_start": "데몬 서비스를 시작하고 백그라운드 작업자를 실행합니다",
       "cmd_stop": "실행 중인 데몬 서비스를 중지합니다",
@@ -1261,9 +1261,9 @@
       "opt_verbose": "상세 로그 출력을 활성화합니다",
       "opt_version": "버전 정보를 표시하고 종료합니다",
       "opt_help": "이 도움말을 표시하고 종료합니다",
-      "stopped": "Yoake 데몬이 중지되었습니다.",
-      "status_running": "Yoake 데몬이 실행 중입니다 (PID: {PID}).",
-      "status_stopped": "Yoake 데몬이 실행 중이 아닙니다.",
+      "stopped": "Kizashi 데몬이 중지되었습니다.",
+      "status_running": "Kizashi 데몬이 실행 중입니다 (PID: {PID}).",
+      "status_stopped": "Kizashi 데몬이 실행 중이 아닙니다.",
       "unknown_arg": "알 수 없는 인자: {ARG}"
     }
   },
@@ -1278,7 +1278,7 @@
     },
     "os": {
       "error_root": "오류: 이 스크립트를 root/sudo로 직접 실행하지 마세요. 일반 사용자로 실행하세요.",
-      "error_unsupported": "지원하지 않는 운영체제({os})입니다. Yoake은 arch linux와 그 파생 배포판만 지원합니다.",
+      "error_unsupported": "지원하지 않는 운영체제({os})입니다. Kizashi은 arch linux와 그 파생 배포판만 지원합니다.",
       "error_not_found": "운영체제를 감지할 수 없습니다. /etc/os-release를 찾을 수 없습니다.",
       "unknown_cpu": "알 수 없는 CPU",
       "unknown_gpu": "알 수 없음 / 가상 머신",
@@ -1334,9 +1334,9 @@
       "tagline": "당신을 위해 만든 데스크톱 셸",
       "support_creator": "제작자 후원하기:",
       "buy_coffee": "이 프로젝트가 마음에 드셨다면 커피 한 잔 사 주세요!",
-      "installed_success": "✔ Yoake {ver} ({commit}) 설치가 완료되었습니다.",
+      "installed_success": "✔ Kizashi {ver} ({commit}) 설치가 완료되었습니다.",
       "failed_packages": "다음 패키지를 설치하는 중 오류가 발생했습니다:",
-      "restart_prompt": "컴포지터를 다시 시작하거나 'yoaked start'를 실행해 시작하세요.",
+      "restart_prompt": "컴포지터를 다시 시작하거나 'kizashid start'를 실행해 시작하세요.",
       "ask_reboot": "다시 시작하시겠습니까? [y/n] "
     },
     "deps": {

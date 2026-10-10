@@ -43,7 +43,7 @@ def artist_matches(candidate, wanted):
 
 
 def fetch_json(url):
-    req = urllib.request.Request(url, headers={"User-Agent": "yoake-shell"})
+    req = urllib.request.Request(url, headers={"User-Agent": "kizashi-shell"})
     with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
         return json.load(resp)
 

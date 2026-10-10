@@ -1,7 +1,7 @@
 {
   "guide": {
     "about": {
-      "title": "Yoake",
+      "title": "Kizashi",
       "loading": "Đang tải...",
       "unknown": "Không rõ",
       "version_by": "v{version} • bởi {author}",
@@ -22,7 +22,7 @@
         "uptime": "Thời gian hoạt động",
         "default_os": "Linux"
       },
-      "github_repo": "yorushi-code/yoake",
+      "github_repo": "yorushi-code/kizashi",
       "github_upstream": "ilyamiro/serpantinum"
     },
     "tabs": {
@@ -458,7 +458,7 @@
     "theme": {
       "font": {
         "title": "Phông chữ",
-        "desc": "Chọn phông chữ mặc định cho yoake",
+        "desc": "Chọn phông chữ mặc định cho kizashi",
         "select": "Chọn..."
       },
       "radius": {
@@ -964,7 +964,7 @@
     }
   },
   "start": {
-    "title": "Yoake",
+    "title": "Kizashi",
     "made_by": "Thực hiện bởi @{author}",
     "welcome": "Chào mừng",
     "tagline": "Một desktop shell được xây dựng cho",
@@ -1099,7 +1099,7 @@
     },
     "guide": {
       "name": "Cài đặt",
-      "desc": "Cài đặt Yoake"
+      "desc": "Cài đặt Kizashi"
     },
     "calendar": {
       "name": "Lịch & Đồng hồ",
@@ -1191,7 +1191,7 @@
     }
   },
   "cli": {
-    "usage": "Cách dùng: yoake [lệnh] [tùy chọn...]",
+    "usage": "Cách dùng: kizashi [lệnh] [tùy chọn...]",
     "description": "Một desktop shell dành cho các Wayland compositor.",
     "commands": "Các lệnh:",
     "script_commands": "Các lệnh tập lệnh:",
@@ -1204,23 +1204,23 @@
     "version_desc": "Hiển thị thông tin phiên bản và thoát",
     "help_desc": "Hiển thị thông báo trợ giúp này và thoát",
     "examples": "Ví dụ:",
-    "daemon_stopped": "Đã dừng daemon Yoake.",
-    "starting_daemon": "Daemon không chạy. Đang khởi động yoaked ở nền...",
+    "daemon_stopped": "Đã dừng daemon Kizashi.",
+    "starting_daemon": "Daemon không chạy. Đang khởi động kizashid ở nền...",
     "error_missing_qml": "Lỗi: thiếu mục tiêu để khởi chạy.",
-    "launch_usage": "Cách dùng: yoake launch <start|widgetredactor> [đối số...]",
+    "launch_usage": "Cách dùng: kizashi launch <start|widgetredactor> [đối số...]",
     "error_qml_not_found": "Lỗi: không tìm thấy {NAME}.qml trong {DIR}",
     "error_shell_qml_not_found": "Lỗi: không tìm thấy đường dẫn đến shell.qml trong {DIR}",
     "error_unknown_command": "Lỗi: lệnh không xác định '{CMD}'.",
     "error_unknown_target": "Lỗi: mục tiêu không xác định '{TARGET}'.",
     "launch_help": {
-      "usage": "Cách dùng: yoake launch <start|widgetredactor> [đối số...]",
+      "usage": "Cách dùng: kizashi launch <start|widgetredactor> [đối số...]",
       "description": "Khởi chạy trực tiếp các thành phần độc lập ở chế độ chạy.",
       "available_targets": "Các mục tiêu khả dụng:",
       "target_start": "Khởi chạy giao diện thiết lập ban đầu",
       "target_widgetredactor": "Khởi chạy giao diện chỉnh sửa tiện ích màn hình"
     },
     "msg_help": {
-      "usage": "Cách dùng: yoake msg <lệnh|không_gian_làm_việc> [đối số...]",
+      "usage": "Cách dùng: kizashi msg <lệnh|không_gian_làm_việc> [đối số...]",
       "description": "Gửi trực tiếp thông điệp quản lý bố cục, không gian làm việc và cửa sổ.",
       "available_commands": "Các thông điệp khả dụng:",
       "cmd_workspace": "Chuyển đến không gian làm việc <số> (thêm 'move' để chuyển cửa sổ đang hoạt động)",
@@ -1229,7 +1229,7 @@
       "cmd_close": "Đóng mọi lớp phủ shell đang hoạt động"
     },
     "ipc_help": {
-      "usage": "Cách dùng: yoake ipc call <mục_tiêu> <phương_thức> [đối số...]",
+      "usage": "Cách dùng: kizashi ipc call <mục_tiêu> <phương_thức> [đối số...]",
       "description": "Gửi lệnh gọi IPC trực tiếp đến phiên bản quickshell đang chạy."
     },
     "scripts": {
@@ -1250,11 +1250,11 @@
   },
   "daemon": {
     "already_running": "Daemon đang chạy rồi. Đang thoát...",
-    "shutting_down": "Đang tắt daemon yoake...",
-    "launching": "Đang khởi chạy daemon yoake...",
+    "shutting_down": "Đang tắt daemon kizashi...",
+    "launching": "Đang khởi chạy daemon kizashi...",
     "cli": {
-      "usage": "Cách dùng: yoaked <lệnh> [tùy chọn...]",
-      "description": "Daemon dịch vụ nền cho desktop shell yoake.",
+      "usage": "Cách dùng: kizashid <lệnh> [tùy chọn...]",
+      "description": "Daemon dịch vụ nền cho desktop shell kizashi.",
       "commands": "Các lệnh:",
       "cmd_start": "Khởi động dịch vụ daemon và các tiến trình nền",
       "cmd_stop": "Dừng dịch vụ daemon đang chạy",
@@ -1263,9 +1263,9 @@
       "opt_verbose": "Bật ghi nhật ký đầu ra chi tiết",
       "opt_version": "Hiển thị thông tin phiên bản và thoát",
       "opt_help": "Hiển thị thông báo trợ giúp này và thoát",
-      "stopped": "Đã dừng daemon Yoake.",
-      "status_running": "Daemon Yoake đang chạy (PID: {PID}).",
-      "status_stopped": "Daemon Yoake không chạy.",
+      "stopped": "Đã dừng daemon Kizashi.",
+      "status_running": "Daemon Kizashi đang chạy (PID: {PID}).",
+      "status_stopped": "Daemon Kizashi không chạy.",
       "unknown_arg": "Đối số không xác định: {ARG}"
     }
   },
@@ -1280,7 +1280,7 @@
     },
     "os": {
       "error_root": "Lỗi: Không chạy trực tiếp tập lệnh này bằng root/sudo. Hãy chạy với tư cách người dùng thường.",
-      "error_unsupported": "Hệ điều hành không được hỗ trợ ({os}). Yoake chỉ hỗ trợ Arch Linux và các bản phân phối dựa trên Arch.",
+      "error_unsupported": "Hệ điều hành không được hỗ trợ ({os}). Kizashi chỉ hỗ trợ Arch Linux và các bản phân phối dựa trên Arch.",
       "error_not_found": "Không thể nhận diện hệ điều hành. Không tìm thấy /etc/os-release.",
       "unknown_cpu": "CPU không rõ",
       "unknown_gpu": "Không rõ / Máy ảo",
@@ -1336,9 +1336,9 @@
       "tagline": "Một desktop shell được xây dựng cho bạn",
       "support_creator": "Ủng hộ tác giả:",
       "buy_coffee": "Nếu bạn thích dự án này, hãy cân nhắc mời tôi một ly cà phê!",
-      "installed_success": "✔ Đã cài đặt thành công Yoake {ver} ({commit}).",
+      "installed_success": "✔ Đã cài đặt thành công Kizashi {ver} ({commit}).",
       "failed_packages": "Các gói sau đã gặp lỗi trong quá trình cài đặt:",
-      "restart_prompt": "Hãy khởi động lại compositor hoặc chạy 'yoaked start' để bắt đầu.",
+      "restart_prompt": "Hãy khởi động lại compositor hoặc chạy 'kizashid start' để bắt đầu.",
       "ask_reboot": "Bạn có muốn khởi động lại không? [y/n] "
     },
     "deps": {

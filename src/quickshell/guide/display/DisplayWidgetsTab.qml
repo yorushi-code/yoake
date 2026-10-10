@@ -202,8 +202,8 @@ Item {
         id: presetsLoader
         running: false
         command: {
-            let assetsDir = Caching.yoakeDir ? (Caching.yoakeDir + "/assets/widgets") : "";
-            let userDir = Caching.stateDir ? (Caching.stateDir + "/widgets/presets") : (Caching.home + "/.local/state/yoake/widgets/presets");
+            let assetsDir = Caching.kizashiDir ? (Caching.kizashiDir + "/assets/widgets") : "";
+            let userDir = Caching.stateDir ? (Caching.stateDir + "/widgets/presets") : (Caching.home + "/.local/state/kizashi/widgets/presets");
             let pyScript =
                 "import os, json, glob, sys\n" +
                 "assets_d = sys.argv[1]\n" +
@@ -364,7 +364,7 @@ Item {
 
     function deleteCustomPreset(presetName) {
         if (!presetName) return;
-        let userPath = Caching.stateDir ? (Caching.stateDir + "/widgets/presets") : (Caching.home + "/.local/state/yoake/widgets/presets");
+        let userPath = Caching.stateDir ? (Caching.stateDir + "/widgets/presets") : (Caching.home + "/.local/state/kizashi/widgets/presets");
         let sanitizeName = String(presetName).replace(/[^a-zA-Z0-9_\- ]/g, "").trim();
         let filePath = userPath + "/" + sanitizeName + ".json";
         let escapeBash = function(str) { return String(str).replace(/(["\\$`])/g, '\\$1'); };
@@ -376,7 +376,7 @@ Item {
     }
 
     function saveCustomPreset(presetName, monName, widgetsList) {
-        let userPath = Caching.stateDir ? (Caching.stateDir + "/widgets/presets") : (Caching.home + "/.local/state/yoake/widgets/presets");
+        let userPath = Caching.stateDir ? (Caching.stateDir + "/widgets/presets") : (Caching.home + "/.local/state/kizashi/widgets/presets");
         let sanitizeName = presetName.replace(/[^a-zA-Z0-9_\- ]/g, "").trim();
         if (sanitizeName === "") sanitizeName = "CustomPreset";
 
@@ -513,7 +513,7 @@ Item {
     }
 
     function openRedactor(mon) {
-        let dir = (typeof Caching !== "undefined" && Caching.yoakeDir) ? Caching.yoakeDir : "";
+        let dir = (typeof Caching !== "undefined" && Caching.kizashiDir) ? Caching.kizashiDir : "";
         let scriptPath = dir ? (dir + "/scripts/redactor.sh") : "redactor.sh";
         Quickshell.execDetached(["bash", scriptPath, mon || ""]);
         if (rootObj && typeof rootObj.closePopup === "function") {

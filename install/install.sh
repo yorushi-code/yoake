@@ -5,11 +5,11 @@ set -e
 setterm -blank 0 -powerdown 0 2>/dev/null || true
 printf '\033[9;0]' 2>/dev/null || true
 
-# --product yoake|serpantinum: what to install (asked when not given).
-#   yoake        this fork
+# --product kizashi|serpantinum: what to install (asked when not given).
+#   kizashi        this fork
 #   serpantinum  clean upstream, through its own installer (install/serpantinum.sh)
 # --yes / -y: no menus. The detected compositor (niri if none is found),
-# SDDM with its defaults, the full wallpaper pack. Implies yoake unless
+# SDDM with its defaults, the full wallpaper pack. Implies kizashi unless
 # --product says otherwise; upstream's installer has menus of its own.
 ASSUME_YES=false
 PRODUCT=""
@@ -26,29 +26,29 @@ done
 
 choose_product() {
     if [ "$ASSUME_YES" = true ]; then
-        PRODUCT=yoake
+        PRODUCT=kizashi
         return
     fi
     printf '\n  What should be installed?\n\n'
-    printf '    1) yoake        the fork: Fedora-first, niri, its own palette, VPN panel\n'
+    printf '    1) kizashi        the fork: Fedora-first, niri, its own palette, VPN panel\n'
     printf '    2) Serpantinum  clean upstream (ilyamiro/serpantinum), as its author ships it\n\n'
     local answer=""
     while [[ "$answer" != "1" && "$answer" != "2" ]]; do
         printf '  Choose 1 or 2: '
         read -r answer < /dev/tty || exit 1
     done
-    [ "$answer" = "1" ] && PRODUCT=yoake || PRODUCT=serpantinum
+    [ "$answer" = "1" ] && PRODUCT=kizashi || PRODUCT=serpantinum
 }
 
 [ -z "$PRODUCT" ] && choose_product
 case "$PRODUCT" in
-    yoake|serpantinum) ;;
-    *) echo "Unknown --product '$PRODUCT' (expected yoake or serpantinum)." >&2; exit 1 ;;
+    kizashi|serpantinum) ;;
+    *) echo "Unknown --product '$PRODUCT' (expected kizashi or serpantinum)." >&2; exit 1 ;;
 esac
 
-RAW_SLUG="${REPO_SLUG:-yorushi-code/yoake}"
+RAW_SLUG="${REPO_SLUG:-yorushi-code/kizashi}"
 REPO_SLUG="$(printf '%s' "$RAW_SLUG" | tr -d '\r\n\t ' | sed 's/[^a-zA-Z0-9_\/-]//g')"
-CACHE_BASE="${XDG_CACHE_HOME:-$HOME/.cache}/yoake-installer"
+CACHE_BASE="${XDG_CACHE_HOME:-$HOME/.cache}/kizashi-installer"
 export REPO_SLUG
 
 if [ -n "${BASH_SOURCE[0]}" ] && [ -f "${BASH_SOURCE[0]}" ]; then
@@ -84,7 +84,7 @@ if [ "$PRODUCT" = "serpantinum" ]; then
     exec bash "$INSTALL_DIR/serpantinum.sh" "${PASSTHROUGH[@]}"
 fi
 
-export YOAKE_DIR="$PROJECT_ROOT/src"
+export KIZASHI_DIR="$PROJECT_ROOT/src"
 export I18N_DIR="$PROJECT_ROOT/src/assets/languages"
 
 MODULES_DIR="$INSTALL_DIR/modules"
@@ -133,6 +133,9 @@ elif [[ "$INSTALL_STATE" == "fresh" || "$IS_REINSTALL" == true ]]; then
     backup_compositors "${SELECTED_COMPOSITORS[@]}"
 fi
 
+# Переезд yoake -> kizashi нужен при любой установке, а не только при legacy.
+migrate_yoake_to_kizashi
+
 install_dependencies "$INSTALL_STATE" "$IS_REINSTALL" "${SELECTED_COMPOSITORS[@]}"
 
 deploy_package "$PROJECT_ROOT" "$OLD_COMMIT" "$TARGET_COMMIT" "$IS_REINSTALL" "$INSTALL_STATE" "${SELECTED_COMPOSITORS[@]}"
@@ -140,14 +143,14 @@ setup_sddm "$PROJECT_ROOT" "$INSTALL_STATE" "$IS_REINSTALL"
 install_wallpapers "$INSTALL_FULL_WALLPAPERS"
 
 WALLPAPER_DIR=$(get_wallpaper_dir)
-init_yoake_config "$PROJECT_ROOT" "$WALLPAPER_DIR" "$INSTALL_STATE" "$IS_REINSTALL"
+init_kizashi_config "$PROJECT_ROOT" "$WALLPAPER_DIR" "$INSTALL_STATE" "$IS_REINSTALL"
 setup_session_extras "$PROJECT_ROOT" "$INSTALL_STATE" "$IS_REINSTALL"
 
 setup_services
 write_version_state "$TARGET_VERSION" "$TARGET_COMMIT" "$TELEMETRY_ID" "$ENABLE_TELEMETRY" "${SELECTED_COMPOSITORS[*]}"
 
 if [[ "$INSTALL_STATE" == "legacy" || "$INSTALL_STATE" == "fresh" || "$IS_REINSTALL" == true ]]; then
-    rm -f "$HOME/.local/state/yoake/first_launch.done" "$HOME/.local/state/quickshell/first_launch.done"
+    rm -f "$HOME/.local/state/kizashi/first_launch.done" "$HOME/.local/state/quickshell/first_launch.done"
 fi
 
 

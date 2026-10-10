@@ -12,11 +12,11 @@ Item {
     property string matugenBaseDir: {
         let dir = "";
         if (typeof Caching !== "undefined" && Caching.qsDir) {
-            dir = Caching.yoakeDir + "/assets/matugen";
-        } else if (typeof Caching !== "undefined" && Caching.yoakeDir) {
-            dir = Caching.yoakeDir + "/src/assets/matugen";
+            dir = Caching.kizashiDir + "/assets/matugen";
+        } else if (typeof Caching !== "undefined" && Caching.kizashiDir) {
+            dir = Caching.kizashiDir + "/src/assets/matugen";
         } else {
-            dir = Quickshell.env("HOME") + "/.local/share/yoake/src/assets/matugen";
+            dir = Quickshell.env("HOME") + "/.local/share/kizashi/src/assets/matugen";
         }
         return dir;
     }
@@ -152,11 +152,11 @@ Item {
         if (!imagePath || imagePath.trim() === "") {
             return false;
         }
-        // Слой yoake меряет палитру сам, в OKLCh. Все, кто меняет обои, уже
+        // Слой kizashi меряет палитру сам, в OKLCh. Все, кто меняет обои, уже
         // проходят через эту функцию, поэтому перехватывать достаточно здесь:
         // ни подборщик, ни вкладка темы не должны знать, что извлекатель другой.
-        if (typeof YoakePalette !== "undefined" && YoakePalette.active) {
-            return YoakePalette.regenerate(imagePath);
+        if (typeof KizashiPalette !== "undefined" && KizashiPalette.active) {
+            return KizashiPalette.regenerate(imagePath);
         }
         if (!root.isMatugenTheme()) {
             return false;
@@ -267,7 +267,7 @@ Item {
         let md3Json = JSON.stringify(md3Obj);
 
         let script =
-            "STATE_DIR=\"$HOME/.local/state/yoake\"; " +
+            "STATE_DIR=\"$HOME/.local/state/kizashi\"; " +
             "TMP_MD3=\"/tmp/matugen_synthetic_colors.json\"; " +
             "mkdir -p \"$STATE_DIR\" && " +
             "echo '" + rawJson.replace(/'/g, "'\\''") + "' > \"$STATE_DIR/qs_colors.json\" && " +
@@ -298,7 +298,7 @@ Item {
                 root._lastGeneratedStaticJson = root._currentStaticJson;
 
                 if (matugenProcess.reqType === "image") {
-                    let stateDir = (typeof Caching !== "undefined" && Caching.stateDir) ? Caching.stateDir : (Quickshell.env("HOME") + "/.local/state/yoake");
+                    let stateDir = (typeof Caching !== "undefined" && Caching.stateDir) ? Caching.stateDir : (Quickshell.env("HOME") + "/.local/state/kizashi");
                     Quickshell.execDetached(["bash", "-c", "mkdir -p \"" + stateDir + "\" && cp -f \"" + stateDir + "/qs_colors.json\" \"" + stateDir + "/qs_matugen_colors.json\" 2>/dev/null || true; killall -USR1 .kitty-wrapped 2>/dev/null || pkill -SIGUSR1 kitty 2>/dev/null || true"]);
                 } else {
                     Quickshell.execDetached(["bash", "-c", "killall -USR1 .kitty-wrapped 2>/dev/null || pkill -SIGUSR1 kitty 2>/dev/null || true"]);

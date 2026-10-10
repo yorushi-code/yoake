@@ -99,7 +99,7 @@ Item {
 
                                 Image {
                                     anchors.fill: parent
-                                    source: "file://" + rootObj.appPaths.yoakeDir + "/assets/logo.svg"
+                                    source: "file://" + rootObj.appPaths.kizashiDir + "/assets/logo.svg"
                                     sourceSize: Qt.size(512, 512)
                                     fillMode: Image.PreserveAspectFit
                                     smooth: true
@@ -235,7 +235,7 @@ Item {
                             // либо проходит целиком, либо не трогает рабочую
                             // копию вовсе, а quickshell перечитает файлы сам.
                             onTriggered: {
-                                let repo = rootObj.appPaths.yoakeDir + "/..";
+                                let repo = rootObj.appPaths.kizashiDir + "/..";
                                 let sync = "bash '" + repo + "/tools/sync-upstream.sh'";
                                 let cmd = "if command -v kitty >/dev/null 2>&1; then kitty --hold bash -c \"" + sync + "\"; else ${TERM:-xterm} -hold -e bash -c \"" + sync + "\"; fi";
                                 Quickshell.execDetached(["bash", "-c", cmd]);
@@ -406,7 +406,7 @@ Item {
                     accentColor: ThemeBackend.surface0
                     textColor: ThemeBackend.text
 
-                    onTriggered: Quickshell.execDetached(["xdg-open", "https://github.com/yorushi-code/yoake"])
+                    onTriggered: Quickshell.execDetached(["xdg-open", "https://github.com/yorushi-code/kizashi"])
                 }
 
                 ClickButton {

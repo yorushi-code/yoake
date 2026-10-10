@@ -213,7 +213,7 @@ Item {
     }
 
     function lockSession() {
-        Quickshell.execDetached(["bash", Caching.yoakeDir + "/scripts/lock.sh"]);
+        Quickshell.execDetached(["bash", Caching.kizashiDir + "/scripts/lock.sh"]);
     }
 
     function performLock() {

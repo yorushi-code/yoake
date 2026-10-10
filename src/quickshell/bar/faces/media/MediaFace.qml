@@ -68,7 +68,7 @@ Item {
                 height: mediaLayoutContainer.height
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onClicked: Quickshell.execDetached(["bash", "-c", Caching.yoakeDir + "/scripts/qs_manager.sh toggle music"])
+                onClicked: Quickshell.execDetached(["bash", "-c", Caching.kizashiDir + "/scripts/qs_manager.sh toggle music"])
 
                 Row {
                     id: infoLayout
